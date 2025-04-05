@@ -32,20 +32,32 @@
         </button>
     </div>
 
-    <!-- Persona Display -->
-    <div id="persona-display" class="hidden">
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <div id="persona-content" class="prose max-w-none">
-                <!-- Persona content will be displayed here -->
-            </div>
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center space-y-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p class="text-lg text-gray-700">Generating Persona...</p>
         </div>
     </div>
 
-    <!-- Loading Indicator -->
-    <div id="loading-indicator" class="hidden">
-        <div class="flex items-center justify-center space-x-2">
-            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
-            <span class="text-gray-600">Generating persona...</span>
+    <!-- Persona Display -->
+    <div id="persona-display" class="hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-xl font-bold text-gray-900">Generated Persona</h2>
+            <div class="flex space-x-4">
+                <button id="saveBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Save
+                </button>
+                <button id="downloadBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                    Download
+                </button>
+                <button id="shareBtn" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                    Share
+                </button>
+            </div>
+        </div>
+        <div id="persona-content" class="space-y-8">
+            <!-- Persona content will be dynamically inserted here -->
         </div>
     </div>
 
@@ -172,6 +184,7 @@ document.addEventListener('DOMContentLoaded', function() {
     let selectedInterviews = new Set();
     let currentPreviewType = null;
     let currentPreviewSection = null;
+    let currentPersonaData = null;
     
     // Load interviews when project is selected
     projectSelect.addEventListener('change', async function() {
@@ -410,16 +423,19 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate persona
     generateBtn.addEventListener('click', async function() {
-        const projectName = projectSelect.value;
-        if (!projectName || selectedInterviews.size === 0) return;
-        
+        if (selectedInterviews.size === 0) {
+            alert('Please select at least one interview');
+            return;
+        }
+
+        // Show loading indicator
+        loadingIndicator.classList.remove('hidden');
+        personaDisplay.classList.add('hidden');
+        errorMessage.classList.add('hidden');
+
         try {
-            console.log('Generating persona for project:', projectName);
             console.log('Selected interview IDs:', Array.from(selectedInterviews));
-            
-            loadingIndicator.classList.remove('hidden');
-            errorMessage.classList.add('hidden');
-            personaDisplay.classList.add('hidden');
+            console.log('Sending request to /generate_persona');
             
             const response = await fetch('/generate_persona', {
                 method: 'POST',
@@ -427,27 +443,44 @@ document.addEventListener('DOMContentLoaded', function() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    project_name: projectName,
+                    project_name: projectSelect.value,
                     interview_ids: Array.from(selectedInterviews)
                 })
             });
-            
+
             console.log('Response status:', response.status);
             const data = await response.json();
             console.log('Response data:', data);
-            
+
             if (!response.ok) {
+                console.error('Error response:', data);
                 throw new Error(data.error || 'Failed to generate persona');
             }
-            
-            personaContent.innerHTML = data.html;
+
+            // Hide loading indicator and show persona
+            loadingIndicator.classList.add('hidden');
             personaDisplay.classList.remove('hidden');
+            
+            // Check the structure of the persona data
+            console.log('Persona content type:', typeof data.html);
+            console.log('Persona content:', data.html);
+
+            if (!data.html) {
+                console.error('No HTML content in response');
+                throw new Error('No persona content received');
+            }
+
+            // Update persona content
+            console.log('Updating persona content element:', personaContent);
+            personaContent.innerHTML = data.html;
+            console.log('Persona content updated');
+
+            currentPersonaData = data;
         } catch (error) {
             console.error('Error generating persona:', error);
-            errorMessage.querySelector('p').textContent = error.message || 'Error generating persona. Please try again.';
-            errorMessage.classList.remove('hidden');
-        } finally {
             loadingIndicator.classList.add('hidden');
+            errorMessage.querySelector('p').textContent = 'Error generating persona. Please try again.';
+            errorMessage.classList.remove('hidden');
         }
     });
     
@@ -460,6 +493,113 @@ document.addEventListener('DOMContentLoaded', function() {
             interviewPreview.classList.add('hidden');
             currentPreviewType = null;
             currentPreviewSection = null;
+        }
+    });
+
+    // Save persona
+    const saveBtn = document.getElementById('saveBtn');
+    saveBtn.addEventListener('click', async function() {
+        if (!currentPersonaData) {
+            alert('No persona to save. Please generate a persona first.');
+            return;
+        }
+
+        try {
+            // Extract project name from the select element
+            const projectSelect = document.getElementById('project-select');
+            const projectName = projectSelect.value;
+            
+            if (!projectName) {
+                alert('Please select a project first.');
+                return;
+            }
+            
+            // Structure the data as expected by the API
+            const dataToSave = {
+                project_name: projectName,
+                persona_data: currentPersonaData.persona_data || currentPersonaData
+            };
+            
+            console.log('Saving persona data:', dataToSave);
+            
+            const response = await fetch('/api/save-persona', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(dataToSave)
+            });
+
+            const data = await response.json();
+
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to save persona');
+            }
+
+            alert('Persona saved successfully!');
+        } catch (error) {
+            console.error('Error saving persona:', error);
+            alert('Error saving persona. Please try again.');
+        }
+    });
+
+    // Download persona
+    const downloadBtn = document.getElementById('downloadBtn');
+    downloadBtn.addEventListener('click', function() {
+        if (!currentPersonaData) {
+            alert('No persona to download. Please generate a persona first.');
+            return;
+        }
+
+        const personaContent = document.getElementById('personaContent').innerHTML;
+        const projectName = currentPersonaData.project_name;
+        
+        // Create a blob with the HTML content
+        const blob = new Blob([personaContent], { type: 'text/html' });
+        const url = window.URL.createObjectURL(blob);
+        
+        // Create a temporary link and trigger download
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${projectName}_persona.html`;
+        document.body.appendChild(a);
+        a.click();
+        
+        // Clean up
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(a);
+    });
+
+    // Share persona
+    const shareBtn = document.getElementById('shareBtn');
+    shareBtn.addEventListener('click', function() {
+        if (!currentPersonaData) {
+            alert('No persona to share. Please generate a persona first.');
+            return;
+        }
+
+        // Get the current URL
+        const url = window.location.href;
+        
+        // Check if the browser supports the clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    alert('Link copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy link to clipboard');
+                });
+        } else {
+            // Fallback for browsers that don't support clipboard API
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Link copied to clipboard!');
         }
     });
 });

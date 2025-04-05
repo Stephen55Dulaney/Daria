@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, redirect, url_for, send_file, session, flash
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session
 from flask_socketio import SocketIO, emit
 from elevenlabs import stream
 from elevenlabs.client import ElevenLabs
@@ -215,10 +215,12 @@ def extract_value(prompt, field_name, context):
 
 # Initialize vector store
 try:
+    logger.info("Initializing vector store...")
     vector_store = InterviewVectorStore(openai_api_key=OPENAI_API_KEY)
     # Load all existing interviews into the vector store
     interviews = []
     if os.path.exists('interviews'):
+        logger.info("Loading existing interviews into vector store...")
         for filename in os.listdir('interviews'):
             if filename.endswith('.json'):
                 try:
@@ -228,20 +230,20 @@ try:
                         interview.setdefault('date', datetime.now().isoformat())
                         interview.setdefault('project_name', 'Unknown Project')
                         interview.setdefault('interview_type', 'Unknown Type')
-                        interview.setdefault('transcript', '')
-                        interview.setdefault('analysis', '')
                         interviews.append(interview)
                 except Exception as e:
                     logger.error(f"Error loading interview {filename}: {str(e)}")
-                    logger.error(traceback.format_exc())
                     continue
-    
-    if interviews:
-        vector_store.add_interviews(interviews)
-        vector_store.save_vector_store()
-        logger.info("Successfully initialized vector store with existing interviews")
+        
+        if interviews:
+            logger.info(f"Adding {len(interviews)} interviews to vector store...")
+            vector_store.add_interviews(interviews)
+            vector_store.save_vector_store()
+            logger.info("Vector store initialized successfully")
+        else:
+            logger.warning("No interviews found to load into vector store")
     else:
-        logger.warning("No interviews found to add to vector store")
+        logger.warning("Interviews directory not found")
 except Exception as e:
     logger.error(f"Error initializing vector store: {str(e)}")
     logger.error(traceback.format_exc())
@@ -320,44 +322,82 @@ def chat_page():
 
 @app.route('/')
 def home():
-    """Home page route"""
+    """Home page."""
     try:
         # Get recent interviews
         recent_interviews = []
+        INTERVIEWS_DIR = Path('interviews')
         if INTERVIEWS_DIR.exists():
-            interview_files = sorted(
-                [f for f in os.listdir(INTERVIEWS_DIR) if f.endswith('.json')],
-                key=lambda x: os.path.getmtime(INTERVIEWS_DIR / x),
-                reverse=True
-            )[:5]  # Get 5 most recent
-            
-            for filename in interview_files:
+            for file in sorted(INTERVIEWS_DIR.glob('*.json'), key=lambda x: x.stat().st_mtime, reverse=True)[:5]:
                 try:
-                    with open(INTERVIEWS_DIR / filename) as f:
-                        interview = json.load(f)
-                        # Ensure all required fields are present
-                        interview.setdefault('date', datetime.now().isoformat())
-                        interview.setdefault('project_name', 'Unknown Project')
-                        interview.setdefault('interview_type', 'Unknown Type')
-                        interview.setdefault('transcript', '')
-                        interview.setdefault('analysis', '')
-                        recent_interviews.append(interview)
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                        if all(key in data for key in ['id', 'project_name', 'interview_type', 'date']):
+                            recent_interviews.append(data)
                 except Exception as e:
-                    logger.error(f"Error loading interview {filename}: {str(e)}")
+                    logger.error(f"Error loading interview {file}: {str(e)}")
                     continue
         
         # Get recent personas
-        recent_personas = list_personas(limit=5)  # Get 5 most recent personas
+        recent_personas = []
+        PERSONAS_DIR = Path('personas')
+        if PERSONAS_DIR.exists():
+            for file in sorted(PERSONAS_DIR.glob('*.json'), key=lambda x: x.stat().st_mtime, reverse=True)[:5]:
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                        # Ensure all required fields are present
+                        if 'id' not in data:
+                            data['id'] = str(uuid.uuid4())
+                        if 'created_at' not in data:
+                            data['created_at'] = datetime.now().isoformat()
+                        if 'project_name' not in data:
+                            data['project_name'] = 'Unknown Project'
+                            # For Unknown Project items, set the ID to match the project name
+                            # This helps with deletion
+                            data['id'] = 'Unknown Project'
+                        recent_personas.append(data)
+                        logger.info(f"Loaded persona: {data.get('project_name')} with ID: {data.get('id')}")
+                except Exception as e:
+                    logger.error(f"Error loading persona {file}: {str(e)}")
+                    continue
         
-        return render_template('home.html', 
+        # Get recent journey maps
+        recent_journey_maps = []
+        JOURNEY_MAPS_DIR = Path('journey_maps')
+        if JOURNEY_MAPS_DIR.exists():
+            for file in sorted(JOURNEY_MAPS_DIR.glob('*.json'), key=lambda x: x.stat().st_mtime, reverse=True)[:5]:
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                        # Ensure the data has all required fields
+                        if 'id' not in data:
+                            data['id'] = str(uuid.uuid4())
+                        if 'created_at' not in data:
+                            data['created_at'] = datetime.now().isoformat()
+                        if 'project_name' not in data:
+                            data['project_name'] = 'Unknown Project'
+                            # For Unknown Project items, set the ID to match the project name
+                            # This helps with deletion
+                            data['id'] = 'Unknown Project'
+                        recent_journey_maps.append(data)
+                        logger.info(f"Loaded journey map: {data.get('project_name')} with ID: {data.get('id')}")
+                except Exception as e:
+                    logger.error(f"Error loading journey map {file}: {str(e)}")
+                    continue
+        
+        return render_template('home.html',
                              recent_interviews=recent_interviews,
-                             recent_personas=recent_personas)
+                             recent_personas=recent_personas,
+                             recent_journey_maps=recent_journey_maps)
     except Exception as e:
-        logger.error(f"Error in home route: {str(e)}")
+        logger.error(f"Error loading home page: {str(e)}")
         logger.error(traceback.format_exc())
-        return render_template('home.html', 
+        flash('Error loading home page', 'error')
+        return render_template('home.html',
                              recent_interviews=[],
-                             recent_personas=[])
+                             recent_personas=[],
+                             recent_journey_maps=[])
 
 @app.route('/new_interview')
 def new_interview():
@@ -1034,53 +1074,167 @@ def search_interviews():
         data = request.get_json()
         query = data.get('query')
         k = data.get('k', 5)  # Number of results to return
+        search_params = data.get('search_params', {})
 
         if not query:
+            logger.warning("No search query provided")
             return jsonify({'error': 'No search query provided'}), 400
 
         if not vector_store:
+            logger.error("Vector store not initialized")
             return jsonify({'error': 'Vector store not initialized'}), 500
 
-        # Perform the search
-        results = vector_store.search_interviews(query, k=k)
+        logger.info(f"Performing search with query: {query}")
+        
+        # Debug information to be sent to frontend
+        debug_info = {
+            'query': query,
+            'search_params': search_params,
+            'exact_matches': [],
+            'semantic_results': [],
+            'final_results': []
+        }
+        
+        # First try exact match search
+        exact_matches = []
+        for interview_id in vector_store.interview_ids:
+            try:
+                # Load the interview
+                interview_file = Path('interviews') / f"{interview_id}.json"
+                if not interview_file.exists():
+                    continue
+                    
+                with open(interview_file) as f:
+                    interview = json.load(f)
+                    
+                transcript = interview.get('transcript', '')
+                if not transcript:
+                    continue
+                    
+                # Look for exact matches in the transcript
+                for line in transcript.split('\n'):
+                    if line.startswith('You:'):
+                        response = line[4:].strip()
+                        # Check for exact match (case insensitive)
+                        if query.lower() in response.lower():
+                            match_info = {
+                                'interview_id': interview_id,
+                                'project_name': interview.get('project_name'),
+                                'response': response
+                            }
+                            debug_info['exact_matches'].append(match_info)
+                            
+                            exact_matches.append({
+                                'id': interview_id,
+                                'project_name': interview.get('project_name', 'Unknown Project'),
+                                'interview_type': interview.get('interview_type', 'Unknown Type'),
+                                'date': interview.get('date', ''),
+                                'transcript': transcript,
+                                'transcript_preview': response,
+                                'score': 1.0,  # Exact matches get highest score
+                                'match_type': 'Exact Match'
+                            })
+                            
+            except Exception as e:
+                logger.error(f"Error processing interview {interview_id}: {str(e)}")
+                continue
+                
+        # If we found exact matches, return those
+        if exact_matches:
+            debug_info['final_results'] = exact_matches[:k]
+            return jsonify({
+                'results': exact_matches[:k],
+                'debug_info': debug_info
+            })
+            
+        # If no exact matches, try semantic search
+        results = vector_store.semantic_search(query, k=k)
         
         if not results:
-            return jsonify({'message': 'No matching interviews found'})
+            return jsonify({
+                'results': [],
+                'debug_info': debug_info
+            })
 
         # Process and format results
         formatted_results = []
         for result in results:
-            interview_data = result['interview']
-            
-            # Format the transcript preview
-            transcript = interview_data.get('transcript', '')
-            transcript_preview = ''
-            if transcript:
-                # Extract user responses
-                responses = []
-                for line in transcript.split('\n'):
-                    if line.startswith('You:'):
-                        response = line[4:].strip()
-                        if len(response) > 10 and not any(x in response.lower() for x in ['start', 'yes, proceed', 'all right']):
-                            responses.append(response)
+            try:
+                result_debug = {
+                    'id': result.get('id'),
+                    'score': result.get('score', 0),
+                    'responses_found': 0,
+                    'most_relevant_response': None,
+                    'word_overlap': 0
+                }
                 
-                if responses:
-                    transcript_preview = ' '.join(responses)
-                    if len(transcript_preview) > 200:
-                        transcript_preview = transcript_preview[:200] + '...'
+                # Format the transcript preview
+                transcript = result.get('transcript', '')
+                transcript_preview = ''
+                
+                if transcript:
+                    # Extract user responses
+                    responses = []
+                    for line in transcript.split('\n'):
+                        if line.startswith('You:'):
+                            response = line[4:].strip()
+                            # Skip permission responses if exclude_permission is True
+                            if search_params.get('exclude_permission'):
+                                if any(x in response.lower() for x in ['yes, you have my', 'permission', 'proceed', 'yes, proceed', 'all right']):
+                                    continue
+                            # Skip short responses and system messages
+                            if len(response) > 10 and not any(x in response.lower() for x in ['start', 'yes, proceed', 'all right']):
+                                responses.append(response)
+                    
+                    if responses:
+                        result_debug['responses_found'] = len(responses)
+                        # Find the most relevant response
+                        most_relevant = None
+                        highest_overlap = 0
+                        for response in responses:
+                            # Calculate word overlap with query
+                            query_words = set(query.lower().split())
+                            response_words = set(response.lower().split())
+                            overlap = len(query_words & response_words)
+                            if overlap > highest_overlap:
+                                highest_overlap = overlap
+                                most_relevant = response
+                        
+                        if most_relevant:
+                            result_debug['most_relevant_response'] = most_relevant
+                            result_debug['word_overlap'] = highest_overlap
+                            transcript_preview = most_relevant
+                            if len(transcript_preview) > 200:
+                                transcript_preview = transcript_preview[:200] + '...'
 
-            formatted_result = {
-                'id': interview_data.get('id'),
-                'project_name': interview_data.get('project_name'),
-                'interview_type': interview_data.get('interview_type'),
-                'date': interview_data.get('date'),
-                'transcript_preview': transcript_preview,
-                'score': result.get('score', 0),
-                'match_type': 'Semantic Match'
-            }
-            formatted_results.append(formatted_result)
+                # Check if the result meets minimum relevance threshold
+                min_relevance = search_params.get('min_relevance', 0.3)  # Default to 0.3 if not specified
+                if result.get('score', 0) < min_relevance:
+                    result_debug['skipped'] = True
+                    result_debug['reason'] = f"Score {result.get('score', 0)} below threshold {min_relevance}"
+                    debug_info['semantic_results'].append(result_debug)
+                    continue
 
-        return jsonify({'results': formatted_results})
+                formatted_result = {
+                    'id': result.get('id'),
+                    'project_name': result.get('project_name'),
+                    'interview_type': result.get('interview_type'),
+                    'date': result.get('date'),
+                    'transcript_preview': transcript_preview,
+                    'score': result.get('score', 0),
+                    'match_type': 'Semantic Match'
+                }
+                formatted_results.append(formatted_result)
+                debug_info['semantic_results'].append(result_debug)
+            except Exception as e:
+                logger.error(f"Error processing search result: {str(e)}")
+                continue
+
+        debug_info['final_results'] = formatted_results
+        return jsonify({
+            'results': formatted_results,
+            'debug_info': debug_info
+        })
 
     except Exception as e:
         logger.error(f"Error in search_interviews: {str(e)}")
@@ -1391,20 +1545,147 @@ Please ensure your response is a valid JSON object with all the sections and fie
         """
         
         logger.info("Generated HTML content")
-        return jsonify({'html': html})
+        return jsonify({
+            'html': html,
+            'persona_data': persona_data
+        })
         
     except Exception as e:
         logger.error(f"Error generating persona: {str(e)}")
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
-@app.route('/persona/<persona_id>')
-def view_persona(persona_id):
-    """View a specific persona."""
-    persona = load_persona(persona_id)
-    if not persona:
+@app.route('/api/save-persona', methods=['POST'])
+def save_persona_api():
+    """Save a generated persona."""
+    try:
+        data = request.get_json()
+        project_name = data.get('project_name')
+        persona_data = data.get('persona_data')
+        
+        if not project_name or not persona_data:
+            return jsonify({'error': 'Project name and persona data are required'}), 400
+        
+        # Create personas directory if it doesn't exist
+        PERSONAS_DIR = Path('personas')
+        PERSONAS_DIR.mkdir(exist_ok=True)
+        
+        # Generate a unique filename based on project name and timestamp
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"{project_name}_{timestamp}.json"
+        file_path = PERSONAS_DIR / filename
+        
+        # Save the persona data with metadata
+        persona_data_with_metadata = {
+            'id': str(uuid.uuid4()),
+            'project_name': project_name,
+            'created_at': datetime.now().isoformat(),
+            'persona_data': persona_data
+        }
+        
+        with open(file_path, 'w') as f:
+            json.dump(persona_data_with_metadata, f, indent=2)
+        
+        logger.info(f"Saved persona to {file_path}")
+        return jsonify({'message': 'Persona saved successfully', 'filename': filename})
+        
+    except Exception as e:
+        logger.error(f"Error saving persona: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/personas')
+def list_personas():
+    """List all saved personas."""
+    try:
+        PERSONAS_DIR = Path('personas')
+        if not PERSONAS_DIR.exists():
+            return jsonify([])
+        
+        personas = []
+        for file in PERSONAS_DIR.glob('*.json'):
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    personas.append({
+                        'id': data.get('id'),
+                        'project_name': data.get('project_name'),
+                        'created_at': data.get('created_at'),
+                        'filename': file.name
+                    })
+            except Exception as e:
+                logger.error(f"Error reading persona file {file}: {str(e)}")
+                continue
+        
+        # Sort personas by creation date, most recent first
+        personas.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        return jsonify(personas)
+        
+    except Exception as e:
+        logger.error(f"Error listing personas: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/personas/<persona_id>')
+def get_persona(persona_id):
+    """Get a specific persona by ID."""
+    try:
+        PERSONAS_DIR = Path('personas')
+        if not PERSONAS_DIR.exists():
+            return jsonify({'error': 'Persona not found'}), 404
+        
+        for file in PERSONAS_DIR.glob('*.json'):
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    if data.get('id') == persona_id:
+                        return jsonify(data)
+            except Exception as e:
+                logger.error(f"Error reading persona file {file}: {str(e)}")
+                continue
+        
         return jsonify({'error': 'Persona not found'}), 404
-    return render_template('view_persona.html', persona=persona)
+        
+    except Exception as e:
+        logger.error(f"Error getting persona: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/view-persona/<persona_id>')
+def view_persona(persona_id):
+    """View a saved persona."""
+    try:
+        PERSONAS_DIR = Path('personas')
+        if not PERSONAS_DIR.exists():
+            flash('Persona not found', 'error')
+            return redirect(url_for('home'))
+        
+        # Find the file with the matching ID
+        for file in PERSONAS_DIR.glob('*.json'):
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    if data.get('id') == persona_id:
+                        # If download parameter is present, return the JSON file
+                        if request.args.get('download'):
+                            return send_file(
+                                file,
+                                as_attachment=True,
+                                download_name=f"{data.get('project_name', 'persona')}.json"
+                            )
+                        return render_template('view_persona.html', 
+                                             persona=data)
+            except Exception as e:
+                logger.error(f"Error reading persona {file}: {str(e)}")
+                continue
+        
+        flash('Persona not found', 'error')
+        return redirect(url_for('home'))
+    except Exception as e:
+        logger.error(f"Error viewing persona: {str(e)}")
+        logger.error(traceback.format_exc())
+        flash('Error viewing persona', 'error')
+        return redirect(url_for('home'))
 
 @app.route('/generate_journey_map', methods=['POST'])
 def generate_journey_map():
@@ -1924,6 +2205,227 @@ Format the report in a clear, professional manner using markdown."""
     except Exception as e:
         logger.error(f"Error generating report: {str(e)}")
         logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+# Add new routes for journey maps
+@app.route('/api/save-journey-map', methods=['POST'])
+def save_journey_map():
+    """Save a journey map to JSON file."""
+    try:
+        data = request.json
+        project_name = data.get('project_name')
+        journey_map_data = data.get('journey_map_data')
+        
+        if not project_name or not journey_map_data:
+            return jsonify({'error': 'Missing project name or journey map data'}), 400
+        
+        # Create journey maps directory if it doesn't exist
+        JOURNEY_MAPS_DIR = Path('journey_maps')
+        JOURNEY_MAPS_DIR.mkdir(exist_ok=True)
+        
+        # Generate a unique ID
+        journey_map_id = str(uuid.uuid4())
+        
+        # Generate a unique filename
+        timestamp = datetime.now().strftime('%Y%m%d_%H%M%S')
+        filename = f"{project_name}_{timestamp}.json"
+        filepath = JOURNEY_MAPS_DIR / filename
+        
+        # Save the journey map data
+        with open(filepath, 'w') as f:
+            json.dump({
+                'id': journey_map_id,
+                'project_name': project_name,
+                'journey_map_data': journey_map_data,
+                'created_at': datetime.now().isoformat()
+            }, f, indent=2)
+        
+        return jsonify({
+            'success': True,
+            'message': 'Journey map saved successfully',
+            'id': journey_map_id
+        })
+    except Exception as e:
+        logger.error(f"Error saving journey map: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/journey-maps', methods=['GET'])
+def list_journey_maps():
+    """List all saved journey maps."""
+    try:
+        JOURNEY_MAPS_DIR = Path('journey_maps')
+        if not JOURNEY_MAPS_DIR.exists():
+            return jsonify([])
+        
+        journey_maps = []
+        for file in JOURNEY_MAPS_DIR.glob('*.json'):
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    journey_maps.append({
+                        'id': data.get('id', str(uuid.uuid4())),
+                        'project_name': data.get('project_name', 'Unknown Project'),
+                        'created_at': data.get('created_at', ''),
+                        'filename': file.name
+                    })
+            except Exception as e:
+                logger.error(f"Error reading journey map {file}: {str(e)}")
+                continue
+        
+        # Sort by creation date, newest first
+        journey_maps.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        return jsonify(journey_maps)
+    except Exception as e:
+        logger.error(f"Error listing journey maps: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/journey-maps/<journey_map_id>', methods=['GET'])
+def get_journey_map(journey_map_id):
+    """Get a specific journey map by ID."""
+    try:
+        JOURNEY_MAPS_DIR = Path('journey_maps')
+        if not JOURNEY_MAPS_DIR.exists():
+            return jsonify({'error': 'Journey map not found'}), 404
+        
+        # Find the file with the matching ID
+        for file in JOURNEY_MAPS_DIR.glob('*.json'):
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    if data.get('id') == journey_map_id:
+                        return jsonify(data)
+            except Exception as e:
+                logger.error(f"Error reading journey map {file}: {str(e)}")
+                continue
+        
+        return jsonify({'error': 'Journey map not found'}), 404
+    except Exception as e:
+        logger.error(f"Error getting journey map: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/view-journey-map/<journey_map_id>')
+def view_journey_map(journey_map_id):
+    """View a saved journey map."""
+    try:
+        JOURNEY_MAPS_DIR = Path('journey_maps')
+        if not JOURNEY_MAPS_DIR.exists():
+            flash('Journey map not found', 'error')
+            return redirect(url_for('home'))
+        
+        # Find the file with the matching ID
+        for file in JOURNEY_MAPS_DIR.glob('*.json'):
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    if data.get('id') == journey_map_id:
+                        # If download parameter is present, return the JSON file
+                        if request.args.get('download'):
+                            return send_file(
+                                file,
+                                as_attachment=True,
+                                download_name=f"{data.get('project_name', 'journey_map')}.json"
+                            )
+                        return render_template('view_journey_map.html', 
+                                             journey_map=data)
+            except Exception as e:
+                logger.error(f"Error reading journey map {file}: {str(e)}")
+                continue
+        
+        flash('Journey map not found', 'error')
+        return redirect(url_for('home'))
+    except Exception as e:
+        logger.error(f"Error viewing journey map: {str(e)}")
+        logger.error(traceback.format_exc())
+        flash('Error loading journey map', 'error')
+        return redirect(url_for('home'))
+
+@app.route('/delete_persona/<persona_id>', methods=['POST'])
+def delete_persona_route(persona_id):
+    """Delete a persona."""
+    try:
+        # Check if personas directory exists
+        PERSONAS_DIR = Path('personas')
+        if not PERSONAS_DIR.exists():
+            return jsonify({'error': 'Personas directory not found'}), 404
+        
+        # If the persona_id is "Unknown Project", find and delete the most recent persona with that project name
+        if persona_id == "Unknown Project":
+            persona_files = sorted(PERSONAS_DIR.glob('*.json'), key=lambda x: x.stat().st_mtime, reverse=True)
+            for file in persona_files:
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                        if data.get('project_name') == 'Unknown Project':
+                            os.remove(file)
+                            logger.info(f"Deleted persona file: {file}")
+                            return jsonify({'message': 'Persona deleted successfully'})
+                except Exception as e:
+                    logger.error(f"Error reading persona file {file}: {str(e)}")
+                    continue
+            return jsonify({'error': 'Persona not found'}), 404
+        
+        # For regular persona IDs, find and delete the specific file
+        for file in PERSONAS_DIR.glob('*.json'):
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    if data.get('id') == persona_id:
+                        os.remove(file)
+                        logger.info(f"Deleted persona file: {file}")
+                        return jsonify({'message': 'Persona deleted successfully'})
+            except Exception as e:
+                logger.error(f"Error reading persona file {file}: {str(e)}")
+                continue
+        
+        return jsonify({'error': 'Persona not found'}), 404
+    except Exception as e:
+        logger.error(f"Error deleting persona: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/delete_journey_map/<journey_map_id>', methods=['POST'])
+def delete_journey_map_route(journey_map_id):
+    """Delete a journey map."""
+    try:
+        # Check if journey_maps directory exists
+        JOURNEY_MAPS_DIR = Path('journey_maps')
+        if not JOURNEY_MAPS_DIR.exists():
+            return jsonify({'error': 'Journey maps directory not found'}), 404
+        
+        # If the journey_map_id is "Unknown Project", find and delete the most recent journey map with that project name
+        if journey_map_id == "Unknown Project":
+            journey_map_files = sorted(JOURNEY_MAPS_DIR.glob('*.json'), key=lambda x: x.stat().st_mtime, reverse=True)
+            for file in journey_map_files:
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                        if data.get('project_name') == 'Unknown Project':
+                            os.remove(file)
+                            logger.info(f"Deleted journey map file: {file}")
+                            return jsonify({'message': 'Journey map deleted successfully'})
+                except Exception as e:
+                    logger.error(f"Error reading journey map file {file}: {str(e)}")
+                    continue
+            return jsonify({'error': 'Journey map not found'}), 404
+        
+        # For regular journey map IDs, find and delete the specific file
+        for file in JOURNEY_MAPS_DIR.glob('*.json'):
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    if data.get('id') == journey_map_id:
+                        os.remove(file)
+                        logger.info(f"Deleted journey map file: {file}")
+                        return jsonify({'message': 'Journey map deleted successfully'})
+            except Exception as e:
+                logger.error(f"Error reading journey map file {file}: {str(e)}")
+                continue
+        
+        return jsonify({'error': 'Journey map not found'}), 404
+    except Exception as e:
+        logger.error(f"Error deleting journey map: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

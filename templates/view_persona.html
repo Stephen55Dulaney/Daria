@@ -1,89 +1,203 @@
 {% extends "base.html" %}
 
-{% block content %}
-<div class="container">
-    <div class="row">
-        <div class="col-md-8 offset-md-2">
-            <!-- Breadcrumb -->
-            <nav aria-label="breadcrumb" class="mb-4">
-                <ol class="breadcrumb">
-                    <li class="breadcrumb-item"><a href="{{ url_for('home') }}">Home</a></li>
-                    <li class="breadcrumb-item"><a href="{{ url_for('persona') }}">Personas</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">{{ persona.project_name }}</li>
-                </ol>
-            </nav>
+{% block title %}View Persona{% endblock %}
 
-            <!-- Persona Card -->
-            <div class="card">
-                <div class="card-header d-flex justify-content-between align-items-center">
-                    <h1 class="h3 mb-0">{{ persona.project_name }}</h1>
-                    <small class="text-muted">Created {{ persona.date.split('T')[0] }}</small>
-                </div>
-                <div class="card-body">
-                    <!-- Render markdown content -->
-                    <div class="persona-content markdown-body">
-                        {{ persona.content | markdown }}
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+        <a href="{{ url_for('home') }}" class="text-blue-600 hover:text-blue-800">← Back to Home</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">Persona: {{ persona.project_name }}</h1>
+            <div class="flex space-x-4">
+                <button id="downloadBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                    Download
+                </button>
+                <button id="shareBtn" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                    Share
+                </button>
+            </div>
+        </div>
+        
+        <div class="text-sm text-gray-500 mb-6">
+            Created: {{ persona.created_at }}
+        </div>
+        
+        <div id="personaContent" class="space-y-8">
+            <div class="demographics-section bg-blue-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-blue-800 mb-4">Demographics</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Age Range</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.age_range }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Gender</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.gender }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Occupation</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.occupation }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Location</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.location }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Education</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.education }}</p>
                     </div>
                 </div>
-                <div class="card-footer">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <div>
-                            <strong>Elements included:</strong>
-                            {% for element in persona.elements %}
-                            <span class="badge bg-secondary me-1">{{ element }}</span>
+            </div>
+            
+            <div class="goals-section bg-green-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">Goals & Motivations</h2>
+                <div class="space-y-4">
+                    {% for goal in persona.persona_data.goals %}
+                    <div class="goal-card bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-green-700 mb-2">{{ goal.goal }}</h3>
+                        <p class="text-gray-600 mb-2">{{ goal.motivation }}</p>
+                        <div class="mt-2">
+                            <p class="text-sm font-medium text-green-600">Supporting Quotes:</p>
+                            <ul class="list-disc list-inside text-sm text-gray-600">
+                                {% for quote in goal.supporting_quotes %}
+                                <li>{{ quote }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="behaviors-section bg-yellow-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-yellow-800 mb-4">Behaviors & Habits</h2>
+                <div class="space-y-4">
+                    {% for behavior in persona.persona_data.behaviors %}
+                    <div class="behavior-card bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-yellow-700 mb-2">{{ behavior.behavior }}</h3>
+                        <p class="text-gray-600 mb-2">Frequency: {{ behavior.frequency }}</p>
+                        <p class="text-gray-600 mb-2">Context: {{ behavior.context }}</p>
+                        <div class="mt-2">
+                            <p class="text-sm font-medium text-yellow-600">Supporting Quotes:</p>
+                            <ul class="list-disc list-inside text-sm text-gray-600">
+                                {% for quote in behavior.supporting_quotes %}
+                                <li>{{ quote }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="pain-points-section bg-red-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-red-800 mb-4">Pain Points</h2>
+                <div class="space-y-4">
+                    {% for pain_point in persona.persona_data.pain_points %}
+                    <div class="pain-point-card bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-red-700 mb-2">{{ pain_point.pain_point }}</h3>
+                        <p class="text-gray-600 mb-2">Impact: {{ pain_point.impact }}</p>
+                        <div class="mt-2">
+                            <p class="text-sm font-medium text-red-600">Supporting Quotes:</p>
+                            <ul class="list-disc list-inside text-sm text-gray-600">
+                                {% for quote in pain_point.supporting_quotes %}
+                                <li>{{ quote }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="needs-section bg-purple-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-purple-800 mb-4">Needs & Preferences</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Needs</h3>
+                        <div class="space-y-4">
+                            {% for need in persona.persona_data.needs %}
+                            <div class="need-card bg-white p-4 rounded-lg shadow-sm">
+                                <h4 class="font-semibold text-purple-600 mb-2">{{ need.need }}</h4>
+                                <p class="text-gray-600 mb-2">Priority: {{ need.priority }}</p>
+                                <div class="mt-2">
+                                    <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
+                                    <ul class="list-disc list-inside text-sm text-gray-600">
+                                        {% for quote in need.supporting_quotes %}
+                                        <li>{{ quote }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
                             {% endfor %}
                         </div>
-                        <a href="{{ url_for('persona') }}?project={{ persona.project_name }}" class="btn btn-primary">
-                            Edit Persona
-                        </a>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Preferences</h3>
+                        <div class="space-y-4">
+                            {% for preference in persona.persona_data.preferences %}
+                            <div class="preference-card bg-white p-4 rounded-lg shadow-sm">
+                                <h4 class="font-semibold text-purple-600 mb-2">{{ preference.preference }}</h4>
+                                <p class="text-gray-600 mb-2">Reason: {{ preference.reason }}</p>
+                                <div class="mt-2">
+                                    <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
+                                    <ul class="list-disc list-inside text-sm text-gray-600">
+                                        {% for quote in preference.supporting_quotes %}
+                                        <li>{{ quote }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
 
-<style>
-.markdown-body {
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-    font-size: 16px;
-    line-height: 1.5;
-    word-wrap: break-word;
-}
-
-.markdown-body h1,
-.markdown-body h2,
-.markdown-body h3 {
-    margin-top: 24px;
-    margin-bottom: 16px;
-    font-weight: 600;
-    line-height: 1.25;
-}
-
-.markdown-body h2 {
-    padding-bottom: 0.3em;
-    border-bottom: 1px solid #eaecef;
-}
-
-.markdown-body blockquote {
-    padding: 0 1em;
-    color: #6a737d;
-    border-left: 0.25em solid #dfe2e5;
-    margin: 0 0 16px 0;
-}
-
-.markdown-body ul,
-.markdown-body ol {
-    padding-left: 2em;
-    margin-bottom: 16px;
-}
-
-.markdown-body li {
-    margin: 0.25em 0;
-}
-
-.badge {
-    text-transform: capitalize;
-}
-</style>
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const downloadBtn = document.getElementById('downloadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    
+    // Download functionality
+    downloadBtn.addEventListener('click', function() {
+        window.location.href = window.location.href + '?download=true';
+    });
+    
+    // Share functionality
+    shareBtn.addEventListener('click', function() {
+        // Get the current URL
+        const url = window.location.href;
+        
+        // Check if the browser supports the clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    alert('Link copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy link to clipboard');
+                });
+        } else {
+            // Fallback for browsers that don't support clipboard API
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Link copied to clipboard!');
+        }
+    });
+});
+</script>
 {% endblock %} 

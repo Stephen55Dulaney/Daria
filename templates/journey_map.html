@@ -23,10 +23,18 @@
     </div>
 
     <!-- Create Journey Map Button -->
-    <div class="flex justify-end mb-8">
+    <div class="flex justify-start mb-8">
         <button id="createMapBtn" disabled class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
             Create Journey Map
         </button>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loadingIndicator" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+        <div class="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center space-y-4">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+            <p class="text-lg text-gray-700">Generating Journey Map...</p>
+        </div>
     </div>
 
     <!-- Journey Map Display Area -->
@@ -34,6 +42,9 @@
         <div class="flex justify-between items-center mb-6">
             <h2 class="text-2xl font-semibold text-gray-900">Journey Map</h2>
             <div class="flex space-x-4">
+                <button id="saveBtn" class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2">
+                    Save
+                </button>
                 <button id="downloadBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
                     Download
                 </button>
@@ -66,9 +77,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const previewTooltip = document.getElementById('previewTooltip');
     const previewTitle = document.getElementById('previewTitle');
     const previewContent = document.getElementById('previewContent');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const saveBtn = document.getElementById('saveBtn');
     
     let selectedInterviews = new Set();
     let currentTimeout;
+    let currentJourneyMapData = null;
 
     // Load interviews when project is selected
     projectSelect.addEventListener('change', async function() {
@@ -193,15 +207,18 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        console.log('Selected interview IDs:', Array.from(selectedInterviews));
-        journeyMapDisplay.classList.remove('hidden');
+        // Show loading indicator
+        loadingIndicator.classList.remove('hidden');
+        journeyMapDisplay.classList.add('hidden');
 
         try {
+            console.log('Selected interview IDs:', Array.from(selectedInterviews));
             console.log('Sending request to /api/journey-map');
+            
             const response = await fetch('/api/journey-map', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     interview_ids: Array.from(selectedInterviews)
@@ -214,23 +231,77 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (!response.ok) {
                 console.error('Error response:', data);
-                throw new Error(data.error || 'Failed to create journey map');
+                throw new Error(data.error || 'Failed to generate journey map');
             }
+
+            // Hide loading indicator and show journey map
+            loadingIndicator.classList.add('hidden');
+            journeyMapDisplay.classList.remove('hidden');
+            
+            // Check the structure of the journey map data
+            console.log('Journey map content type:', typeof data.html);
+            console.log('Journey map content:', data.html);
 
             if (!data.html) {
                 console.error('No HTML content in response');
                 throw new Error('No journey map content received');
             }
 
-            console.log('Received HTML content length:', data.html.length);
-            document.getElementById('journeyMapContent').innerHTML = data.html;
+            // Store the journey map data for saving
+            currentJourneyMapData = data.html;
+
+            // Update journey map content
+            const journeyMapContent = document.getElementById('journeyMapContent');
+            console.log('Updating journey map content element:', journeyMapContent);
+            journeyMapContent.innerHTML = data.html;
+            console.log('Journey map content updated');
+
         } catch (error) {
-            console.error('Error creating journey map:', error);
-            document.getElementById('journeyMapContent').innerHTML = `
-                <div class="error-message p-4 bg-red-50 rounded-lg">
-                    <p class="text-red-600">Error: ${error.message}</p>
-                </div>
-            `;
+            console.error('Error generating journey map:', error);
+            alert('Error generating journey map: ' + error.message);
+            loadingIndicator.classList.add('hidden');
+        }
+    });
+
+    // Save journey map
+    saveBtn.addEventListener('click', async function() {
+        if (!currentJourneyMapData) {
+            alert('No journey map to save. Please generate a journey map first.');
+            return;
+        }
+
+        const projectName = projectSelect.value;
+        if (!projectName) {
+            alert('Please select a project first.');
+            return;
+        }
+
+        try {
+            const response = await fetch('/api/save-journey-map', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    project_name: projectName,
+                    journey_map_data: currentJourneyMapData
+                })
+            });
+
+            const data = await response.json();
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to save journey map');
+            }
+
+            alert('Journey map saved successfully!');
+            
+            // Optionally redirect to the view page
+            // window.location.href = `/view-journey-map/${data.id}`;
+            
+        } catch (error) {
+            console.error('Error saving journey map:', error);
+            alert('Error saving journey map: ' + error.message);
         }
     });
 

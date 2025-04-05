@@ -71,151 +71,197 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Search functionality
     async function performSearch() {
-        const query = searchInput.value.trim();
+        const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
 
-        // Show spinner and results container
+        // Show loading indicator
+        const searchResults = document.getElementById('searchResults');
+        const searchSpinner = document.getElementById('searchSpinner');
+        const searchContent = document.getElementById('searchContent');
+        
         searchResults.style.display = 'block';
         searchSpinner.style.display = 'block';
         searchContent.innerHTML = '';
+
+        const searchParams = {
+            include_answers: true,
+            include_analysis: true,
+            exclude_permission: true,
+            min_relevance: 0.5
+        };
 
         try {
             const response = await fetch('/search_interviews', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
                     query: query,
-                    k: 10  // Request more results
+                    k: 5,
+                    search_params: searchParams
                 })
             });
 
-            if (!response.ok) {
-                const errorData = await response.json();
-                throw new Error(errorData.details || 'Failed to search interviews');
-            }
-
             const data = await response.json();
             
-            if (data.message) {
-                // No results found
-                searchContent.innerHTML = `<div class="alert alert-info">${data.message}</div>`;
-            } else if (data.results && data.results.length > 0) {
-                // Display results
-                displaySearchResults(data.results);
-            } else {
-                searchContent.innerHTML = '<div class="alert alert-warning">No matching responses found.</div>';
+            // Debug information display
+            console.group('Search Debug Information');
+            console.log('Query:', data.debug_info.query);
+            console.log('Search Parameters:', data.debug_info.search_params);
+            
+            if (data.debug_info.exact_matches.length > 0) {
+                console.group('Exact Matches Found');
+                data.debug_info.exact_matches.forEach(match => {
+                    console.log('Interview:', match.interview_id);
+                    console.log('Project:', match.project_name);
+                    console.log('Response:', match.response);
+                    console.log('---');
+                });
+                console.groupEnd();
             }
-        } catch (error) {
-            console.error('Search error:', error);
-            searchContent.innerHTML = `
-                <div class="alert alert-danger">
-                    Error performing search: ${error.message}
-                </div>
-            `;
-        } finally {
+            
+            if (data.debug_info.semantic_results.length > 0) {
+                console.group('Semantic Search Results');
+                data.debug_info.semantic_results.forEach(result => {
+                    console.log('Interview ID:', result.id);
+                    console.log('Score:', result.score);
+                    console.log('Responses Found:', result.responses_found);
+                    if (result.most_relevant_response) {
+                        console.log('Most Relevant Response:', result.most_relevant_response);
+                        console.log('Word Overlap:', result.word_overlap);
+                    }
+                    if (result.skipped) {
+                        console.log('Skipped:', result.reason);
+                    }
+                    console.log('---');
+                });
+                console.groupEnd();
+            }
+            
+            console.log('Final Results:', data.debug_info.final_results.length);
+            console.groupEnd();
+            
+            // Hide spinner and display results
             searchSpinner.style.display = 'none';
+            displaySearchResults(data.results);
+        } catch (error) {
+            console.error('Error performing search:', error);
+            searchSpinner.style.display = 'none';
+            searchContent.innerHTML = '<p class="text-red-500">Error performing search</p>';
         }
     }
 
     function displaySearchResults(results) {
-        const resultsContainer = document.getElementById('searchResults');
-        resultsContainer.innerHTML = '';
-        
-        // Log the full results object to console
-        console.log('Search Results:', results);
+        const searchContent = document.getElementById('searchContent');
         
         if (!results || results.length === 0) {
-            resultsContainer.innerHTML = '<p class="text-gray-500">No interviews found matching your search.</p>';
+            searchContent.innerHTML = '<p class="text-gray-500">No interviews found matching your search.</p>';
             return;
         }
 
-        results.forEach(result => {
-            const card = document.createElement('div');
-            card.className = 'bg-white rounded-lg shadow-md p-6 mb-4';
-            
-            // Format date
-            const date = new Date(result.date);
-            const formattedDate = date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
+        searchContent.innerHTML = ''; // Clear previous results
+
+        // Separate exact matches and semantic matches
+        const exactMatches = results.filter(r => r.match_type === 'Exact Match');
+        const semanticMatches = results.filter(r => r.match_type === 'Semantic Match');
+
+        // Function to create result cards
+        function createResultCards(results) {
+            const flexContainer = document.createElement('div');
+            flexContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6';
+
+            results.forEach((result, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-lg shadow p-4 relative group cursor-pointer hover:shadow-lg transition-all duration-200';
+                
+                // Format date
+                const date = new Date(result.date);
+                const formattedDate = date.toLocaleDateString('en-US', {
+                    year: 'numeric',
+                    month: 'long',
+                    day: 'numeric'
+                });
+
+                // Calculate relevance percentage
+                const relevancePercentage = (result.score * 100).toFixed(1);
+
+                // Get the matched content preview
+                const contentPreview = result.transcript_preview || '';
+                const matchType = result.match_type || 'Content Match';
+                
+                // Create the card content
+                card.innerHTML = `
+                    <div class="mb-2">
+                        <h3 class="text-lg font-semibold text-gray-900">Project Name: ${result.project_name || 'Unknown Project'}</h3>
+                        <p class="text-sm text-gray-600">Interview Type: ${result.interview_type || 'Unknown Type'}</p>
+                        <p class="text-sm text-gray-500 mb-2">Date: ${formattedDate}</p>
+                        <div class="flex flex-col gap-2">
+                            <a href="/transcript/${result.id}" class="inline-flex items-center justify-center px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors" style="width: 100px;">
+                                Transcript
+                            </a>
+                            <a href="/analysis/${result.id}" class="inline-flex items-center justify-center px-3 py-1 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors" style="width: 100px;">
+                                Analysis
+                            </a>
+                            <a href="/metadata/${result.id}" class="inline-flex items-center justify-center px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded hover:bg-purple-200 transition-colors" style="width: 100px;">
+                                Metadata
+                            </a>
+                        </div>
+                    </div>
+                    <div class="absolute bottom-4 right-4">
+                        <div class="text-sm text-gray-500 relative cursor-pointer tooltip-trigger">
+                            <span>${matchType}: ${relevancePercentage}%</span>
+                            <div class="tooltip-content absolute right-0 -top-20 w-64 z-50 bg-gray-800 text-white text-sm rounded p-3 shadow-xl transition-all duration-200" 
+                                 style="visibility: hidden; opacity: 0;">
+                                <div class="font-medium mb-1">Matched Content:</div>
+                                <div class="text-gray-200 text-xs">${contentPreview}</div>
+                                <div class="absolute bottom-0 right-4 transform translate-y-1/2">
+                                    <div class="border-8 border-transparent border-t-gray-800"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                flexContainer.appendChild(card);
+
+                // Add event listeners for this card's tooltip
+                const tooltipTrigger = card.querySelector('.tooltip-trigger');
+                const tooltipContent = card.querySelector('.tooltip-content');
+                
+                if (tooltipTrigger && tooltipContent) {
+                    tooltipTrigger.addEventListener('mouseenter', () => {
+                        tooltipContent.style.visibility = 'visible';
+                        tooltipContent.style.opacity = '1';
+                    });
+                    
+                    tooltipTrigger.addEventListener('mouseleave', () => {
+                        tooltipContent.style.visibility = 'hidden';
+                        tooltipContent.style.opacity = '0';
+                    });
+                }
             });
 
-            // Extract user responses from transcript
-            let userResponses = '';
-            if (result.transcript) {
-                userResponses = result.transcript
-                    .split('\n')
-                    .filter(line => {
-                        const trimmed = line.trim();
-                        // Filter out initial commands and short responses
-                        return trimmed.startsWith('You:') && 
-                               !trimmed.toLowerCase().includes('start') &&
-                               !trimmed.toLowerCase().includes('yes, proceed') &&
-                               !trimmed.toLowerCase().includes('all right') &&
-                               !trimmed.toLowerCase().includes('you have my permission') &&
-                               trimmed.length > 10; // Only include responses longer than 10 characters
-                    })
-                    .map(line => {
-                        // Remove 'You:' prefix and clean up the response
-                        const response = line.substring(4).trim();
-                        // Remove any trailing hyphens or ellipses
-                        return response.replace(/[-…]$/, '').trim();
-                    })
-                    .filter(response => response.length > 0) // Remove empty responses
-                    .join(' '); // Join with spaces instead of newlines
-            }
+            return flexContainer;
+        }
 
-            // Create transcript preview from user responses (first 200 characters)
-            const transcriptPreview = userResponses ? 
-                userResponses.substring(0, 200) + (userResponses.length > 200 ? '...' : '') : 
-                'No meaningful responses available';
+        // Display exact matches if any
+        if (exactMatches.length > 0) {
+            const exactMatchHeader = document.createElement('div');
+            exactMatchHeader.className = 'w-full mb-4 p-3 bg-yellow-50 text-yellow-800 rounded';
+            exactMatchHeader.innerHTML = `<strong>Found ${exactMatches.length} exact match${exactMatches.length === 1 ? '' : 'es'}</strong> for your search`;
+            searchContent.appendChild(exactMatchHeader);
+            searchContent.appendChild(createResultCards(exactMatches));
+        }
 
-            // Log individual result to console
-            console.log('Result:', {
-                id: result.id,
-                project_name: result.project_name,
-                interview_type: result.interview_type,
-                date: result.date,
-                score: result.score,
-                transcript_preview: transcriptPreview,
-                full_transcript: result.transcript,
-                processed_responses: userResponses
-            });
-
-            card.innerHTML = `
-                <div class="flex justify-between items-start mb-4">
-                    <div>
-                        <h3 class="text-xl font-semibold text-gray-900">${result.project_name || 'Unknown Project'}</h3>
-                        <p class="text-gray-600">${result.interview_type || 'Unknown Type'}</p>
-                        <p class="text-sm text-gray-500">${formattedDate}</p>
-                    </div>
-                    <div class="flex space-x-2">
-                        <a href="/transcript/${result.id}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
-                            Transcript
-                        </a>
-                        <a href="/analysis/${result.id}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
-                            Analysis
-                        </a>
-                        <a href="/metadata/${result.id}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
-                            Metadata
-                        </a>
-                    </div>
-                </div>
-                <div class="mt-4">
-                    <h4 class="text-sm font-medium text-gray-900 mb-2">User Responses Preview:</h4>
-                    <p class="text-gray-600 text-sm">${transcriptPreview}</p>
-                </div>
-                <div class="mt-4">
-                    <h4 class="text-sm font-medium text-gray-900 mb-2">Similarity Score:</h4>
-                    <p class="text-gray-600 text-sm">${(result.score * 100).toFixed(2)}% match</p>
-                </div>
-            `;
-            
-            resultsContainer.appendChild(card);
-        });
+        // Display semantic matches if any
+        if (semanticMatches.length > 0) {
+            const semanticMatchHeader = document.createElement('div');
+            semanticMatchHeader.className = 'w-full mb-4 p-3 bg-blue-50 text-blue-800 rounded';
+            semanticMatchHeader.innerHTML = `<strong>Found ${semanticMatches.length} semantic match${semanticMatches.length === 1 ? '' : 'es'}</strong> for your search`;
+            searchContent.appendChild(semanticMatchHeader);
+            searchContent.appendChild(createResultCards(semanticMatches));
+        }
     }
 
     // Event listeners
@@ -247,6 +293,7 @@ document.addEventListener('DOMContentLoaded', function() {
 #searchResults {
     max-height: 500px;
     overflow-y: auto;
+    padding-top: 1rem; /* Add padding to accommodate tooltips */
 }
 
 .search-result {
@@ -254,6 +301,18 @@ document.addEventListener('DOMContentLoaded', function() {
     margin-bottom: 1rem;
     padding: 0.5rem 1rem;
     background-color: #f8f9fa;
+}
+
+/* Update tooltip styles */
+.tooltip-trigger {
+    position: relative;
+}
+
+.tooltip-content {
+    transition: visibility 0.2s, opacity 0.2s;
+    visibility: hidden;
+    opacity: 0;
+    pointer-events: none;
 }
 </style>
 {% endblock %} 
