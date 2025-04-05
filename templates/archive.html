@@ -1,0 +1,259 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Archive{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Interview Archive</h1>
+
+    <!-- Search Section -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="input-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="Search interviews...">
+                <button class="btn btn-primary" type="button" id="searchButton">Search</button>
+            </div>
+            <!-- Search Results Area -->
+            <div id="searchResults" class="mt-3" style="display: none;">
+                <div id="searchSpinner" class="text-center" style="display: none;">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Searching...</span>
+                    </div>
+                    <p class="mt-2">Searching interviews...</p>
+                </div>
+                <div id="searchContent"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Interviews Grid -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="interviewList">
+        {% for interview in interviews %}
+        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-xl font-semibold mb-2">{{ interview.project_name }}</h2>
+                    <p class="text-gray-600 mb-2">{{ interview.interview_type }}</p>
+                    <p class="text-sm text-gray-500">{{ interview.date }}</p>
+                </div>
+                <div class="flex flex-col space-y-2">
+                    <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" 
+                       class="inline-block px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors">
+                        Transcript
+                    </a>
+                    <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
+                       class="inline-block px-3 py-1 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors">
+                        Analysis
+                    </a>
+                    <a href="{{ url_for('view_metadata', interview_id=interview.id) }}" 
+                       class="inline-block px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded hover:bg-purple-200 transition-colors">
+                        Metadata
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const searchButton = document.getElementById('searchButton');
+    const searchResults = document.getElementById('searchResults');
+    const searchSpinner = document.getElementById('searchSpinner');
+    const searchContent = document.getElementById('searchContent');
+
+    // Get base URLs from the server-side template
+    const viewTranscriptBaseUrl = "{{ url_for('view_transcript', interview_id='') }}";
+    const viewAnalysisBaseUrl = "{{ url_for('view_analysis', interview_id='') }}";
+    const viewMetadataBaseUrl = "{{ url_for('view_metadata', interview_id='') }}";
+
+    // Search functionality
+    async function performSearch() {
+        const query = searchInput.value.trim();
+        if (!query) return;
+
+        // Show spinner and results container
+        searchResults.style.display = 'block';
+        searchSpinner.style.display = 'block';
+        searchContent.innerHTML = '';
+
+        try {
+            const response = await fetch('/search_interviews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    query: query,
+                    k: 10  // Request more results
+                })
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.details || 'Failed to search interviews');
+            }
+
+            const data = await response.json();
+            
+            if (data.message) {
+                // No results found
+                searchContent.innerHTML = `<div class="alert alert-info">${data.message}</div>`;
+            } else if (data.results && data.results.length > 0) {
+                // Display results
+                displaySearchResults(data.results);
+            } else {
+                searchContent.innerHTML = '<div class="alert alert-warning">No matching responses found.</div>';
+            }
+        } catch (error) {
+            console.error('Search error:', error);
+            searchContent.innerHTML = `
+                <div class="alert alert-danger">
+                    Error performing search: ${error.message}
+                </div>
+            `;
+        } finally {
+            searchSpinner.style.display = 'none';
+        }
+    }
+
+    function displaySearchResults(results) {
+        const resultsContainer = document.getElementById('searchResults');
+        resultsContainer.innerHTML = '';
+        
+        // Log the full results object to console
+        console.log('Search Results:', results);
+        
+        if (!results || results.length === 0) {
+            resultsContainer.innerHTML = '<p class="text-gray-500">No interviews found matching your search.</p>';
+            return;
+        }
+
+        results.forEach(result => {
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-lg shadow-md p-6 mb-4';
+            
+            // Format date
+            const date = new Date(result.date);
+            const formattedDate = date.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric'
+            });
+
+            // Extract user responses from transcript
+            let userResponses = '';
+            if (result.transcript) {
+                userResponses = result.transcript
+                    .split('\n')
+                    .filter(line => {
+                        const trimmed = line.trim();
+                        // Filter out initial commands and short responses
+                        return trimmed.startsWith('You:') && 
+                               !trimmed.toLowerCase().includes('start') &&
+                               !trimmed.toLowerCase().includes('yes, proceed') &&
+                               !trimmed.toLowerCase().includes('all right') &&
+                               !trimmed.toLowerCase().includes('you have my permission') &&
+                               trimmed.length > 10; // Only include responses longer than 10 characters
+                    })
+                    .map(line => {
+                        // Remove 'You:' prefix and clean up the response
+                        const response = line.substring(4).trim();
+                        // Remove any trailing hyphens or ellipses
+                        return response.replace(/[-…]$/, '').trim();
+                    })
+                    .filter(response => response.length > 0) // Remove empty responses
+                    .join(' '); // Join with spaces instead of newlines
+            }
+
+            // Create transcript preview from user responses (first 200 characters)
+            const transcriptPreview = userResponses ? 
+                userResponses.substring(0, 200) + (userResponses.length > 200 ? '...' : '') : 
+                'No meaningful responses available';
+
+            // Log individual result to console
+            console.log('Result:', {
+                id: result.id,
+                project_name: result.project_name,
+                interview_type: result.interview_type,
+                date: result.date,
+                score: result.score,
+                transcript_preview: transcriptPreview,
+                full_transcript: result.transcript,
+                processed_responses: userResponses
+            });
+
+            card.innerHTML = `
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <h3 class="text-xl font-semibold text-gray-900">${result.project_name || 'Unknown Project'}</h3>
+                        <p class="text-gray-600">${result.interview_type || 'Unknown Type'}</p>
+                        <p class="text-sm text-gray-500">${formattedDate}</p>
+                    </div>
+                    <div class="flex space-x-2">
+                        <a href="/transcript/${result.id}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700">
+                            Transcript
+                        </a>
+                        <a href="/analysis/${result.id}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700">
+                            Analysis
+                        </a>
+                        <a href="/metadata/${result.id}" class="inline-flex items-center px-3 py-1.5 border border-transparent text-sm font-medium rounded-md text-white bg-purple-600 hover:bg-purple-700">
+                            Metadata
+                        </a>
+                    </div>
+                </div>
+                <div class="mt-4">
+                    <h4 class="text-sm font-medium text-gray-900 mb-2">User Responses Preview:</h4>
+                    <p class="text-gray-600 text-sm">${transcriptPreview}</p>
+                </div>
+                <div class="mt-4">
+                    <h4 class="text-sm font-medium text-gray-900 mb-2">Similarity Score:</h4>
+                    <p class="text-gray-600 text-sm">${(result.score * 100).toFixed(2)}% match</p>
+                </div>
+            `;
+            
+            resultsContainer.appendChild(card);
+        });
+    }
+
+    // Event listeners
+    searchButton.addEventListener('click', performSearch);
+    searchInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+});
+</script>
+
+<style>
+.card {
+    transition: transform 0.2s;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
+.btn-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+#searchResults {
+    max-height: 500px;
+    overflow-y: auto;
+}
+
+.search-result {
+    border-left: 3px solid #007bff;
+    margin-bottom: 1rem;
+    padding: 0.5rem 1rem;
+    background-color: #f8f9fa;
+}
+</style>
+{% endblock %} 

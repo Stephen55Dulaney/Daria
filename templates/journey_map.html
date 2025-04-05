@@ -1,0 +1,248 @@
+{% extends "base.html" %}
+
+{% block title %}Journey Map{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-8">Journey Map</h1>
+    
+    <!-- Project Selection -->
+    <div class="mb-8">
+        <label for="projectSelect" class="block text-sm font-medium text-gray-700 mb-2">Select Project</label>
+        <select id="projectSelect" class="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm rounded-md">
+            <option value="">Select a project...</option>
+            {% for project in projects %}
+            <option value="{{ project.name }}">{{ project.name }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Interview Selection Cards -->
+    <div id="interviewCards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <!-- Interview cards will be dynamically inserted here -->
+    </div>
+
+    <!-- Create Journey Map Button -->
+    <div class="flex justify-end mb-8">
+        <button id="createMapBtn" disabled class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed">
+            Create Journey Map
+        </button>
+    </div>
+
+    <!-- Journey Map Display Area -->
+    <div id="journeyMapDisplay" class="bg-white rounded-lg shadow-lg p-6 hidden">
+        <div class="flex justify-between items-center mb-6">
+            <h2 class="text-2xl font-semibold text-gray-900">Journey Map</h2>
+            <div class="flex space-x-4">
+                <button id="downloadBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                    Download
+                </button>
+                <button id="shareBtn" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                    Share
+                </button>
+            </div>
+        </div>
+        <div id="journeyMapContent" class="space-y-6">
+            <!-- Journey map content will be dynamically inserted here -->
+        </div>
+    </div>
+</div>
+
+<!-- Preview Tooltips -->
+<div id="previewTooltip" class="hidden fixed z-50 bg-white rounded-lg shadow-lg p-4 max-w-md">
+    <div id="previewTitle" class="font-medium text-gray-900 mb-2"></div>
+    <div id="previewContent" class="text-sm text-gray-500"></div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const projectSelect = document.getElementById('projectSelect');
+    const interviewCards = document.getElementById('interviewCards');
+    const createMapBtn = document.getElementById('createMapBtn');
+    const journeyMapDisplay = document.getElementById('journeyMapDisplay');
+    const previewTooltip = document.getElementById('previewTooltip');
+    const previewTitle = document.getElementById('previewTitle');
+    const previewContent = document.getElementById('previewContent');
+    
+    let selectedInterviews = new Set();
+    let currentTimeout;
+
+    // Load interviews when project is selected
+    projectSelect.addEventListener('change', async function() {
+        const projectId = this.value;
+        if (!projectId) {
+            interviewCards.innerHTML = '';
+            selectedInterviews.clear();
+            createMapBtn.disabled = true;
+            return;
+        }
+
+        try {
+            const response = await fetch(`/api/projects/${projectId}/interviews`);
+            const interviews = await response.json();
+            
+            interviewCards.innerHTML = interviews.map(interview => `
+                <div class="bg-white rounded-lg shadow-md p-6">
+                    <div class="flex items-start justify-between mb-4">
+                        <div class="flex items-center">
+                            <input type="checkbox" 
+                                   class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                                   data-interview-id="${interview.id}">
+                            <span class="ml-2 text-sm font-medium text-gray-900">${interview.date}</span>
+                        </div>
+                        <span class="text-sm text-gray-500">${interview.interview_type}</span>
+                    </div>
+                    <div class="space-y-2">
+                        <button class="preview-btn w-full text-left px-3 py-2 text-sm text-blue-600 hover:bg-blue-50 rounded-md flex items-center justify-between"
+                                data-type="transcript"
+                                data-interview-id="${interview.id}">
+                            <span>Transcript</span>
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                        <button class="preview-btn w-full text-left px-3 py-2 text-sm text-green-600 hover:bg-green-50 rounded-md flex items-center justify-between"
+                                data-type="analysis"
+                                data-interview-id="${interview.id}">
+                            <span>Analysis</span>
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                        <button class="preview-btn w-full text-left px-3 py-2 text-sm text-purple-600 hover:bg-purple-50 rounded-md flex items-center justify-between"
+                                data-type="metadata"
+                                data-interview-id="${interview.id}">
+                            <span>Metadata</span>
+                            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+
+            // Add event listeners for checkboxes
+            document.querySelectorAll('input[type="checkbox"]').forEach(checkbox => {
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectedInterviews.add(this.dataset.interviewId);
+                    } else {
+                        selectedInterviews.delete(this.dataset.interviewId);
+                    }
+                    createMapBtn.disabled = selectedInterviews.size === 0;
+                });
+            });
+
+            // Add event listeners for preview buttons
+            document.querySelectorAll('.preview-btn').forEach(button => {
+                // Show preview on hover
+                button.addEventListener('mouseenter', async function(e) {
+                    const rect = this.getBoundingClientRect();
+                    const interviewId = this.dataset.interviewId;
+                    const type = this.dataset.type;
+                    
+                    // Clear any existing timeout
+                    if (currentTimeout) {
+                        clearTimeout(currentTimeout);
+                    }
+                    
+                    // Set a timeout to load and show the preview
+                    currentTimeout = setTimeout(async () => {
+                        try {
+                            const response = await fetch(`/api/interviews/${interviewId}/${type}`);
+                            const data = await response.json();
+                            
+                            previewTitle.textContent = `${type.charAt(0).toUpperCase() + type.slice(1)} Preview`;
+                            previewContent.textContent = data.content.substring(0, 500) + '...';
+                            
+                            // Position the tooltip
+                            previewTooltip.style.left = `${rect.right + 10}px`;
+                            previewTooltip.style.top = `${rect.top}px`;
+                            previewTooltip.classList.remove('hidden');
+                        } catch (error) {
+                            console.error('Error loading preview:', error);
+                        }
+                    }, 500); // Show preview after 500ms hover
+                });
+                
+                // Hide preview when mouse leaves
+                button.addEventListener('mouseleave', function() {
+                    // Clear the timeout if it hasn't triggered yet
+                    if (currentTimeout) {
+                        clearTimeout(currentTimeout);
+                    }
+                    // Hide the tooltip
+                    previewTooltip.classList.add('hidden');
+                });
+            });
+
+        } catch (error) {
+            console.error('Error loading interviews:', error);
+            interviewCards.innerHTML = '<p class="text-red-500">Error loading interviews</p>';
+        }
+    });
+
+    // Create journey map
+    createMapBtn.addEventListener('click', async function() {
+        if (selectedInterviews.size === 0) {
+            console.error('No interviews selected');
+            alert('Please select at least one interview');
+            return;
+        }
+
+        console.log('Selected interview IDs:', Array.from(selectedInterviews));
+        journeyMapDisplay.classList.remove('hidden');
+
+        try {
+            console.log('Sending request to /api/journey-map');
+            const response = await fetch('/api/journey-map', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    interview_ids: Array.from(selectedInterviews)
+                })
+            });
+
+            console.log('Response status:', response.status);
+            const data = await response.json();
+            console.log('Response data:', data);
+
+            if (!response.ok) {
+                console.error('Error response:', data);
+                throw new Error(data.error || 'Failed to create journey map');
+            }
+
+            if (!data.html) {
+                console.error('No HTML content in response');
+                throw new Error('No journey map content received');
+            }
+
+            console.log('Received HTML content length:', data.html.length);
+            document.getElementById('journeyMapContent').innerHTML = data.html;
+        } catch (error) {
+            console.error('Error creating journey map:', error);
+            document.getElementById('journeyMapContent').innerHTML = `
+                <div class="error-message p-4 bg-red-50 rounded-lg">
+                    <p class="text-red-600">Error: ${error.message}</p>
+                </div>
+            `;
+        }
+    });
+
+    // Download journey map
+    document.getElementById('downloadBtn').addEventListener('click', function() {
+        // Implement download functionality
+    });
+
+    // Share journey map
+    document.getElementById('shareBtn').addEventListener('click', function() {
+        // Implement share functionality
+    });
+});
+</script>
+{% endblock %} 

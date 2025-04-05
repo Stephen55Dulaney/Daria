@@ -1,0 +1,467 @@
+{% extends "base.html" %}
+
+{% block title %}Persona Generator{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Persona Generator</h1>
+    
+    <!-- Project Selection -->
+    <div class="mb-8">
+        <label for="project-select" class="block text-sm font-medium text-gray-700 mb-2">Select Project</label>
+        <select id="project-select" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <option value="">Select a project...</option>
+            {% for project in projects %}
+            <option value="{{ project }}">{{ project }}</option>
+            {% endfor %}
+        </select>
+    </div>
+
+    <!-- Interview Selection -->
+    <div id="interview-selection" class="mb-8 hidden">
+        <h2 class="text-xl font-semibold mb-4">Select Interviews</h2>
+        <div id="interview-cards" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- Interview cards will be dynamically added here -->
+        </div>
+    </div>
+
+    <!-- Generate Button -->
+    <div class="mb-8">
+        <button id="generate-btn" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+            Generate Persona
+        </button>
+    </div>
+
+    <!-- Persona Display -->
+    <div id="persona-display" class="hidden">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div id="persona-content" class="prose max-w-none">
+                <!-- Persona content will be displayed here -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Indicator -->
+    <div id="loading-indicator" class="hidden">
+        <div class="flex items-center justify-center space-x-2">
+            <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
+            <span class="text-gray-600">Generating persona...</span>
+        </div>
+    </div>
+
+    <!-- Error Message -->
+    <div id="error-message" class="hidden">
+        <div class="bg-red-50 border border-red-200 rounded-lg p-4">
+            <p class="text-red-600"></p>
+        </div>
+    </div>
+</div>
+
+<!-- Interview Preview Tooltip -->
+<div id="interview-preview" class="hidden fixed bg-white border border-gray-200 rounded-lg shadow-lg p-4 max-w-xl z-50">
+    <div class="preview-content max-h-96 overflow-y-auto"></div>
+</div>
+
+<style>
+.preview-section {
+    cursor: pointer;
+    padding: 8px;
+    margin: 4px 0;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.preview-section:hover {
+    background-color: #f3f4f6;
+}
+
+.preview-section.transcript {
+    color: #3b82f6;
+}
+
+.preview-section.analysis {
+    color: #10b981;
+}
+
+.preview-section.metadata {
+    color: #8b5cf6;
+}
+
+.preview-section .chevron {
+    margin-left: auto;
+}
+
+#interview-preview {
+    max-width: 48rem;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.preview-content {
+    font-size: 0.875rem;
+    line-height: 1.5;
+}
+
+.preview-title {
+    font-size: 1.125rem;
+    font-weight: 600;
+    margin-bottom: 1rem;
+    color: #374151;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.preview-text {
+    color: #6b7280;
+    white-space: pre-line;
+}
+
+.metadata-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.metadata-section {
+    margin-bottom: 1rem;
+}
+
+.metadata-section-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: #4b5563;
+    margin-bottom: 0.5rem;
+    padding-bottom: 0.25rem;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.metadata-list {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.5rem 1rem;
+}
+
+.metadata-label {
+    color: #6b7280;
+    font-weight: 500;
+}
+
+.metadata-value {
+    color: #111827;
+}
+</style>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const projectSelect = document.getElementById('project-select');
+    const interviewSelection = document.getElementById('interview-selection');
+    const interviewCards = document.getElementById('interview-cards');
+    const generateBtn = document.getElementById('generate-btn');
+    const personaDisplay = document.getElementById('persona-display');
+    const personaContent = document.getElementById('persona-content');
+    const loadingIndicator = document.getElementById('loading-indicator');
+    const errorMessage = document.getElementById('error-message');
+    const interviewPreview = document.getElementById('interview-preview');
+    const previewContent = interviewPreview.querySelector('.preview-content');
+    
+    let selectedInterviews = new Set();
+    let currentPreviewType = null;
+    let currentPreviewSection = null;
+    
+    // Load interviews when project is selected
+    projectSelect.addEventListener('change', async function() {
+        const projectName = this.value;
+        if (!projectName) {
+            interviewSelection.classList.add('hidden');
+            generateBtn.disabled = true;
+            return;
+        }
+        
+        try {
+            console.log('Loading interviews for project:', projectName);
+            const response = await fetch(`/api/projects/${encodeURIComponent(projectName)}/interviews`);
+            if (!response.ok) {
+                throw new Error(`Failed to load interviews: ${response.statusText}`);
+            }
+            const data = await response.json();
+            console.log('Received interview data:', data);
+            
+            interviewCards.innerHTML = '';
+            selectedInterviews.clear();
+            
+            data.forEach(interview => {
+                const card = document.createElement('div');
+                card.className = 'interview-card bg-white rounded-lg shadow-md p-4 hover:shadow-lg transition-shadow';
+                
+                const date = new Date(interview.date).toLocaleDateString();
+                card.innerHTML = `
+                    <div class="flex items-start justify-between mb-4">
+                        <div>
+                            <h3 class="font-semibold text-lg">${interview.interview_type}</h3>
+                            <p class="text-sm text-gray-600">${date}</p>
+                        </div>
+                        <div class="flex items-center">
+                            <input type="checkbox" class="interview-checkbox h-5 w-5 text-blue-600 rounded border-gray-300 focus:ring-blue-500" 
+                                   data-id="${interview.id}">
+                        </div>
+                    </div>
+                    <div class="space-y-1">
+                        <div class="preview-section transcript" data-id="${interview.id}" data-type="transcript">
+                            <span>Transcript</span>
+                            <span class="chevron">›</span>
+                        </div>
+                        <div class="preview-section analysis" data-id="${interview.id}" data-type="analysis">
+                            <span>Analysis</span>
+                            <span class="chevron">›</span>
+                        </div>
+                        <div class="preview-section metadata" data-id="${interview.id}" data-type="metadata">
+                            <span>Metadata</span>
+                            <span class="chevron">›</span>
+                        </div>
+                    </div>
+                `;
+                
+                interviewCards.appendChild(card);
+                
+                // Add checkbox event listener
+                const checkbox = card.querySelector('.interview-checkbox');
+                checkbox.addEventListener('change', function() {
+                    if (this.checked) {
+                        selectedInterviews.add(this.dataset.id);
+                    } else {
+                        selectedInterviews.delete(this.dataset.id);
+                    }
+                    generateBtn.disabled = selectedInterviews.size === 0;
+                });
+                
+                // Add preview section event listeners
+                const previewSections = card.querySelectorAll('.preview-section');
+                previewSections.forEach(section => {
+                    section.addEventListener('mouseenter', async function() {
+                        const interviewId = this.dataset.id;
+                        const contentType = this.dataset.type;
+                        
+                        // Don't reload if hovering over the same section
+                        if (currentPreviewType === contentType && currentPreviewSection === this) {
+                            return;
+                        }
+                        
+                        currentPreviewType = contentType;
+                        currentPreviewSection = this;
+                        
+                        try {
+                            console.log(`Fetching ${contentType} for interview:`, interviewId);
+                            const response = await fetch(`/api/interviews/${interviewId}/${contentType}`);
+                            if (!response.ok) {
+                                throw new Error(`Failed to load ${contentType}: ${response.statusText}`);
+                            }
+                            const data = await response.json();
+                            console.log(`Received ${contentType} data:`, data);
+                            
+                            let content = '';
+                            if (contentType === 'metadata') {
+                                console.log('Raw metadata response:', data);
+                                let metadata = data;  // Start with the raw response
+                                
+                                // If the data has a content property, use that
+                                if (data.content) {
+                                    console.log('Content field found:', data.content);
+                                    try {
+                                        if (typeof data.content === 'string') {
+                                            metadata = JSON.parse(data.content);
+                                        } else {
+                                            metadata = data.content;
+                                        }
+                                    } catch (error) {
+                                        console.error('Error parsing metadata content:', error);
+                                        metadata = data.content; // Use the content directly if parsing fails
+                                    }
+                                }
+                                
+                                console.log('Final metadata object:', metadata);
+                                
+                                // Helper function to safely get nested values
+                                const getValue = (obj, path) => {
+                                    return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined ? acc[part] : null), obj);
+                                };
+                                
+                                content = `
+                                    <div class="preview-title">Interview Metadata</div>
+                                    <div class="metadata-grid">
+                                        <div class="metadata-section">
+                                            <div class="metadata-section-title">Project Information</div>
+                                            <div class="metadata-list">
+                                                <span class="metadata-label">Project Name:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'project_name') || getValue(metadata, 'Project Name') || 'N/A'}</span>
+                                                <span class="metadata-label">Interview Type:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'interview_type') || getValue(metadata, 'Interview Type') || 'N/A'}</span>
+                                                <span class="metadata-label">Date:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'date') ? new Date(getValue(metadata, 'date')).toLocaleString() : 'N/A'}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="metadata-section">
+                                            <div class="metadata-section-title">Researcher Information</div>
+                                            <div class="metadata-list">
+                                                <span class="metadata-label">Name:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'researcher.name') || getValue(metadata, 'Researcher Information.Name') || 'N/A'}</span>
+                                                <span class="metadata-label">Role:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'researcher.role') || getValue(metadata, 'Researcher Information.Role') || 'N/A'}</span>
+                                                <span class="metadata-label">Email:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'researcher.email') || getValue(metadata, 'Researcher Information.Email') || 'N/A'}</span>
+                                                <span class="metadata-label">Phone:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'researcher.phone') || getValue(metadata, 'Researcher Information.Phone') || 'N/A'}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="metadata-section">
+                                            <div class="metadata-section-title">Interviewee Information</div>
+                                            <div class="metadata-list">
+                                                <span class="metadata-label">Name:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'interviewee.name') || getValue(metadata, 'Interviewee Information.Name') || 'N/A'}</span>
+                                                <span class="metadata-label">Age Range:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'interviewee.age_range') || getValue(metadata, 'Interviewee Information.Age Range') || 'N/A'}</span>
+                                                <span class="metadata-label">Gender:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'interviewee.gender') || getValue(metadata, 'Interviewee Information.Gender') || 'N/A'}</span>
+                                                <span class="metadata-label">Location:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'interviewee.location') || getValue(metadata, 'Interviewee Information.Location') || 'N/A'}</span>
+                                                <span class="metadata-label">Occupation:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'interviewee.occupation') || getValue(metadata, 'Interviewee Information.Occupation') || 'N/A'}</span>
+                                                <span class="metadata-label">Industry:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'interviewee.industry') || getValue(metadata, 'Interviewee Information.Industry') || 'N/A'}</span>
+                                                <span class="metadata-label">Years of Experience:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'interviewee.years_of_experience') || getValue(metadata, 'Interviewee Information.Years of Experience') || 'N/A'}</span>
+                                                <span class="metadata-label">Education:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'interviewee.education') || getValue(metadata, 'Interviewee Information.Education') || 'N/A'}</span>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="metadata-section">
+                                            <div class="metadata-section-title">Technology Usage</div>
+                                            <div class="metadata-list">
+                                                <span class="metadata-label">Primary Device:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'technology.primaryDevice') || 'N/A'}</span>
+                                                <span class="metadata-label">Operating System:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'technology.operatingSystem') || 'N/A'}</span>
+                                                <span class="metadata-label">Browser Preference:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'technology.browserPreference') || 'N/A'}</span>
+                                                <span class="metadata-label">Technical Proficiency:</span>
+                                                <span class="metadata-value">${getValue(metadata, 'technology.technicalProficiency') || 'N/A'}</span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                `;
+                            } else {
+                                content = `
+                                    <div class="preview-title">${contentType.charAt(0).toUpperCase() + contentType.slice(1)} Preview</div>
+                                    <div class="preview-text">${data.content || `No ${contentType} available`}</div>
+                                `;
+                            }
+                            
+                            previewContent.innerHTML = content;
+                            interviewPreview.classList.remove('hidden');
+                            
+                            // Position the preview tooltip
+                            const rect = this.getBoundingClientRect();
+                            const previewRect = interviewPreview.getBoundingClientRect();
+                            
+                            // Calculate the left position to ensure the preview doesn't go off-screen
+                            let left = rect.right + 10;
+                            if (left + previewRect.width > window.innerWidth) {
+                                left = rect.left - previewRect.width - 10;
+                            }
+                            
+                            // Calculate the top position
+                            let top = rect.top + window.scrollY;
+                            const bottomSpace = window.innerHeight - rect.bottom;
+                            const topSpace = rect.top;
+                            
+                            if (bottomSpace < previewRect.height && topSpace > bottomSpace) {
+                                // Position above if there's more space
+                                top = rect.top + window.scrollY - previewRect.height + rect.height;
+                            }
+                            
+                            interviewPreview.style.top = `${top}px`;
+                            interviewPreview.style.left = `${left}px`;
+                        } catch (error) {
+                            console.error(`Error fetching ${contentType}:`, error);
+                            previewContent.innerHTML = `
+                                <div class="preview-title">Error</div>
+                                <div class="preview-text text-red-600">Failed to load ${contentType}. Please try again.</div>
+                            `;
+                            interviewPreview.classList.remove('hidden');
+                        }
+                    });
+                });
+            });
+            
+            interviewSelection.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error loading interviews:', error);
+            errorMessage.querySelector('p').textContent = 'Error loading interviews. Please try again.';
+            errorMessage.classList.remove('hidden');
+        }
+    });
+    
+    // Generate persona
+    generateBtn.addEventListener('click', async function() {
+        const projectName = projectSelect.value;
+        if (!projectName || selectedInterviews.size === 0) return;
+        
+        try {
+            console.log('Generating persona for project:', projectName);
+            console.log('Selected interview IDs:', Array.from(selectedInterviews));
+            
+            loadingIndicator.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+            personaDisplay.classList.add('hidden');
+            
+            const response = await fetch('/generate_persona', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    project_name: projectName,
+                    interview_ids: Array.from(selectedInterviews)
+                })
+            });
+            
+            console.log('Response status:', response.status);
+            const data = await response.json();
+            console.log('Response data:', data);
+            
+            if (!response.ok) {
+                throw new Error(data.error || 'Failed to generate persona');
+            }
+            
+            personaContent.innerHTML = data.html;
+            personaDisplay.classList.remove('hidden');
+        } catch (error) {
+            console.error('Error generating persona:', error);
+            errorMessage.querySelector('p').textContent = error.message || 'Error generating persona. Please try again.';
+            errorMessage.classList.remove('hidden');
+        } finally {
+            loadingIndicator.classList.add('hidden');
+        }
+    });
+    
+    // Hide preview when mouse leaves the section or preview
+    document.addEventListener('mouseover', function(e) {
+        const isOverPreviewSection = e.target.closest('.preview-section');
+        const isOverPreview = e.target.closest('#interview-preview');
+        
+        if (!isOverPreviewSection && !isOverPreview) {
+            interviewPreview.classList.add('hidden');
+            currentPreviewType = null;
+            currentPreviewSection = null;
+        }
+    });
+});
+</script>
+{% endblock %} 

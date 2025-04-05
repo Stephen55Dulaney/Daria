@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Transcript{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+        <a href="{{ url_for('archive') }}" class="text-blue-600 hover:text-blue-800">← Back to Archive</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="space-y-6">
+            <div>
+                <h2 class="text-xl font-semibold mb-4">Project Information</h2>
+                <p><strong>Project Name:</strong> {{ interview.project_name }}</p>
+                <p><strong>Interview Type:</strong> {{ interview.interview_type }}</p>
+                <p><strong>Date:</strong> {{ interview.date }}</p>
+                {% if interview.metadata %}
+                    <p><strong>Interviewee:</strong> {{ interview.metadata.interviewee.name }}</p>
+                {% endif %}
+            </div>
+
+            <div class="border-t pt-6">
+                <h1 class="text-2xl font-bold mb-6">Interview Transcript</h1>
+                <div class="space-y-4">
+                    {% for line in interview.transcript.split('\n') %}
+                        {% if line.strip() %}
+                            {% if 'Daria:' in line %}
+                                <div class="bg-blue-50 p-4 rounded-lg">
+                                    <p class="font-semibold text-blue-800">{{ line }}</p>
+                                </div>
+                            {% elif 'You:' in line %}
+                                <div class="bg-gray-50 p-4 rounded-lg ml-8">
+                                    <p class="font-semibold text-gray-800">{{ line }}</p>
+                                </div>
+                            {% else %}
+                                <p class="text-gray-600">{{ line }}</p>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 flex space-x-4">
+            <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
+               class="text-blue-600 hover:text-blue-800">View Analysis</a>
+            {% if interview.metadata %}
+                <a href="{{ url_for('view_metadata', interview_id=interview.id) }}" 
+                   class="text-blue-600 hover:text-blue-800">View Metadata</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

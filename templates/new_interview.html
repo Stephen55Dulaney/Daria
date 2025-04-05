@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">New Interview</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Project Information</h5>
+                    <div class="mb-3">
+                        <label for="projectName" class="form-label">Project Name</label>
+                        <input type="text" class="form-control" id="projectName" placeholder="Enter project name">
+                    </div>
+                    <div class="mb-3">
+                        <label for="interviewType" class="form-label">Interview Type</label>
+                        <select class="form-select" id="interviewType">
+                            <option value="Application Interview">Application Interview</option>
+                            <option value="Persona Interview">Persona Interview</option>
+                            <option value="Journey Map Interview">Journey Map Interview</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="projectDescription" class="form-label">Project Description</label>
+                        <textarea class="form-control" id="projectDescription" rows="3" placeholder="Describe the project and its goals"></textarea>
+                    </div>
+                    <button id="startButton" class="btn btn-primary">Start Interview</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Interview Guidelines</h5>
+                    <div id="guidelineContent">
+                        <p>Select an interview type to see specific guidelines.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('interviewType').addEventListener('change', function() {
+    const guidelines = {
+        'Application Interview': `
+            <h6>Application Interview Guidelines:</h6>
+            <ul>
+                <li>Focus on understanding how users interact with the application</li>
+                <li>Gather information about key tasks and workflows</li>
+                <li>Identify pain points and areas for improvement</li>
+                <li>Collect feedback on specific features and functionality</li>
+                <li>Understand user satisfaction and needs</li>
+            </ul>
+        `,
+        'Persona Interview': `
+            <h6>Persona Interview Guidelines:</h6>
+            <ul>
+                <li>Focus on understanding the user's background and characteristics</li>
+                <li>Gather information about goals and motivations</li>
+                <li>Identify behaviors and habits</li>
+                <li>Understand pain points and challenges</li>
+                <li>Collect information about preferences and needs</li>
+            </ul>
+        `,
+        'Journey Map Interview': `
+            <h6>Journey Map Interview Guidelines:</h6>
+            <ul>
+                <li>Focus on understanding the user's journey through different stages</li>
+                <li>Identify key touchpoints and interactions</li>
+                <li>Track emotional states throughout the journey</li>
+                <li>Document pain points at each stage</li>
+                <li>Collect information about positive experiences</li>
+            </ul>
+        `
+    };
+    
+    document.getElementById('guidelineContent').innerHTML = guidelines[this.value];
+});
+
+document.getElementById('startButton').addEventListener('click', async function() {
+    const projectName = document.getElementById('projectName').value.trim();
+    const interviewType = document.getElementById('interviewType').value;
+    const projectDescription = document.getElementById('projectDescription').value.trim();
+    
+    if (!projectName) {
+        alert('Please enter a project name');
+        return;
+    }
+    
+    if (!projectDescription) {
+        alert('Please enter a project description');
+        return;
+    }
+    
+    try {
+        const response = await fetch('/save_interview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                project_name: projectName,
+                interview_type: interviewType,
+                project_description: projectDescription
+            })
+        });
+        
+        const data = await response.json();
+        
+        if (data.status === 'success') {
+            window.location.href = data.redirect_url;
+        } else {
+            alert('Error starting interview: ' + data.error);
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('Error starting interview. Please try again.');
+    }
+});
+</script>
+{% endblock %} 

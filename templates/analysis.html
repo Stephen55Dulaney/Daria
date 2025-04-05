@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Analysis{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+        <a href="{{ url_for('archive') }}" class="text-blue-600 hover:text-blue-800">← Back to Archive</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="space-y-6">
+            <div>
+                <h2 class="text-xl font-semibold mb-4">Project Information</h2>
+                <p><strong>Project Name:</strong> {{ interview.project_name }}</p>
+                <p><strong>Interview Type:</strong> {{ interview.interview_type }}</p>
+                <p><strong>Date:</strong> {{ interview.date }}</p>
+                {% if interview.metadata %}
+                    <p><strong>Interviewee:</strong> {{ interview.metadata.interviewee.name }}</p>
+                {% endif %}
+            </div>
+
+            <div class="border-t pt-6">
+                <h1 class="text-2xl font-bold mb-6">Interview Analysis</h1>
+                <div class="prose max-w-none">
+                    {% for section in interview.analysis.split('\n\n') %}
+                        {% if section.strip() %}
+                            {% if section.startswith('##') %}
+                                <h2 class="text-xl font-semibold mt-8 mb-4">{{ section[3:].strip() }}</h2>
+                            {% elif section.startswith('-') or section.startswith('*') %}
+                                <ul class="list-disc pl-6 space-y-2">
+                                    {% for item in section.split('\n') %}
+                                        {% if item.strip() and (item.startswith('-') or item.startswith('*')) %}
+                                            <li>{{ item[2:].strip() }}</li>
+                                        {% endif %}
+                                    {% endfor %}
+                                </ul>
+                            {% else %}
+                                <p class="mb-4">{{ section.strip() }}</p>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+
+        <div class="mt-8 flex space-x-4">
+            <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" 
+               class="text-blue-600 hover:text-blue-800">View Transcript</a>
+            {% if interview.metadata %}
+                <a href="{{ url_for('view_metadata', interview_id=interview.id) }}" 
+                   class="text-blue-600 hover:text-blue-800">View Metadata</a>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

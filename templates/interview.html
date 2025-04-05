@@ -1,0 +1,288 @@
+{% extends "base.html" %}
+
+{% block title %}DARIA - Interview Session{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto">
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex items-center gap-4 mb-6">
+            <img src="{{ url_for('static', filename='images/daria-logo.png') }}" alt="DARIA Logo" class="w-12 h-12 object-contain">
+            <div>
+                <h1 class="text-2xl font-bold">Interview Session</h1>
+                <p class="text-gray-600">Project: {{ project_name }}</p>
+            </div>
+        </div>
+
+        <!-- Store Flask template variables in data attributes -->
+        <div id="templateData" 
+             data-report-prompt='{{ prompt | tojson | safe }}'
+             data-project-name='{{ project_name | tojson | safe }}'
+             style="display: none;">
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Chat Container -->
+            <div class="chat-container bg-white rounded-lg shadow-md p-4">
+                <div id="chatContainer" class="space-y-4 h-[500px] overflow-y-auto">
+                    <div class="message daria-message">
+                        <strong>Daria:</strong> Hello! I'm Daria, a UX researcher. Click "Start Interview" when you're ready to begin.
+                    </div>
+                </div>
+            </div>
+
+            <!-- Report Container -->
+            <div id="reportContainer" class="report-container bg-white rounded-lg shadow-md p-4 hidden">
+                <h2 class="text-xl font-semibold mb-4">Interview Report</h2>
+                <div id="reportContent" class="prose max-w-none">
+                    <!-- Report will be inserted here -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Controls -->
+        <div class="mt-6 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button id="startInterview" class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                    Start Interview
+                </button>
+                <button id="stopInterview" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 hidden">
+                    Stop Interview
+                </button>
+            </div>
+            <div id="recordingStatus" class="text-gray-600">
+                Click 'Start Interview' to begin
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script src="{{ url_for('static', filename='js/audio.js') }}"></script>
+<script>
+    // Initialize variables from data attributes
+    const templateData = document.getElementById('templateData');
+    window.REPORT_PROMPT = JSON.parse(templateData.dataset.reportPrompt);
+    window.PROJECT_NAME = JSON.parse(templateData.dataset.projectName);
+    
+    // Debug logging and validation
+    console.log('Interview page loaded');
+    if (!window.PROJECT_NAME) {
+        console.error('Project name is missing');
+    } else {
+        console.log('Project:', window.PROJECT_NAME);
+    }
+    console.log('Report prompt:', window.REPORT_PROMPT);
+
+    const INTRODUCTION = "Welcome to our user study! Do we have your permission to proceed?";
+    
+    const chatContainer = document.getElementById('chatContainer');
+    const startButton = document.getElementById('startInterview');
+    const stopButton = document.getElementById('stopInterview');
+    const status = document.getElementById('recordingStatus');
+    let isInterviewStarted = false;
+    let shouldStopInterview = false;
+
+    // Check if audio.js functions are loaded
+    console.log('speak function available:', typeof speak === 'function');
+    console.log('listen function available:', typeof listen === 'function');
+
+    function addMessage(text, type = 'daria') {
+        console.log('Adding message:', { text, type });
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${type}-message`;
+        messageDiv.innerHTML = `<strong>${type === 'daria' ? 'Daria' : type === 'user' ? 'You' : 'Error'}:</strong> ${text}`;
+        chatContainer.appendChild(messageDiv);
+        chatContainer.scrollTop = chatContainer.scrollHeight;
+    }
+
+    // Function to reset the interview state
+    async function resetInterviewState(fullReset = false) {
+        console.log('Resetting interview state', fullReset ? '(full reset)' : '(partial reset)');
+        isInterviewStarted = false;
+        shouldStopInterview = false;
+        startButton.disabled = false;
+        stopButton.classList.add('hidden');
+        status.textContent = 'Interview stopped';
+        
+        // Stop any ongoing recording and cleanup
+        await cleanup();
+        
+        // Force stop any ongoing speech
+        if (window.speechSynthesis) {
+            window.speechSynthesis.cancel();
+        }
+        
+        // Force stop any ongoing audio recording
+        if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {
+            window.mediaRecorder.stop();
+        }
+        
+        if (fullReset) {
+            // Reset the chat container to initial state only on full reset
+            chatContainer.innerHTML = `
+                <div class="message daria-message">
+                    <strong>Daria:</strong> Hello! I'm Daria, a UX researcher. Click "Start Interview" when you're ready to begin.
+                </div>
+            `;
+            
+            // Hide the report container if it's visible
+            const reportContainer = document.getElementById('reportContainer');
+            if (reportContainer) {
+                reportContainer.classList.add('hidden');
+            }
+            
+            // Reset button text
+            startButton.textContent = 'Start Interview';
+        }
+    }
+
+    // Event listeners for interview controls
+    startButton.addEventListener('click', async () => {
+        if (!isInterviewStarted) {
+            isInterviewStarted = true;
+            startButton.disabled = true;
+            stopButton.classList.remove('hidden');
+            status.textContent = 'Recording in progress...';
+            status.classList.add('recording');
+            
+            // Start recording
+            await startRecording();
+            
+            // Start the interview
+            await speak(INTRODUCTION);
+            
+            // Wait for user's permission response
+            const permissionResponse = await listen();
+            if (permissionResponse) {
+                addMessage(permissionResponse, 'user');
+                
+                // Send the permission response to the server
+                const permissionResult = await fetch('/chat', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        user_input: permissionResponse
+                    })
+                });
+                
+                if (!permissionResult.ok) {
+                    console.error('Error getting permission response:', permissionResult.status);
+                    await resetInterviewState(true);
+                    return;
+                }
+                
+                const permissionData = await permissionResult.json();
+                if (permissionData.error) {
+                    console.error('Error:', permissionData.error);
+                    await resetInterviewState(true);
+                    return;
+                }
+                
+                addMessage(permissionData.response, 'daria');
+                await speak(permissionData.response);
+            }
+            
+            // Interview loop
+            let roundCount = 0;
+            while (isInterviewStarted && !shouldStopInterview && roundCount < 3) {
+                const transcription = await listen();
+                if (transcription) {
+                    addMessage(transcription, 'user');
+                }
+                
+                if (!shouldStopInterview) {
+                    const response = await fetch('/chat', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            user_input: transcription
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        console.error('Error getting response:', response.status);
+                        break;
+                    }
+                    
+                    const result = await response.json();
+                    if (result.error) {
+                        console.error('Error:', result.error);
+                        break;
+                    }
+                    
+                    addMessage(result.response, 'daria');
+                    await speak(result.response);
+                    
+                    roundCount++;
+                    
+                    if (roundCount >= 3 || result.should_stop_interview) {
+                        shouldStopInterview = true;
+                        // Generate and display report
+                        await generateAndDisplayReport();
+                        await resetInterviewState(true);
+                        break;
+                    }
+                }
+            }
+        }
+    });
+
+    stopButton.addEventListener('click', async () => {
+        if (isInterviewStarted) {
+            shouldStopInterview = true;
+            await resetInterviewState(true);
+        }
+    });
+
+    // Function to generate and display the report
+    async function generateAndDisplayReport() {
+        try {
+            const response = await fetch('/generate_report', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    project_name: window.PROJECT_NAME,
+                    report_prompt: window.REPORT_PROMPT
+                })
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to generate report');
+            }
+            
+            const result = await response.json();
+            if (result.error) {
+                throw new Error(result.error);
+            }
+            
+            // Show the report container
+            const reportContainer = document.getElementById('reportContainer');
+            const reportContent = document.getElementById('reportContent');
+            
+            reportContainer.classList.remove('hidden');
+            reportContent.innerHTML = result.report;
+            
+            // Scroll to the report
+            reportContainer.scrollIntoView({ behavior: 'smooth' });
+            
+        } catch (error) {
+            console.error('Error generating report:', error);
+            addMessage('Error generating report: ' + error.message, 'error');
+        }
+    }
+
+    // Initialize the interview page
+    document.addEventListener('DOMContentLoaded', () => {
+        console.log('Interview page initialized');
+        resetInterviewState(true);
+    });
+</script>
+{% endblock %} 

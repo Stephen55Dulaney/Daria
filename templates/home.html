@@ -1,0 +1,104 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <h1 class="mb-4">Welcome to DARIA</h1>
+            <p class="lead mb-4">Design Analysis and Research Interview Assistant</p>
+
+            <!-- Action Buttons -->
+            <div class="d-flex gap-3 mb-5">
+                <a href="{{ url_for('new_interview') }}" class="btn btn-primary">New Interview</a>
+                <a href="{{ url_for('archive') }}" class="btn btn-outline-primary">View Archive</a>
+                <a href="{{ url_for('persona') }}" class="btn btn-outline-primary">Create Persona</a>
+                <a href="{{ url_for('journey_map') }}" class="btn btn-outline-primary">Create Journey Map</a>
+            </div>
+
+            <!-- Recent Content Grid -->
+            <div class="row g-4">
+                <!-- Recent Interviews Column -->
+                <div class="col-md-6">
+                    {% if recent_interviews %}
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h2 class="h5 mb-0">Recent Interviews</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                {% for interview in recent_interviews %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ interview.project_name }}</h6>
+                                            <small class="text-muted">{{ interview.interview_type }} - {{ interview.get('date', '') }}</small>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" class="btn btn-sm btn-outline-primary">View Transcript</a>
+                                            <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" class="btn btn-sm btn-outline-success">View Analysis</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <!-- Recent Personas Column -->
+                <div class="col-md-6">
+                    {% if recent_personas %}
+                    <div class="card h-100">
+                        <div class="card-header">
+                            <h2 class="h5 mb-0">Recent Personas</h2>
+                        </div>
+                        <div class="card-body">
+                            <div class="list-group list-group-flush">
+                                {% for persona in recent_personas %}
+                                <div class="list-group-item">
+                                    <div class="d-flex justify-content-between align-items-center">
+                                        <div>
+                                            <h6 class="mb-1">{{ persona.project_name }}</h6>
+                                            <small class="text-muted">Created {{ persona.get('date', '').split('T')[0] if persona.get('date') else 'Unknown date' }}</small>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a href="{{ url_for('view_persona', persona_id=persona.id) }}" class="btn btn-sm btn-outline-primary">View Persona</a>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- No Content Message -->
+            {% if not recent_interviews and not recent_personas %}
+            <div class="alert alert-info">
+                <h4 class="alert-heading">Welcome to DARIA!</h4>
+                <p>Start by conducting a new interview to gather insights from your users.</p>
+                <hr>
+                <a href="{{ url_for('new_interview') }}" class="btn btn-primary">Start New Interview</a>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+.btn-group {
+    gap: 0.5rem;
+}
+
+.list-group-item:hover {
+    background-color: #f8f9fa;
+}
+
+.card {
+    height: 100%;
+}
+</style>
+{% endblock %} 

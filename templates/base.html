@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}DARIA - Deloitte Advanced Research & Interview Assistant{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <style>
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        .masthead {
+            background-color: white;
+            padding: 1rem 0;
+            margin-bottom: 2rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .masthead .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .masthead .navbar-brand img {
+            width: 40px;
+            height: 40px;
+            border-radius: 8px;
+            padding: 4px;
+        }
+        .masthead .navbar-brand .brand-text {
+            color: #333;
+            font-size: 1.5rem;
+            margin: 0;
+        }
+        .masthead .nav-link {
+            color: #333 !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            transition: background-color 0.2s;
+            border-radius: 4px;
+        }
+        .masthead .nav-link:hover {
+            background-color: rgba(0, 0, 0, 0.05);
+        }
+        .masthead .nav-link.active {
+            background-color: rgba(0, 0, 0, 0.1);
+        }
+        .content {
+            flex: 1;
+            padding: 2rem 0;
+        }
+        .card {
+            border: none;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+        .markdown-content {
+            line-height: 1.6;
+            max-width: 65ch;
+        }
+        .markdown-content h2 {
+            color: #333;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #eee;
+        }
+        .markdown-content h3 {
+            color: #555;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .markdown-content ul {
+            margin-bottom: 1rem;
+            padding-left: 1.5rem;
+        }
+        .markdown-content blockquote {
+            border-left: 4px solid #86BC25;
+            padding-left: 1rem;
+            margin: 1rem 0;
+            color: #666;
+            font-style: italic;
+        }
+        .prose pre {
+            background-color: #f3f4f6;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            overflow-x: auto;
+        }
+        .prose code {
+            background-color: #f3f4f6;
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem;
+            font-size: 0.875em;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg masthead">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <img src="{{ url_for('static', filename='images/daria-logo.png') }}" alt="DARIA Logo">
+                <div class="brand-text">
+                    DARIA
+                    <div style="font-size: 0.8rem; opacity: 0.7;">Deloitte Advanced Research & Interview Assistant</div>
+                </div>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" href="/">Home</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'new_interview' %}active{% endif %}" href="{{ url_for('new_interview') }}">New Interview</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'archive' %}active{% endif %}" href="{{ url_for('archive') }}">Archive</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'persona' %}active{% endif %}" href="{{ url_for('persona') }}">Persona</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'journey_map' %}active{% endif %}" href="{{ url_for('journey_map') }}">Journey Map</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container content">
+        {% block content %}{% endblock %}
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    {% block extra_js %}{% endblock %}
+    {% block scripts %}{% endblock %}
+</body>
+</html> 
