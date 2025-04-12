@@ -325,7 +325,7 @@ Analysis:
             query_embedding = self.embeddings.embed_query(query)
             
             # Search the index with a larger k to get more potential matches
-            search_k = min(k * 8, len(self.interview_ids))  # Get 8x more results than requested
+            search_k = min(k * 10, len(self.interview_ids))  # Increased from 5x to 10x
             distances, indices = self.index.search(
                 np.array([query_embedding]).astype('float32'),
                 search_k
@@ -348,10 +348,15 @@ Analysis:
                         if not interview_data.get('transcript'):
                             continue
                         
-                        # Convert L2 distance to a similarity score between 0 and 1
-                        # Using a sigmoid-like function for better scaling
+                        # Calculate similarity score using a modified sigmoid function
+                        # This provides better differentiation between results
                         l2_distance = float(distances[0][i])
-                        similarity_score = 1 / (1 + l2_distance)
+                        # Use a more lenient sigmoid function with a larger divisor
+                        similarity_score = 1 / (1 + np.exp(l2_distance / 5))  # Increased divisor from 3 to 5
+                        
+                        # Skip results with very low similarity
+                        if similarity_score < 0.1:  # Reduced threshold from 0.2 to 0.1
+                            continue
                         
                         # Format the result with all necessary fields
                         unique_interviews[interview_id] = {

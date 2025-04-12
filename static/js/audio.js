@@ -1,11 +1,14 @@
 // Audio recording configuration
 const SAMPLE_RATE = 16000;  // Match server's expected sample rate
-const SILENCE_THRESHOLD = 0.005;
+const SILENCE_THRESHOLD = 0.01;
 const NOISE_THRESHOLD = 0.02;
 const SPEECH_THRESHOLD = 0.1;
 const SILENCE_DURATION = 2.0;
 const MIN_RECORDING_TIME = 2;
 const MAX_RECORDING_TIME = 60;
+const MIN_SPEECH_DURATION = 0.1;
+const MAX_SILENCE_DURATION = 1.3;  // Changed from 3.0 to 1.3 seconds for faster, more natural interview pace
+const MIN_RECORDING_DURATION = 1.0;
 
 let mediaRecorder = null;
 let audioContext = null;
@@ -17,24 +20,6 @@ let recordingStartTime = null;
 let currentAudioLevel = 0;
 let isSpeechDetected = false;
 let silenceDuration = 0;
-
-function startDebugLogging() {
-    if (debugLoggingInterval) {
-        clearInterval(debugLoggingInterval);
-    }
-    debugLoggingInterval = setInterval(() => {
-        if (audioContext && isRecording) {
-            console.log(`[${(Date.now() - recordingStartTime) / 1000}s] Audio Level: ${currentAudioLevel.toFixed(3)} | Speech Detected: ${isSpeechDetected} | Silence Duration: ${silenceDuration.toFixed(1)}s`);
-        }
-    }, 500);
-}
-
-function stopDebugLogging() {
-    if (debugLoggingInterval) {
-        clearInterval(debugLoggingInterval);
-        debugLoggingInterval = null;
-    }
-}
 
 async function cleanup() {
     console.log('Cleaning up audio resources');
@@ -81,6 +66,24 @@ async function cleanup() {
     currentAudioLevel = 0;
     isSpeechDetected = false;
     silenceDuration = 0;
+}
+
+function startDebugLogging() {
+    if (debugLoggingInterval) {
+        clearInterval(debugLoggingInterval);
+    }
+    debugLoggingInterval = setInterval(() => {
+        if (audioContext && isRecording) {
+            console.log(`[${(Date.now() - recordingStartTime) / 1000}s] Audio Level: ${currentAudioLevel.toFixed(3)} | Speech Detected: ${isSpeechDetected} | Silence Duration: ${silenceDuration.toFixed(1)}s`);
+        }
+    }, 500);
+}
+
+function stopDebugLogging() {
+    if (debugLoggingInterval) {
+        clearInterval(debugLoggingInterval);
+        debugLoggingInterval = null;
+    }
 }
 
 async function setupAudioContext(stream) {
@@ -240,13 +243,68 @@ async function speak(text) {
 window.startRecording = startRecording;
 window.stopRecording = stopRecording;
 window.cleanup = cleanup;
+window.listen = listen;
+window.speak = speak;
 
 // Add the listen function
 async function listen() {
     try {
+        // Initialize recording
         const chunks = [];
-        const recorder = await startRecording();
+        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+        const audioContext = new AudioContext();
+        const source = audioContext.createMediaStreamSource(stream);
+        const analyzer = audioContext.createAnalyser();
+        analyzer.fftSize = 2048;
+        source.connect(analyzer);
+
+        const recorder = new MediaRecorder(stream);
+        let silenceStartTime = null;
+        let speechDetected = false;
+        let recordingStartTime = Date.now();
         
+        // Create buffer for analyzing audio levels
+        const dataArray = new Float32Array(analyzer.frequencyBinCount);
+        
+        // Monitor audio levels
+        const audioLevelInterval = setInterval(() => {
+            analyzer.getFloatTimeDomainData(dataArray);
+            const audioLevel = Math.max(...dataArray.map(Math.abs));
+            const currentTime = (Date.now() - recordingStartTime) / 1000;
+            
+            console.log(`[${currentTime.toFixed(3)}s] Audio Level: ${audioLevel.toFixed(3)} | Speech Detected: ${speechDetected} | Silence Duration: ${silenceStartTime ? ((Date.now() - silenceStartTime) / 1000).toFixed(1) : '0.0'}s`);
+            
+            if (audioLevel > SILENCE_THRESHOLD) {
+                speechDetected = true;
+                silenceStartTime = null;
+            } else if (!silenceStartTime) {
+                silenceStartTime = Date.now();
+                console.log(`[${currentTime.toFixed(3)}s] Silence started`);
+            }
+            
+            // Only stop if we've detected speech and then silence
+            if (speechDetected && silenceStartTime) {
+                const silenceDuration = (Date.now() - silenceStartTime) / 1000;
+                const totalDuration = (Date.now() - recordingStartTime) / 1000;
+                
+                if (silenceDuration >= MAX_SILENCE_DURATION && totalDuration >= MIN_RECORDING_DURATION) {
+                    console.log(`[${currentTime.toFixed(3)}s] Stopping due to silence`);
+                    clearInterval(audioLevelInterval);
+                    stopRecording();
+                }
+            }
+        }, 500);
+
+        function stopRecording() {
+            console.log('Stopping recording...');
+            console.log('MediaRecorder state before stop:', recorder.state);
+            if (recorder.state === 'recording') {
+                recorder.stop();
+                stream.getTracks().forEach(track => track.stop());
+                clearInterval(audioLevelInterval);
+            }
+        }
+
         return new Promise((resolve) => {
             recorder.ondataavailable = (e) => {
                 if (e.data.size > 0) {
@@ -310,9 +368,6 @@ async function listen() {
         return 'Error recording audio';
     }
 }
-
-// Make listen function available globally
-window.listen = listen;
 
 // Add visual feedback for recording state
 function updateRecordingStatus(isRecording) {

@@ -123,6 +123,9 @@
                         <a class="nav-link {% if request.endpoint == 'new_interview' %}active{% endif %}" href="{{ url_for('new_interview') }}">New Interview</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'test_interview' %}active{% endif %}" href="{{ url_for('test_interview') }}">Test Interview</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'archive' %}active{% endif %}" href="{{ url_for('archive') }}">Archive</a>
                     </li>
                     <li class="nav-item">

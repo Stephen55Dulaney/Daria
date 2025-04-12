@@ -16,11 +16,12 @@ from langchain.chains import ConversationChain
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime
 from pathlib import Path
-from vector_store import InterviewVectorStore
+from src.vector_store import InterviewVectorStore
 import traceback
 import logging
 from markupsafe import Markup
 from openai import OpenAI
+import markdown  # Added this import since it's used in the markdown filter
 
 # Global variables
 vector_store = None
@@ -449,9 +450,10 @@ def journey_map():
 def save_interview():
     try:
         data = request.get_json()
-        project_name = data.get('project_name')
-        interview_type = data.get('interview_type')
-        project_description = data.get('project_description')
+        project_data = data.get('project', {})
+        project_name = project_data.get('name')
+        interview_type = project_data.get('type')
+        project_description = project_data.get('description')
 
         if not project_name or not interview_type or not project_description:
             logger.error(f"Missing required fields. Received: project_name={project_name}, interview_type={interview_type}")
@@ -558,7 +560,7 @@ def save_interview():
         return jsonify({
             'status': 'success',
             'interview_prompt': interview_prompt,
-            'redirect_url': url_for('chat_page', project_name=project_name)
+            'redirect_url': url_for('interview', project_name=project_name)
         })
         
     except Exception as e:
@@ -566,21 +568,74 @@ def save_interview():
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
-@app.route('/interview/<project_name>')
+@app.route('/interview/<project_name>', methods=['GET', 'POST'])
 def interview(project_name):
-    """Interview page route"""
     try:
-        if project_name not in interview_prompts:
-            return redirect(url_for('new_interview'))
-        
-        prompt = interview_prompts[project_name]
-        # Escape the prompt for JavaScript using json.dumps to handle special characters
-        prompt = json.dumps(prompt).replace("'", "\\'")
-        return render_template('interview.html', project_name=project_name, prompt=prompt)
+        if request.method == 'GET':
+            # Check if the project exists in interview_prompts
+            if project_name not in interview_prompts:
+                return redirect(url_for('new_interview'))
+            
+            # Get the prompt for this project
+            prompt = interview_prompts[project_name]
+            
+            # Render the interview template
+            return render_template('interview.html', project_name=project_name, prompt=prompt)
+        else:  # POST request
+            data = request.get_json()
+            user_input = data.get('user_input', '')
+            question_count = data.get('question_count', 0)
+            
+            # Create OpenAI client
+            llm = create_openai_client()
+            
+            # Get the interview prompt
+            prompt = interview_prompts.get(project_name)
+            if not prompt:
+                return jsonify({'error': 'Interview prompt not found'}), 404
+            
+            # Generate system message based on interview type
+            if "Persona Interview" in prompt:
+                system_message = """You are Daria, an expert UX researcher conducting a persona interview. 
+                Your goal is to understand the user's background, behaviors, goals, and pain points to create a detailed persona."""
+            elif "Journey Map Interview" in prompt:
+                system_message = """You are Daria, an expert UX researcher conducting a journey mapping interview. 
+                Your goal is to understand the user's experience at each stage of their journey with the system."""
+            else:  # Application Interview
+                system_message = """You are Daria, an expert UX researcher conducting an application evaluation interview. 
+                Your goal is to understand how users interact with the system and identify areas for improvement."""
+            
+            # Add context about the current state of the interview
+            system_message += f"\nThis is question {question_count} of the interview about {project_name}."
+            
+            # If we're near the end of the interview, guide the conversation towards wrap-up
+            if question_count >= 12:  # 3 questions before max
+                system_message += "\nThe interview is nearing completion. Guide the conversation towards a natural conclusion, asking for any final thoughts or insights."
+            
+            # Generate response using the language model
+            messages = [
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": user_input}
+            ]
+            
+            response = llm.chat.completions.create(
+                model="gpt-4",
+                messages=messages,
+                temperature=0.7,
+                max_tokens=300
+            )
+            
+            # Extract the response text
+            response_text = response.choices[0].message.content.strip()
+            
+            return jsonify({
+                'status': 'success',
+                'response': response_text
+            })
+            
     except Exception as e:
-        logger.error(f"Error in interview route: {str(e)}")
-        logger.error(traceback.format_exc())
-        return redirect(url_for('new_interview'))
+        print(f"Error in interview route: {str(e)}")
+        return jsonify({'error': str(e)}), 500
 
 @app.route('/process_audio', methods=['POST'])
 def process_audio():
@@ -589,61 +644,41 @@ def process_audio():
         if not project_name:
             return jsonify({'error': 'Project name is required'}), 400
 
-        if project_name not in conversations:
-            conversations[project_name] = {
-                'id': str(uuid.uuid4()),
-                'messages': []
-            }
-
         if 'audio' not in request.files:
             return jsonify({'error': 'No audio file provided'}), 400
 
         audio_file = request.files['audio']
-        
-        # Save audio to temporary file
+        if not audio_file:
+            return jsonify({'error': 'Empty audio file'}), 400
+
+        # Create a temporary file to store the audio
         with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio:
             audio_file.save(temp_audio.name)
             
-            # Transcribe audio using OpenAI Whisper
+            # Process the audio file with OpenAI's Whisper API
             client = OpenAI()
             with open(temp_audio.name, 'rb') as audio:
                 transcription = client.audio.transcriptions.create(
                     model="whisper-1",
-                    file=audio,
-                    response_format="text"
+                    file=audio
                 )
 
-        # Clean up temporary file
+        # Clean up the temporary file
         os.unlink(temp_audio.name)
 
-        # Format the user's transcribed message
-        formatted_user_input = f"You: {transcription}\n\n"
-        
-        # Add the user's message to the conversation
-        conversations[project_name]['messages'].append({"role": "user", "content": formatted_user_input})
-        
+        # Get the saved interview prompt
+        interview_prompt = interview_prompts.get(project_name)
+        if not interview_prompt:
+            return jsonify({'error': 'Interview prompt not found'}), 400
+
         # Get the current conversation
         conversation = conversations[project_name]
-        
-        # Calculate current round
         current_round = len(conversation['messages']) // 2
-        
-        # Create the system message for this turn
-        system_message = f"""You are conducting an interview about {project_name}.
-Based on the user's responses so far, ask the next relevant question. Remember to:
-1. Stay focused on {project_name}
-2. Ask follow-up questions only if clarification is needed
-3. Move to a new topic when appropriate
-4. Never repeat questions
-5. Keep questions concise and direct
-6. Maintain a professional tone without unnecessary acknowledgments
-7. Focus on gathering specific, actionable insights
-8. This is round {current_round + 1} of {MAX_ROUNDS}, so manage time accordingly"""
 
-        # Update the system message
-        conversation['messages'][0]['content'] = system_message
+        # Add the transcription to the conversation history
+        conversation['messages'].append({"role": "user", "content": f"You: {transcription.text}\n\n"})
 
-        # Get AI response
+        # Get AI response using OpenAI client
         response = client.chat.completions.create(
             model="gpt-4",
             messages=conversation['messages'],
@@ -651,22 +686,17 @@ Based on the user's responses so far, ask the next relevant question. Remember t
         )
 
         ai_response = response.choices[0].message.content
-        formatted_response = f"Daria: {ai_response}\n\n"
-        
-        # Add the AI response to the conversation
-        conversation['messages'].append({"role": "assistant", "content": formatted_response})
+        conversation['messages'].append({"role": "assistant", "content": f"Daria: {ai_response}\n\n"})
 
-        # Check if this was the last round
-        if (current_round + 1) >= MAX_ROUNDS:
-            return jsonify({
-                'transcription': transcription,
-                'response': ai_response,
-                'should_stop_interview': True
-            })
+        # Only set should_stop_interview if we've reached max rounds and have meaningful conversation
+        should_stop = False
+        if current_round > 0 and len(transcription.text.split()) > 2 and current_round >= MAX_ROUNDS:
+            should_stop = False  # Don't stop the interview automatically
 
         return jsonify({
-            'transcription': transcription,
-            'response': ai_response
+            'transcription': transcription.text,
+            'response': ai_response,
+            'should_stop_interview': should_stop
         })
 
     except Exception as e:
@@ -714,7 +744,7 @@ def chat():
             return jsonify({'error': 'Invalid project'}), 400
         
         data = request.get_json()
-        user_input = data.get('user_input', '')
+        user_input = data.get('user_input', '').strip()
         
         if not user_input:
             return jsonify({'error': 'No input provided'}), 400
@@ -740,15 +770,31 @@ def chat():
         # Calculate current round (each round has a user message and an assistant message)
         current_round = len(conversation['messages']) // 2
         
-        # Check if we've reached the maximum number of rounds
-        if current_round >= MAX_ROUNDS:
-            return jsonify({
-                'response': "Thank you for participating in this interview. I've gathered enough information for now. Would you like to conclude the interview?",
-                'should_stop_interview': True
-            })
-        
         # Add the user's message to the conversation
         conversation['messages'].append({"role": "user", "content": formatted_user_input})
+        
+        # Check if this is a response to the conclusion question
+        if conversation['messages'][-2]['content'].startswith("Thank you for participating"):
+            if "yes" in user_input.lower() or "complete" in user_input.lower() or "generate" in user_input.lower():
+                return jsonify({
+                    'response': "Great! I'll now analyze our conversation and generate a report.",
+                    'should_stop_interview': True,
+                    'generate_report': True
+                })
+            else:
+                return jsonify({
+                    'response': "I understand you'd like to continue. Let's proceed with the interview.",
+                    'should_stop_interview': False
+                })
+        
+        # Only check for max rounds if we're past the first round and the input isn't too short
+        if current_round > 0 and len(user_input.split()) > 2 and current_round >= MAX_ROUNDS:
+            # Only ask to conclude if we haven't already asked
+            if not any(msg['content'].startswith("Thank you for participating") for msg in conversation['messages']):
+                return jsonify({
+                    'response': "Thank you for participating in this interview. I've gathered enough information for now. Would you like to conclude the interview?",
+                    'should_stop_interview': False  # Don't stop until user confirms
+                })
         
         # Create the system message for this turn
         system_message = f"""You are conducting a {interview_type} about {project_name}.
@@ -763,8 +809,8 @@ Based on the user's responses so far, ask the next relevant question. Remember t
 7. Focus on gathering specific, actionable insights
 8. This is round {current_round + 1} of {MAX_ROUNDS}, so manage time accordingly"""
 
-        # Special handling for the first response (permission question)
-        if current_round == 0 and "permission" in user_input.lower():
+        # Special handling for the first response
+        if current_round == 0:
             system_message = f"""You are conducting a {interview_type} about {project_name}.
 The user has just given permission to proceed with the interview.
 
@@ -793,14 +839,10 @@ Based on this, ask the first question about {project_name}. Remember to:
         # Add the AI response to the conversation
         conversation['messages'].append({"role": "assistant", "content": formatted_response})
         
-        # Check if this was the last round
-        if (current_round + 1) >= MAX_ROUNDS:
-            return jsonify({
-                'response': ai_response,
-                'should_stop_interview': True
-            })
-        
-        return jsonify({'response': ai_response})
+        return jsonify({
+            'response': ai_response,
+            'should_stop_interview': False  # Only stop when user confirms
+        })
         
     except Exception as e:
         logger.error(f"Error in chat route: {str(e)}")
@@ -872,39 +914,13 @@ Format your response with clear sections using headers and include relevant quot
 
 Your analysis should include:
 1. User Journey Stages: Break down the experience into key stages or phases
-2. Touchpoints:
-   - For each stage, identify:
-     * Key interactions with the system
-     * Tools or features used
-     * Communication channels
-     * Support mechanisms
-   - Include specific examples from the interviews
+2. Touchpoints: Identify all interactions with the system and other stakeholders
+3. Emotions: Track emotional highs and lows throughout the journey
+4. Pain Points: Identify frustrations and challenges at each stage
+5. Moments of Delight: Note positive experiences and successful interactions
+6. Opportunities: Suggest improvements for each stage of the journey
 
-3. User Emotions:
-   - Track emotional changes throughout the journey
-   - Identify:
-     * High points and low points
-     * Specific triggers for emotional responses
-     * Patterns in emotional experiences
-   - Include emotional quotes from users
-
-4. Pain Points:
-   - For each stage, identify:
-     * Specific challenges users face
-     * Technical difficulties
-     * Process bottlenecks
-     * User frustrations
-   - Include supporting quotes
-
-5. Opportunities:
-   - Based on the analysis, suggest:
-     * Specific improvements for each stage
-     * Potential new features
-     * Process changes
-     * Quick wins vs long-term solutions
-   - Prioritize based on impact and feasibility
-
-Format your response with clear section headers and bullet points. Include specific quotes from the interviews to support each insight."""
+Format your response with clear sections using headers and include relevant quotes from the transcript."""
 
         # Generate the analysis using the actual transcript from the current interview
         analysis = analysis_llm.predict(analysis_prompt + "\n\nInterview Transcript:\n" + transcript)
@@ -1097,8 +1113,14 @@ def search_interviews():
         
         # First try exact match search
         exact_matches = []
+        seen_interview_ids = set()  # Track seen interview IDs to prevent duplicates
+        
         for interview_id in vector_store.interview_ids:
             try:
+                # Skip if we've already seen this interview
+                if interview_id in seen_interview_ids:
+                    continue
+                    
                 # Load the interview
                 interview_file = Path('interviews') / f"{interview_id}.json"
                 if not interview_file.exists():
@@ -1115,26 +1137,52 @@ def search_interviews():
                 for line in transcript.split('\n'):
                     if line.startswith('You:'):
                         response = line[4:].strip()
-                        # Check for exact match (case insensitive)
-                        if query.lower() in response.lower():
-                            match_info = {
-                                'interview_id': interview_id,
-                                'project_name': interview.get('project_name'),
-                                'response': response
-                            }
-                            debug_info['exact_matches'].append(match_info)
-                            
+                        response_lower = response.lower()
+                        query_lower = query.lower()
+                        
+                        # First check for exact phrase match
+                        if query_lower in response_lower:
                             exact_matches.append({
                                 'id': interview_id,
                                 'project_name': interview.get('project_name', 'Unknown Project'),
                                 'interview_type': interview.get('interview_type', 'Unknown Type'),
-                                'date': interview.get('date', ''),
-                                'transcript': transcript,
+                                'date': interview.get('date', datetime.now().isoformat()),
                                 'transcript_preview': response,
                                 'score': 1.0,  # Exact matches get highest score
-                                'match_type': 'Exact Match'
+                                'debug_info': {
+                                    'match_type': 'Exact Phrase Match',
+                                    'word_overlap': len(query_lower.split()),
+                                    'word_overlap_ratio': 1.0
+                                }
                             })
-                            
+                            seen_interview_ids.add(interview_id)
+                            break
+                        
+                        # If no exact phrase match, try word overlap
+                        query_words = set(query_lower.split())
+                        response_words = set(response_lower.split())
+                        
+                        # Calculate word overlap
+                        matching_words = query_words & response_words
+                        word_overlap_ratio = len(matching_words) / len(query_words)
+                        
+                        # If we have a good match, add it to results
+                        if word_overlap_ratio >= 0.7:  # Increased threshold for word overlap
+                            exact_matches.append({
+                                'id': interview_id,
+                                'project_name': interview.get('project_name', 'Unknown Project'),
+                                'interview_type': interview.get('interview_type', 'Unknown Type'),
+                                'date': interview.get('date', datetime.now().isoformat()),
+                                'transcript_preview': response,
+                                'score': 0.8,  # High score for word overlap
+                                'debug_info': {
+                                    'match_type': 'Word Overlap Match',
+                                    'word_overlap': len(matching_words),
+                                    'word_overlap_ratio': word_overlap_ratio
+                                }
+                            })
+                            seen_interview_ids.add(interview_id)
+                            break
             except Exception as e:
                 logger.error(f"Error processing interview {interview_id}: {str(e)}")
                 continue
@@ -1195,7 +1243,9 @@ def search_interviews():
                             # Calculate word overlap with query
                             query_words = set(query.lower().split())
                             response_words = set(response.lower().split())
-                            overlap = len(query_words & response_words)
+                            matching_words = query_words & response_words
+                            overlap = len(matching_words) / len(query_words)
+                            
                             if overlap > highest_overlap:
                                 highest_overlap = overlap
                                 most_relevant = response
@@ -1208,24 +1258,22 @@ def search_interviews():
                                 transcript_preview = transcript_preview[:200] + '...'
 
                 # Check if the result meets minimum relevance threshold
-                min_relevance = search_params.get('min_relevance', 0.3)  # Default to 0.3 if not specified
+                min_relevance = search_params.get('min_relevance', 0.2)  # Reduced from 0.3 to 0.2
                 if result.get('score', 0) < min_relevance:
                     result_debug['skipped'] = True
                     result_debug['reason'] = f"Score {result.get('score', 0)} below threshold {min_relevance}"
                     debug_info['semantic_results'].append(result_debug)
                     continue
 
-                formatted_result = {
+                formatted_results.append({
                     'id': result.get('id'),
                     'project_name': result.get('project_name'),
                     'interview_type': result.get('interview_type'),
                     'date': result.get('date'),
                     'transcript_preview': transcript_preview,
                     'score': result.get('score', 0),
-                    'match_type': 'Semantic Match'
-                }
-                formatted_results.append(formatted_result)
-                debug_info['semantic_results'].append(result_debug)
+                    'debug_info': result_debug
+                })
             except Exception as e:
                 logger.error(f"Error processing search result: {str(e)}")
                 continue
@@ -2166,41 +2214,78 @@ def generate_report():
         project_name = data.get('project_name')
         report_prompt = data.get('report_prompt')
         
+        logger.info(f"Generating report for project: {project_name}")
+        logger.info(f"Report prompt: {report_prompt}")
+        
         if not project_name or not report_prompt:
+            logger.error("Missing project_name or report_prompt")
             return jsonify({'error': 'Missing required parameters'}), 400
-            
+        
         # Get the conversation history
         conversation = conversations.get(project_name)
         if not conversation:
-            return jsonify({'error': 'No conversation found for this project'}), 404
-            
-        # Create the system message for report generation
-        system_message = f"""You are a UX researcher analyzing an interview about {project_name}.
-Based on the interview transcript, generate a comprehensive report that includes:
-1. Key findings and insights
-2. User pain points and challenges
-3. Suggestions and recommendations
-4. Overall user experience assessment
-
-Format the report in a clear, professional manner using markdown."""
-
-        # Prepare messages for the report generation
-        messages = [
-            {"role": "system", "content": system_message},
-            {"role": "user", "content": "Please generate a report based on this interview transcript:\n\n" + "\n".join([msg["content"] for msg in conversation['messages'][1:]])}
-        ]
+            logger.error(f"No conversation found for project: {project_name}")
+            return jsonify({'error': 'No conversation found'}), 404
         
-        # Generate the report using OpenAI
-        client = OpenAI()
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=messages,
-            temperature=0.7
+        # Format the conversation for analysis
+        transcript = "\n".join([msg['content'] for msg in conversation['messages']])
+        logger.info(f"Conversation transcript: {transcript}")
+        
+        # Create a new instance of ChatOpenAI for analysis
+        analysis_llm = ChatOpenAI(
+            temperature=0.7,
+            model_name="gpt-4",
+            openai_api_key=os.getenv('OPENAI_API_KEY')
         )
         
-        report = response.choices[0].message.content
+        # Generate analysis prompt based on interview type
+        if "Journey Map Interview" in report_prompt:
+            analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Creating a Journey Map interviews.
+#Objective: Generate a comprehensive Journey Map based on the interviewee's responses about {project_name}
+#Instructions: Evaluate the interview transcript and generate a Journey Map based on the interviewee's responses.
+
+Your analysis should include:
+1. User Journey Stages: Break down the experience into key stages or phases
+2. Touchpoints:
+   - For each stage, identify:
+     * Key interactions with the system
+     * Tools or features used
+     * Communication channels
+     * Support mechanisms
+   - Include specific examples from the interviews
+
+3. User Emotions:
+   - Track emotional changes throughout the journey
+   - Identify:
+     * High points and low points
+     * Specific triggers for emotional responses
+     * Patterns in emotional experiences
+   - Include emotional quotes from users
+
+4. Pain Points:
+   - For each stage, identify:
+     * Specific challenges users face
+     * Technical difficulties
+     * Process inefficiencies
+     * Communication gaps
+   - Include specific examples and quotes
+
+5. Moments of Delight:
+   - Identify positive experiences
+   - Note what worked well
+   - Highlight successful interactions
+   - Include specific examples and quotes
+
+Format your response with clear sections using headers and include relevant quotes from the transcript.
+
+Here is the interview transcript:
+{transcript}"""
         
-        return jsonify({'report': report})
+        logger.info("Sending request to OpenAI for report generation")
+        response = analysis_llm.predict(analysis_prompt)
+        logger.info("Received response from OpenAI")
+        
+        return jsonify({'report': response})
         
     except Exception as e:
         logger.error(f"Error generating report: {str(e)}")
@@ -2428,5 +2513,58 @@ def delete_journey_map_route(journey_map_id):
         logger.error(f"Error deleting journey map: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
+@app.route('/test_interview')
+def test_interview():
+    # Pre-configured test data
+    project_name = "Green Eggs and Ham"
+    interview_type = "Journey Map Interview"
+    prompt = """#Role: you are Daria, a UX researcher conducting a Journey Map Interview
+#Objective: You are conducting a Journey Map Interview about Green Eggs and Ham
+#Project Description: study how they order green eggs and ham
+#Instructions: 
+1. Ask questions to understand the user's journey through different stages
+2. Focus on gathering information about:
+   - Journey Stages: Different phases or steps in their experience
+   - Touchpoints: Interactions with the system and other stakeholders
+   - Emotions: How they feel at different stages
+   - Pain Points: Challenges and frustrations
+   - Moments of Delight: Positive experiences and successes
+3. Keep questions concise and direct
+4. Never repeat questions
+5. Ask follow-up questions only when clarification is needed
+6. Maintain a professional tone without unnecessary acknowledgments"""
+
+    # Store the interview prompt
+    interview_prompts[project_name] = prompt
+
+    # Create initial conversation
+    conversations[project_name] = {
+        'messages': [
+            {"role": "system", "content": prompt}
+        ]
+    }
+
+    # Create interview object with required data
+    interview = {
+        'id': str(uuid.uuid4()),
+        'project': {
+            'name': project_name,
+            'type': interview_type,
+            'description': 'Study how users order green eggs and ham'
+        },
+        'researcher': {
+            'name': 'Daria'
+        },
+        'interviewee': {
+            'name': 'Test User'
+        },
+        'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+    }
+
+    return render_template('interview.html', 
+                         project_name=project_name,
+                         prompt=prompt,
+                         interview=interview)
+
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5002) 
+    socketio.run(app, debug=True, port=5003) 

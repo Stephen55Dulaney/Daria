@@ -9,23 +9,30 @@
             <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Project Information</h5>
-                    <div class="mb-3">
-                        <label for="projectName" class="form-label">Project Name</label>
-                        <input type="text" class="form-control" id="projectName" placeholder="Enter project name">
-                    </div>
-                    <div class="mb-3">
-                        <label for="interviewType" class="form-label">Interview Type</label>
-                        <select class="form-select" id="interviewType">
-                            <option value="Application Interview">Application Interview</option>
-                            <option value="Persona Interview">Persona Interview</option>
-                            <option value="Journey Map Interview">Journey Map Interview</option>
-                        </select>
-                    </div>
-                    <div class="mb-3">
-                        <label for="projectDescription" class="form-label">Project Description</label>
-                        <textarea class="form-control" id="projectDescription" rows="3" placeholder="Describe the project and its goals"></textarea>
-                    </div>
-                    <button id="startButton" class="btn btn-primary">Start Interview</button>
+                    <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
+                    <form id="interviewForm" novalidate>
+                        <div class="mb-3">
+                            <label for="projectName" class="form-label">Project Name</label>
+                            <input type="text" class="form-control" id="projectName" placeholder="Enter project name" required>
+                            <div class="invalid-feedback">Please enter a project name</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="interviewType" class="form-label">Interview Type</label>
+                            <select class="form-select" id="interviewType" required>
+                                <option value="">Select an interview type</option>
+                                <option value="Application Interview">Application Interview</option>
+                                <option value="Persona Interview">Persona Interview</option>
+                                <option value="Journey Map Interview">Journey Map Interview</option>
+                            </select>
+                            <div class="invalid-feedback">Please select an interview type</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectDescription" class="form-label">Project Description</label>
+                            <textarea class="form-control" id="projectDescription" rows="3" placeholder="Describe the project and its goals" required></textarea>
+                            <div class="invalid-feedback">Please enter a project description</div>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Start Interview</button>
+                    </form>
                 </div>
             </div>
         </div>
@@ -44,6 +51,63 @@
 </div>
 
 <script>
+// Debug logging function
+function debugLog(message, data = null) {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${message}`);
+    if (data) {
+        console.log('Data:', data);
+    }
+}
+
+// Function to show error message
+function showError(message, missingFields = []) {
+    const errorAlert = document.getElementById('errorAlert');
+    if (missingFields.length > 0) {
+        const fieldNames = missingFields.map(field => {
+            switch(field) {
+                case 'projectName': return 'Project Name';
+                case 'projectDescription': return 'Project Description';
+                case 'interviewType': return 'Interview Type';
+                default: return field;
+            }
+        });
+        message += `<br>Missing fields: ${fieldNames.join(', ')}`;
+    }
+    errorAlert.innerHTML = message;
+    errorAlert.classList.remove('d-none');
+}
+
+// Function to hide error message
+function hideError() {
+    const errorAlert = document.getElementById('errorAlert');
+    errorAlert.classList.add('d-none');
+}
+
+// Function to validate form fields
+function validateForm() {
+    const projectName = document.getElementById('projectName').value.trim();
+    const interviewType = document.getElementById('interviewType').value;
+    const projectDescription = document.getElementById('projectDescription').value.trim();
+    
+    debugLog('Checking field projectName', { value: projectName });
+    debugLog('Checking field projectDescription', { value: projectDescription });
+    debugLog('Interview type selection', { selected: interviewType });
+    
+    const missingFields = [];
+    
+    if (!projectName) missingFields.push('projectName');
+    if (!projectDescription) missingFields.push('projectDescription');
+    if (!interviewType) missingFields.push('interviewType');
+    
+    if (missingFields.length > 0) {
+        debugLog('Missing required fields', missingFields);
+        return { valid: false, missingFields };
+    }
+    
+    return { valid: true, missingFields: [] };
+}
+
 document.getElementById('interviewType').addEventListener('change', function() {
     const guidelines = {
         'Application Interview': `
@@ -79,24 +143,29 @@ document.getElementById('interviewType').addEventListener('change', function() {
     };
     
     document.getElementById('guidelineContent').innerHTML = guidelines[this.value];
+    hideError(); // Hide any existing error when interview type changes
 });
 
-document.getElementById('startButton').addEventListener('click', async function() {
+document.getElementById('interviewForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    debugLog('Generate Interview button clicked');
+    
+    // Hide any existing error
+    hideError();
+    
+    // Validate form
+    const validation = validateForm();
+    if (!validation.valid) {
+        showError('Please fill in all required fields:', validation.missingFields);
+        return;
+    }
+    
     const projectName = document.getElementById('projectName').value.trim();
     const interviewType = document.getElementById('interviewType').value;
     const projectDescription = document.getElementById('projectDescription').value.trim();
     
-    if (!projectName) {
-        alert('Please enter a project name');
-        return;
-    }
-    
-    if (!projectDescription) {
-        alert('Please enter a project description');
-        return;
-    }
-    
     try {
+        debugLog('Sending request to /save_interview');
         const response = await fetch('/save_interview', {
             method: 'POST',
             headers: {
@@ -109,17 +178,27 @@ document.getElementById('startButton').addEventListener('click', async function(
             })
         });
         
+        debugLog('Response received:', response.status);
         const data = await response.json();
+        debugLog('Response data:', data);
         
         if (data.status === 'success') {
+            debugLog('Redirecting to:', data.redirect_url);
             window.location.href = data.redirect_url;
         } else {
-            alert('Error starting interview: ' + data.error);
+            debugLog('Error in response:', data.error);
+            showError(data.error || 'Error starting interview. Please try again.');
         }
     } catch (error) {
+        debugLog('Error occurred:', error);
         console.error('Error:', error);
-        alert('Error starting interview. Please try again.');
+        showError('Error starting interview. Please try again.');
     }
+});
+
+// Add input event listeners to clear error when user starts typing
+['projectName', 'projectDescription'].forEach(fieldId => {
+    document.getElementById(fieldId).addEventListener('input', hideError);
 });
 </script>
 {% endblock %} 

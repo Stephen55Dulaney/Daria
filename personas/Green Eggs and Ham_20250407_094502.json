@@ -1,0 +1,106 @@
+{
+  "id": "2a085856-0922-4d39-b99d-6ac3bfeacf5a",
+  "project_name": "Green Eggs and Ham",
+  "created_at": "2025-04-07T09:45:02.653805",
+  "persona_data": {
+    "behaviors": [
+      {
+        "behavior": "Avoidance of the dish",
+        "context": "When presented with green eggs and ham",
+        "frequency": "Initially, in all encounters with the dish",
+        "supporting_quotes": [
+          "I do not like them with a fox. I do not like them in a box.",
+          "I was not gonna try them in the rain on a train or in a box with a fox."
+        ]
+      },
+      {
+        "behavior": "Giving in and trying the dish",
+        "context": "After being persistently followed around by Sam",
+        "frequency": "Once, after persistent coaxing",
+        "supporting_quotes": [
+          "I was tired of running away.",
+          "He even followed me around with that plate until I finally gave in and tried it."
+        ]
+      }
+    ],
+    "demographics": {
+      "age_range": "18-34",
+      "education": "high-school, bachelors, masters",
+      "gender": "non-binary, female, male",
+      "location": "LuLoz, ZZ",
+      "occupation": "Food Taster"
+    },
+    "goals": [
+      {
+        "goal": "To avoid trying green eggs and ham",
+        "motivation": "Initial aversion due to the dish's appearance and unfamiliarity",
+        "supporting_quotes": [
+          "Uh, green eggs and ham are green.",
+          "Well, I did not like green eggs and ham."
+        ]
+      },
+      {
+        "goal": "To express their dislike for green eggs and ham",
+        "motivation": "To express personal preferences and stand their ground",
+        "supporting_quotes": [
+          "I do not like green eggs and ham, Sam I am.",
+          "I was not gonna try them in the rain on a train or in a box with a fox."
+        ]
+      }
+    ],
+    "needs": [
+      {
+        "need": "To be presented with the dish in a more appealing way",
+        "priority": "High",
+        "supporting_quotes": [
+          "And maybe presenting it in a more appetizing way.",
+          "I guess, giving someone a choice to try it without pressuring would be nice."
+        ]
+      },
+      {
+        "need": "To be given the choice to try the dish without pressure",
+        "priority": "Medium",
+        "supporting_quotes": [
+          "I guess, giving someone a choice to try it without pressuring would be nice.",
+          "And maybe presenting it in a more appetizing way."
+        ]
+      }
+    ],
+    "pain_points": [
+      {
+        "impact": "Creates a strong initial aversion and resistance to try the dish",
+        "pain_point": "The unappealing appearance of the dish",
+        "supporting_quotes": [
+          "I think it was the appearance of the green eggs.",
+          "I mean, who wants to eat green eggs and ham?"
+        ]
+      },
+      {
+        "impact": "Creates annoyance and pressure",
+        "pain_point": "Persistent coaxing from Sam",
+        "supporting_quotes": [
+          "The constant insistence from Sam was annoying.",
+          "Well, the constant insistence from Sam was annoying."
+        ]
+      }
+    ],
+    "preferences": [
+      {
+        "preference": "For food that looks normal and appetizing",
+        "reason": "Aversion to food that appears abnormal or unappetizing",
+        "supporting_quotes": [
+          "I think it was the appearance of the green eggs.",
+          "I mean, who wants to eat green eggs and ham?"
+        ]
+      },
+      {
+        "preference": "To try new food at their own pace without being pressured",
+        "reason": "Annoyance and discomfort from being pressured into trying something new",
+        "supporting_quotes": [
+          "The constant insistence from Sam was annoying.",
+          "Well, the constant insistence from Sam was annoying."
+        ]
+      }
+    ]
+  }
+}
