@@ -17,6 +17,7 @@ from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime
 from pathlib import Path
 from src.vector_store import InterviewVectorStore
+from src.persona_gpt import generate_persona_with_architect
 import traceback
 import logging
 from markupsafe import Markup
@@ -463,6 +464,14 @@ def save_interview():
         interview_id = str(uuid.uuid4())
         logger.info(f"Creating new interview with ID: {interview_id}")
 
+        # Store the form data
+        form_data = {
+            'researcher': data.get('researcher', {}),
+            'interviewee': data.get('interviewee', {}),
+            'technology': data.get('technology', {}),
+            'consent': data.get('consent', {})
+        }
+
         # Generate the interview prompt based on interview type
         if interview_type == "Persona Interview":
             interview_prompt = f"""#Role: you are Daria, a UX researcher conducting a Persona Interview
@@ -515,9 +524,12 @@ def save_interview():
 5. Ask follow-up questions only when clarification is needed
 6. Maintain a professional tone without unnecessary acknowledgments"""
         
-        # Store the prompt
-        interview_prompts[project_name] = interview_prompt
-        logger.info(f"Stored interview prompt for project: {project_name}")
+        # Store the prompt and form data
+        interview_prompts[project_name] = {
+            'prompt': interview_prompt,
+            'form_data': form_data
+        }
+        logger.info(f"Stored interview prompt and form data for project: {project_name}")
         
         # Initialize conversation using OpenAI client
         try:
@@ -860,10 +872,13 @@ def final_analysis():
         transcript = data.get('transcript', '')
         report_prompt = data.get('report_prompt', '')
 
-        # Get the saved interview prompt to determine the interview type
-        interview_prompt = interview_prompts.get(project_name)
-        if not interview_prompt:
-            return jsonify({'status': 'error', 'error': 'Interview prompt not found'}), 404
+        # Get the saved interview prompt and form data
+        interview_data = interview_prompts.get(project_name)
+        if not interview_data:
+            return jsonify({'status': 'error', 'error': 'Interview data not found'}), 404
+
+        interview_prompt = interview_data['prompt']
+        form_data = interview_data['form_data']
 
         # Determine interview type from the prompt
         interview_type = "Application Interview"  # default
@@ -924,32 +939,6 @@ Format your response with clear sections using headers and include relevant quot
 
         # Generate the analysis using the actual transcript from the current interview
         analysis = analysis_llm.predict(analysis_prompt + "\n\nInterview Transcript:\n" + transcript)
-
-        # Extract form data from the interview prompt
-        form_data = {
-            'researcher': {
-                'name': extract_value(interview_prompt, 'Name:', 'researcher'),
-                'role': extract_value(interview_prompt, 'Role:', 'researcher'),
-                'email': extract_value(interview_prompt, 'Email:', 'researcher'),
-                'phone': extract_value(interview_prompt, 'Phone:', 'researcher')
-            },
-            'interviewee': {
-                'name': extract_value(interview_prompt, 'Name:', 'interviewee'),
-                'age': extract_value(interview_prompt, 'Age Range:', 'interviewee'),
-                'gender': extract_value(interview_prompt, 'Gender:', 'interviewee'),
-                'location': extract_value(interview_prompt, 'Location:', 'interviewee'),
-                'occupation': extract_value(interview_prompt, 'Occupation:', 'interviewee'),
-                'industry': extract_value(interview_prompt, 'Industry:', 'interviewee'),
-                'experience': extract_value(interview_prompt, 'Years of Experience:', 'interviewee'),
-                'education': extract_value(interview_prompt, 'Education:', 'interviewee')
-            },
-            'technology': {
-                'primaryDevice': extract_value(interview_prompt, 'Primary Device:', 'technology'),
-                'operatingSystem': extract_value(interview_prompt, 'Operating System:', 'technology'),
-                'browserPreference': extract_value(interview_prompt, 'Browser Preference:', 'technology'),
-                'technicalProficiency': extract_value(interview_prompt, 'Technical Proficiency:', 'technology')
-            }
-        }
 
         # Save the interview data with the transcript and analysis
         save_interview_data(project_name, interview_type, transcript, analysis, form_data)
@@ -1337,12 +1326,10 @@ def save_persona():
 def generate_persona():
     """Generate a persona based on selected interviews."""
     try:
+        # Get request data
         data = request.get_json()
         project_name = data.get('project_name')
         interview_ids = data.get('interview_ids', [])
-        
-        logger.info(f"Generating persona for project: {project_name}")
-        logger.info(f"Selected interview IDs: {interview_ids}")
         
         if not project_name or not interview_ids:
             return jsonify({'error': 'Project name and interview IDs are required'}), 400
@@ -1350,24 +1337,9 @@ def generate_persona():
         # Load selected interviews
         interviews = []
         for interview_id in interview_ids:
-            interview_path = os.path.join('interviews', f"{interview_id}.json")
-            logger.info(f"Loading interview from: {interview_path}")
-            
-            if not os.path.exists(interview_path):
-                logger.error(f"Interview file not found: {interview_path}")
-                continue
-                
-            try:
-                with open(interview_path, 'r') as f:
-                    interview_data = json.load(f)
-                    logger.info(f"Loaded interview {interview_id}")
-                    logger.info(f"Interview type: {interview_data.get('interview_type')}")
-                    logger.info(f"Transcript length: {len(interview_data.get('transcript', ''))}")
-                    logger.info(f"Analysis length: {len(interview_data.get('analysis', ''))}")
-                    interviews.append(interview_data)
-            except Exception as e:
-                logger.error(f"Error loading interview {interview_id}: {str(e)}")
-                continue
+            interview_data = load_interview(interview_id)
+            if interview_data:
+                interviews.append(interview_data)
         
         if not interviews:
             return jsonify({'error': 'No valid interviews found'}), 400
@@ -1377,8 +1349,16 @@ def generate_persona():
         # Create OpenAI client
         client = OpenAI(api_key=OPENAI_API_KEY)
         
-        # Create a structured prompt for persona generation
-        analysis_prompt = f"""As a UX research expert, analyze these {len(interviews)} interviews and create a detailed user persona. 
+        # Use the new Persona Architect GPT module
+        try:
+            persona_data = generate_persona_with_architect(client, interviews)
+            logger.info("Successfully generated persona using Persona Architect GPT")
+        except Exception as e:
+            logger.error(f"Error using Persona Architect GPT: {str(e)}")
+            logger.error("Falling back to standard persona generation")
+            
+            # Create a structured prompt for persona generation
+            analysis_prompt = f"""As a UX research expert, analyze these {len(interviews)} interviews and create a detailed user persona. 
 Focus on extracting specific, actionable insights from the interviews.
 
 For each interview, I'll provide:
@@ -1439,34 +1419,248 @@ Interview Data:
 
 Please ensure your response is a valid JSON object with all the sections and fields as shown above. Include specific quotes from the interviews to support each insight."""
 
-        logger.info("Sending request to OpenAI")
-        # Get analysis from OpenAI
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a UX research expert specializing in persona creation. Your task is to analyze interview data and create a detailed, evidence-based persona with specific insights and supporting quotes. Return your analysis as a structured JSON object."},
-                {"role": "user", "content": analysis_prompt}
-            ],
-            temperature=0.7
-        )
-        
-        # Log the raw response
-        analysis = response.choices[0].message.content
-        logger.info(f"Received analysis from OpenAI, length: {len(analysis)}")
-        logger.info("Analysis content preview:")
-        logger.info(analysis[:500] + "...")
-        
-        # Parse the JSON response
-        try:
-            persona_data = json.loads(analysis)
-            logger.info("Successfully parsed JSON response")
-        except json.JSONDecodeError as e:
-            logger.error(f"Error parsing JSON response: {str(e)}")
-            logger.error("Raw response:")
-            logger.error(analysis)
-            raise
+            logger.info("Sending request to OpenAI")
+            # Get analysis from OpenAI
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": "You are a UX research expert specializing in persona creation. Your task is to analyze interview data and create a detailed, evidence-based persona with specific insights and supporting quotes. Return your analysis as a structured JSON object."},
+                    {"role": "user", "content": analysis_prompt}
+                ],
+                temperature=0.7
+            )
+            
+            # Log the raw response
+            analysis = response.choices[0].message.content
+            logger.info(f"Received analysis from OpenAI, length: {len(analysis)}")
+            logger.info("Analysis content preview:")
+            logger.info(analysis[:500] + "...")
+            
+            # Parse the JSON response
+            try:
+                persona_data = json.loads(analysis)
+                logger.info("Successfully parsed JSON response")
+            except json.JSONDecodeError as e:
+                logger.error(f"Error parsing JSON response: {str(e)}")
+                logger.error("Raw response:")
+                logger.error(analysis)
+                raise
         
         # Generate HTML for the persona
+        html = generate_persona_html(persona_data)
+        
+        logger.info("Generated HTML content")
+        return jsonify({
+            'html': html,
+            'persona_data': persona_data
+        })
+        
+    except Exception as e:
+        logger.error(f"Error generating persona: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+def generate_persona_html(persona_data):
+    """Generate HTML representation of the persona data."""
+    
+    # Check if we have the enhanced persona format or the standard format
+    if 'name' in persona_data and 'summary' in persona_data:
+        # Enhanced format from Persona Architect GPT
+        html = f"""
+        <div class="persona-container space-y-8">
+            <div class="header-section bg-indigo-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-indigo-800 mb-2">{persona_data['name']}</h2>
+                <p class="text-gray-700">{persona_data['summary']}</p>
+            </div>
+            
+            <div class="demographics-section bg-blue-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-blue-800 mb-4">Demographics</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Age Range</p>
+                        <p class="text-gray-600">{persona_data['demographics']['age_range']}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Gender</p>
+                        <p class="text-gray-600">{persona_data['demographics']['gender']}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Occupation</p>
+                        <p class="text-gray-600">{persona_data['demographics']['occupation']}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Location</p>
+                        <p class="text-gray-600">{persona_data['demographics']['location']}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Education</p>
+                        <p class="text-gray-600">{persona_data['demographics']['education']}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="background-section bg-gray-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Background & Context</h2>
+                <p class="text-gray-700">{persona_data.get('background', 'No background information provided.')}</p>
+            </div>
+            
+            <div class="goals-section bg-green-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">Goals & Motivations</h2>
+                <div class="space-y-4">
+                    {''.join(f'''
+                        <div class="goal-card bg-white p-4 rounded-lg shadow-sm">
+                            <h3 class="font-semibold text-green-700 mb-2">{goal['goal']}</h3>
+                            <p class="text-gray-600 mb-2">{goal['motivation']}</p>
+                            <div class="mt-2">
+                                <p class="text-sm font-medium text-green-600">Supporting Quotes:</p>
+                                <ul class="list-disc list-inside text-sm text-gray-600">
+                                    {''.join(f'<li>{quote}</li>' for quote in goal['supporting_quotes'])}
+                                </ul>
+                            </div>
+                        </div>
+                    ''' for goal in persona_data['goals'])}
+                </div>
+            </div>
+            
+            <div class="pain-points-section bg-red-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-red-800 mb-4">Pain Points & Challenges</h2>
+                <div class="space-y-4">
+                    {''.join(f'''
+                        <div class="pain-point-card bg-white p-4 rounded-lg shadow-sm">
+                            <h3 class="font-semibold text-red-700 mb-2">{pain_point['pain_point']}</h3>
+                            <p class="text-gray-600 mb-2">Impact: {pain_point['impact']}</p>
+                            <div class="mt-2">
+                                <p class="text-sm font-medium text-red-600">Supporting Quotes:</p>
+                                <ul class="list-disc list-inside text-sm text-gray-600">
+                                    {''.join(f'<li>{quote}</li>' for quote in pain_point['supporting_quotes'])}
+                                </ul>
+                            </div>
+                        </div>
+                    ''' for pain_point in persona_data['pain_points'])}
+                </div>
+            </div>
+            
+            <div class="behaviors-section bg-yellow-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-yellow-800 mb-4">Behaviors & Habits</h2>
+                <div class="space-y-4">
+                    {''.join(f'''
+                        <div class="behavior-card bg-white p-4 rounded-lg shadow-sm">
+                            <h3 class="font-semibold text-yellow-700 mb-2">{behavior['behavior']}</h3>
+                            <p class="text-gray-600 mb-2">Frequency: {behavior['frequency']}</p>
+                            <p class="text-gray-600 mb-2">Context: {behavior['context']}</p>
+                            <div class="mt-2">
+                                <p class="text-sm font-medium text-yellow-600">Supporting Quotes:</p>
+                                <ul class="list-disc list-inside text-sm text-gray-600">
+                                    {''.join(f'<li>{quote}</li>' for quote in behavior['supporting_quotes'])}
+                                </ul>
+                            </div>
+                        </div>
+                    ''' for behavior in persona_data['behaviors'])}
+                </div>
+            </div>
+            
+            {f"""
+            <div class="technology-section bg-blue-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-blue-800 mb-4">Technology Usage</h2>
+                <div class="space-y-4">
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-blue-700 mb-2">Devices</h3>
+                        <ul class="list-disc list-inside text-gray-600">
+                            {''.join(f'<li>{device}</li>' for device in persona_data['technology'].get('devices', []))}
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-blue-700 mb-2">Software</h3>
+                        <ul class="list-disc list-inside text-gray-600">
+                            {''.join(f'<li>{software}</li>' for software in persona_data['technology'].get('software', []))}
+                        </ul>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-blue-700 mb-2">Tech Comfort Level</h3>
+                        <p class="text-gray-600">{persona_data['technology'].get('comfort_level', 'Not specified')}</p>
+                    </div>
+                    <div class="bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-blue-700 mb-2">Supporting Quotes</h3>
+                        <ul class="list-disc list-inside text-gray-600">
+                            {''.join(f'<li>{quote}</li>' for quote in persona_data['technology'].get('supporting_quotes', []))}
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            """ if 'technology' in persona_data else ''}
+            
+            <div class="quotes-section bg-indigo-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-indigo-800 mb-4">Key Quotes</h2>
+                <div class="space-y-4">
+                    <ul class="list-disc list-inside text-gray-600">
+                        {''.join(f'<li class="mb-2">"{quote}"</li>' for quote in persona_data.get('key_quotes', []))}
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="opportunities-section bg-emerald-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-emerald-800 mb-4">Opportunities & Recommendations</h2>
+                <div class="space-y-4">
+                    {''.join(f'''
+                        <div class="opportunity-card bg-white p-4 rounded-lg shadow-sm">
+                            <h3 class="font-semibold text-emerald-700 mb-2">{opportunity['opportunity']}</h3>
+                            <p class="text-gray-600 mb-2">Impact: {opportunity['impact']}</p>
+                            <p class="text-gray-600 mb-2">Implementation: {opportunity['implementation']}</p>
+                        </div>
+                    ''' for opportunity in persona_data.get('opportunities', []))}
+                </div>
+            </div>
+            
+            <div class="needs-section bg-purple-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-purple-800 mb-4">Needs & Preferences</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Needs</h3>
+                        <div class="space-y-4">
+                            {''.join(f'''
+                                <div class="need-card bg-white p-4 rounded-lg shadow-sm">
+                                    <h4 class="font-semibold text-purple-600 mb-2">{need['need']}</h4>
+                                    <p class="text-gray-600 mb-2">Priority: {need['priority']}</p>
+                                    <div class="mt-2">
+                                        <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
+                                        <ul class="list-disc list-inside text-sm text-gray-600">
+                                            {''.join(f'<li>{quote}</li>' for quote in need['supporting_quotes'])}
+                                        </ul>
+                                    </div>
+                                </div>
+                            ''' for need in persona_data['needs'])}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Preferences</h3>
+                        <div class="space-y-4">
+                            {''.join(f'''
+                                <div class="preference-card bg-white p-4 rounded-lg shadow-sm">
+                                    <h4 class="font-semibold text-purple-600 mb-2">{preference['preference']}</h4>
+                                    <p class="text-gray-600 mb-2">Reason: {preference['reason']}</p>
+                                    <div class="mt-2">
+                                        <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
+                                        <ul class="list-disc list-inside text-sm text-gray-600">
+                                            {''.join(f'<li>{quote}</li>' for quote in preference['supporting_quotes'])}
+                                        </ul>
+                                    </div>
+                                </div>
+                            ''' for preference in persona_data['preferences'])}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="image-prompt-section bg-gray-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-gray-800 mb-4">Image Generation Prompt</h2>
+                <div class="bg-white p-4 rounded-lg shadow-sm">
+                    <p class="text-gray-600">{persona_data.get('image_prompt', 'No image prompt provided.')}</p>
+                </div>
+            </div>
+        </div>
+        """
+    else:
+        # Standard format
         html = f"""
         <div class="persona-container space-y-8">
             <div class="demographics-section bg-blue-50 p-6 rounded-lg shadow-md">
@@ -1591,17 +1785,8 @@ Please ensure your response is a valid JSON object with all the sections and fie
             </div>
         </div>
         """
-        
-        logger.info("Generated HTML content")
-        return jsonify({
-            'html': html,
-            'persona_data': persona_data
-        })
-        
-    except Exception as e:
-        logger.error(f"Error generating persona: {str(e)}")
-        logger.error(traceback.format_exc())
-        return jsonify({'error': str(e)}), 500
+    
+    return html
 
 @app.route('/api/save-persona', methods=['POST'])
 def save_persona_api():
