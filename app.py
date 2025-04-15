@@ -23,6 +23,7 @@ import logging
 from markupsafe import Markup
 from openai import OpenAI
 import markdown  # Added this import since it's used in the markdown filter
+from src.google_ai import GeminiPersonaGenerator
 
 # Global variables
 vector_store = None
@@ -1326,137 +1327,59 @@ def save_persona():
 def generate_persona():
     """Generate a persona based on selected interviews."""
     try:
-        # Get request data
         data = request.get_json()
-        project_name = data.get('project_name')
-        interview_ids = data.get('interview_ids', [])
+        selected_interviews = data.get('selected_interviews', [])
         
-        if not project_name or not interview_ids:
-            return jsonify({'error': 'Project name and interview IDs are required'}), 400
-        
-        # Load selected interviews
+        if not selected_interviews:
+            return jsonify({'error': 'No interviews selected'}), 400
+            
+        # Load the interviews from JSON files
         interviews = []
-        for interview_id in interview_ids:
-            interview_data = load_interview(interview_id)
-            if interview_data:
-                interviews.append(interview_data)
-        
+        for interview_id in selected_interviews:
+            interview_path = os.path.join('interviews', f"{interview_id}.json")
+            if os.path.exists(interview_path):
+                with open(interview_path, 'r') as f:
+                    interview = json.load(f)
+                    interviews.append(interview)
+                
         if not interviews:
             return jsonify({'error': 'No valid interviews found'}), 400
-        
-        logger.info(f"Successfully loaded {len(interviews)} interviews")
-        
+            
         # Create OpenAI client
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        
-        # Use the new Persona Architect GPT module
-        try:
-            persona_data = generate_persona_with_architect(client, interviews)
-            logger.info("Successfully generated persona using Persona Architect GPT")
-        except Exception as e:
-            logger.error(f"Error using Persona Architect GPT: {str(e)}")
-            logger.error("Falling back to standard persona generation")
+        client = create_openai_client()
+        if not client:
+            return jsonify({'error': 'Failed to create OpenAI client'}), 500
             
-            # Create a structured prompt for persona generation
-            analysis_prompt = f"""As a UX research expert, analyze these {len(interviews)} interviews and create a detailed user persona. 
-Focus on extracting specific, actionable insights from the interviews.
-
-For each interview, I'll provide:
-1. The interview transcript
-2. The individual analysis
-3. The interview date and type
-
-Please create a comprehensive persona and return it as a JSON object with the following structure:
-
-{{
-    "demographics": {{
-        "age_range": "Age range",
-        "gender": "Gender",
-        "occupation": "Occupation",
-        "location": "Location",
-        "education": "Education level"
-    }},
-    "goals": [
-        {{
-            "goal": "Primary goal",
-            "motivation": "Why this goal is important",
-            "supporting_quotes": ["Quote 1", "Quote 2"]
-        }}
-    ],
-    "behaviors": [
-        {{
-            "behavior": "Specific behavior",
-            "frequency": "How often this occurs",
-            "context": "When/where this happens",
-            "supporting_quotes": ["Quote 1", "Quote 2"]
-        }}
-    ],
-    "pain_points": [
-        {{
-            "pain_point": "Description of the pain point",
-            "impact": "How it affects the user",
-            "supporting_quotes": ["Quote 1", "Quote 2"]
-        }}
-    ],
-    "needs": [
-        {{
-            "need": "Specific need",
-            "priority": "High, Medium, or Low",
-            "supporting_quotes": ["Quote 1", "Quote 2"]
-        }}
-    ],
-    "preferences": [
-        {{
-            "preference": "Specific preference",
-            "reason": "Why this preference exists",
-            "supporting_quotes": ["Quote 1", "Quote 2"]
-        }}
-    ]
-}}
-
-Interview Data:
-{json.dumps(interviews, indent=2)}
-
-Please ensure your response is a valid JSON object with all the sections and fields as shown above. Include specific quotes from the interviews to support each insight."""
-
-            logger.info("Sending request to OpenAI")
-            # Get analysis from OpenAI
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "You are a UX research expert specializing in persona creation. Your task is to analyze interview data and create a detailed, evidence-based persona with specific insights and supporting quotes. Return your analysis as a structured JSON object."},
-                    {"role": "user", "content": analysis_prompt}
-                ],
-                temperature=0.7
-            )
-            
-            # Log the raw response
-            analysis = response.choices[0].message.content
-            logger.info(f"Received analysis from OpenAI, length: {len(analysis)}")
-            logger.info("Analysis content preview:")
-            logger.info(analysis[:500] + "...")
-            
-            # Parse the JSON response
-            try:
-                persona_data = json.loads(analysis)
-                logger.info("Successfully parsed JSON response")
-            except json.JSONDecodeError as e:
-                logger.error(f"Error parsing JSON response: {str(e)}")
-                logger.error("Raw response:")
-                logger.error(analysis)
-                raise
+        # Generate persona using the architect
+        persona_data = generate_persona_with_architect(client, interviews)
         
-        # Generate HTML for the persona
-        html = generate_persona_html(persona_data)
+        # Generate HTML representation
+        html_content = generate_persona_html(persona_data)
         
-        logger.info("Generated HTML content")
+        # Save the generated persona
+        timestamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+        project_name = interviews[0].get('project_name', 'Unknown Project')
+        file_name = f"{project_name}_{timestamp}.json"
+        
+        persona_path = os.path.join('personas', file_name)
+        with open(persona_path, 'w') as f:
+            json.dump({
+                'id': str(uuid.uuid4()),
+                'project_name': project_name,
+                'created_at': datetime.now().isoformat(),
+                'persona_data': persona_data
+            }, f, indent=2)
+            
         return jsonify({
-            'html': html,
-            'persona_data': persona_data
+            'status': 'success',
+            'persona': persona_data,
+            'html': html_content,
+            'project_name': project_name,
+            'message': 'Persona generated successfully using OpenAI'
         })
         
     except Exception as e:
-        logger.error(f"Error generating persona: {str(e)}")
+        logger.error(f"Error in generate_persona: {str(e)}")
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 

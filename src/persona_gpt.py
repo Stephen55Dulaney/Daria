@@ -1,42 +1,16 @@
 """
-Persona Architect GPT module that provides customized prompts for persona generation.
+Persona generation module using Thesia, the Persona Architect GPT.
 """
 import json
-from openai import OpenAI
+import logging
+from typing import List, Dict, Any
+from .thesia_resources import get_complete_system_prompt
 
-# The specialized system prompt for the Persona Architect GPT
-PERSONA_ARCHITECT_SYSTEM_PROMPT = """You are Persona Architect GPT, an expert UX researcher specialized in creating evidence-based user personas from research data. Your responses should:
+# Configure logger
+logger = logging.getLogger(__name__)
 
-1. ALWAYS base persona details on provided research data, never invent demographic information without evidence
-2. ORGANIZE persona reports with clear, consistent sections
-3. HIGHLIGHT direct quotes and specific data points to support insights
-4. ENSURE personas are realistic, nuanced, and avoid stereotypes
-5. FOCUS on goals, pain points, and behaviors rather than just demographics
-6. ADAPT tone and formatting to match the intended audience (stakeholders, designers, developers)
-7. INCLUDE actionable insights for product/service improvements
-8. MAINTAIN a professional, analytical tone while making personas feel like real people
-
-When analyzing raw data, look for:
-- Patterns across multiple participants
-- Emotional inflections and word choice
-- Contradictions between stated preferences and behaviors
-- Underlying motivations and unstated needs
-
-Format personas with these sections:
-- Name and Role
-- Summary background one or two paragraphs totaling less than 600 characters
-- Image prompt to generate a AI generated persona picture
-- Key Demographics (evidence-based)
-- Background & Context
-- Goals & Motivations
-- Pain Points & Challenges
-- Behaviors & Habits
-- Technology Usage
-- Quotes & Evidence
-- Opportunities & Recommendations
-
-For follow-up questions, provide additional depth rather than contradicting the initial persona.
-"""
+# Use the complete system prompt from thesia_resources
+PERSONA_ARCHITECT_SYSTEM_PROMPT = get_complete_system_prompt()
 
 # Enhanced JSON template for the persona
 PERSONA_JSON_TEMPLATE = """{
@@ -103,64 +77,151 @@ PERSONA_JSON_TEMPLATE = """{
     ]
 }"""
 
-def generate_persona_architect_prompt(interviews):
-    """
-    Generate the prompt for the Persona Architect GPT.
-    
-    Args:
-        interviews (list): List of interview data objects
-        
-    Returns:
-        str: Formatted prompt for the Persona Architect GPT
-    """
-    analysis_prompt = f"""As Persona Architect GPT, analyze these {len(interviews)} interviews and create a detailed, evidence-based user persona. 
-Focus on extracting specific, actionable insights from the interviews.
+def generate_persona_architect_prompt(interviews: List[Dict[str, Any]]) -> str:
+    """Generate the analysis prompt for Thesia."""
+    prompt = f"""You are Thesia, an expert UX researcher specializing in persona creation. Your task is to analyze the following interviews and create a detailed, evidence-based persona.
 
-For each interview, I'll provide:
-1. The interview transcript
-2. The individual analysis
-3. The interview date and type
+Focus only on the interviewee's responses, not the interviewer's questions. Extract insights, behaviors, and patterns from what the interviewee actually said.
 
-Please create a comprehensive persona and return it as a valid JSON object with the following structure:
+For each interview, I will provide:
+1. Project context
+2. Interview metadata
+3. Transcript (focusing only on interviewee responses)
+4. Analysis (if available)
+
+Please analyze the interviews and generate a detailed persona in the following JSON format:
 
 {PERSONA_JSON_TEMPLATE}
 
-Interview Data:
-{json.dumps(interviews, indent=2)}
+Ensure all insights are supported by direct quotes from the interviewee's responses. Do not include any quotes from the interviewer (Daria)."""
 
-Please ensure your response is a valid JSON object with all the sections and fields as shown above. Include specific quotes from the interviews to support each insight. 
-Format the image_prompt to create a realistic portrait of this persona that captures their demographic characteristics and overall mood.
-"""
-    return analysis_prompt
+    # Add each interview's data
+    for interview in interviews:
+        prompt += "\n\nInterview Data:"
+        
+        # Add project context
+        prompt += f"\nProject: {interview.get('project_name', 'Unknown Project')}"
+        prompt += f"\nType: {interview.get('interview_type', 'Unknown Type')}"
+        
+        # Add metadata if available
+        metadata = interview.get('metadata', {})
+        if metadata:
+            prompt += "\nMetadata:"
+            for key, value in metadata.items():
+                prompt += f"\n- {key}: {value}"
+            
+            if 'technology' in metadata:
+                prompt += "\nTechnology Usage:"
+                prompt += f"\n- Primary Device: {metadata['technology'].get('primaryDevice', 'Unknown')}"
+                prompt += f"\n- Operating System: {metadata['technology'].get('operatingSystem', 'Unknown')}"
+                prompt += f"\n- Browser Preference: {metadata['technology'].get('browserPreference', 'Unknown')}"
+                prompt += f"\n- Technical Proficiency: {metadata['technology'].get('technicalProficiency', 'Unknown')}"
+        
+        # Handle transcript - extract only interviewee responses
+        transcript = interview.get('transcript', '')
+        if isinstance(transcript, str):
+            # Split into lines and filter for interviewee responses
+            lines = transcript.split('\n')
+            interviewee_responses = []
+            for line in lines:
+                if line.startswith('You:'):
+                    response = line[4:].strip()  # Remove 'You: ' prefix
+                    if response and not response.startswith('Daria:'):  # Extra check to ensure no Daria responses
+                        interviewee_responses.append(response)
+            
+            prompt += "\nInterviewee Responses:"
+            for response in interviewee_responses:
+                prompt += f"\n- {response}"
+        else:
+            prompt += "\nInterviewee Responses:"
+            for message in transcript[:5]:  # Limit to first 5 messages
+                if isinstance(message, dict) and message.get('speaker') == 'You':
+                    prompt += f"\n- {message.get('text', '')[:100]}..."  # Limit message length
+        
+        # Handle analysis - limit to first 300 characters
+        if 'analysis' in interview:
+            analysis = interview['analysis']
+            if isinstance(analysis, dict):
+                content = analysis.get('content', '')
+                prompt += f"\n\nAnalysis: {content[:300]}..."
+            else:
+                prompt += f"\n\nAnalysis: {str(analysis)[:300]}..."
+    
+    # Add the JSON template at the end
+    prompt += f"""
 
-def generate_persona_with_architect(openai_client, interviews):
+Please analyze the interviews and generate a detailed persona in the following JSON format:
+
+{PERSONA_JSON_TEMPLATE}
+
+Ensure all insights are supported by quotes from the interviewee's responses only. Do not include any quotes from the interviewer (Daria). Use the metadata provided to inform the persona's demographics and technology usage sections."""
+    
+    return prompt
+
+def generate_persona_with_architect(openai_client, interviews: List[Dict[str, Any]]) -> Dict[str, Any]:
     """
-    Generate a persona using the Persona Architect GPT.
+    Generate a persona using Thesia, the Persona Architect GPT.
     
     Args:
         openai_client: OpenAI client instance
-        interviews (list): List of interview data objects
+        interviews: List of interview data objects
         
     Returns:
         dict: The generated persona data
     """
     analysis_prompt = generate_persona_architect_prompt(interviews)
     
-    response = openai_client.chat.completions.create(
-        model="gpt-4",
-        messages=[
-            {"role": "system", "content": PERSONA_ARCHITECT_SYSTEM_PROMPT},
-            {"role": "user", "content": analysis_prompt}
-        ],
-        temperature=0.7
-    )
-    
-    # Extract the response content
-    analysis = response.choices[0].message.content
-    
-    # Parse the JSON response
     try:
-        persona_data = json.loads(analysis)
-        return persona_data
-    except json.JSONDecodeError as e:
-        raise ValueError(f"Error parsing JSON response: {str(e)}") 
+        response = openai_client.chat.completions.create(
+            model="gpt-4-0125-preview",  # Use GPT-4-turbo-preview with 128k context length
+            messages=[
+                {"role": "system", "content": PERSONA_ARCHITECT_SYSTEM_PROMPT},
+                {"role": "user", "content": analysis_prompt}
+            ],
+            temperature=0.7
+        )
+        
+        # Extract the response content
+        analysis = response.choices[0].message.content
+        
+        # Log the response for debugging
+        logger.info(f"Raw response from GPT: {analysis[:200]}...")  # Log first 200 chars
+        
+        # Parse the JSON response
+        try:
+            # Try to find JSON content within the response
+            start_idx = analysis.find('{')
+            end_idx = analysis.rfind('}') + 1
+            if start_idx >= 0 and end_idx > start_idx:
+                json_str = analysis[start_idx:end_idx]
+                
+                # Clean up the JSON string
+                json_str = json_str.replace('...', '')  # Remove any ellipsis
+                json_str = json_str.replace('\n', ' ')  # Replace newlines with spaces
+                
+                # Try to parse the cleaned JSON
+                try:
+                    persona_data = json.loads(json_str)
+                    
+                    # Validate the persona data structure
+                    required_fields = ['name', 'summary', 'demographics', 'technology']
+                    for field in required_fields:
+                        if field not in persona_data:
+                            raise ValueError(f"Missing required field in persona data: {field}")
+                    
+                    return persona_data
+                except json.JSONDecodeError as e:
+                    logger.error(f"Error parsing cleaned JSON: {str(e)}")
+                    logger.error(f"Cleaned JSON string: {json_str[:500]}...")
+                    raise ValueError(f"Error parsing JSON response: {str(e)}")
+            else:
+                raise ValueError("No valid JSON object found in response")
+            
+        except json.JSONDecodeError as e:
+            logger.error(f"Error parsing JSON response: {str(e)}")
+            logger.error(f"Response content: {analysis[:500]}...")  # Log first 500 chars
+            raise ValueError(f"Error parsing JSON response: {str(e)}")
+            
+    except Exception as e:
+        logger.error(f"Error generating persona: {str(e)}")
+        raise 

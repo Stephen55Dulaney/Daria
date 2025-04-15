@@ -423,63 +423,55 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Generate persona
     generateBtn.addEventListener('click', async function() {
-        if (selectedInterviews.size === 0) {
+        const selectedInterviews = Array.from(document.querySelectorAll('input[type="checkbox"]:checked'))
+            .map(checkbox => checkbox.dataset.id);
+        
+        if (selectedInterviews.length === 0) {
             alert('Please select at least one interview');
             return;
         }
-
+        
         // Show loading indicator
         loadingIndicator.classList.remove('hidden');
         personaDisplay.classList.add('hidden');
         errorMessage.classList.add('hidden');
-
+        
         try {
-            console.log('Selected interview IDs:', Array.from(selectedInterviews));
-            console.log('Sending request to /generate_persona');
-            
             const response = await fetch('/generate_persona', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({
-                    project_name: projectSelect.value,
-                    interview_ids: Array.from(selectedInterviews)
-                })
+                body: JSON.stringify({ selected_interviews: selectedInterviews })
             });
-
-            console.log('Response status:', response.status);
-            const data = await response.json();
-            console.log('Response data:', data);
-
-            if (!response.ok) {
-                console.error('Error response:', data);
-                throw new Error(data.error || 'Failed to generate persona');
-            }
-
-            // Hide loading indicator and show persona
-            loadingIndicator.classList.add('hidden');
-            personaDisplay.classList.remove('hidden');
             
-            // Check the structure of the persona data
-            console.log('Persona content type:', typeof data.html);
-            console.log('Persona content:', data.html);
-
-            if (!data.html) {
-                console.error('No HTML content in response');
-                throw new Error('No persona content received');
+            const data = await response.json();
+            
+            if (response.ok) {
+                if (data.html) {
+                    // Display the HTML content
+                    personaContent.innerHTML = data.html;
+                    
+                    // Store the current persona data
+                    currentPersonaData = data;
+                    
+                    // Enable the download button
+                    const downloadBtn = document.getElementById('downloadBtn');
+                    downloadBtn.disabled = false;
+                    
+                    // Show the persona display
+                    loadingIndicator.classList.add('hidden');
+                    personaDisplay.classList.remove('hidden');
+                } else {
+                    throw new Error('No persona content received');
+                }
+            } else {
+                throw new Error(data.error || 'Error generating persona');
             }
-
-            // Update persona content
-            console.log('Updating persona content element:', personaContent);
-            personaContent.innerHTML = data.html;
-            console.log('Persona content updated');
-
-            currentPersonaData = data;
         } catch (error) {
             console.error('Error generating persona:', error);
             loadingIndicator.classList.add('hidden');
-            errorMessage.querySelector('p').textContent = 'Error generating persona. Please try again.';
+            errorMessage.querySelector('p').textContent = 'Error generating persona: ' + error.message;
             errorMessage.classList.remove('hidden');
         }
     });
@@ -551,17 +543,14 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
-        const personaContent = document.getElementById('persona-content').innerHTML;
-        const projectName = currentPersonaData.project_name;
-        
-        // Create a blob with the HTML content
-        const blob = new Blob([personaContent], { type: 'text/html' });
+        // Create a blob with the JSON content
+        const blob = new Blob([JSON.stringify(currentPersonaData.persona, null, 2)], { type: 'application/json' });
         const url = window.URL.createObjectURL(blob);
         
         // Create a temporary link and trigger download
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${projectName}_persona.html`;
+        a.download = `${currentPersonaData.project_name}_persona.json`;
         document.body.appendChild(a);
         a.click();
         
