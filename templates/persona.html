@@ -25,6 +25,15 @@
         </div>
     </div>
 
+    <!-- Model Selection -->
+    <div class="mb-8">
+        <label for="model-select" class="block text-sm font-medium text-gray-700 mb-2">Select Model</label>
+        <select id="model-select" class="w-full p-2 border rounded-lg focus:ring-2 focus:ring-blue-500">
+            <option value="openai">OpenAI GPT-4</option>
+            <option value="gemini">Google Gemini</option>
+        </select>
+    </div>
+
     <!-- Generate Button -->
     <div class="mb-8">
         <button id="generate-btn" class="bg-blue-500 text-white px-6 py-2 rounded-lg hover:bg-blue-600 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
@@ -431,6 +440,9 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         
+        // Get selected model
+        const modelType = document.getElementById('model-select').value;
+        
         // Show loading indicator
         loadingIndicator.classList.remove('hidden');
         personaDisplay.classList.add('hidden');
@@ -442,7 +454,10 @@ document.addEventListener('DOMContentLoaded', function() {
                 headers: {
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ selected_interviews: selectedInterviews })
+                body: JSON.stringify({ 
+                    selected_interviews: selectedInterviews,
+                    model_type: modelType
+                })
             });
             
             const data = await response.json();

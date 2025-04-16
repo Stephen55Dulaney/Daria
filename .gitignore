@@ -51,4 +51,13 @@ tensorboard/
 
 # OS
 .DS_Store
-Thumbs.db 
+Thumbs.db
+
+# Vector Store
+vector_store/
+vector_store_metadata.json
+
+# Generated Content
+personas/*.json
+interviews/*.json
+journey_maps/*.json 

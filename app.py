@@ -24,6 +24,7 @@ from markupsafe import Markup
 from openai import OpenAI
 import markdown  # Added this import since it's used in the markdown filter
 from src.google_ai import GeminiPersonaGenerator
+from src.daria_resources import get_interview_prompt, BASE_SYSTEM_PROMPT, INTERVIEWER_BEST_PRACTICES
 
 # Global variables
 vector_store = None
@@ -452,133 +453,33 @@ def journey_map():
 def save_interview():
     try:
         data = request.get_json()
-        project_data = data.get('project', {})
-        project_name = project_data.get('name')
-        interview_type = project_data.get('type')
-        project_description = project_data.get('description')
+        project_name = data.get('project_name')
+        interview_type = data.get('interview_type')
+        project_description = data.get('project_description')
+        form_data = data.get('form_data', {})
 
-        if not project_name or not interview_type or not project_description:
-            logger.error(f"Missing required fields. Received: project_name={project_name}, interview_type={interview_type}")
-            return jsonify({'error': 'Missing required fields'}), 400
+        if not all([project_name, interview_type, project_description]):
+            return jsonify({'error': 'Missing required parameters'}), 400
 
-        # Generate a unique ID for the interview
-        interview_id = str(uuid.uuid4())
-        logger.info(f"Creating new interview with ID: {interview_id}")
-
-        # Store the form data
-        form_data = {
-            'researcher': data.get('researcher', {}),
-            'interviewee': data.get('interviewee', {}),
-            'technology': data.get('technology', {}),
-            'consent': data.get('consent', {})
-        }
-
-        # Generate the interview prompt based on interview type
-        if interview_type == "Persona Interview":
-            interview_prompt = f"""#Role: you are Daria, a UX researcher conducting a Persona Interview
-#Objective: You are conducting a Persona Interview about {project_name}
-#Project Description: {project_description}
-#Instructions: 
-1. Ask questions to understand the interviewee's characteristics, behaviors, goals, and needs
-2. Focus on gathering information about:
-   - Demographics: Age, role, experience level, and other relevant characteristics
-   - Behaviors: How they interact with the system, their workflow, and habits
-   - Goals: What they're trying to achieve and their motivations
-   - Challenges: Pain points, frustrations, and obstacles they face
-   - Preferences: Their likes, dislikes, and preferences in using the system
-3. Keep questions concise and direct
-4. Never repeat questions
-5. Ask follow-up questions only when clarification is needed
-6. Maintain a professional tone without unnecessary acknowledgments"""
-        
-        elif interview_type == "Journey Map Interview":
-            interview_prompt = f"""#Role: you are Daria, a UX researcher conducting a Journey Map Interview
-#Objective: You are conducting a Journey Map Interview about {project_name}
-#Project Description: {project_description}
-#Instructions: 
-1. Ask questions to understand the user's journey through different stages
-2. Focus on gathering information about:
-   - Journey Stages: Different phases or steps in their experience
-   - Touchpoints: Interactions with the system and other stakeholders
-   - Emotions: How they feel at different stages
-   - Pain Points: Challenges and frustrations
-   - Moments of Delight: Positive experiences and successes
-3. Keep questions concise and direct
-4. Never repeat questions
-5. Ask follow-up questions only when clarification is needed
-6. Maintain a professional tone without unnecessary acknowledgments"""
-        
-        else:
-            interview_prompt = f"""#Role: you are Daria, a UX researcher conducting an Application Interview
-#Objective: You are conducting an Application Interview about {project_name}
-#Project Description: {project_description}
-#Instructions: 
-1. Ask questions to understand the user's experience and needs
-2. Focus on gathering information about:
-   - Role and Experience: Their role and how they use the system
-   - Key Tasks: Main tasks they perform
-   - Pain Points: Any frustrations or challenges
-   - Suggestions: Improvements they'd like to see
-   - Overall Experience: Their satisfaction and needs
-3. Keep questions concise and direct
-4. Never repeat questions
-5. Ask follow-up questions only when clarification is needed
-6. Maintain a professional tone without unnecessary acknowledgments"""
+        # Generate the interview prompt using the function from daria_resources
+        interview_prompt = get_interview_prompt(interview_type, project_name, project_description)
         
         # Store the prompt and form data
         interview_prompts[project_name] = {
             'prompt': interview_prompt,
             'form_data': form_data
         }
-        logger.info(f"Stored interview prompt and form data for project: {project_name}")
         
-        # Initialize conversation using OpenAI client
-        try:
-            client = OpenAI(
-                api_key=OPENAI_API_KEY,
-                base_url="https://api.openai.com/v1"
-            )
-            logger.info("OpenAI client created successfully")
-            
-            # Initialize the conversation with the prompt
-            response = client.chat.completions.create(
-                model="gpt-4",
-                messages=[
-                    {"role": "system", "content": "You are Daria, a UX researcher conducting interviews."},
-                    {"role": "user", "content": f"This is the start of a new interview. Here is your role and objective:\n\n{interview_prompt}"}
-                ],
-                temperature=0.7
-            )
-            logger.info("Initial conversation response received from OpenAI")
-            
-            # Store the initial conversation state
-            conversations[project_name] = {
-                'id': interview_id,
-                'messages': [
-                    {"role": "system", "content": "You are Daria, a UX researcher conducting interviews."},
-                    {"role": "user", "content": f"This is the start of a new interview. Here is your role and objective:\n\n{interview_prompt}"},
-                    {"role": "assistant", "content": response.choices[0].message.content}
-                ]
-            }
-            logger.info(f"Stored conversation for project: {project_name}")
-            
-        except Exception as e:
-            logger.error(f"Error with OpenAI client: {str(e)}")
-            logger.error(traceback.format_exc())
-            return jsonify({
-                'error': 'Failed to initialize interview with AI',
-                'details': str(e)
-            }), 500
+        logger.info(f"Stored interview prompt and form data for project: {project_name}")
         
         return jsonify({
             'status': 'success',
-            'interview_prompt': interview_prompt,
-            'redirect_url': url_for('interview', project_name=project_name)
+            'message': 'Interview prompt saved successfully',
+            'project_name': project_name
         })
         
     except Exception as e:
-        logger.error(f"Error in save_interview route: {str(e)}")
-        logger.error(traceback.format_exc())
+        logger.error(f"Error saving interview: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/interview/<project_name>', methods=['GET', 'POST'])
@@ -607,47 +508,43 @@ def interview(project_name):
             if not prompt:
                 return jsonify({'error': 'Interview prompt not found'}), 404
             
+            # Get the interview type from the prompt
+            interview_type = "Application Interview"  # Default
+            if "Persona Interview" in prompt['prompt']:
+                interview_type = "Persona Interview"
+            elif "Journey Map Interview" in prompt['prompt']:
+                interview_type = "Journey Map Interview"
+            
             # Generate system message based on interview type
-            if "Persona Interview" in prompt:
-                system_message = """You are Daria, an expert UX researcher conducting a persona interview. 
-                Your goal is to understand the user's background, behaviors, goals, and pain points to create a detailed persona."""
-            elif "Journey Map Interview" in prompt:
-                system_message = """You are Daria, an expert UX researcher conducting a journey mapping interview. 
-                Your goal is to understand the user's experience at each stage of their journey with the system."""
-            else:  # Application Interview
-                system_message = """You are Daria, an expert UX researcher conducting an application evaluation interview. 
-                Your goal is to understand how users interact with the system and identify areas for improvement."""
+            system_message = get_interview_prompt(interview_type, project_name, prompt['form_data'].get('project_description', ''))
             
-            # Add context about the current state of the interview
-            system_message += f"\nThis is question {question_count} of the interview about {project_name}."
+            # Add the user's message to the conversation
+            if project_name not in conversations:
+                conversations[project_name] = {'messages': []}
             
-            # If we're near the end of the interview, guide the conversation towards wrap-up
-            if question_count >= 12:  # 3 questions before max
-                system_message += "\nThe interview is nearing completion. Guide the conversation towards a natural conclusion, asking for any final thoughts or insights."
+            conversations[project_name]['messages'].append({"role": "user", "content": user_input})
             
-            # Generate response using the language model
-            messages = [
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": user_input}
-            ]
-            
+            # Generate response
             response = llm.chat.completions.create(
                 model="gpt-4",
-                messages=messages,
-                temperature=0.7,
-                max_tokens=300
+                messages=[
+                    {"role": "system", "content": system_message},
+                    *conversations[project_name]['messages']
+                ],
+                temperature=0.7
             )
             
-            # Extract the response text
-            response_text = response.choices[0].message.content.strip()
+            # Add the assistant's response to the conversation
+            assistant_response = response.choices[0].message.content
+            conversations[project_name]['messages'].append({"role": "assistant", "content": assistant_response})
             
             return jsonify({
-                'status': 'success',
-                'response': response_text
+                'response': assistant_response,
+                'question_count': question_count + 1
             })
             
     except Exception as e:
-        print(f"Error in interview route: {str(e)}")
+        logger.error(f"Error in interview route: {str(e)}")
         return jsonify({'error': str(e)}), 500
 
 @app.route('/process_audio', methods=['POST'])
@@ -1329,10 +1226,11 @@ def generate_persona():
     try:
         data = request.get_json()
         selected_interviews = data.get('selected_interviews', [])
+        model_type = data.get('model_type', 'openai')  # Default to OpenAI if not specified
         
         if not selected_interviews:
             return jsonify({'error': 'No interviews selected'}), 400
-            
+        
         # Load the interviews from JSON files
         interviews = []
         for interview_id in selected_interviews:
@@ -1345,13 +1243,28 @@ def generate_persona():
         if not interviews:
             return jsonify({'error': 'No valid interviews found'}), 400
             
-        # Create OpenAI client
-        client = create_openai_client()
-        if not client:
-            return jsonify({'error': 'Failed to create OpenAI client'}), 500
-            
-        # Generate persona using the architect
-        persona_data = generate_persona_with_architect(client, interviews)
+        # Generate persona based on selected model
+        if model_type == 'gemini':
+            try:
+                # Create Gemini generator
+                generator = GeminiPersonaGenerator()
+                persona_data = generator.generate_persona(interviews)
+                model_message = 'Persona generated successfully using Gemini'
+            except Exception as e:
+                logger.error(f"Gemini generation failed: {str(e)}")
+                # Fallback to OpenAI if Gemini fails
+                client = create_openai_client()
+                if not client:
+                    return jsonify({'error': 'Failed to create OpenAI client'}), 500
+                persona_data = generate_persona_with_architect(client, interviews)
+                model_message = 'Persona generated with OpenAI (Gemini fallback)'
+        else:
+            # Use OpenAI
+            client = create_openai_client()
+            if not client:
+                return jsonify({'error': 'Failed to create OpenAI client'}), 500
+            persona_data = generate_persona_with_architect(client, interviews)
+            model_message = 'Persona generated successfully using OpenAI'
         
         # Generate HTML representation
         html_content = generate_persona_html(persona_data)
@@ -1367,7 +1280,8 @@ def generate_persona():
                 'id': str(uuid.uuid4()),
                 'project_name': project_name,
                 'created_at': datetime.now().isoformat(),
-                'persona_data': persona_data
+                'persona_data': persona_data,
+                'model_type': model_type
             }, f, indent=2)
             
         return jsonify({
@@ -1375,7 +1289,8 @@ def generate_persona():
             'persona': persona_data,
             'html': html_content,
             'project_name': project_name,
-            'message': 'Persona generated successfully using OpenAI'
+            'model_type': model_type,
+            'message': model_message
         })
         
     except Exception as e:
@@ -1708,7 +1623,7 @@ def generate_persona_html(persona_data):
             </div>
         </div>
         """
-    
+        
     return html
 
 @app.route('/api/save-persona', methods=['POST'])
@@ -2673,6 +2588,42 @@ def test_interview():
                          project_name=project_name,
                          prompt=prompt,
                          interview=interview)
+
+@app.route('/start_interview', methods=['POST'])
+def start_interview():
+    data = request.get_json()
+    interview_type = data.get('interview_type')
+    project_name = data.get('project_name')
+    project_description = data.get('project_description')
+    
+    if not all([interview_type, project_name, project_description]):
+        return jsonify({'error': 'Missing required parameters'}), 400
+    
+    try:
+        # Get the appropriate interview prompt based on type
+        interview_prompt = get_interview_prompt(interview_type, project_name, project_description)
+        
+        # Initialize the conversation with the system prompt
+        conversation = [
+            {"role": "system", "content": BASE_SYSTEM_PROMPT},
+            {"role": "system", "content": interview_prompt}
+        ]
+        
+        # Store the conversation in the session
+        session['conversation'] = conversation
+        session['interview_type'] = interview_type
+        session['project_name'] = project_name
+        session['project_description'] = project_description
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Interview started successfully',
+            'interview_type': interview_type,
+            'project_name': project_name
+        })
+        
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5003) 
