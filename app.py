@@ -25,6 +25,7 @@ from openai import OpenAI
 import markdown  # Added this import since it's used in the markdown filter
 from src.google_ai import GeminiPersonaGenerator
 from src.daria_resources import get_interview_prompt, BASE_SYSTEM_PROMPT, INTERVIEWER_BEST_PRACTICES
+from langchain.schema import SystemMessage, HumanMessage
 
 # Global variables
 vector_store = None
@@ -759,6 +760,32 @@ Based on this, ask the first question about {project_name}. Remember to:
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
+def update_interview_data(interview_id, analysis):
+    """Update an existing interview with new analysis."""
+    try:
+        file_path = INTERVIEWS_DIR / f"{interview_id}.json"
+        if not file_path.exists():
+            return None
+            
+        # Read existing interview
+        with open(file_path, 'r') as f:
+            interview_data = json.load(f)
+            
+        # Update analysis
+        interview_data['analysis'] = analysis
+        
+        # Save updated interview
+        with open(file_path, 'w') as f:
+            json.dump(interview_data, f, indent=2)
+            
+        logger.info(f"Interview {interview_id} updated successfully")
+        return interview_id
+        
+    except Exception as e:
+        logger.error(f"Error updating interview: {str(e)}")
+        logger.error(traceback.format_exc())
+        return None
+
 @app.route('/final_analysis', methods=['POST'])
 def final_analysis():
     try:
@@ -801,7 +828,7 @@ def final_analysis():
 Your analysis should include:
 1. Role and Experience: Describe their role and how they use the system
 2. Key Tasks: List the main tasks they perform
-3. Pain Points: Identify any frustrations or challenges
+3. Pain Points: Identify any frustrations and challenges
 4. Suggestions: Note any improvements they mentioned
 5. Overall Assessment: Evaluate their experience and needs
 
@@ -886,16 +913,118 @@ def view_transcript(interview_id):
 
 @app.route('/analysis/<interview_id>')
 def view_analysis(interview_id):
-    """View interview analysis."""
+    """View interview analysis. If analysis doesn't exist, generate it."""
     try:
         interview = load_interview(interview_id)
         if not interview:
             flash('Interview not found', 'error')
             return redirect(url_for('archive'))
         
+        # If analysis doesn't exist or is empty, generate it
+        if not interview.get('analysis') or interview['analysis'].endswith('**'):
+            try:
+                # Initialize OpenAI client
+                analysis_llm = ChatOpenAI(
+                    temperature=0.7,
+                    model_name="gpt-4",
+                    openai_api_key=os.getenv('OPENAI_API_KEY')
+                )
+                
+                # Get interview type and generate appropriate prompt
+                interview_type = interview.get('interview_type', 'Application Interview')
+                project_name = interview.get('project_name', '')
+                transcript = interview.get('transcript', '')
+                
+                # Generate analysis prompt based on interview type
+                if interview_type == "Application Interview":
+                    analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Application Evaluation interviews.
+#Objective: Evaluate the interviewee's experience with {project_name}
+#Instructions: Evaluate the interview transcript and provide a comprehensive analysis.
+
+Your analysis should include:
+1. Role and Experience: Describe their role and how they use the system
+2. Key Tasks: List the main tasks they perform
+3. Pain Points: Identify any frustrations and challenges
+4. Suggestions: Note any improvements they mentioned
+5. Overall Assessment: Evaluate their experience and needs
+
+Format your response with clear sections using headers. For each section, provide detailed insights and include relevant quotes from the transcript."""
+                elif interview_type == "Persona Interview":
+                    analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Creating a Persona interviews.
+#Objective: Generate a persona based on the interviewee's responses about {project_name}
+#Instructions: Evaluate the interview transcript and generate a detailed persona based on the interviewee's responses.
+
+Your analysis should include:
+1. Demographics: Age, role, experience level, and other relevant characteristics
+2. Behaviors: How they interact with the system, their workflow, and habits
+3. Goals: What they're trying to achieve and their motivations
+4. Challenges: Pain points, frustrations, and obstacles they face
+5. Preferences: Their likes, dislikes, and preferences in using the system
+6. Key Insights: Important quotes or observations that define their experience
+
+For each section:
+- Provide at least 3-4 detailed points
+- Include specific examples and quotes from the transcript
+- Make connections between different aspects of the persona
+- Highlight patterns and recurring themes
+
+Format your response with clear sections using headers and ensure each section has substantial content."""
+                else:  # Journey Map Interview
+                    analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Creating a Journey Map interviews.
+#Objective: Generate a comprehensive Journey Map based on the interviewee's responses about {project_name}
+#Instructions: Evaluate the interview transcript and generate a detailed journey map based on the interviewee's responses.
+
+Your analysis should include:
+1. User Journey Stages: Break down the experience into key stages or phases
+2. Touchpoints: Identify all interactions with the system and other stakeholders
+3. Emotions: Track emotional highs and lows throughout the journey
+4. Pain Points: Identify frustrations and challenges at each stage
+5. Moments of Delight: Note positive experiences and successful interactions
+6. Opportunities: Suggest improvements for each stage of the journey
+
+For each section:
+- Provide detailed descriptions and analysis
+- Include specific examples and quotes from the transcript
+- Identify patterns and trends
+- Make connections between different stages of the journey
+
+Format your response with clear sections using headers and ensure each section has substantial content."""
+
+                # Generate the analysis using invoke instead of predict
+                messages = [
+                    SystemMessage(content=analysis_prompt),
+                    HumanMessage(content=f"Here is the interview transcript to analyze:\n\n{transcript}")
+                ]
+                response = analysis_llm.invoke(messages)
+                analysis = response.content
+                
+                # Update the interview with the new analysis
+                interview['analysis'] = analysis
+                
+                # Update the existing interview instead of creating a new one
+                if not update_interview_data(interview_id, analysis):
+                    raise Exception("Failed to update interview")
+                
+                # Update vector store with new analysis
+                if vector_store:
+                    vector_store.add_texts(
+                        texts=[analysis],
+                        metadatas=[{
+                            'id': interview_id,
+                            'project_name': project_name,
+                            'type': 'analysis',
+                            'interview_type': interview_type
+                        }]
+                    )
+                
+            except Exception as e:
+                logger.error(f"Error generating analysis: {str(e)}")
+                logger.error(traceback.format_exc())
+                flash('Error generating analysis', 'error')
+                return redirect(url_for('archive'))
+        
         return render_template('analysis.html', 
-                             interview=interview,
-                             analysis=interview.get('analysis', ''))
+                             interview=interview)
     except Exception as e:
         logger.error(f"Error viewing analysis: {str(e)}")
         logger.error(traceback.format_exc())
@@ -983,9 +1112,15 @@ def search_interviews():
             logger.warning("No search query provided")
             return jsonify({'error': 'No search query provided'}), 400
 
+        # Initialize vector store if not already initialized
+        global vector_store
         if not vector_store:
-            logger.error("Vector store not initialized")
-            return jsonify({'error': 'Vector store not initialized'}), 500
+            try:
+                vector_store = InterviewVectorStore(openai_api_key=OPENAI_API_KEY)
+                logger.info("Vector store initialized successfully")
+            except Exception as e:
+                logger.error(f"Error initializing vector store: {str(e)}")
+                return jsonify({'error': 'Failed to initialize search functionality'}), 500
 
         logger.info(f"Performing search with query: {query}")
         
@@ -1000,7 +1135,7 @@ def search_interviews():
         
         # First try exact match search
         exact_matches = []
-        seen_interview_ids = set()  # Track seen interview IDs to prevent duplicates
+        seen_interview_ids = set()
         
         for interview_id in vector_store.interview_ids:
             try:
@@ -1083,93 +1218,98 @@ def search_interviews():
             })
             
         # If no exact matches, try semantic search
-        results = vector_store.semantic_search(query, k=k)
-        
-        if not results:
-            return jsonify({
-                'results': [],
-                'debug_info': debug_info
-            })
+        try:
+            results = vector_store.semantic_search(query, k=k)
+            
+            if not results:
+                return jsonify({
+                    'results': [],
+                    'debug_info': debug_info
+                })
 
-        # Process and format results
-        formatted_results = []
-        for result in results:
-            try:
-                result_debug = {
-                    'id': result.get('id'),
-                    'score': result.get('score', 0),
-                    'responses_found': 0,
-                    'most_relevant_response': None,
-                    'word_overlap': 0
-                }
-                
-                # Format the transcript preview
-                transcript = result.get('transcript', '')
-                transcript_preview = ''
-                
-                if transcript:
-                    # Extract user responses
-                    responses = []
-                    for line in transcript.split('\n'):
-                        if line.startswith('You:'):
-                            response = line[4:].strip()
-                            # Skip permission responses if exclude_permission is True
-                            if search_params.get('exclude_permission'):
-                                if any(x in response.lower() for x in ['yes, you have my', 'permission', 'proceed', 'yes, proceed', 'all right']):
-                                    continue
-                            # Skip short responses and system messages
-                            if len(response) > 10 and not any(x in response.lower() for x in ['start', 'yes, proceed', 'all right']):
-                                responses.append(response)
+            # Process and format results
+            formatted_results = []
+            for result in results:
+                try:
+                    result_debug = {
+                        'id': result.get('id'),
+                        'score': result.get('score', 0),
+                        'responses_found': 0,
+                        'most_relevant_response': None,
+                        'word_overlap': 0
+                    }
                     
-                    if responses:
-                        result_debug['responses_found'] = len(responses)
-                        # Find the most relevant response
-                        most_relevant = None
-                        highest_overlap = 0
-                        for response in responses:
-                            # Calculate word overlap with query
-                            query_words = set(query.lower().split())
-                            response_words = set(response.lower().split())
-                            matching_words = query_words & response_words
-                            overlap = len(matching_words) / len(query_words)
-                            
-                            if overlap > highest_overlap:
-                                highest_overlap = overlap
-                                most_relevant = response
+                    # Format the transcript preview
+                    transcript = result.get('transcript', '')
+                    transcript_preview = ''
+                    
+                    if transcript:
+                        # Extract user responses
+                        responses = []
+                        for line in transcript.split('\n'):
+                            if line.startswith('You:'):
+                                response = line[4:].strip()
+                                # Skip permission responses if exclude_permission is True
+                                if search_params.get('exclude_permission'):
+                                    if any(x in response.lower() for x in ['yes, you have my', 'permission', 'proceed', 'yes, proceed', 'all right']):
+                                        continue
+                                # Skip short responses and system messages
+                                if len(response) > 10 and not any(x in response.lower() for x in ['start', 'yes, proceed', 'all right']):
+                                    responses.append(response)
                         
-                        if most_relevant:
-                            result_debug['most_relevant_response'] = most_relevant
-                            result_debug['word_overlap'] = highest_overlap
-                            transcript_preview = most_relevant
-                            if len(transcript_preview) > 200:
-                                transcript_preview = transcript_preview[:200] + '...'
+                        if responses:
+                            result_debug['responses_found'] = len(responses)
+                            # Find the most relevant response
+                            most_relevant = None
+                            highest_overlap = 0
+                            for response in responses:
+                                # Calculate word overlap with query
+                                query_words = set(query.lower().split())
+                                response_words = set(response.lower().split())
+                                matching_words = query_words & response_words
+                                overlap = len(matching_words) / len(query_words)
+                                
+                                if overlap > highest_overlap:
+                                    highest_overlap = overlap
+                                    most_relevant = response
+                            
+                            if most_relevant:
+                                result_debug['most_relevant_response'] = most_relevant
+                                result_debug['word_overlap'] = highest_overlap
+                                transcript_preview = most_relevant
+                                if len(transcript_preview) > 200:
+                                    transcript_preview = transcript_preview[:200] + '...'
 
-                # Check if the result meets minimum relevance threshold
-                min_relevance = search_params.get('min_relevance', 0.2)  # Reduced from 0.3 to 0.2
-                if result.get('score', 0) < min_relevance:
-                    result_debug['skipped'] = True
-                    result_debug['reason'] = f"Score {result.get('score', 0)} below threshold {min_relevance}"
-                    debug_info['semantic_results'].append(result_debug)
+                    # Check if the result meets minimum relevance threshold
+                    min_relevance = search_params.get('min_relevance', 0.2)  # Reduced from 0.3 to 0.2
+                    if result.get('score', 0) < min_relevance:
+                        result_debug['skipped'] = True
+                        result_debug['reason'] = f"Score {result.get('score', 0)} below threshold {min_relevance}"
+                        debug_info['semantic_results'].append(result_debug)
+                        continue
+
+                    formatted_results.append({
+                        'id': result.get('id'),
+                        'project_name': result.get('project_name'),
+                        'interview_type': result.get('interview_type'),
+                        'date': result.get('date'),
+                        'transcript_preview': transcript_preview,
+                        'score': result.get('score', 0),
+                        'debug_info': result_debug
+                    })
+                except Exception as e:
+                    logger.error(f"Error processing search result: {str(e)}")
                     continue
 
-                formatted_results.append({
-                    'id': result.get('id'),
-                    'project_name': result.get('project_name'),
-                    'interview_type': result.get('interview_type'),
-                    'date': result.get('date'),
-                    'transcript_preview': transcript_preview,
-                    'score': result.get('score', 0),
-                    'debug_info': result_debug
-                })
-            except Exception as e:
-                logger.error(f"Error processing search result: {str(e)}")
-                continue
-
-        debug_info['final_results'] = formatted_results
-        return jsonify({
-            'results': formatted_results,
-            'debug_info': debug_info
-        })
+            debug_info['final_results'] = formatted_results
+            return jsonify({
+                'results': formatted_results,
+                'debug_info': debug_info
+            })
+        except Exception as e:
+            logger.error(f"Error in semantic search: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': 'Error performing semantic search'}), 500
 
     except Exception as e:
         logger.error(f"Error in search_interviews: {str(e)}")
@@ -2623,6 +2763,99 @@ def start_interview():
         })
         
     except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/upload_transcript', methods=['GET', 'POST'])
+def upload_transcript():
+    if request.method == 'GET':
+        return render_template('upload_transcript.html')
+    
+    try:
+        # Get form data
+        researcher = json.loads(request.form.get('researcher', '{}'))
+        project = json.loads(request.form.get('project', '{}'))
+        interviewee = json.loads(request.form.get('interviewee', '{}'))
+        technology = json.loads(request.form.get('technology', '{}'))
+        consent = request.form.get('consent') == 'true'
+        transcript_name = request.form.get('transcriptName')
+        
+        # Get the transcript file
+        transcript_file = request.files.get('transcriptFile')
+        if not transcript_file:
+            return jsonify({'error': 'No transcript file provided'}), 400
+        
+        # Get file extension
+        file_ext = transcript_file.filename.split('.')[-1].lower()
+        
+        # Read the file content based on file type
+        if file_ext in ['txt']:
+            # For text files, read directly
+            transcript_text = transcript_file.read().decode('utf-8')
+        elif file_ext in ['docx']:
+            # For Word documents, use python-docx to extract text
+            try:
+                import docx
+                doc = docx.Document(transcript_file)
+                transcript_text = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
+            except ImportError:
+                return jsonify({'error': 'python-docx package is required for Word document processing. Please install it with: pip install python-docx'}), 400
+        elif file_ext in ['doc']:
+            return jsonify({'error': 'Old .doc format is not supported. Please convert to .docx or .txt format'}), 400
+        elif file_ext in ['pdf']:
+            return jsonify({'error': 'PDF support is not yet implemented. Please convert to .docx or .txt format'}), 400
+        else:
+            return jsonify({'error': f'Unsupported file type: {file_ext}'}), 400
+        
+        # Generate a unique ID for the transcript
+        transcript_id = str(uuid.uuid4())
+        
+        # Create the transcript data structure
+        transcript_data = {
+            'id': transcript_id,
+            'transcript_name': transcript_name,
+            'project_name': project.get('name'),
+            'interview_type': project.get('type'),
+            'project_description': project.get('description'),
+            'date': datetime.now().isoformat(),
+            'transcript': transcript_text,
+            'analysis': None,
+            'metadata': {
+                'researcher': researcher,
+                'interviewee': interviewee,
+                'technology': technology,
+                'interview_details': json.loads(request.form.get('metadata', '{}')),
+                'consent': consent
+            }
+        }
+        
+        # Create interviews directory if it doesn't exist
+        INTERVIEWS_DIR.mkdir(exist_ok=True)
+        
+        # Save the transcript to the interviews directory
+        transcript_path = INTERVIEWS_DIR / f"{transcript_id}.json"
+        with open(transcript_path, 'w', encoding='utf-8') as f:
+            json.dump(transcript_data, f, indent=2)
+        
+        # Add to vector store
+        try:
+            vector_store = VectorStore()
+            vector_store.add_document(transcript_data)
+        except Exception as e:
+            logger.error(f"Error adding transcript to vector store: {str(e)}")
+            # Continue even if vector store update fails
+        
+        return jsonify({
+            'status': 'success',
+            'message': 'Transcript uploaded successfully',
+            'transcript_id': transcript_id
+        })
+        
+    except json.JSONDecodeError as e:
+        logger.error(f"JSON decode error: {str(e)}")
+        return jsonify({'error': 'Invalid form data format'}), 400
+    except Exception as e:
+        logger.error(f"Error uploading transcript: {str(e)}")
+        logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':

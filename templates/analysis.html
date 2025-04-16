@@ -23,23 +23,40 @@
             <div class="border-t pt-6">
                 <h1 class="text-2xl font-bold mb-6">Interview Analysis</h1>
                 <div class="prose max-w-none">
-                    {% for section in interview.analysis.split('\n\n') %}
-                        {% if section.strip() %}
-                            {% if section.startswith('##') %}
-                                <h2 class="text-xl font-semibold mt-8 mb-4">{{ section[3:].strip() }}</h2>
-                            {% elif section.startswith('-') or section.startswith('*') %}
-                                <ul class="list-disc pl-6 space-y-2">
-                                    {% for item in section.split('\n') %}
-                                        {% if item.strip() and (item.startswith('-') or item.startswith('*')) %}
-                                            <li>{{ item[2:].strip() }}</li>
-                                        {% endif %}
-                                    {% endfor %}
-                                </ul>
-                            {% else %}
-                                <p class="mb-4">{{ section.strip() }}</p>
+                    {% if interview.analysis and interview.analysis.strip() and not interview.analysis.endswith('**') %}
+                        {% for section in interview.analysis.split('\n\n') %}
+                            {% if section.strip() %}
+                                {% if section.startswith('##') %}
+                                    <h2 class="text-xl font-semibold mt-8 mb-4">{{ section[3:].strip() }}</h2>
+                                {% elif section.startswith('-') or section.startswith('*') %}
+                                    <ul class="list-disc pl-6 space-y-2">
+                                        {% for item in section.split('\n') %}
+                                            {% if item.strip() and (item.startswith('-') or item.startswith('*')) %}
+                                                <li>{{ item[2:].strip() }}</li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                {% else %}
+                                    <p class="mb-4">{{ section.strip() }}</p>
+                                {% endif %}
                             {% endif %}
-                        {% endif %}
-                    {% endfor %}
+                        {% endfor %}
+                    {% else %}
+                        <!-- Full page loading overlay -->
+                        <div class="fixed inset-0 bg-gray-500 bg-opacity-50 flex items-center justify-center z-50">
+                            <div class="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center">
+                                <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                                <p class="text-lg text-gray-700">Generating analysis...</p>
+                                <p class="text-sm text-gray-500 mt-2">This may take a few moments</p>
+                            </div>
+                        </div>
+                        <script>
+                            // Reload the page after 5 seconds to check if analysis is ready
+                            setTimeout(function() {
+                                window.location.reload();
+                            }, 5000);
+                        </script>
+                    {% endif %}
                 </div>
             </div>
         </div>
