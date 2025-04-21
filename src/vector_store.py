@@ -160,8 +160,12 @@ class InterviewVectorStore:
             # Extract user responses from transcript
             user_responses = self._extract_user_responses(interview.get('transcript', ''))
             
-            # Clean and format the analysis
-            analysis = interview.get('analysis', '').strip()
+            # Clean and format the analysis, handling None case
+            analysis = interview.get('analysis')
+            if analysis is None:
+                analysis = ''
+            else:
+                analysis = str(analysis).strip()
             
             # Add project context
             project_name = interview.get('project_name', '')
@@ -431,4 +435,23 @@ Analysis:
                 print(f"Successfully removed interview {interview_id}")
         except Exception as e:
             print(f"Error removing interview: {str(e)}")
-            raise 
+            raise
+
+    def calculate_similarity(self, text1: str, text2: str) -> float:
+        """Calculate semantic similarity between two texts."""
+        try:
+            # Get embeddings for both texts
+            embedding1 = self.embeddings.embed_query(text1)
+            embedding2 = self.embeddings.embed_query(text2)
+            
+            # Convert to numpy arrays
+            vec1 = np.array(embedding1)
+            vec2 = np.array(embedding2)
+            
+            # Calculate cosine similarity
+            similarity = np.dot(vec1, vec2) / (np.linalg.norm(vec1) * np.linalg.norm(vec2))
+            
+            return float(similarity)
+        except Exception as e:
+            logger.error(f"Error calculating similarity: {str(e)}")
+            return 0.0 

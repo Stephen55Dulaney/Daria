@@ -47,6 +47,28 @@
                     <p><strong>Browser Preference:</strong> {{ interview.metadata.technology.browserPreference }}</p>
                     <p><strong>Technical Proficiency:</strong> {{ interview.metadata.technology.technicalProficiency }}</p>
                 </div>
+
+                {% if interview.metadata.interview_details %}
+                <div>
+                    <h2 class="text-xl font-semibold mb-4">Interview Metadata</h2>
+                    <p><strong>Interview Date:</strong> {{ interview.metadata.interview_details.interviewDate }}</p>
+                    <p><strong>Duration:</strong> {{ interview.metadata.interview_details.interviewDuration }} minutes</p>
+                    <p><strong>Format:</strong> {{ interview.metadata.interview_details.interviewFormat }}</p>
+                    <p><strong>Language:</strong> {{ interview.metadata.interview_details.interviewLanguage }}</p>
+                    {% if interview.metadata.interview_details.interviewNotes %}
+                    <div class="mt-2">
+                        <p><strong>Interview Notes:</strong></p>
+                        <p class="text-gray-600 whitespace-pre-line">{{ interview.metadata.interview_details.interviewNotes }}</p>
+                    </div>
+                    {% endif %}
+                    {% if interview.metadata.interview_details.keyInsights %}
+                    <div class="mt-2">
+                        <p><strong>Key Insights:</strong></p>
+                        <p class="text-gray-600 whitespace-pre-line">{{ interview.metadata.interview_details.keyInsights }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+                {% endif %}
             {% else %}
                 <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
                     <div class="flex">

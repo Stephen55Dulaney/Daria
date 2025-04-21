@@ -26,12 +26,19 @@ import markdown  # Added this import since it's used in the markdown filter
 from src.google_ai import GeminiPersonaGenerator
 from src.daria_resources import get_interview_prompt, BASE_SYSTEM_PROMPT, INTERVIEWER_BEST_PRACTICES
 from langchain.schema import SystemMessage, HumanMessage
+from langchain.vectorstores import VectorStore
 
 # Global variables
 vector_store = None
 
+# Initialize Flask app
 app = Flask(__name__)
-app.config['SECRET_KEY'] = os.urandom(24)
+app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev')
+app.config['UPLOAD_FOLDER'] = 'uploads'
+app.config['INTERVIEWS_DIR'] = 'interviews'
+app.config['VECTOR_STORE_PATH'] = 'vector_store'
+app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')  # Add OpenAI API key configuration
+
 socketio = SocketIO(app)
 load_dotenv()
 
@@ -79,6 +86,9 @@ MAX_ROUNDS = 3
 # Set up logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+# Initialize vector store
+app.vector_store = None
 
 # Helper functions
 def list_interviews():
@@ -1384,7 +1394,26 @@ def generate_persona():
             return jsonify({'error': 'No valid interviews found'}), 400
             
         # Generate persona based on selected model
-        if model_type == 'gemini':
+        if model_type == 'claude':
+            try:
+                # Create Claude generator
+                from src.anthropic_test import AnthropicTest
+                generator = AnthropicTest()
+                response = generator.test_model(interviews)  # Pass interviews to test_model
+                if response.get('success'):
+                    persona_data = response['response']
+                    model_message = 'Persona generated successfully using Claude 3.7 Sonnet'
+                else:
+                    raise Exception(response.get('error', 'Unknown error with Claude'))
+            except Exception as e:
+                logger.error(f"Claude generation failed: {str(e)}")
+                # Fallback to OpenAI
+                client = create_openai_client()
+                if not client:
+                    return jsonify({'error': 'Failed to create OpenAI client'}), 500
+                persona_data = generate_persona_with_architect(client, interviews)
+                model_message = 'Persona generated with OpenAI (Claude fallback)'
+        elif model_type == 'gemini':
             try:
                 # Create Gemini generator
                 generator = GeminiPersonaGenerator()
@@ -1425,17 +1454,13 @@ def generate_persona():
             }, f, indent=2)
             
         return jsonify({
-            'status': 'success',
-            'persona': persona_data,
             'html': html_content,
-            'project_name': project_name,
-            'model_type': model_type,
-            'message': model_message
+            'message': model_message,
+            'persona': persona_data
         })
-        
+            
     except Exception as e:
         logger.error(f"Error in generate_persona: {str(e)}")
-        logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 def generate_persona_html(persona_data):
@@ -2857,6 +2882,149 @@ def upload_transcript():
         logger.error(f"Error uploading transcript: {str(e)}")
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
+
+@app.route('/advanced_search', methods=['GET', 'POST'])
+def advanced_search():
+    if request.method == 'GET':
+        return render_template('advanced_search.html')
+    
+    try:
+        data = request.get_json()
+        query = data.get('query')
+        search_type = data.get('search_type', 'general')
+        k = min(max(data.get('k', 10), 1), 20)  # Limit between 1 and 20
+        
+        if not query:
+            return jsonify({'error': 'Search query is required'}), 400
+            
+        # Initialize vector store if not already done
+        if not hasattr(app, 'vector_store') or app.vector_store is None:
+            app.vector_store = InterviewVectorStore(
+                openai_api_key=app.config['OPENAI_API_KEY'],
+                vector_store_path=app.config['VECTOR_STORE_PATH']
+            )
+            if not app.vector_store.load_vector_store():
+                app.vector_store.initialize()
+        
+        # Perform search based on type
+        if search_type == 'emotion':
+            query = f"Find responses expressing or describing {query} feelings, emotional states, or experiences. Look for genuine emotional expressions, personal feelings, and emotional reactions."
+        elif search_type == 'sentiment':
+            # Break down the sentiment query into components
+            sentiment_parts = query.lower().split()
+            if 'positive' in sentiment_parts and 'fishing' in sentiment_parts:
+                query = """Find responses that express any positive attitudes, enjoyment, or good experiences related to:
+                - Fishing activities and experiences
+                - Catching fish or fishing success
+                - Fishing equipment or gear
+                - Fishing locations or spots
+                - Time spent fishing
+                - Learning to fish
+                - Fishing with others
+                - The overall fishing experience
+                Look for both explicit positive statements and implicit enjoyment or satisfaction."""
+            else:
+                query = f"Analyze sentiment patterns and attitudes in this context: {query}"
+        
+        # Use semantic search to find relevant interviews
+        results = app.vector_store.semantic_search(query, k=k)
+        
+        # Format results for response
+        formatted_results = []
+        for result in results:
+            # Clean up the transcript content
+            transcript = result.get('transcript', '')
+            analysis = result.get('analysis', '')
+            
+            # For emotion searches, prioritize analysis content that mentions emotions
+            content_to_show = ''
+            if search_type == 'emotion':
+                # Look for emotional content in analysis first
+                analysis_lines = []
+                for line in analysis.split('\n'):
+                    if query.lower() in line.lower() or 'emotion' in line.lower() or 'feeling' in line.lower():
+                        analysis_lines.append(line.strip())
+                
+                if analysis_lines:
+                    content_to_show = "Analysis:\n" + '\n'.join(analysis_lines) + "\n\nTranscript:\n"
+            
+            # Process transcript
+            user_responses = []
+            # Define common introductory responses to filter out
+            intro_responses = {
+                'start', 'start, start', 'start, start, start',  # Various "start" combinations
+                'proceed', 'you have my permission to proceed', 'they proceed',  # Permission responses
+                'yes', 'yes, proceed', 'ok', 'okay',  # Other common intro responses
+                'begin the interview', 'begin', 'let\'s begin',  # Begin variations
+                'you can proceed', 'please proceed',  # More permission variations
+                'please begin the interview', 'please begin', 'please start the interview',  # Additional begin variations
+                'ready to begin', 'ready to start', 'i\'m ready',  # Ready variations
+                'all right, begin the interview', 'alright, begin the interview'  # More formal begin variations
+            }
+            
+            # For sentiment analysis about fishing, look for positive indicators
+            positive_fishing_indicators = {
+                'enjoy', 'love', 'like', 'great', 'good', 'fun', 'exciting', 'relaxing',
+                'peaceful', 'satisfying', 'successful', 'caught', 'learned', 'beautiful',
+                'perfect', 'wonderful', 'amazing', 'favorite', 'best', 'happy'
+            }
+            
+            fishing_terms = {
+                'fish', 'fishing', 'angling', 'catch', 'caught', 'rod', 'reel', 'bait',
+                'lure', 'tackle', 'cast', 'casting', 'river', 'lake', 'ocean', 'boat',
+                'spot', 'location'
+            }
+            
+            relevant_responses = []
+            for line in transcript.split('\n'):
+                if line.startswith('You:'):
+                    response = line[4:].strip()  # Remove 'You: ' prefix
+                    if response and not response.startswith('Daria:'):
+                        response_lower = response.lower()
+                        # Skip introductory responses
+                        if response_lower not in intro_responses and not any(
+                            intro in response_lower for intro in ['start', 'proceed', 'permission']
+                        ):
+                            # For sentiment search about fishing, check for relevant content
+                            if search_type == 'sentiment' and 'fishing' in query.lower():
+                                words = set(response_lower.split())
+                                has_fishing = any(term in response_lower for term in fishing_terms)
+                                has_positive = any(term in response_lower for term in positive_fishing_indicators)
+                                
+                                # Include response if it's relevant to fishing and either positive or part of a larger context
+                                if has_fishing or (has_positive and len(relevant_responses) > 0):
+                                    relevant_responses.append(response)
+                                    if has_positive:
+                                        result['score'] = min(1.0, result.get('score', 0) + 0.1)  # Boost score for positive content
+                            else:
+                                user_responses.append(response)
+            
+            # Use relevant responses if available, otherwise use regular responses
+            final_responses = relevant_responses if relevant_responses else user_responses
+
+            # Combine content
+            if final_responses:  # Only add content if there are non-introductory responses
+                content_to_show += '\n'.join(final_responses)
+                
+                # Truncate if too long
+                if len(content_to_show) > 500:
+                    content_to_show = content_to_show[:500] + '...'
+                
+                formatted_results.append({
+                    'interview_id': result['id'],
+                    'content': content_to_show,
+                    'similarity': result.get('score', 0),
+                    'project_name': result.get('project_name', 'Unknown Project'),
+                    'interview_type': result.get('interview_type', 'Unknown Type'),
+                    'date': result.get('date', 'Unknown Date')
+                })
+        
+        return jsonify({'results': formatted_results})
+        
+    except Exception as e:
+        app.logger.error(f"Advanced search error: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': 'An error occurred during search'}), 500
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5003) 

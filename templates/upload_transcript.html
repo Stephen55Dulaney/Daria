@@ -1,0 +1,580 @@
+{% extends "base.html" %}
+
+{% block title %}Import Transcript{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Import Transcript</h1>
+    
+    <form id="uploadTranscriptForm" class="space-y-8">
+        <!-- Step 1: Researcher Information -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center mb-4">
+                <span class="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full mr-3">1</span>
+                <h2 class="text-xl font-semibold">Researcher Information</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Researcher Name</label>
+                    <input type="text" id="researcherName" name="researcherName" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter researcher name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Researcher Email</label>
+                    <input type="email" id="researcherEmail" name="researcherEmail" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter researcher email" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Researcher Role</label>
+                    <input type="text" id="researcherRole" name="researcherRole" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter researcher role" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Transcript Configuration -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center mb-4">
+                <span class="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full mr-3">2</span>
+                <h2 class="text-xl font-semibold">Transcript Configuration</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
+                    <input type="text" id="projectName" name="projectName" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter project name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Interview Type</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="interviewType" value="Persona Interview" class="mr-2" required>
+                            Persona Interview
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="interviewType" value="Journey Map Interview" class="mr-2">
+                            Journey Map Interview
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="interviewType" value="Application Interview" class="mr-2">
+                            Application Interview
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Project Description</label>
+                    <textarea id="projectDescription" name="projectDescription" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                              rows="4" placeholder="Enter project description" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Transcript Name</label>
+                    <input type="text" id="transcriptName" name="transcriptName" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter transcript name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Upload Transcript</label>
+                    <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:border-blue-500 transition-colors duration-200" id="dropZone">
+                        <div class="space-y-1 text-center">
+                            <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48" aria-hidden="true">
+                                <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                            </svg>
+                            <div class="flex text-sm text-gray-600">
+                                <label for="transcriptFile" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                    <span>Upload a file</span>
+                                    <input id="transcriptFile" name="transcriptFile" type="file" class="sr-only" accept=".txt,.doc,.docx,.pdf">
+                                </label>
+                                <p class="pl-1">or drag and drop</p>
+                            </div>
+                            <p class="text-xs text-gray-500">TXT, DOC, DOCX, or PDF up to 10MB</p>
+                            <div id="selectedFile" class="mt-2 text-sm text-gray-600 hidden">
+                                <p>Selected file: <span id="fileName" class="font-medium"></span></p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Interviewee Information -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center mb-4">
+                <span class="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full mr-3">3</span>
+                <h2 class="text-xl font-semibold">Interviewee Information</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Interviewee Name</label>
+                    <input type="text" id="intervieweeName" name="intervieweeName" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter interviewee's name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Age Range</label>
+                    <select id="intervieweeAge" name="intervieweeAge" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="">Select age range</option>
+                        <option value="18-24">18-24</option>
+                        <option value="25-34">25-34</option>
+                        <option value="35-44">35-44</option>
+                        <option value="45-54">45-54</option>
+                        <option value="55-64">55-64</option>
+                        <option value="65+">65+</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                    <select id="intervieweeGender" name="intervieweeGender" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="non-binary">Non-binary</option>
+                        <option value="prefer-not-to-say">Prefer not to say</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                    <input type="text" id="intervieweeLocation" name="intervieweeLocation" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="City, State">
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Occupation</label>
+                    <input type="text" id="intervieweeOccupation" name="intervieweeOccupation" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter occupation">
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                    <input type="text" id="intervieweeIndustry" name="intervieweeIndustry" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter industry">
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
+                    <input type="number" id="intervieweeExperience" name="intervieweeExperience" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Years in current role">
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Education Level</label>
+                    <select id="intervieweeEducation" name="intervieweeEducation" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="">Select education level</option>
+                        <option value="high-school">High School</option>
+                        <option value="associates">Associate's Degree</option>
+                        <option value="bachelors">Bachelor's Degree</option>
+                        <option value="masters">Master's Degree</option>
+                        <option value="doctorate">Doctorate</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Technology Information -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center mb-4">
+                <span class="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full mr-3">4</span>
+                <h2 class="text-xl font-semibold">Technology Information</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Primary Device</label>
+                    <select id="primaryDevice" name="primaryDevice" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="">Select primary device</option>
+                        <option value="smartphone">Smartphone</option>
+                        <option value="tablet">Tablet</option>
+                        <option value="laptop">Laptop</option>
+                        <option value="desktop">Desktop</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Operating System</label>
+                    <select id="operatingSystem" name="operatingSystem" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="">Select operating system</option>
+                        <option value="windows">Windows</option>
+                        <option value="macos">macOS</option>
+                        <option value="ios">iOS</option>
+                        <option value="android">Android</option>
+                        <option value="linux">Linux</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Browser Preference</label>
+                    <select id="browserPreference" name="browserPreference" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="">Select browser preference</option>
+                        <option value="chrome">Chrome</option>
+                        <option value="firefox">Firefox</option>
+                        <option value="safari">Safari</option>
+                        <option value="edge">Edge</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Technical Proficiency</label>
+                    <select id="technicalProficiency" name="technicalProficiency" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="">Select technical proficiency</option>
+                        <option value="beginner">Beginner</option>
+                        <option value="intermediate">Intermediate</option>
+                        <option value="advanced">Advanced</option>
+                        <option value="expert">Expert</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 5: Metadata -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center mb-4">
+                <span class="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full mr-3">5</span>
+                <h2 class="text-xl font-semibold">Interview Metadata</h2>
+            </div>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Interview Date</label>
+                    <input type="datetime-local" id="interviewDate" name="interviewDate" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Interview Duration (minutes)</label>
+                    <input type="number" id="interviewDuration" name="interviewDuration" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter duration in minutes" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Interview Format</label>
+                    <select id="interviewFormat" name="interviewFormat" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="">Select interview format</option>
+                        <option value="in-person">In-person</option>
+                        <option value="video-call">Video Call</option>
+                        <option value="phone-call">Phone Call</option>
+                        <option value="chat">Chat</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Interview Language</label>
+                    <select id="interviewLanguage" name="interviewLanguage" 
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                        <option value="">Select language</option>
+                        <option value="english">English</option>
+                        <option value="spanish">Spanish</option>
+                        <option value="french">French</option>
+                        <option value="german">German</option>
+                        <option value="other">Other</option>
+                    </select>
+                </div>
+                
+                <div class="form-group md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Interview Notes</label>
+                    <textarea id="interviewNotes" name="interviewNotes" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                              rows="3" placeholder="Enter any notes about the interview"></textarea>
+                </div>
+                
+                <div class="form-group md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Key Insights</label>
+                    <textarea id="keyInsights" name="keyInsights" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                              rows="3" placeholder="Enter key insights from the interview"></textarea>
+                </div>
+                
+                <div class="form-group md:col-span-2">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Follow-up Actions</label>
+                    <textarea id="followUpActions" name="followUpActions" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                              rows="3" placeholder="Enter any follow-up actions needed"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 6: Consent -->
+        <div class="bg-white p-6 rounded-lg shadow-md">
+            <div class="flex items-center mb-4">
+                <span class="flex items-center justify-center w-8 h-8 bg-blue-500 text-white rounded-full mr-3">6</span>
+                <h2 class="text-xl font-semibold">Consent</h2>
+            </div>
+            
+            <div class="form-group">
+                <label class="flex items-center">
+                    <input type="checkbox" id="consent" name="consent" class="mr-2" required>
+                    <span class="text-sm text-gray-700">I confirm that I have obtained consent to use this transcript for research purposes.</span>
+                </label>
+            </div>
+        </div>
+
+        <!-- Submit Button -->
+        <div class="flex justify-end">
+            <button type="submit" class="bg-green-500 text-white px-6 py-2 rounded-lg hover:bg-green-600">
+                Upload Transcript
+            </button>
+        </div>
+    </form>
+</div>
+
+<!-- Error Message -->
+<div id="errorMessage" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-xl">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Error</h3>
+        <p id="errorText" class="text-gray-600"></p>
+        <div class="mt-4 flex justify-end">
+            <button id="closeError" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loadingIndicator" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center space-y-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p class="text-lg text-gray-700">Uploading Transcript...</p>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('uploadTranscriptForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    const closeError = document.getElementById('closeError');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    
+    // Close error message
+    closeError.addEventListener('click', function() {
+        errorMessage.classList.add('hidden');
+    });
+    
+    // Form submission handler
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+        
+        // Show loading indicator
+        loadingIndicator.classList.remove('hidden');
+        
+        try {
+            // Create FormData object
+            const formData = new FormData();
+            
+            // Add form fields
+            formData.append('researcher', JSON.stringify({
+                name: document.getElementById('researcherName').value,
+                email: document.getElementById('researcherEmail').value,
+                role: document.getElementById('researcherRole').value
+            }));
+            
+            formData.append('project', JSON.stringify({
+                name: document.getElementById('projectName').value,
+                type: document.querySelector('input[name="interviewType"]:checked').value,
+                description: document.getElementById('projectDescription').value
+            }));
+            
+            formData.append('interviewee', JSON.stringify({
+                name: document.getElementById('intervieweeName').value,
+                age: document.getElementById('intervieweeAge').value,
+                gender: document.getElementById('intervieweeGender').value,
+                location: document.getElementById('intervieweeLocation').value,
+                occupation: document.getElementById('intervieweeOccupation').value,
+                industry: document.getElementById('intervieweeIndustry').value,
+                experience: document.getElementById('intervieweeExperience').value,
+                education: document.getElementById('intervieweeEducation').value
+            }));
+            
+            formData.append('technology', JSON.stringify({
+                primaryDevice: document.getElementById('primaryDevice').value,
+                operatingSystem: document.getElementById('operatingSystem').value,
+                browserPreference: document.getElementById('browserPreference').value,
+                technicalProficiency: document.getElementById('technicalProficiency').value
+            }));
+            
+            formData.append('metadata', JSON.stringify({
+                interviewDate: document.getElementById('interviewDate').value,
+                interviewDuration: document.getElementById('interviewDuration').value,
+                interviewFormat: document.getElementById('interviewFormat').value,
+                interviewLanguage: document.getElementById('interviewLanguage').value,
+                interviewNotes: document.getElementById('interviewNotes').value,
+                keyInsights: document.getElementById('keyInsights').value,
+                followUpActions: document.getElementById('followUpActions').value
+            }));
+            
+            formData.append('consent', document.getElementById('consent').checked);
+            formData.append('transcriptName', document.getElementById('transcriptName').value);
+            
+            // Add transcript file
+            const transcriptFile = document.getElementById('transcriptFile').files[0];
+            if (transcriptFile) {
+                formData.append('transcriptFile', transcriptFile);
+            }
+            
+            // Send the request
+            const response = await fetch('/upload_transcript', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to upload transcript');
+            }
+            
+            // Redirect to transcript view
+            const data = await response.json();
+            window.location.href = `/transcript/${data.transcript_id}`;
+            
+        } catch (error) {
+            errorText.textContent = error.message;
+            errorMessage.classList.remove('hidden');
+        } finally {
+            loadingIndicator.classList.add('hidden');
+        }
+    });
+    
+    // Validate form
+    function validateForm() {
+        const requiredInputs = form.querySelectorAll('[required]');
+        
+        for (const input of requiredInputs) {
+            if (!input.value) {
+                errorText.textContent = `Please fill in all required fields`;
+                errorMessage.classList.remove('hidden');
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+        }
+        
+        // Validate email format if email fields are filled
+        const emailInputs = form.querySelectorAll('input[type="email"]');
+        for (const emailInput of emailInputs) {
+            if (emailInput.value && !emailInput.validity.valid) {
+                errorText.textContent = `Please enter a valid email address`;
+                errorMessage.classList.remove('hidden');
+                emailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+        }
+        
+        // Validate file upload
+        const fileInput = document.getElementById('transcriptFile');
+        if (!fileInput.files.length) {
+            errorText.textContent = `Please upload a transcript file`;
+            errorMessage.classList.remove('hidden');
+            fileInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        
+        return true;
+    }
+
+    // File upload handling
+    const fileInput = document.getElementById('transcriptFile');
+    const dropZone = document.getElementById('dropZone');
+    const selectedFile = document.getElementById('selectedFile');
+    const fileName = document.getElementById('fileName');
+    
+    // Handle file selection
+    fileInput.addEventListener('change', function(e) {
+        if (this.files.length > 0) {
+            const file = this.files[0];
+            fileName.textContent = file.name;
+            selectedFile.classList.remove('hidden');
+            dropZone.classList.add('border-blue-500');
+        } else {
+            selectedFile.classList.add('hidden');
+            dropZone.classList.remove('border-blue-500');
+        }
+    });
+    
+    // Handle drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight(e) {
+        dropZone.classList.add('border-blue-500', 'bg-blue-50');
+    }
+    
+    function unhighlight(e) {
+        dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+    }
+    
+    dropZone.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        
+        if (files.length > 0) {
+            const file = files[0];
+            if (isValidFileType(file)) {
+                fileInput.files = files;
+                fileName.textContent = file.name;
+                selectedFile.classList.remove('hidden');
+            } else {
+                errorText.textContent = 'Please upload a valid file type (TXT, DOC, DOCX, or PDF)';
+                errorMessage.classList.remove('hidden');
+            }
+        }
+    }
+    
+    function isValidFileType(file) {
+        const validTypes = ['.txt', '.doc', '.docx', '.pdf'];
+        const fileType = '.' + file.name.split('.').pop().toLowerCase();
+        return validTypes.includes(fileType);
+    }
+});
+</script>
+{% endblock %} 

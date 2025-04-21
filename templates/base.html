@@ -130,10 +130,16 @@
                         <a class="nav-link {% if request.endpoint == 'archive' %}active{% endif %}" href="{{ url_for('archive') }}">Archive</a>
                     </li>
                     <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'advanced_search' %}active{% endif %}" href="{{ url_for('advanced_search') }}">Advanced Search</a>
+                    </li>
+                    <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'persona' %}active{% endif %}" href="{{ url_for('persona') }}">Persona</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link {% if request.endpoint == 'journey_map' %}active{% endif %}" href="{{ url_for('journey_map') }}">Journey Map</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link {% if request.endpoint == 'upload_transcript' %}active{% endif %}" href="{{ url_for('upload_transcript') }}">Upload Transcript</a>
                     </li>
                 </ul>
             </div>

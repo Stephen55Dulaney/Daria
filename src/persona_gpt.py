@@ -31,6 +31,17 @@ PERSONA_JSON_TEMPLATE = """{
             "motivation": "Why this goal is important",
             "supporting_quotes": ["Quote 1", "Quote 2"]
         }
+        {
+            "goal": "Secondary goal",
+            "motivation": "Why this goal is important",
+            "supporting_quotes": ["Quote 1", "Quote 2"]
+        }  
+        {
+            "goal": "Tertiary goal",
+            "motivation": "Why this goal is important",
+            "supporting_quotes": ["Quote 1", "Quote 2"]
+        } 
+                       
     ],
     "pain_points": [
         {
