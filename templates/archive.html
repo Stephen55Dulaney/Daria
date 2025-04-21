@@ -3,52 +3,112 @@
 {% block title %}Interview Archive{% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="mb-4">Interview Archive</h1>
+<div class="container mx-auto px-4 py-8">
+    <h1 class="text-3xl font-bold mb-8">Interview Archive</h1>
 
     <!-- Search Section -->
-    <div class="card mb-4">
-        <div class="card-body">
-            <div class="input-group">
-                <input type="text" id="searchInput" class="form-control" placeholder="Search interviews...">
-                <button class="btn btn-primary" type="button" id="searchButton">Search</button>
-            </div>
-            <!-- Search Results Area -->
-            <div id="searchResults" class="mt-3" style="display: none;">
-                <div id="searchSpinner" class="text-center" style="display: none;">
-                    <div class="spinner-border text-primary" role="status">
-                        <span class="visually-hidden">Searching...</span>
-                    </div>
-                    <p class="mt-2">Searching interviews...</p>
-                </div>
-                <div id="searchContent"></div>
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="flex gap-2">
+            <input type="text" id="searchInput" class="flex-1 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Search interviews...">
+            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" type="button" id="searchButton">Search</button>
+        </div>
+        <!-- Search Results Area -->
+        <div id="searchResults" class="mt-4" style="display: none;">
+            <h3 class="text-xl font-semibold mb-4">
+                Search Results: <span id="resultCount">0</span> items
+                <span id="matchType" class="text-sm text-gray-600 ml-2"></span>
+            </h3>
+            <div id="searchResultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <!-- Search results will be dynamically inserted here -->
             </div>
         </div>
     </div>
 
     <!-- Interviews Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4" id="interviewList">
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="interviewList">
         {% for interview in interviews %}
-        <div class="bg-white rounded-lg shadow-md p-6 mb-6">
-            <div class="flex justify-between items-start">
-                <div>
-                    <h2 class="text-xl font-semibold mb-2">{{ interview.project_name }}</h2>
-                    <p class="text-gray-600 mb-2">{{ interview.interview_type }}</p>
-                    <p class="text-sm text-gray-500">{{ interview.date }}</p>
+        <div class="bg-white rounded-lg shadow-md overflow-hidden">
+            <!-- Type Badge -->
+            <div class="px-4 py-1 bg-gray-100 text-gray-600 text-sm font-medium">
+                {{ interview.interview_type|default('INTERVIEW') }}
+            </div>
+            
+            <!-- Content -->
+            <div class="p-4">
+                <!-- Title and Date -->
+                <h2 class="text-xl font-semibold mb-2">
+                    {% if interview.participant_name %}
+                    Interview w/ {{ interview.participant_name }}
+                    {% else %}
+                    Interview
+                    {% endif %}
+                    {% if interview.date %}
+                    — {{ interview.date|strftime('%B %Y') }}
+                    {% endif %}
+                </h2>
+                
+                <!-- Preview Quote -->
+                <blockquote class="border-l-4 border-gray-200 pl-4 my-4 italic text-gray-600">
+                    {% if interview.transcript %}
+                    "{{ interview.transcript|truncate(100) }}"
+                    {% else %}
+                    No transcript available
+                    {% endif %}
+                </blockquote>
+                
+                <!-- Project and Author -->
+                <div class="mb-4">
+                    <p class="text-gray-600">
+                        Project: {{ interview.project_name }}
+                        {% if interview.author %}
+                        <span class="mx-2">•</span>
+                        Author: {{ interview.author }}
+                        {% endif %}
+                    </p>
                 </div>
-                <div class="flex flex-col space-y-2">
+                
+                <!-- Tags -->
+                <div class="flex flex-wrap gap-2 mb-4">
+                    {% if interview.tags %}
+                        {% for tag in interview.tags %}
+                        <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
+                            {{ tag }}
+                        </span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+                
+                <!-- Status and Emotion -->
+                <div class="flex items-center gap-4 mb-4">
+                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                        {{ interview.status|default('Draft') }}
+                    </span>
+                    {% if interview.emotion %}
+                    <span class="flex items-center text-gray-600">
+                        <span class="mr-1">Emotion:</span>
+                        <span class="font-medium">{{ interview.emotion }}</span>
+                    </span>
+                    {% endif %}
+                </div>
+                
+                <!-- Actions -->
+                <div class="flex gap-2 mt-4">
                     <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" 
-                       class="inline-block px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors">
-                        Transcript
+                       class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                        View
                     </a>
                     <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
-                       class="inline-block px-3 py-1 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors">
-                        Analysis
+                       class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                        Edit
                     </a>
-                    <a href="{{ url_for('view_metadata', interview_id=interview.id) }}" 
-                       class="inline-block px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded hover:bg-purple-200 transition-colors">
-                        Metadata
-                    </a>
+                    <button onclick="copyLink('{{ interview.id }}')"
+                            class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                        Link
+                    </button>
+                    <button onclick="toggleFavorite('{{ interview.id }}')"
+                            class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 transition-colors">
+                        Favorite
+                    </button>
                 </div>
             </div>
         </div>
@@ -61,8 +121,9 @@ document.addEventListener('DOMContentLoaded', function() {
     const searchInput = document.getElementById('searchInput');
     const searchButton = document.getElementById('searchButton');
     const searchResults = document.getElementById('searchResults');
-    const searchSpinner = document.getElementById('searchSpinner');
-    const searchContent = document.getElementById('searchContent');
+    const searchResultsGrid = document.getElementById('searchResultsGrid');
+    const resultCount = document.getElementById('resultCount');
+    const matchType = document.getElementById('matchType');
 
     // Get base URLs from the server-side template
     const viewTranscriptBaseUrl = "{{ url_for('view_transcript', interview_id='') }}";
@@ -74,21 +135,9 @@ document.addEventListener('DOMContentLoaded', function() {
         const query = document.getElementById('searchInput').value.trim();
         if (!query) return;
 
-        // Show loading indicator
-        const searchResults = document.getElementById('searchResults');
-        const searchSpinner = document.getElementById('searchSpinner');
-        const searchContent = document.getElementById('searchContent');
-        
+        // Show loading state
         searchResults.style.display = 'block';
-        searchSpinner.style.display = 'block';
-        searchContent.innerHTML = '';
-
-        const searchParams = {
-            include_answers: true,
-            include_analysis: true,
-            exclude_permission: true,
-            min_relevance: 0.4
-        };
+        searchResultsGrid.innerHTML = '<div class="col-span-full text-center"><div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"><span class="sr-only">Loading...</span></div><p class="mt-2 text-gray-600">Searching interviews...</p></div>';
 
         try {
             const response = await fetch('/search_interviews', {
@@ -98,8 +147,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: JSON.stringify({
                     query: query,
-                    k: 5,
-                    search_params: searchParams
+                    k: 5
                 })
             });
 
@@ -109,160 +157,108 @@ document.addEventListener('DOMContentLoaded', function() {
 
             const data = await response.json();
             
-            // Debug information display
-            console.group('Search Debug Information');
-            console.log('Query:', query);
-            console.log('Search Parameters:', searchParams);
-            
+            // Display results
             if (data.error) {
-                console.error('Search error:', data.error);
-                throw new Error(data.error);
-            }
-
-            if (data.debug_info) {
-                if (data.debug_info.exact_matches && data.debug_info.exact_matches.length > 0) {
-                    console.group('Exact Matches Found');
-                    data.debug_info.exact_matches.forEach(match => {
-                        console.log('Interview:', match.interview_id);
-                        console.log('Project:', match.project_name);
-                        console.log('Response:', match.response);
-                        console.log('---');
-                    });
-                    console.groupEnd();
-                }
-                
-                if (data.debug_info.semantic_results && data.debug_info.semantic_results.length > 0) {
-                    console.group('Semantic Search Results');
-                    data.debug_info.semantic_results.forEach(result => {
-                        console.log('Interview ID:', result.id);
-                        console.log('Score:', result.score);
-                        console.log('Responses Found:', result.responses_found);
-                        if (result.most_relevant_response) {
-                            console.log('Most Relevant Response:', result.most_relevant_response);
-                            console.log('Word Overlap:', result.word_overlap);
-                        }
-                        if (result.skipped) {
-                            console.log('Skipped:', result.reason);
-                        }
-                        console.log('---');
-                    });
-                    console.groupEnd();
-                }
-                
-                console.log('Final Results:', data.debug_info.final_results ? data.debug_info.final_results.length : 0);
-            }
-            
-            console.groupEnd();
-            
-            // Hide spinner and display results
-            searchSpinner.style.display = 'none';
-            if (data.results) {
-                displaySearchResults(data.results);
+                searchResultsGrid.innerHTML = `<div class="col-span-full text-red-600">${data.error}</div>`;
+            } else if (!data.results || data.results.length === 0) {
+                searchResultsGrid.innerHTML = '<div class="col-span-full">No results found</div>';
             } else {
-                searchContent.innerHTML = '<p class="text-gray-500">No results found.</p>';
+                displaySearchResults(data);
             }
         } catch (error) {
             console.error('Error performing search:', error);
-            searchSpinner.style.display = 'none';
-            searchContent.innerHTML = `<p class="text-red-500">Error performing search: ${error.message}</p>`;
+            searchResultsGrid.innerHTML = `<div class="col-span-full text-red-500">Error performing search: ${error.message}</div>`;
         }
     }
 
-    function displaySearchResults(results) {
-        const searchContent = document.getElementById('searchContent');
+    function displaySearchResults(data) {
+        const searchResults = document.getElementById('searchResults');
+        const searchResultsGrid = document.getElementById('searchResultsGrid');
+        const resultCount = document.getElementById('resultCount');
+        const matchType = document.getElementById('matchType');
         
-        if (!results || results.length === 0) {
-            searchContent.innerHTML = '<p class="text-gray-500">No interviews found matching your search.</p>';
+        searchResults.style.display = 'block';
+        searchResultsGrid.innerHTML = '';
+        
+        if (data.error) {
+            searchResultsGrid.innerHTML = `<div class="col-span-full text-red-600">${data.error}</div>`;
             return;
         }
-
-        searchContent.innerHTML = ''; // Clear previous results
-
-        // Track seen interview IDs to prevent duplicates
-        const seenInterviewIds = new Set();
-
-        // Create flex container for results
-        const flexContainer = document.createElement('div');
-        flexContainer.className = 'grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mb-6';
-
-        results.forEach((result, index) => {
-            // Skip if we've already seen this interview
-            if (seenInterviewIds.has(result.id)) {
-                return;
-            }
-            seenInterviewIds.add(result.id);
-
-            const card = document.createElement('div');
-            card.className = 'bg-white rounded-lg shadow p-4 relative group cursor-pointer hover:shadow-lg transition-all duration-200';
-            
-            // Format date
+        
+        if (!data.results || data.results.length === 0) {
+            searchResultsGrid.innerHTML = '<div class="col-span-full">No results found</div>';
+            return;
+        }
+        
+        // Update result count and match type
+        resultCount.textContent = data.debug_info.total_results;
+        if (data.debug_info.search_type === 'exact_match') {
+            matchType.textContent = '(Exact Match)';
+        } else if (data.debug_info.search_type === 'semantic') {
+            matchType.textContent = '(Semantic Search)';
+        }
+        
+        data.results.forEach(result => {
             const date = new Date(result.date);
             const formattedDate = date.toLocaleDateString('en-US', {
                 year: 'numeric',
-                month: 'long',
+                month: 'short',
                 day: 'numeric'
             });
-
-            // Calculate relevance percentage
-            const relevancePercentage = (result.score * 100).toFixed(1);
-
-            // Get the matched content preview
-            const contentPreview = result.transcript_preview || '';
-            const matchType = result.debug_info?.match_type || 'Match';
             
-            // Create the card content
+            const card = document.createElement('div');
+            card.className = 'bg-white rounded-lg shadow-md p-4 border border-gray-200';
+            
+            let relevanceDisplay = '';
+            if (result.match_type === 'exact') {
+                relevanceDisplay = '<span class="text-green-600">Exact Match (100%)</span>';
+            } else {
+                const score = Math.round(result.score * 100);
+                relevanceDisplay = `<span class="text-blue-600">Relevance: ${score}%</span>`;
+            }
+            
             card.innerHTML = `
-                <div class="mb-2">
-                    <h3 class="text-lg font-semibold text-gray-900">Project Name: ${result.project_name || 'Unknown Project'}</h3>
-                    <p class="text-sm text-gray-600">Interview Type: ${result.interview_type || 'Unknown Type'}</p>
-                    <p class="text-sm text-gray-500 mb-2">Date: ${formattedDate}</p>
-                    <div class="flex flex-col gap-2">
-                        <a href="/transcript/${result.id}" class="inline-flex items-center justify-center px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors" style="width: 100px;">
-                            Transcript
+                <div class="flex justify-between items-start mb-2">
+                    <div>
+                        <h3 class="text-lg font-semibold">${result.interview_type} - ${formattedDate}</h3>
+                        <p class="text-sm text-gray-600">${result.participant_name}</p>
+                    </div>
+                    <div class="text-sm">${relevanceDisplay}</div>
+                </div>
+                <blockquote class="border-l-4 border-gray-300 pl-4 my-2 text-gray-700">
+                    ${result.preview || 'No transcript available'}
+                </blockquote>
+                <div class="mt-2">
+                    <p class="text-sm text-gray-600">Project: ${result.project_name}</p>
+                    <p class="text-sm text-gray-600">Author: ${result.author || 'Unknown'}</p>
+                </div>
+                <div class="flex flex-wrap gap-2 mt-2">
+                    ${(result.tags || []).map(tag => 
+                        `<span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">${tag}</span>`
+                    ).join('')}
+                </div>
+                <div class="flex justify-between items-center mt-4">
+                    <div class="flex gap-2">
+                        <a href="${viewTranscriptBaseUrl}${result.id}" class="text-blue-600 hover:text-blue-800">
+                            <i class="fas fa-eye"></i> View
                         </a>
-                        <a href="/analysis/${result.id}" class="inline-flex items-center justify-center px-3 py-1 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors" style="width: 100px;">
-                            Analysis
-                        </a>
-                        <a href="/metadata/${result.id}" class="inline-flex items-center justify-center px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded hover:bg-purple-200 transition-colors" style="width: 100px;">
-                            Metadata
+                        <a href="${viewAnalysisBaseUrl}${result.id}" class="text-green-600 hover:text-green-800 ml-2">
+                            <i class="fas fa-edit"></i> Edit
                         </a>
                     </div>
-                </div>
-                <div class="absolute bottom-4 right-4">
-                    <div class="text-sm text-gray-500 relative cursor-pointer tooltip-trigger">
-                        <span>${matchType}: ${relevancePercentage}%</span>
-                        <div class="tooltip-content absolute right-0 -top-20 w-64 z-50 bg-gray-800 text-white text-sm rounded p-3 shadow-xl transition-all duration-200" 
-                             style="visibility: hidden; opacity: 0;">
-                            <div class="font-medium mb-1">Matched Content:</div>
-                            <div class="text-gray-200 text-xs">${contentPreview}</div>
-                            <div class="absolute bottom-0 right-4 transform translate-y-1/2">
-                                <div class="border-8 border-transparent border-t-gray-800"></div>
-                            </div>
-                        </div>
+                    <div class="flex gap-2">
+                        <button onclick="copyLink('${result.id}')" class="text-gray-600 hover:text-gray-800">
+                            <i class="fas fa-link"></i>
+                        </button>
+                        <button onclick="toggleFavorite('${result.id}')" class="text-yellow-600 hover:text-yellow-800">
+                            <i class="fas fa-star"></i>
+                        </button>
                     </div>
                 </div>
             `;
             
-            flexContainer.appendChild(card);
-
-            // Add event listeners for this card's tooltip
-            const tooltipTrigger = card.querySelector('.tooltip-trigger');
-            const tooltipContent = card.querySelector('.tooltip-content');
-            
-            if (tooltipTrigger && tooltipContent) {
-                tooltipTrigger.addEventListener('mouseenter', () => {
-                    tooltipContent.style.visibility = 'visible';
-                    tooltipContent.style.opacity = '1';
-                });
-                
-                tooltipTrigger.addEventListener('mouseleave', () => {
-                    tooltipContent.style.visibility = 'hidden';
-                    tooltipContent.style.opacity = '0';
-                });
-            }
+            searchResultsGrid.appendChild(card);
         });
-
-        searchContent.appendChild(flexContainer);
     }
 
     // Event listeners
@@ -273,6 +269,19 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     });
 });
+
+function copyLink(interviewId) {
+    const url = window.location.origin + '/transcript/' + interviewId;
+    navigator.clipboard.writeText(url).then(() => {
+        // You could add a toast notification here
+        console.log('Link copied to clipboard');
+    });
+}
+
+function toggleFavorite(interviewId) {
+    // Implement favorite functionality
+    console.log('Toggle favorite for interview:', interviewId);
+}
 </script>
 
 <style>
