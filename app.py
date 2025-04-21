@@ -27,6 +27,7 @@ from src.google_ai import GeminiPersonaGenerator
 from src.daria_resources import get_interview_prompt, BASE_SYSTEM_PROMPT, INTERVIEWER_BEST_PRACTICES
 from langchain.schema import SystemMessage, HumanMessage
 from langchain.vectorstores import VectorStore
+import MySQLdb
 
 # Global variables
 vector_store = None
@@ -37,9 +38,38 @@ app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev')
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['INTERVIEWS_DIR'] = 'interviews'
 app.config['VECTOR_STORE_PATH'] = 'vector_store'
-app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')  # Add OpenAI API key configuration
+app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
+app.config['APPLICATION_ROOT'] = '/'
+app.config['PREFERRED_URL_SCHEME'] = 'http'
 
-socketio = SocketIO(app)
+# URL prefix handler
+@app.before_request
+def before_request():
+    """Handle URL routing before each request."""
+    if request.path.startswith('/static/'):
+        return
+
+    # Get the current URL and host
+    url = request.url
+    host = request.host_url.rstrip('/')
+    path = request.path
+
+    # Handle the case where the URL contains the port number in the path
+    if '127.0.0.5003' in url and not url.startswith('http://127.0.0.1:5003'):
+        corrected_url = f"http://127.0.0.1:5003{path}"
+        return redirect(corrected_url, code=301)
+
+    # Handle the case where the URL is missing http://
+    if not url.startswith('http'):
+        return redirect(f"http://{url}", code=301)
+
+    return None
+
+# Initialize SocketIO with specific configuration
+socketio = SocketIO(app, 
+                   async_mode='threading',
+                   path='/socket.io',
+                   cors_allowed_origins='*')
 load_dotenv()
 
 # Add markdown filter
@@ -91,25 +121,95 @@ logger = logging.getLogger(__name__)
 app.vector_store = None
 
 # Helper functions
-def list_interviews():
-    """List all saved interviews."""
-    interviews = []
-    if INTERVIEWS_DIR.exists():
-        for file_path in INTERVIEWS_DIR.glob('*.json'):
-            try:
-                with open(file_path) as f:
-                    interview = json.load(f)
-                    # Ensure all required fields are present
-                    interview.setdefault('date', datetime.now().isoformat())
-                    interview.setdefault('project_name', 'Unknown Project')
-                    interview.setdefault('interview_type', 'Unknown Type')
-                    interview.setdefault('transcript', '')
-                    interview.setdefault('analysis', '')
+def truncate_text(text, max_length=200):
+    """Truncate text to a maximum length while preserving word boundaries."""
+    if not text or len(text) <= max_length:
+        return text
+    truncated = text[:max_length]
+    last_space = truncated.rfind(' ')
+    if last_space > 0:
+        truncated = truncated[:last_space]
+    return truncated + '...'
+
+def list_interviews(group_by='project'):
+    """List all saved interviews, optionally grouped by project."""
+    try:
+        interviews = []
+        interview_dir = os.path.join(app.root_path, 'interviews')
+        if not os.path.exists(interview_dir):
+            return {} if group_by else []
+
+        for filename in os.listdir(interview_dir):
+            if filename.endswith('.json'):
+                file_path = os.path.join(interview_dir, filename)
+                try:
+                    with open(file_path, 'r') as f:
+                        data = json.load(f)
+                        
+                    # Handle tags that could be either string or array
+                    tags = data.get('tags', [])
+                    if isinstance(tags, str):
+                        tags = [tag.strip() for tag in tags.split(',') if tag.strip()]
+                    elif not isinstance(tags, list):
+                        tags = []
+                        
+                    # Get participant name from either participant_name or interviewee field
+                    participant_name = data.get('participant_name')
+                    if not participant_name:
+                        participant_name = data.get('interviewee')
+                        
+                    interview = {
+                        'id': data.get('id', os.path.splitext(filename)[0]),
+                        'title': data.get('title', "Untitled Interview"),
+                        'participant_name': participant_name or "Unknown Participant",
+                        'date': data.get('date'),
+                        'interview_type': data.get('interview_type', "Interview"),
+                        'tags': tags,
+                        'project_name': data.get('project_name', "Unknown Project"),
+                        'status': data.get('status', "In Progress"),
+                        'emotion': data.get('emotion'),
+                        'author': data.get('author'),
+                        'transcript': data.get('transcript', ''),
+                        'preview': truncate_text(data.get('summary', data.get('transcript', '')), 200) if data.get('summary') or data.get('transcript') else "No preview available"
+                    }
                     interviews.append(interview)
-            except Exception as e:
-                logger.error(f"Error loading interview {file_path}: {str(e)}")
-                continue
-    return sorted(interviews, key=lambda x: x.get('date', ''), reverse=True)
+                except Exception as e:
+                    app.logger.error(f"Error reading interview file {filename}: {str(e)}")
+                    continue
+
+        # Sort interviews by date
+        interviews = sorted(interviews, key=lambda x: x.get('date', ''), reverse=True)
+        
+        # Return as is if no grouping requested
+        if not group_by:
+            return interviews
+            
+        # Group interviews based on the specified parameter
+        grouped = {}
+        for interview in interviews:
+            key = interview.get(group_by, 'Unknown')
+            if key not in grouped:
+                grouped[key] = []
+            grouped[key].append(interview)
+
+        return grouped
+
+    except Exception as e:
+        app.logger.error(f"Error listing interviews: {str(e)}")
+        return {} if group_by else []
+
+def get_emotion_icon(emotion):
+    """Get an emoji icon for the given emotion."""
+    emotion_icons = {
+        'Happy': '😊',
+        'Sad': '😢',
+        'Angry': '😠',
+        'Neutral': '😐',
+        'Excited': '😃',
+        'Frustrated': '😤',
+        'Confused': '😕'
+    }
+    return emotion_icons.get(emotion, '')
 
 def load_interview(interview_id):
     """Load interview data from JSON file."""
@@ -147,29 +247,78 @@ def delete_interview(interview_id):
 def save_interview_data(project_name, interview_type, transcript, analysis, form_data=None):
     """Save interview data to a JSON file."""
     try:
+        # Create interviews directory if it doesn't exist
+        if not os.path.exists('interviews'):
+            os.makedirs('interviews')
+            
+        # Generate a unique ID for the interview
         interview_id = str(uuid.uuid4())
+        
+        # If analysis is not provided, create a structured template
+        if not analysis:
+            analysis = """# Interview Analysis
+
+## Key Pain Points
+- List major issues and challenges
+- Include specific examples
+
+## User Needs
+- Core requirements
+- Desired improvements
+- Feature requests
+
+## Recommendations
+1. Actionable suggestions
+2. Potential solutions
+3. Priority items
+
+## Additional Insights
+- Notable quotes
+- Unexpected findings
+- Context details"""
+        
+        # Prepare interview data
         interview_data = {
             'id': interview_id,
             'project_name': project_name,
             'interview_type': interview_type,
-            'date': datetime.now().isoformat(),
             'transcript': transcript,
             'analysis': analysis,
-            'metadata': form_data if form_data else {}
+            'date': datetime.now().isoformat(),
+            'last_modified': datetime.now().isoformat()
         }
         
-        # Create interviews directory if it doesn't exist
-        INTERVIEWS_DIR.mkdir(exist_ok=True)
+        # Add form data if provided
+        if form_data:
+            # Convert tags to array if it's a string
+            if isinstance(form_data.get('tags'), str):
+                form_data['tags'] = [tag.strip() for tag in form_data['tags'].split(',') if tag.strip()]
+            elif not form_data.get('tags'):
+                form_data['tags'] = []
+                
+            interview_data.update({
+                'participant_name': form_data.get('participant_name', ''),
+                'role': form_data.get('role', ''),
+                'experience_level': form_data.get('experience_level', ''),
+                'department': form_data.get('department', ''),
+                'tags': form_data.get('tags', []),
+                'emotion': form_data.get('emotion', ''),
+                'status': form_data.get('status', 'Draft'),
+                'author': form_data.get('author', '')
+            })
         
-        file_path = INTERVIEWS_DIR / f"{interview_id}.json"
-        with open(file_path, 'w') as f:
+        # Save to JSON file
+        filename = f'interviews/{interview_id}.json'
+        with open(filename, 'w') as f:
             json.dump(interview_data, f, indent=2)
+            
+        logger.info(f"Saved interview data to {filename}")
+        logger.debug(f"Interview data: {interview_data}")
         
-        logger.info(f"Interview saved successfully: {interview_id}")
         return interview_id
         
     except Exception as e:
-        logger.error(f"Error saving interview: {str(e)}")
+        logger.error(f"Error saving interview data: {str(e)}")
         logger.error(traceback.format_exc())
         raise
 
@@ -467,7 +616,18 @@ def save_interview():
         project_name = data.get('project_name')
         interview_type = data.get('interview_type')
         project_description = data.get('project_description')
-        form_data = data.get('form_data', {})
+        
+        # Get all the new metadata fields
+        form_data = {
+            'participant_name': data.get('participant_name'),
+            'role': data.get('role'),
+            'experience_level': data.get('experience_level'),
+            'department': data.get('department'),
+            'tags': data.get('tags', []),
+            'emotion': data.get('emotion'),
+            'status': data.get('status', 'Draft'),
+            'author': data.get('author')
+        }
 
         if not all([project_name, interview_type, project_description]):
             return jsonify({'error': 'Missing required parameters'}), 400
@@ -478,15 +638,18 @@ def save_interview():
         # Store the prompt and form data
         interview_prompts[project_name] = {
             'prompt': interview_prompt,
-            'form_data': form_data
+            'form_data': form_data,
+            'project_description': project_description
         }
         
         logger.info(f"Stored interview prompt and form data for project: {project_name}")
+        logger.debug(f"Form data: {form_data}")
         
         return jsonify({
             'status': 'success',
             'message': 'Interview prompt saved successfully',
-            'project_name': project_name
+            'project_name': project_name,
+            'redirect_url': url_for('interview', project_name=project_name)
         })
         
     except Exception as e:
@@ -900,8 +1063,22 @@ def handle_disconnect():
 @app.route('/archive')
 def archive():
     """Display the archive page with all interviews."""
-    interviews = list_interviews()
-    return render_template('archive.html', interviews=interviews)
+    try:
+        # Get all interviews without grouping
+        app.logger.debug("Loading interviews for archive page")
+        interviews = list_interviews(group_by=None)
+        app.logger.debug(f"Loaded {len(interviews)} interviews")
+        
+        # Add debug info for each interview
+        for interview in interviews:
+            app.logger.debug(f"Interview: {interview.get('id')} - {interview.get('project_name')} - {interview.get('participant_name')}")
+        
+        return render_template('archive.html', interviews=interviews)
+    except Exception as e:
+        app.logger.error(f"Error in archive: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        flash('Error loading interviews', 'error')
+        return render_template('archive.html', interviews=[])
 
 @app.route('/transcript/<interview_id>')
 def view_transcript(interview_id):
@@ -1031,7 +1208,7 @@ Format your response with clear sections using headers and ensure each section h
                 logger.error(f"Error generating analysis: {str(e)}")
                 logger.error(traceback.format_exc())
                 flash('Error generating analysis', 'error')
-                return redirect(url_for('archive'))
+            return redirect(url_for('archive'))
         
         return render_template('analysis.html', 
                              interview=interview)
@@ -1111,220 +1288,98 @@ Format your response with clear sections and bullet points where appropriate."""
 
 @app.route('/search_interviews', methods=['POST'])
 def search_interviews():
-    """Search interviews using vector store."""
+    """Search interviews using semantic search."""
     try:
         data = request.get_json()
-        query = data.get('query')
-        k = data.get('k', 5)  # Number of results to return
-        search_params = data.get('search_params', {})
-
+        query = data.get('query', '').strip()
+        k = min(max(data.get('k', 10), 1), 20)  # Increased default k to 10
+        
         if not query:
-            logger.warning("No search query provided")
-            return jsonify({'error': 'No search query provided'}), 400
-
-        # Initialize vector store if not already initialized
-        global vector_store
-        if not vector_store:
-            try:
-                vector_store = InterviewVectorStore(openai_api_key=OPENAI_API_KEY)
-                logger.info("Vector store initialized successfully")
-            except Exception as e:
-                logger.error(f"Error initializing vector store: {str(e)}")
-                return jsonify({'error': 'Failed to initialize search functionality'}), 500
-
-        logger.info(f"Performing search with query: {query}")
+            return jsonify({'error': 'Search query is required'}), 400
+            
+        # Initialize vector store if not already done
+        if not hasattr(app, 'vector_store') or app.vector_store is None:
+            app.vector_store = InterviewVectorStore(
+                openai_api_key=app.config['OPENAI_API_KEY'],
+                vector_store_path=app.config['VECTOR_STORE_PATH']
+            )
+            if not app.vector_store.load_vector_store():
+                app.vector_store.initialize()
         
-        # Debug information to be sent to frontend
-        debug_info = {
-            'query': query,
-            'search_params': search_params,
-            'exact_matches': [],
-            'semantic_results': [],
-            'final_results': []
-        }
+        # Perform semantic search with more results
+        results = app.vector_store.semantic_search(query, k=k)
         
-        # First try exact match search
-        exact_matches = []
-        seen_interview_ids = set()
+        if not results:
+            return jsonify({
+                'results': [],
+                'debug_info': {'search_type': 'semantic', 'no_results': True}
+            })
         
-        for interview_id in vector_store.interview_ids:
-            try:
-                # Skip if we've already seen this interview
-                if interview_id in seen_interview_ids:
-                    continue
-                    
-                # Load the interview
-                interview_file = Path('interviews') / f"{interview_id}.json"
-                if not interview_file.exists():
-                    continue
-                    
+        # Format results for response
+        formatted_results = []
+        for result in results:
+            # Load full interview data
+            interview_file = Path('interviews') / f"{result['id']}.json"
+            interview_data = {}
+            if interview_file.exists():
                 with open(interview_file) as f:
-                    interview = json.load(f)
-                    
-                transcript = interview.get('transcript', '')
-                if not transcript:
-                    continue
-                    
-                # Look for exact matches in the transcript
-                for line in transcript.split('\n'):
-                    if line.startswith('You:'):
-                        response = line[4:].strip()
-                        response_lower = response.lower()
-                        query_lower = query.lower()
-                        
-                        # First check for exact phrase match
-                        if query_lower in response_lower:
-                            exact_matches.append({
-                                'id': interview_id,
-                                'project_name': interview.get('project_name', 'Unknown Project'),
-                                'interview_type': interview.get('interview_type', 'Unknown Type'),
-                                'date': interview.get('date', datetime.now().isoformat()),
-                                'transcript_preview': response,
-                                'score': 1.0,  # Exact matches get highest score
-                                'debug_info': {
-                                    'match_type': 'Exact Phrase Match',
-                                    'word_overlap': len(query_lower.split()),
-                                    'word_overlap_ratio': 1.0
-                                }
-                            })
-                            seen_interview_ids.add(interview_id)
-                            break
-                        
-                        # If no exact phrase match, try word overlap
-                        query_words = set(query_lower.split())
-                        response_words = set(response_lower.split())
-                        
-                        # Calculate word overlap
-                        matching_words = query_words & response_words
-                        word_overlap_ratio = len(matching_words) / len(query_words)
-                        
-                        # If we have a good match, add it to results
-                        if word_overlap_ratio >= 0.7:  # Increased threshold for word overlap
-                            exact_matches.append({
-                                'id': interview_id,
-                                'project_name': interview.get('project_name', 'Unknown Project'),
-                                'interview_type': interview.get('interview_type', 'Unknown Type'),
-                                'date': interview.get('date', datetime.now().isoformat()),
-                                'transcript_preview': response,
-                                'score': 0.8,  # High score for word overlap
-                                'debug_info': {
-                                    'match_type': 'Word Overlap Match',
-                                    'word_overlap': len(matching_words),
-                                    'word_overlap_ratio': word_overlap_ratio
-                                }
-                            })
-                            seen_interview_ids.add(interview_id)
-                            break
-            except Exception as e:
-                logger.error(f"Error processing interview {interview_id}: {str(e)}")
-                continue
-                
-        # If we found exact matches, return those
-        if exact_matches:
-            debug_info['final_results'] = exact_matches[:k]
-            return jsonify({
-                'results': exact_matches[:k],
-                'debug_info': debug_info
+                    interview_data = json.load(f)
+            
+            # Extract preview from transcript
+            preview = get_match_preview(result['transcript'], query.lower(), window=150)  # Increased window
+            
+            formatted_results.append({
+                'id': result['id'],
+                'project_name': result['project_name'],
+                'interview_type': result['interview_type'],
+                'date': result['date'],
+                'preview': preview,
+                'score': result['score'],
+                'transcript': result['transcript'],
+                'participant_name': interview_data.get('participant_name', 'Anonymous'),
+                'tags': interview_data.get('tags', []),
+                'status': interview_data.get('status', 'Draft'),
+                'emotion': interview_data.get('emotion', ''),
+                'author': interview_data.get('author', ''),
+                'role': interview_data.get('role', ''),
+                'experience_level': interview_data.get('experience_level', ''),
+                'department': interview_data.get('department', '')
             })
             
-        # If no exact matches, try semantic search
-        try:
-            results = vector_store.semantic_search(query, k=k)
-            
-            if not results:
-                return jsonify({
-                    'results': [],
-                    'debug_info': debug_info
-                })
-
-            # Process and format results
-            formatted_results = []
-            for result in results:
-                try:
-                    result_debug = {
-                        'id': result.get('id'),
-                        'score': result.get('score', 0),
-                        'responses_found': 0,
-                        'most_relevant_response': None,
-                        'word_overlap': 0
-                    }
-                    
-                    # Format the transcript preview
-                    transcript = result.get('transcript', '')
-                    transcript_preview = ''
-                    
-                    if transcript:
-                        # Extract user responses
-                        responses = []
-                        for line in transcript.split('\n'):
-                            if line.startswith('You:'):
-                                response = line[4:].strip()
-                                # Skip permission responses if exclude_permission is True
-                                if search_params.get('exclude_permission'):
-                                    if any(x in response.lower() for x in ['yes, you have my', 'permission', 'proceed', 'yes, proceed', 'all right']):
-                                        continue
-                                # Skip short responses and system messages
-                                if len(response) > 10 and not any(x in response.lower() for x in ['start', 'yes, proceed', 'all right']):
-                                    responses.append(response)
-                        
-                        if responses:
-                            result_debug['responses_found'] = len(responses)
-                            # Find the most relevant response
-                            most_relevant = None
-                            highest_overlap = 0
-                            for response in responses:
-                                # Calculate word overlap with query
-                                query_words = set(query.lower().split())
-                                response_words = set(response.lower().split())
-                                matching_words = query_words & response_words
-                                overlap = len(matching_words) / len(query_words)
-                                
-                                if overlap > highest_overlap:
-                                    highest_overlap = overlap
-                                    most_relevant = response
-                            
-                            if most_relevant:
-                                result_debug['most_relevant_response'] = most_relevant
-                                result_debug['word_overlap'] = highest_overlap
-                                transcript_preview = most_relevant
-                                if len(transcript_preview) > 200:
-                                    transcript_preview = transcript_preview[:200] + '...'
-
-                    # Check if the result meets minimum relevance threshold
-                    min_relevance = search_params.get('min_relevance', 0.2)  # Reduced from 0.3 to 0.2
-                    if result.get('score', 0) < min_relevance:
-                        result_debug['skipped'] = True
-                        result_debug['reason'] = f"Score {result.get('score', 0)} below threshold {min_relevance}"
-                        debug_info['semantic_results'].append(result_debug)
-                        continue
-
-                    formatted_results.append({
-                        'id': result.get('id'),
-                        'project_name': result.get('project_name'),
-                        'interview_type': result.get('interview_type'),
-                        'date': result.get('date'),
-                        'transcript_preview': transcript_preview,
-                        'score': result.get('score', 0),
-                        'debug_info': result_debug
-                    })
-                except Exception as e:
-                    logger.error(f"Error processing search result: {str(e)}")
-                    continue
-
-            debug_info['final_results'] = formatted_results
-            return jsonify({
-                'results': formatted_results,
-                'debug_info': debug_info
-            })
-        except Exception as e:
-            logger.error(f"Error in semantic search: {str(e)}")
-            logger.error(traceback.format_exc())
-            return jsonify({'error': 'Error performing semantic search'}), 500
-
+        return jsonify({
+            'results': formatted_results,
+            'debug_info': {
+                'search_type': 'semantic',
+                'query': query,
+                'num_results': len(formatted_results)
+            }
+        })
+        
     except Exception as e:
-        logger.error(f"Error in search_interviews: {str(e)}")
-        logger.error(traceback.format_exc())
-        return jsonify({'error': str(e)}), 500
+        app.logger.error(f"Search error: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({'error': 'An error occurred during search'}), 500
+
+def get_match_preview(text, query, window=100):
+    """Get a preview of text around the search query match."""
+    if not text or not query:
+        return ""
+    
+    text = text.lower()
+    index = text.find(query)
+    if index == -1:
+        # If exact query not found, return start of text
+        return text[:window] + "..." if len(text) > window else text
+        
+    # Calculate preview window
+    start = max(0, index - window // 2)
+    end = min(len(text), index + len(query) + window // 2)
+    
+    # Add ellipsis if necessary
+    prefix = "..." if start > 0 else ""
+    suffix = "..." if end < len(text) else ""
+    
+    return prefix + text[start:end] + suffix
 
 @app.route('/similar_interviews/<interview_id>')
 def similar_interviews(interview_id):
@@ -2703,56 +2758,75 @@ def delete_journey_map_route(journey_map_id):
 
 @app.route('/test_interview')
 def test_interview():
-    # Pre-configured test data
-    project_name = "Green Eggs and Ham"
-    interview_type = "Journey Map Interview"
-    prompt = """#Role: you are Daria, a UX researcher conducting a Journey Map Interview
-#Objective: You are conducting a Journey Map Interview about Green Eggs and Ham
-#Project Description: study how they order green eggs and ham
-#Instructions: 
-1. Ask questions to understand the user's journey through different stages
-2. Focus on gathering information about:
-   - Journey Stages: Different phases or steps in their experience
-   - Touchpoints: Interactions with the system and other stakeholders
-   - Emotions: How they feel at different stages
-   - Pain Points: Challenges and frustrations
-   - Moments of Delight: Positive experiences and successes
-3. Keep questions concise and direct
-4. Never repeat questions
-5. Ask follow-up questions only when clarification is needed
-6. Maintain a professional tone without unnecessary acknowledgments"""
+    """Create a test interview with sample data."""
+    try:
+        # Pre-configured test data
+        project_name = "Login Redesign"
+        interview_type = "Application Interview"
+        transcript = """
+Interviewer: Can you walk me through your experience with the login process?
 
-    # Store the interview prompt
-    interview_prompts[project_name] = prompt
+You: I hate having to go through this screen just to reset my password. The process is really frustrating. First, I have to click through multiple pages, then wait for an email, and sometimes the email never arrives.
 
-    # Create initial conversation
-    conversations[project_name] = {
-        'messages': [
-            {"role": "system", "content": prompt}
-        ]
-    }
+Interviewer: How often do you need to reset your password?
 
-    # Create interview object with required data
-    interview = {
-        'id': str(uuid.uuid4()),
-        'project': {
-            'name': project_name,
-            'type': interview_type,
-            'description': 'Study how users order green eggs and ham'
-        },
-        'researcher': {
-            'name': 'Daria'
-        },
-        'interviewee': {
-            'name': 'Test User'
-        },
-        'date': datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-    }
+You: At least once a month because the system requires password changes. It's particularly annoying on mobile because the interface is clunky.
 
-    return render_template('interview.html', 
-                         project_name=project_name,
-                         prompt=prompt,
-                         interview=interview)
+Interviewer: What would make this process better for you?
+
+You: I wish there was a simpler way, maybe using biometrics or a one-click reset option. Also, the mobile interface needs serious improvement.
+"""
+        analysis = """
+# Interview Analysis
+
+## Key Pain Points
+- Frustrating password reset process
+- Multiple pages to navigate
+- Email delivery issues
+- Frequent mandatory password changes
+- Poor mobile interface
+
+## User Needs
+- Simpler authentication process
+- Better mobile experience
+- More reliable password reset system
+
+## Recommendations
+1. Implement biometric authentication
+2. Streamline password reset flow
+3. Optimize mobile interface
+4. Review password expiration policy
+"""
+        
+        # Sample form data with all card fields
+        form_data = {
+            'participant_name': 'Sam P.',
+            'tags': ['frustration', 'mobile', 'authentication'],
+            'status': 'Validated',
+            'emotion': 'Angry',
+            'author': 'M. Li',
+            'role': 'Product Manager',
+            'experience_level': 'Senior',
+            'department': 'Engineering'
+        }
+        
+        # Save the test interview
+        interview_id = save_interview_data(
+            project_name=project_name,
+            interview_type=interview_type,
+            transcript=transcript,
+            analysis=analysis,
+            form_data=form_data
+        )
+        
+        flash('Test interview created successfully', 'success')
+        return redirect(url_for('archive'))
+        
+    except Exception as e:
+        logger.error(f"Error creating test interview: {str(e)}")
+        logger.error(traceback.format_exc())
+        flash('Error creating test interview', 'error')
+        return redirect(url_for('archive'))
 
 @app.route('/start_interview', methods=['POST'])
 def start_interview():
@@ -3026,5 +3100,74 @@ def advanced_search():
         app.logger.error(traceback.format_exc())
         return jsonify({'error': 'An error occurred during search'}), 500
 
+@app.route('/interviews')
+def interviews_page():
+    """Display the interviews page with optional grouping."""
+    try:
+        # Default to grouping by project_name
+        group_by = request.args.get('group_by', 'project_name')
+        app.logger.debug(f"Listing interviews with group_by={group_by}")
+        
+        # Get grouped interviews
+        grouped_interviews = list_interviews(group_by)
+        app.logger.debug(f"Found {len(grouped_interviews)} groups")
+        
+        # Format projects for template
+        projects = []
+        for project_name, interview_list in grouped_interviews.items():
+            if not isinstance(interview_list, list):
+                app.logger.error(f"Expected list for project {project_name}, got {type(interview_list)}")
+                continue
+                
+            projects.append({
+                'name': project_name,
+                'items': [{
+                    'id': item.get('id'),
+                    'title': f"{item.get('interview_type', 'Interview')} - {item.get('participant_name', 'Unknown Participant')}",
+                    'participant_name': item.get('participant_name', 'Unknown Participant'),
+                    'date': item.get('date'),
+                    'type': item.get('interview_type', 'Interview'),
+                    'tags': item.get('tags', []),
+                    'status': item.get('status', 'In Progress'),
+                    'emotion': item.get('emotion'),
+                    'author': item.get('author'),
+                    'preview': item.get('preview', 'No preview available')
+                } for item in interview_list]
+            })
+            app.logger.debug(f"Added project {project_name} with {len(interview_list)} interviews")
+        
+        return render_template('interviews.html', projects=projects)
+    except Exception as e:
+        app.logger.error(f"Error in interviews_page: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        flash('Error loading interviews', 'error')
+        return render_template('interviews.html', projects=[])
+
+@app.template_filter('strftime')
+def strftime_filter(date, format='%Y-%m-%d'):
+    """Convert a date to a formatted string."""
+    if not date:
+        return ''
+    if isinstance(date, str):
+        try:
+            # Try parsing different date formats
+            for fmt in ['%Y-%m-%d', '%Y-%m-%dT%H:%M:%S', '%Y-%m-%d %H:%M:%S']:
+                try:
+                    date = datetime.strptime(date, fmt)
+                    break
+                except ValueError:
+                    continue
+            if isinstance(date, str):  # If still a string, parsing failed
+                return date
+        except Exception:
+            return date
+    try:
+        return date.strftime(format)
+    except Exception:
+        return str(date)
+
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5003) 
+    # Initialize the app with Socket.IO
+    socketio.init_app(app, async_mode='threading')
+    # Run the app with Socket.IO support
+    socketio.run(app, debug=True, port=5003, host='127.0.0.1') 
