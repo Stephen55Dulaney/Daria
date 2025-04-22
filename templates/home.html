@@ -4,38 +4,60 @@
 
 {% block content %}
 <div class="container mx-auto px-4 py-8">
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <!-- Recent Interviews -->
+    <!-- Project Header -->
+    <div class="mb-8">
         <div class="bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Interviews</h2>
-            {% if recent_interviews %}
-            <div class="space-y-4">
-                {% for interview in recent_interviews %}
-                <div class="bg-white rounded-lg shadow-md p-6 mb-6 relative group">
-                    <button class="delete-btn absolute top-2 right-2 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" 
-                            onclick="confirmDelete('interview', '{{ interview.id }}', '{{ interview.project_name }}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Research Dashboard</h1>
+                    <p class="text-gray-600 mt-1">Manage your UX research projects and activities</p>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="window.location.href='{{ url_for('new_project') }}'" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                        Start New Project
                     </button>
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">{{ interview.project_name }}</h3>
-                            <p class="text-gray-600 mb-2">{{ interview.interview_type }}</p>
-                            <p class="text-sm text-gray-500">{{ interview.date.split('T')[0] }}</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Projects Section -->
+    <div class="mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Active Projects</h2>
+            {% if projects %}
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {% for project in projects %}
+                <div class="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow">
+                    <div class="p-6">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="text-lg font-medium text-gray-900">
+                                    <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="hover:text-indigo-600">
+                                        {{ project.name }}
+                                    </a>
+                                </h3>
+                                <p class="mt-1 text-sm text-gray-500">{{ project.description }}</p>
+                            </div>
+                            <div class="flex items-start space-x-2">
+                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ 'bg-green-100 text-green-800' if project.status == 'active' else 'bg-gray-100 text-gray-800' }}">
+                                    {{ project.status|title }}
+                                </span>
+                                <button onclick="confirmDelete('project', '{{ project.id }}', '{{ project.name }}')"
+                                        class="text-gray-400 hover:text-red-500">
+                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                    </svg>
+                                </button>
+                            </div>
                         </div>
-                        <div class="flex flex-col space-y-2">
-                            <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" 
-                               class="inline-block px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors">
-                                Transcript
-                            </a>
-                            <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
-                               class="inline-block px-3 py-1 text-sm bg-green-100 text-green-800 rounded hover:bg-green-200 transition-colors">
-                                Analysis
-                            </a>
-                            <a href="{{ url_for('view_metadata', interview_id=interview.id) }}" 
-                               class="inline-block px-3 py-1 text-sm bg-purple-100 text-purple-800 rounded hover:bg-purple-200 transition-colors">
-                                Metadata
+                        <div class="mt-4 flex justify-between items-center">
+                            <div class="text-sm text-gray-500">
+                                Started {{ project.start_date|strftime }}
+                            </div>
+                            <a href="{{ url_for('project_dashboard', project_id=project.id) }}" 
+                               class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                                View Project →
                             </a>
                         </div>
                     </div>
@@ -43,79 +65,166 @@
                 {% endfor %}
             </div>
             {% else %}
-            <p class="text-gray-500">No recent interviews</p>
+            <p class="text-gray-500 text-center py-4">No active projects. Click "Start New Project" to create one.</p>
             {% endif %}
         </div>
+    </div>
 
-        <!-- Recent Personas -->
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Personas</h2>
-            {% if recent_personas %}
-            <div class="space-y-4">
-                {% for persona in recent_personas %}
-                <div class="bg-white rounded-lg shadow-md p-6 mb-6 relative group">
-                    <button class="delete-btn absolute top-2 right-2 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" 
-                            onclick="confirmDelete('persona', '{{ persona.id }}', '{{ persona.project_name }}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">{{ persona.project_name }}</h3>
-                            {% if persona.persona_data and persona.persona_data.demographics %}
-                            <p class="text-gray-600 mb-2">{{ persona.persona_data.demographics.occupation }}</p>
-                            {% else %}
-                            <p class="text-gray-600 mb-2">Persona</p>
-                            {% endif %}
-                            <p class="text-sm text-gray-500">{{ persona.created_at.split('T')[0] }}</p>
-                        </div>
-                        <div class="flex flex-col space-y-2">
-                            <a href="{{ url_for('view_persona', persona_id=persona.id) }}" 
-                               class="inline-block px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors">
-                                View Persona
-                            </a>
-                        </div>
-                    </div>
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left Column -->
+        <div class="lg:col-span-3 space-y-8">
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+                <div class="space-y-3">
+                    <a href="/interview" class="block w-full text-left px-4 py-2 bg-gray-50 text-gray-700 rounded hover:bg-gray-100">
+                        New Interview
+                    </a>
+                    <a href="/upload_transcript" class="block w-full text-left px-4 py-2 bg-gray-50 text-gray-700 rounded hover:bg-gray-100">
+                        Upload Transcript
+                    </a>
+                    <a href="/persona" class="block w-full text-left px-4 py-2 bg-gray-50 text-gray-700 rounded hover:bg-gray-100">
+                        Create Persona
+                    </a>
+                    <a href="/journey_map" class="block w-full text-left px-4 py-2 bg-gray-50 text-gray-700 rounded hover:bg-gray-100">
+                        Create Journey Map
+                    </a>
                 </div>
-                {% endfor %}
             </div>
-            {% else %}
-            <p class="text-gray-500">No recent personas</p>
-            {% endif %}
+
+            <!-- Upcoming Milestones -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Upcoming Milestones</h2>
+                <div class="space-y-3">
+                    <p class="text-gray-500 text-sm">No upcoming milestones</p>
+                </div>
+            </div>
         </div>
 
-        <!-- Recent Journey Maps -->
-        <div class="bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Journey Maps</h2>
-            {% if recent_journey_maps %}
-            <div class="space-y-4">
-                {% for journey_map in recent_journey_maps %}
-                <div class="bg-white rounded-lg shadow-md p-6 mb-6 relative group">
-                    <button class="delete-btn absolute top-2 right-2 text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity" 
-                            onclick="confirmDelete('journey_map', '{{ journey_map.id }}', '{{ journey_map.project_name }}')">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                            <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
-                        </svg>
-                    </button>
-                    <div class="flex justify-between items-start">
-                        <div>
-                            <h3 class="text-xl font-semibold mb-2">{{ journey_map.project_name }}</h3>
-                            <p class="text-sm text-gray-500">{{ journey_map.created_at.split('T')[0] }}</p>
-                        </div>
-                        <div class="flex flex-col space-y-2">
-                            <a href="{{ url_for('view_journey_map', journey_map_id=journey_map.id) }}" 
-                               class="inline-block px-3 py-1 text-sm bg-blue-100 text-blue-800 rounded hover:bg-blue-200 transition-colors">
-                                View Journey Map
-                            </a>
+        <!-- Middle Column -->
+        <div class="lg:col-span-6 space-y-8">
+            <!-- Resume Work -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Resume Where You Left Off</h2>
+                {% if recent_interviews %}
+                <div class="space-y-4">
+                    {% for interview in recent_interviews[:1] %}
+                    <div class="bg-gray-50 rounded-lg p-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-medium text-gray-900">{{ interview.project_name }}</h3>
+                                <p class="text-sm text-gray-500">{{ interview.interview_type }}</p>
+                                <p class="text-xs text-gray-400 mt-1">{{ interview.date.split('T')[0] }}</p>
+                            </div>
+                            <div class="flex space-x-2">
+                                <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" 
+                                   class="text-sm text-indigo-600 hover:text-indigo-500">View</a>
+                            </div>
                         </div>
                     </div>
+                    {% endfor %}
                 </div>
-                {% endfor %}
+                {% else %}
+                <p class="text-gray-500 text-sm">No recent work to resume</p>
+                {% endif %}
             </div>
-            {% else %}
-            <p class="text-gray-500">No recent journey maps</p>
-            {% endif %}
+
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+                <div class="space-y-4">
+                    {% if recent_interviews %}
+                    {% for interview in recent_interviews %}
+                    <div class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                        <div class="flex justify-between items-start group">
+                            <div>
+                                <h3 class="font-medium text-gray-900">{{ interview.project_name }}</h3>
+                                <p class="text-sm text-gray-500">{{ interview.interview_type }}</p>
+                                <p class="text-xs text-gray-400 mt-1">{{ interview.date.split('T')[0] }}</p>
+                            </div>
+                            <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" 
+                                   class="text-sm text-indigo-600 hover:text-indigo-500">Transcript</a>
+                                <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
+                                   class="text-sm text-green-600 hover:text-green-500">Analysis</a>
+                                <button onclick="confirmDelete('interview', '{{ interview.id }}', '{{ interview.project_name }}')"
+                                        class="text-sm text-red-600 hover:text-red-500">Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-gray-500 text-sm">No recent activity</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="lg:col-span-3 space-y-8">
+            <!-- Research Stats -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Research Stats</h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Interviews</span>
+                        <span class="font-medium">{{ recent_interviews|length }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Personas</span>
+                        <span class="font-medium">{{ recent_personas|length }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Journey Maps</span>
+                        <span class="font-medium">{{ recent_journey_maps|length }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Artifacts -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Artifacts</h2>
+                <div class="space-y-4">
+                    {% if recent_personas %}
+                    {% for persona in recent_personas[:2] %}
+                    <div class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                        <div class="flex justify-between items-start group">
+                            <div>
+                                <h3 class="font-medium text-gray-900">{{ persona.project_name }}</h3>
+                                <p class="text-xs text-gray-400 mt-1">{{ persona.created_at.split('T')[0] }}</p>
+                            </div>
+                            <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ url_for('view_persona', persona_id=persona.id) }}" 
+                                   class="text-sm text-indigo-600 hover:text-indigo-500">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if recent_journey_maps %}
+                    {% for journey_map in recent_journey_maps[:2] %}
+                    <div class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                        <div class="flex justify-between items-start group">
+                            <div>
+                                <h3 class="font-medium text-gray-900">{{ journey_map.project_name }}</h3>
+                                <p class="text-xs text-gray-400 mt-1">{{ journey_map.created_at.split('T')[0] }}</p>
+                            </div>
+                            <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ url_for('view_journey_map', journey_map_id=journey_map.id) }}" 
+                                   class="text-sm text-indigo-600 hover:text-indigo-500">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if not recent_personas and not recent_journey_maps %}
+                    <p class="text-gray-500 text-sm">No recent artifacts</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
@@ -156,6 +265,8 @@
                 url = `/delete_persona/${itemToDelete}`;
             } else if (itemType === 'journey_map') {
                 url = `/delete_journey_map/${itemToDelete}`;
+            } else if (itemType === 'project') {
+                url = `/delete_project/${itemToDelete}`;
             }
             
             fetch(url, {
@@ -167,7 +278,6 @@
             .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Reload the page to show updated content
                     window.location.reload();
                 } else {
                     alert('Error deleting item: ' + (data.error || 'Unknown error'));

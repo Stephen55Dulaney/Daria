@@ -28,6 +28,7 @@ from src.daria_resources import get_interview_prompt, BASE_SYSTEM_PROMPT, INTERV
 from langchain.schema import SystemMessage, HumanMessage
 from langchain.vectorstores import VectorStore
 import MySQLdb
+from werkzeug.utils import secure_filename
 
 # Global variables
 vector_store = None
@@ -146,7 +147,10 @@ def list_interviews(group_by_project=False):
                 
                 # Ensure date is in ISO format
                 if interview['date'] and not isinstance(interview['date'], str):
-                    interview['date'] = interview['date'].isoformat()
+                    try:
+                        interview['date'] = datetime.strftime(interview['date'], '%Y-%m-%dT%H:%M:%S')
+                    except:
+                        interview['date'] = datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
                 
                 interviews.append(interview)
             except Exception as e:
@@ -469,10 +473,33 @@ def chat_page():
     prompt = interview_prompts.get(project_name, '') if project_name else ''
     return render_template('interview.html', project_name=project_name, prompt=prompt)
 
+def list_projects():
+    """List all projects."""
+    try:
+        projects = []
+        PROJECTS_DIR = Path('projects')
+        if PROJECTS_DIR.exists():
+            for file in sorted(PROJECTS_DIR.glob('*.json'), key=lambda x: x.stat().st_mtime, reverse=True):
+                try:
+                    with open(file, 'r') as f:
+                        data = json.load(f)
+                        if all(key in data for key in ['id', 'name', 'description', 'status']):
+                            projects.append(data)
+                except Exception as e:
+                    logger.error(f"Error loading project {file}: {str(e)}")
+                    continue
+        return projects
+    except Exception as e:
+        logger.error(f"Error listing projects: {str(e)}")
+        return []
+
 @app.route('/')
 def home():
     """Home page."""
     try:
+        # Get projects
+        projects = list_projects()
+        
         # Get recent interviews
         recent_interviews = []
         INTERVIEWS_DIR = Path('interviews')
@@ -536,6 +563,7 @@ def home():
                     continue
         
         return render_template('home.html',
+                             projects=projects,
                              recent_interviews=recent_interviews,
                              recent_personas=recent_personas,
                              recent_journey_maps=recent_journey_maps)
@@ -544,6 +572,7 @@ def home():
         logger.error(traceback.format_exc())
         flash('Error loading home page', 'error')
         return render_template('home.html',
+                             projects=[],
                              recent_interviews=[],
                              recent_personas=[],
                              recent_journey_maps=[])
@@ -3204,6 +3233,150 @@ def strftime_filter(date, format='%Y-%m-%d'):
         return date.strftime(format)
     except Exception:
         return str(date)
+
+@app.route('/new_project')
+def new_project():
+    """Display the new project creation page."""
+    try:
+        return render_template('new_project.html')
+    except Exception as e:
+        logger.error(f"Error in new_project: {str(e)}")
+        logger.error(traceback.format_exc())
+        return redirect(url_for('home'))
+
+@app.route('/create_project', methods=['POST'])
+def create_project():
+    """Handle new project creation."""
+    try:
+        # Basic project info
+        project_name = request.form.get('project_name')
+        description = request.form.get('description')
+        
+        # Problem space
+        business_problem = request.form.get('business_problem')
+        stakeholders = request.form.get('stakeholders', '').split(',')
+        stakeholders = [s.strip() for s in stakeholders if s.strip()]
+        
+        # Research methods
+        methods = request.form.getlist('methods[]')
+        
+        # Research plan
+        research_objectives = request.form.get('research_objectives')
+        start_date = request.form.get('start_date')
+        end_date = request.form.get('end_date')
+        
+        # Action type
+        action = request.form.get('action', 'start')  # 'start' or 'draft'
+
+        # Validate required fields
+        if not all([project_name, description, business_problem]):
+            flash('Please fill in all required fields.', 'error')
+            return redirect(url_for('new_project'))
+
+        # Create projects directory if it doesn't exist
+        projects_dir = Path('projects')
+        projects_dir.mkdir(exist_ok=True)
+
+        # Generate a unique project ID
+        project_id = str(uuid.uuid4())
+
+        # Create project data
+        project_data = {
+            'id': project_id,
+            'name': project_name,
+            'description': description,
+            'business_problem': business_problem,
+            'stakeholders': stakeholders,
+            'methods': methods,
+            'research_objectives': research_objectives,
+            'start_date': start_date,
+            'end_date': end_date,
+            'created_at': datetime.now().strftime('%Y-%m-%dT%H:%M:%S'),
+            'status': 'draft' if action == 'draft' else 'active'
+        }
+
+        # Handle file uploads
+        if 'file' in request.files:
+            files = request.files.getlist('file')
+            if any(files):
+                # Create assets directory for this project
+                assets_dir = projects_dir / project_id / 'assets'
+                assets_dir.mkdir(parents=True, exist_ok=True)
+                
+                uploaded_files = []
+                for file in files:
+                    if file and file.filename:
+                        # Secure the filename
+                        filename = secure_filename(file.filename)
+                        file_path = assets_dir / filename
+                        file.save(file_path)
+                        uploaded_files.append(filename)
+                
+                project_data['assets'] = uploaded_files
+
+        # Save project data
+        project_file = projects_dir / f"{project_id}.json"
+        with open(project_file, 'w') as f:
+            json.dump(project_data, f, indent=2)
+
+        flash('Project created successfully!', 'success')
+        if action == 'draft':
+            return redirect(url_for('home'))
+        return redirect(url_for('project_dashboard', project_id=project_id))
+    except Exception as e:
+        logger.error(f"Error creating project: {str(e)}")
+        logger.error(traceback.format_exc())
+        flash('Error creating project. Please try again.', 'error')
+        return redirect(url_for('new_project'))
+
+@app.route('/project/<project_id>')
+def project_dashboard(project_id):
+    """Display the project dashboard."""
+    try:
+        # Load project data
+        projects_dir = Path('projects')
+        project_file = projects_dir / f"{project_id}.json"
+        
+        if not project_file.exists():
+            flash('Project not found.', 'error')
+            return redirect(url_for('home'))
+            
+        with open(project_file) as f:
+            project = json.load(f)
+            
+        # Get project interviews
+        interviews = list_interviews()
+        project_interviews = [i for i in interviews if i.get('project_name') == project.get('name')]
+        
+        return render_template('project_dashboard.html', 
+                             project=project,
+                             interviews=project_interviews)
+    except Exception as e:
+        logger.error(f"Error in project_dashboard: {str(e)}")
+        logger.error(traceback.format_exc())
+        flash('Error loading project dashboard.', 'error')
+        return redirect(url_for('home'))
+
+@app.route('/delete_project/<project_id>', methods=['POST'])
+def delete_project_route(project_id):
+    """Delete a project and its associated files."""
+    try:
+        # Define project file path
+        PROJECTS_DIR = Path('projects')
+        project_file = PROJECTS_DIR / f"{project_id}.json"
+        
+        if not project_file.exists():
+            return jsonify({'status': 'error', 'error': 'Project not found'}), 404
+            
+        # Delete the project file
+        project_file.unlink()
+        
+        # Return success response
+        return jsonify({'status': 'success', 'message': 'Project deleted successfully'})
+    except Exception as e:
+        logger.error(f"Error deleting project {project_id}: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'status': 'error', 'error': str(e)}), 500
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5003) 

@@ -4,10 +4,12 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
-    <title>{% block title %}DARIA - Deloitte Advanced Research & Interview Assistant{% endblock %}</title>
+    <title>{% block title %}DARIA - Deloitte Advanced Research & Interview Assistant{% endblock %} - Daria Research Tool</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             background-color: #f5f5f5;
@@ -15,6 +17,7 @@
             margin: 0;
             display: flex;
             flex-direction: column;
+            font-family: 'Inter', sans-serif;
         }
         .masthead {
             background-color: white;
@@ -102,53 +105,113 @@
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
-<body>
-    <nav class="navbar navbar-expand-lg masthead">
-        <div class="container">
-            <a class="navbar-brand" href="/">
-                <img src="{{ url_for('static', filename='images/daria-logo.png') }}" alt="DARIA Logo">
-                <div class="brand-text">
-                    DARIA
-                    <div style="font-size: 0.8rem; opacity: 0.7;">Deloitte Advanced Research & Interview Assistant</div>
+<body class="min-h-screen">
+    <!-- Global Navigation -->
+    <nav class="bg-white shadow-lg">
+        <div class="max-w-7xl mx-auto px-4">
+            <div class="flex justify-between h-16">
+                <!-- Left side -->
+                <div class="flex">
+                    <div class="flex-shrink-0 flex items-center">
+                        <a href="/" class="text-xl font-bold text-gray-800">Daria</a>
+                    </div>
+                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
+                        <!-- Primary Navigation -->
+                        <a href="{{ url_for('home') }}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
+                            Home
+                        </a>
+                        
+                        <!-- Plan Dropdown -->
+                        <div class="relative group">
+                            <button class="text-gray-500 group-hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                Plan
+                                <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div class="absolute z-10 left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block">
+                                <div class="py-1">
+                                    <a href="{{ url_for('new_project') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">New Project</a>
+                                    <a href="{{ url_for('archive') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Research Plans</a>
+                                    <a href="{{ url_for('new_interview') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Team Members</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Research Dropdown -->
+                        <div class="relative group">
+                            <button class="text-gray-500 group-hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                Research
+                                <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div class="absolute z-10 left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block">
+                                <div class="py-1">
+                                    <a href="{{ url_for('interviews_page') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Interviews</a>
+                                    <a href="{{ url_for('upload_transcript') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Upload Transcript</a>
+                                    <a href="{{ url_for('advanced_search') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Advanced Search</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Synthesis Dropdown -->
+                        <div class="relative group">
+                            <button class="text-gray-500 group-hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                                Synthesis
+                                <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
+                                </svg>
+                            </button>
+                            <div class="absolute z-10 left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block">
+                                <div class="py-1">
+                                    <a href="{{ url_for('persona') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Personas</a>
+                                    <a href="{{ url_for('journey_map') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Journey Maps</a>
+                                    <a href="{{ url_for('create_personas', project_name='') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Create Personas</a>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Opportunities -->
+                        <a href="#" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                            Opportunities
+                        </a>
+
+                        <!-- Workshops -->
+                        <a href="#" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
+                            Workshops
+                        </a>
+                    </div>
                 </div>
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'home' %}active{% endif %}" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'new_interview' %}active{% endif %}" href="{{ url_for('new_interview') }}">New Interview</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'test_interview' %}active{% endif %}" href="{{ url_for('test_interview') }}">Test Interview</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'archive' %}active{% endif %}" href="{{ url_for('archive') }}">Archive</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'advanced_search' %}active{% endif %}" href="{{ url_for('advanced_search') }}">Advanced Search</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'persona' %}active{% endif %}" href="{{ url_for('persona') }}">Persona</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'journey_map' %}active{% endif %}" href="{{ url_for('journey_map') }}">Journey Map</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link {% if request.endpoint == 'upload_transcript' %}active{% endif %}" href="{{ url_for('upload_transcript') }}">Upload Transcript</a>
-                    </li>
-                </ul>
+
+                <!-- Right side -->
+                <div class="flex items-center">
+                    <button class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        + New
+                    </button>
+                </div>
             </div>
         </div>
     </nav>
 
-    <div class="container content">
+    <!-- Page Content -->
+    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
         {% block content %}{% endblock %}
-    </div>
+    </main>
+
+    <!-- Help Footer -->
+    <footer class="bg-white border-t border-gray-200 mt-auto">
+        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between items-center">
+                <div class="text-gray-500 text-sm">
+                    Need help? Check out our <a href="#" class="text-indigo-600 hover:text-indigo-500">documentation</a>
+                </div>
+                <div class="text-gray-400 text-sm">
+                    Daria Research Tool v1.0
+                </div>
+            </div>
+        </div>
+    </footer>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     {% block extra_js %}{% endblock %}
