@@ -3,326 +3,74 @@
 {% block title %}Interview Archive{% endblock %}
 
 {% block content %}
-<div class="container mx-auto px-4 py-8">
-    <h1 class="text-3xl font-bold mb-8">Interview Archive</h1>
-
-    <!-- Search Section -->
-    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
-        <div class="flex gap-2">
-            <input type="text" id="searchInput" class="flex-1 rounded-lg border-gray-300 focus:border-blue-500 focus:ring-1 focus:ring-blue-500" placeholder="Search interviews...">
-            <button class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors" type="button" id="searchButton">Search</button>
-        </div>
-        <!-- Search Results Area -->
-        <div id="searchResults" class="mt-4" style="display: none;">
-            <h3 class="text-xl font-semibold mb-4">
-                Search Results: <span id="resultCount">0</span> items
-                <span id="matchType" class="text-sm text-gray-600 ml-2"></span>
-            </h3>
-            <div id="searchResultsGrid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <!-- Search results will be dynamically inserted here -->
-            </div>
+<div class="container">
+    <div class="header">
+        <h1>Interview Archive</h1>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="Search interviews..." class="search-input">
+            <button id="searchButton" class="btn btn-primary">Search</button>
         </div>
     </div>
 
-    <!-- Interviews Grid -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" id="interviewList">
+    <div class="interview-grid">
         {% for interview in interviews %}
-        <div class="bg-white rounded-lg shadow-md overflow-hidden">
-            <!-- Type Badge -->
-            <div class="px-4 py-1 bg-gray-100 text-gray-600 text-sm font-medium">
-                {{ interview.interview_type|default('INTERVIEW') }}
+        <div class="interview-card" data-interview-id="{{ interview.id }}">
+            <div class="card-header">
+                <span class="type-badge {{ interview.type|lower }}">{{ interview.type }}</span>
+                <span class="status-badge {{ interview.status|lower }}">{{ interview.status }}</span>
             </div>
             
-            <!-- Content -->
-            <div class="p-4">
-                <!-- Title and Date -->
-                <h2 class="text-xl font-semibold mb-2">
-                    {% if interview.participant_name %}
-                    Interview w/ {{ interview.participant_name }}
-                    {% else %}
-                    Interview
-                    {% endif %}
-                    {% if interview.date %}
-                    — {{ interview.date|strftime('%B %Y') }}
-                    {% endif %}
-                </h2>
-                
-                <!-- Preview Quote -->
-                <blockquote class="border-l-4 border-gray-200 pl-4 my-4 italic text-gray-600">
-                    {% if interview.transcript %}
-                    "{{ interview.transcript|truncate(100) }}"
-                    {% else %}
-                    No transcript available
-                    {% endif %}
-                </blockquote>
-                
-                <!-- Project and Author -->
-                <div class="mb-4">
-                    <p class="text-gray-600">
-                        Project: {{ interview.project_name }}
-                        {% if interview.author %}
-                        <span class="mx-2">•</span>
-                        Author: {{ interview.author }}
-                        {% endif %}
-                    </p>
+            <div class="card-body">
+                <h3 class="interview-title">{{ interview.title }}</h3>
+                <div class="interview-meta">
+                    <span class="participant">{{ interview.participant_name }}</span>
+                    <span class="date">{{ interview.created_at|strftime }}</span>
                 </div>
                 
-                <!-- Tags -->
-                <div class="flex flex-wrap gap-2 mb-4">
-                    {% if interview.tags %}
-                        {% for tag in interview.tags %}
-                        <span class="px-2 py-1 bg-gray-100 text-gray-600 rounded-full text-sm">
-                            {{ tag }}
-                        </span>
-                        {% endfor %}
+                <p class="preview-text">{{ interview.preview }}</p>
+                
+                <div class="project-info">
+                    <span class="project-name">{{ interview.project_name }}</span>
+                    {% if interview.created_by %}
+                    <span class="author">by {{ interview.created_by }}</span>
                     {% endif %}
                 </div>
                 
-                <!-- Status and Emotion -->
-                <div class="flex items-center gap-4 mb-4">
-                    <span class="px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
-                        {{ interview.status|default('Draft') }}
-                    </span>
-                    {% if interview.emotion %}
-                    <span class="flex items-center text-gray-600">
-                        <span class="mr-1">Emotion:</span>
-                        <span class="font-medium">{{ interview.emotion }}</span>
-                    </span>
-                    {% endif %}
+                {% if interview.tags %}
+                <div class="tags-container">
+                    {% for tag in interview.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
                 </div>
-                
-                <!-- Actions -->
-                <div class="flex gap-2 mt-4">
-                    <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" 
-                       class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                        View
-                    </a>
-                    <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
-                       class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                        Edit
-                    </a>
-                    <button onclick="copyLink('{{ interview.id }}')"
-                            class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                        Link
-                    </button>
-                    <button onclick="toggleFavorite('{{ interview.id }}')"
-                            class="px-3 py-1 text-sm text-blue-600 hover:text-blue-800 transition-colors">
-                        Favorite
-                    </button>
-                </div>
+                {% endif %}
+            </div>
+            
+            <div class="card-footer">
+                <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" class="btn btn-icon" title="View Transcript">
+                    <i class="fas fa-file-alt"></i>
+                </a>
+                <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" class="btn btn-icon" title="View Analysis">
+                    <i class="fas fa-chart-bar"></i>
+                </a>
+                <a href="{{ url_for('view_metadata', interview_id=interview.id) }}" class="btn btn-icon" title="View Metadata">
+                    <i class="fas fa-info-circle"></i>
+                </a>
+                <button class="btn btn-icon copy-link" data-interview-id="{{ interview.id }}" title="Copy Link">
+                    <i class="fas fa-link"></i>
+                </button>
+                <button class="btn btn-icon favorite" data-interview-id="{{ interview.id }}" title="Favorite">
+                    <i class="fas fa-star"></i>
+                </button>
             </div>
         </div>
         {% endfor %}
     </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const searchInput = document.getElementById('searchInput');
-    const searchButton = document.getElementById('searchButton');
-    const searchResults = document.getElementById('searchResults');
-    const searchResultsGrid = document.getElementById('searchResultsGrid');
-    const resultCount = document.getElementById('resultCount');
-    const matchType = document.getElementById('matchType');
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<link rel="stylesheet" href="{{ url_for('static', filename='css/archive.css') }}">
+{% endblock %}
 
-    // Get base URLs from the server-side template
-    const viewTranscriptBaseUrl = "{{ url_for('view_transcript', interview_id='') }}";
-    const viewAnalysisBaseUrl = "{{ url_for('view_analysis', interview_id='') }}";
-    const viewMetadataBaseUrl = "{{ url_for('view_metadata', interview_id='') }}";
-
-    // Search functionality
-    async function performSearch() {
-        const query = document.getElementById('searchInput').value.trim();
-        if (!query) return;
-
-        // Show loading state
-        searchResults.style.display = 'block';
-        searchResultsGrid.innerHTML = '<div class="col-span-full text-center"><div class="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-blue-600 border-r-transparent"><span class="sr-only">Loading...</span></div><p class="mt-2 text-gray-600">Searching interviews...</p></div>';
-
-        try {
-            const response = await fetch('/search_interviews', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    query: query,
-                    k: 5
-                })
-            });
-
-            if (!response.ok) {
-                throw new Error(`HTTP error! status: ${response.status}`);
-            }
-
-            const data = await response.json();
-            
-            // Display results
-            if (data.error) {
-                searchResultsGrid.innerHTML = `<div class="col-span-full text-red-600">${data.error}</div>`;
-            } else if (!data.results || data.results.length === 0) {
-                searchResultsGrid.innerHTML = '<div class="col-span-full">No results found</div>';
-            } else {
-                displaySearchResults(data);
-            }
-        } catch (error) {
-            console.error('Error performing search:', error);
-            searchResultsGrid.innerHTML = `<div class="col-span-full text-red-500">Error performing search: ${error.message}</div>`;
-        }
-    }
-
-    function displaySearchResults(data) {
-        const searchResults = document.getElementById('searchResults');
-        const searchResultsGrid = document.getElementById('searchResultsGrid');
-        const resultCount = document.getElementById('resultCount');
-        const matchType = document.getElementById('matchType');
-        
-        searchResults.style.display = 'block';
-        searchResultsGrid.innerHTML = '';
-        
-        if (data.error) {
-            searchResultsGrid.innerHTML = `<div class="col-span-full text-red-600">${data.error}</div>`;
-            return;
-        }
-        
-        if (!data.results || data.results.length === 0) {
-            searchResultsGrid.innerHTML = '<div class="col-span-full">No results found</div>';
-            return;
-        }
-        
-        // Update result count and match type
-        resultCount.textContent = data.debug_info.total_results;
-        if (data.debug_info.search_type === 'exact_match') {
-            matchType.textContent = '(Exact Match)';
-        } else if (data.debug_info.search_type === 'semantic') {
-            matchType.textContent = '(Semantic Search)';
-        }
-        
-        data.results.forEach(result => {
-            const date = new Date(result.date);
-            const formattedDate = date.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'short',
-                day: 'numeric'
-            });
-            
-            const card = document.createElement('div');
-            card.className = 'bg-white rounded-lg shadow-md p-4 border border-gray-200';
-            
-            let relevanceDisplay = '';
-            if (result.match_type === 'exact') {
-                relevanceDisplay = '<span class="text-green-600">Exact Match (100%)</span>';
-            } else {
-                const score = Math.round(result.score * 100);
-                relevanceDisplay = `<span class="text-blue-600">Relevance: ${score}%</span>`;
-            }
-            
-            card.innerHTML = `
-                <div class="flex justify-between items-start mb-2">
-                    <div>
-                        <h3 class="text-lg font-semibold">${result.interview_type} - ${formattedDate}</h3>
-                        <p class="text-sm text-gray-600">${result.participant_name}</p>
-                    </div>
-                    <div class="text-sm">${relevanceDisplay}</div>
-                </div>
-                <blockquote class="border-l-4 border-gray-300 pl-4 my-2 text-gray-700">
-                    ${result.preview || 'No transcript available'}
-                </blockquote>
-                <div class="mt-2">
-                    <p class="text-sm text-gray-600">Project: ${result.project_name}</p>
-                    <p class="text-sm text-gray-600">Author: ${result.author || 'Unknown'}</p>
-                </div>
-                <div class="flex flex-wrap gap-2 mt-2">
-                    ${(result.tags || []).map(tag => 
-                        `<span class="bg-gray-100 text-gray-800 text-xs px-2 py-1 rounded">${tag}</span>`
-                    ).join('')}
-                </div>
-                <div class="flex justify-between items-center mt-4">
-                    <div class="flex gap-2">
-                        <a href="${viewTranscriptBaseUrl}${result.id}" class="text-blue-600 hover:text-blue-800">
-                            <i class="fas fa-eye"></i> View
-                        </a>
-                        <a href="${viewAnalysisBaseUrl}${result.id}" class="text-green-600 hover:text-green-800 ml-2">
-                            <i class="fas fa-edit"></i> Edit
-                        </a>
-                    </div>
-                    <div class="flex gap-2">
-                        <button onclick="copyLink('${result.id}')" class="text-gray-600 hover:text-gray-800">
-                            <i class="fas fa-link"></i>
-                        </button>
-                        <button onclick="toggleFavorite('${result.id}')" class="text-yellow-600 hover:text-yellow-800">
-                            <i class="fas fa-star"></i>
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            searchResultsGrid.appendChild(card);
-        });
-    }
-
-    // Event listeners
-    searchButton.addEventListener('click', performSearch);
-    searchInput.addEventListener('keypress', function(e) {
-        if (e.key === 'Enter') {
-            performSearch();
-        }
-    });
-});
-
-function copyLink(interviewId) {
-    const url = window.location.origin + '/transcript/' + interviewId;
-    navigator.clipboard.writeText(url).then(() => {
-        // You could add a toast notification here
-        console.log('Link copied to clipboard');
-    });
-}
-
-function toggleFavorite(interviewId) {
-    // Implement favorite functionality
-    console.log('Toggle favorite for interview:', interviewId);
-}
-</script>
-
-<style>
-.card {
-    transition: transform 0.2s;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-}
-
-.card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-}
-
-.btn-group {
-    display: flex;
-    gap: 0.5rem;
-}
-
-#searchResults {
-    max-height: 500px;
-    overflow-y: auto;
-    padding-top: 1rem; /* Add padding to accommodate tooltips */
-}
-
-.search-result {
-    border-left: 3px solid #007bff;
-    margin-bottom: 1rem;
-    padding: 0.5rem 1rem;
-    background-color: #f8f9fa;
-}
-
-/* Update tooltip styles */
-.tooltip-trigger {
-    position: relative;
-}
-
-.tooltip-content {
-    transition: visibility 0.2s, opacity 0.2s;
-    visibility: hidden;
-    opacity: 0;
-    pointer-events: none;
-}
-</style>
+<script src="{{ url_for('static', filename='js/archive.js') }}"></script>
 {% endblock %} 

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block title %}Error{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="error-container">
+        <h1 class="text-3xl font-bold text-red-600 mb-4">Error</h1>
+        <div class="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded relative mb-4">
+            <p class="font-bold">{{ error }}</p>
+            {% if details %}
+            <p class="text-sm mt-2">{{ details }}</p>
+            {% endif %}
+        </div>
+        <div class="mt-8">
+            <a href="{{ url_for('home') }}" class="btn btn-primary">Return to Home</a>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -6,215 +6,228 @@
     <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='images/favicon.ico') }}">
     <title>{% block title %}DARIA - Deloitte Advanced Research & Interview Assistant{% endblock %} - Daria Research Tool</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
     <style>
+        :root {
+            --primary-color: #86BC25;
+            --primary-dark: #6A9B1E;
+            --text-dark: #333;
+            --text-muted: #666;
+            --border-color: #ddd;
+            --background-light: #f5f5f5;
+        }
+        
         body {
-            background-color: #f5f5f5;
+            background-color: var(--background-light);
             min-height: 100vh;
             margin: 0;
             display: flex;
             flex-direction: column;
             font-family: 'Inter', sans-serif;
         }
-        .masthead {
-            background-color: white;
-            padding: 1rem 0;
-            margin-bottom: 2rem;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
-        .masthead .navbar-brand {
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--text-dark);
+        }
+
+        .nav-container {
+            background-color: white;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .navbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .navbar-brand {
             display: flex;
             align-items: center;
             gap: 1rem;
+            text-decoration: none;
+            color: var(--text-dark);
         }
-        .masthead .navbar-brand img {
+
+        .navbar-brand img {
             width: 40px;
             height: 40px;
             border-radius: 8px;
-            padding: 4px;
         }
-        .masthead .navbar-brand .brand-text {
-            color: #333;
-            font-size: 1.5rem;
-            margin: 0;
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
         }
-        .masthead .nav-link {
-            color: #333 !important;
+
+        .nav-link {
+            color: var(--text-muted);
+            text-decoration: none;
             font-weight: 500;
-            padding: 0.5rem 1rem;
-            transition: background-color 0.2s;
+            padding: 0.5rem;
             border-radius: 4px;
+            transition: color 0.2s, background-color 0.2s;
         }
-        .masthead .nav-link:hover {
-            background-color: rgba(0, 0, 0, 0.05);
+
+        .nav-link:hover {
+            color: var(--text-dark);
+            background-color: var(--background-light);
         }
-        .masthead .nav-link.active {
-            background-color: rgba(0, 0, 0, 0.1);
+
+        .nav-link.active {
+            color: var(--primary-color);
         }
+
+        .dropdown {
+            position: relative;
+        }
+
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background: white;
+            min-width: 200px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 4px;
+            z-index: 100;
+        }
+
+        .dropdown:hover .dropdown-content {
+            display: block;
+        }
+
+        .dropdown-link {
+            display: block;
+            padding: 0.75rem 1rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            transition: background-color 0.2s;
+        }
+
+        .dropdown-link:hover {
+            background-color: var(--background-light);
+            color: var(--text-dark);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            border-radius: 4px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border: none;
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+        }
+
         .content {
             flex: 1;
-            padding: 2rem 0;
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
         }
-        .card {
-            border: none;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-        }
-        .markdown-content {
-            line-height: 1.6;
-            max-width: 65ch;
-        }
-        .markdown-content h2 {
-            color: #333;
-            margin-top: 2rem;
-            margin-bottom: 1rem;
-            padding-bottom: 0.5rem;
-            border-bottom: 2px solid #eee;
-        }
-        .markdown-content h3 {
-            color: #555;
-            margin-top: 1.5rem;
-            margin-bottom: 0.75rem;
-        }
-        .markdown-content ul {
-            margin-bottom: 1rem;
-            padding-left: 1.5rem;
-        }
-        .markdown-content blockquote {
-            border-left: 4px solid #86BC25;
-            padding-left: 1rem;
-            margin: 1rem 0;
-            color: #666;
-            font-style: italic;
-        }
-        .prose pre {
-            background-color: #f3f4f6;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            overflow-x: auto;
-        }
-        .prose code {
-            background-color: #f3f4f6;
-            padding: 0.2rem 0.4rem;
-            border-radius: 0.25rem;
-            font-size: 0.875em;
+
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+
+            .nav-links {
+                display: none;
+            }
+
+            .container {
+                padding: 1rem;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
     {% block extra_head %}{% endblock %}
 </head>
-<body class="min-h-screen">
-    <!-- Global Navigation -->
-    <nav class="bg-white shadow-lg">
-        <div class="max-w-7xl mx-auto px-4">
-            <div class="flex justify-between h-16">
-                <!-- Left side -->
-                <div class="flex">
-                    <div class="flex-shrink-0 flex items-center">
-                        <a href="/" class="text-xl font-bold text-gray-800">Daria</a>
-                    </div>
-                    <div class="hidden sm:ml-6 sm:flex sm:space-x-8">
-                        <!-- Primary Navigation -->
-                        <a href="{{ url_for('home') }}" class="border-indigo-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium">
-                            Home
-                        </a>
-                        
-                        <!-- Plan Dropdown -->
-                        <div class="relative group">
-                            <button class="text-gray-500 group-hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                                Plan
-                                <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                            <div class="absolute z-10 left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block">
-                                <div class="py-1">
-                                    <a href="{{ url_for('new_project') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">New Project</a>
-                                    <a href="{{ url_for('archive') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Research Plans</a>
-                                    <a href="{{ url_for('new_interview') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Team Members</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Research Dropdown -->
-                        <div class="relative group">
-                            <button class="text-gray-500 group-hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                                Research
-                                <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                            <div class="absolute z-10 left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block">
-                                <div class="py-1">
-                                    <a href="{{ url_for('interviews_page') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Interviews</a>
-                                    <a href="{{ url_for('upload_transcript') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Upload Transcript</a>
-                                    <a href="{{ url_for('advanced_search') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Advanced Search</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Synthesis Dropdown -->
-                        <div class="relative group">
-                            <button class="text-gray-500 group-hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                                Synthesis
-                                <svg class="ml-2 h-5 w-5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                    <path fill-rule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clip-rule="evenodd" />
-                                </svg>
-                            </button>
-                            <div class="absolute z-10 left-0 mt-2 w-48 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 hidden group-hover:block">
-                                <div class="py-1">
-                                    <a href="{{ url_for('persona') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Personas</a>
-                                    <a href="{{ url_for('journey_map') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Journey Maps</a>
-                                    <a href="{{ url_for('create_personas', project_name='') }}" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">Create Personas</a>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Opportunities -->
-                        <a href="#" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                            Opportunities
-                        </a>
-
-                        <!-- Workshops -->
-                        <a href="#" class="text-gray-500 hover:text-gray-900 inline-flex items-center px-1 pt-1 text-sm font-medium">
-                            Workshops
-                        </a>
+<body>
+    <div class="nav-container">
+        <nav class="navbar">
+            <a href="/" class="navbar-brand">
+                <img src="{{ url_for('static', filename='images/logo.png') }}" alt="Daria">
+                <span>Daria</span>
+            </a>
+            
+            <div class="nav-links">
+                <a href="{{ url_for('home') }}" class="nav-link {% if request.endpoint == 'home' %}active{% endif %}">Home</a>
+                
+                <div class="dropdown">
+                    <a href="#" class="nav-link">Plan</a>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('new_project') }}" class="dropdown-link">New Project</a>
+                        <a href="{{ url_for('archive') }}" class="dropdown-link">Research Plans</a>
+                        <a href="{{ url_for('new_interview') }}" class="dropdown-link">Team Members</a>
                     </div>
                 </div>
 
-                <!-- Right side -->
-                <div class="flex items-center">
-                    <button class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                        + New
-                    </button>
+                <div class="dropdown">
+                    <a href="#" class="nav-link">Research</a>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('interviews_page') }}" class="dropdown-link">Interviews</a>
+                        <a href="{{ url_for('upload_transcript') }}" class="dropdown-link">Upload Transcript</a>
+                        <a href="{{ url_for('advanced_search') }}" class="dropdown-link">Advanced Search</a>
+                    </div>
                 </div>
+
+                <div class="dropdown">
+                    <a href="#" class="nav-link">Synthesis</a>
+                    <div class="dropdown-content">
+                        <a href="{{ url_for('persona') }}" class="dropdown-link">Personas</a>
+                        <a href="{{ url_for('journey_map') }}" class="dropdown-link">Journey Maps</a>
+                        <a href="{{ url_for('create_personas', project_name='') }}" class="dropdown-link">Create Personas</a>
+                    </div>
+                </div>
+
+                <a href="#" class="nav-link">Opportunities</a>
+                <a href="#" class="nav-link">Workshops</a>
             </div>
-        </div>
-    </nav>
 
-    <!-- Page Content -->
-    <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+            <button class="btn btn-primary">+ New</button>
+        </nav>
+    </div>
+
+    <main class="content">
         {% block content %}{% endblock %}
     </main>
 
-    <!-- Help Footer -->
-    <footer class="bg-white border-t border-gray-200 mt-auto">
-        <div class="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <div class="flex justify-between items-center">
-                <div class="text-gray-500 text-sm">
-                    Need help? Check out our <a href="#" class="text-indigo-600 hover:text-indigo-500">documentation</a>
-                </div>
-                <div class="text-gray-400 text-sm">
-                    Daria Research Tool v1.0
-                </div>
-            </div>
-        </div>
-    </footer>
-
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    {% block extra_js %}{% endblock %}
     {% block scripts %}{% endblock %}
 </body>
 </html> 
