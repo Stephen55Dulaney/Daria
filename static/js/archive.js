@@ -55,62 +55,86 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Create HTML for a single interview card
     const createInterviewCard = (interview) => {
-        const date = interview.created_at ? new Date(interview.created_at).toLocaleDateString() : 'No date';
+        // Get participant name from all possible sources
+        const participantName = interview.transcript_name || // Try transcript_name first
+                               interview.metadata?.participant?.name ||
+                               interview.participant_name ||
+                               'Anonymous';
+                               
+        // Calculate interview duration
+        const durationMinutes = interview.metadata?.interview_details?.duration || 
+                               interview.duration || 
+                               calculateDurationFromChunks(interview.chunks);
+                               
+        const durationText = durationMinutes ? `${durationMinutes} min` : '';
+        
+        // Format date nicely
+        const date = interview.created_at ? 
+            new Date(interview.created_at).toLocaleDateString(undefined, {
+                month: 'short',
+                day: 'numeric',
+                year: 'numeric'
+            }) : 'No date';
+            
         const previewText = interview.preview || interview.content_preview || 'No preview available';
-        const tags = interview.tags || [];
-        const status = interview.status || 'Draft';
         const type = interview.type || 'Interview';
-
+        const status = interview.status || 'Draft';
+        
+        // Construct title using participant name
+        const title = `Interview with ${participantName} - ${date}`;
+        
         return `
             <div class="interview-card" data-interview-id="${interview.id}">
                 <div class="card-header">
                     <span class="type-badge ${type.toLowerCase()}">${type}</span>
                     <span class="status-badge ${status.toLowerCase()}">${status}</span>
                 </div>
+                
                 <div class="card-body">
-                    <h3 class="interview-title">${interview.title || 'Untitled Interview'}</h3>
+                    <h3 class="interview-title">${title}</h3>
                     <div class="interview-meta">
-                        <span class="participant">${interview.participant_name || 'Anonymous'}</span>
-                        <span class="date">${date}</span>
+                        <span class="duration">${durationText || 'Duration unknown'}</span>
                     </div>
+                    
                     <p class="preview-text">${previewText}</p>
-                    <div class="project-info">
-                        <span class="project-name">${interview.project_name || 'Unassigned'}</span>
-                        ${interview.created_by ? `<span class="author">by ${interview.created_by}</span>` : ''}
+                    
+                    <div class="card-actions">
+                        <button class="action-btn view-btn" data-id="${interview.id}">
+                            <i class="fas fa-eye"></i> View
+                        </button>
+                        <button class="action-btn copy-btn" data-id="${interview.id}">
+                            <i class="fas fa-link"></i> Copy Link
+                        </button>
+                        <button class="action-btn favorite-btn" data-id="${interview.id}">
+                            <i class="far fa-star"></i>
+                        </button>
                     </div>
-                    ${tags.length ? `
-                        <div class="tags-container">
-                            ${tags.map(tag => `<span class="tag">${tag}</span>`).join('')}
-                        </div>
-                    ` : ''}
-                </div>
-                <div class="card-footer">
-                    <a href="/transcript/${interview.id}" class="btn-icon" title="View Transcript">
-                        <i class="fas fa-file-alt"></i>
-                    </a>
-                    <a href="/analysis/${interview.id}" class="btn-icon" title="View Analysis">
-                        <i class="fas fa-chart-bar"></i>
-                    </a>
-                    <a href="/metadata/${interview.id}" class="btn-icon" title="View Metadata">
-                        <i class="fas fa-info-circle"></i>
-                    </a>
-                    <button class="btn-icon copy-link" data-interview-id="${interview.id}" title="Copy Link">
-                        <i class="fas fa-link"></i>
-                    </button>
-                    <button class="btn-icon favorite" data-interview-id="${interview.id}" title="Favorite">
-                        <i class="fas fa-star"></i>
-                    </button>
                 </div>
             </div>
         `;
     };
 
+    // Helper function to calculate duration from chunks
+    const calculateDurationFromChunks = (chunks) => {
+        if (!chunks || !Array.isArray(chunks)) return null;
+        
+        // Assuming chunks have timestamps or we can calculate from content length
+        let totalDuration = 0;
+        chunks.forEach(chunk => {
+            if (chunk.duration) {
+                totalDuration += parseFloat(chunk.duration);
+            }
+        });
+        
+        return totalDuration > 0 ? Math.round(totalDuration / 60) : null;
+    };
+
     // Attach event listeners to card buttons
     const attachCardEventListeners = () => {
         // Copy link buttons
-        document.querySelectorAll('.copy-link').forEach(button => {
+        document.querySelectorAll('.copy-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
-                const id = e.currentTarget.dataset.interviewId;
+                const id = e.currentTarget.dataset.id;
                 const url = `${window.location.origin}/transcript/${id}`;
                 
                 try {
@@ -124,9 +148,9 @@ document.addEventListener('DOMContentLoaded', () => {
         });
 
         // Favorite buttons
-        document.querySelectorAll('.favorite').forEach(button => {
+        document.querySelectorAll('.favorite-btn').forEach(button => {
             button.addEventListener('click', async (e) => {
-                const id = e.currentTarget.dataset.interviewId;
+                const id = e.currentTarget.dataset.id;
                 const icon = e.currentTarget.querySelector('i');
                 
                 try {

@@ -10,6 +10,8 @@ import numpy as np
 from dotenv import load_dotenv
 import faiss
 import logging
+from langchain_openai import OpenAIEmbeddings
+from langchain.docstore.document import Document
 from datetime import datetime
 
 # Load environment variables
@@ -204,7 +206,8 @@ Analysis:
                 self.interview_metadata[interview['id']] = {
                     'project_name': interview.get('project_name', ''),
                     'interview_type': interview.get('interview_type', ''),
-                    'date': interview.get('date', '')
+                    'date': interview.get('date', ''),
+                    'last_updated': datetime.now().strftime('%Y-%m-%dT%H:%M:%S')
                 }
 
             logger.info(f"Processing {len(texts)} interviews for vectorization")
@@ -353,13 +356,11 @@ Analysis:
                             continue
                         
                         # Calculate similarity score using a modified sigmoid function
-                        # This provides better differentiation between results
                         l2_distance = float(distances[0][i])
-                        # Use a more lenient sigmoid function with a larger divisor
-                        similarity_score = 1 / (1 + np.exp(l2_distance / 5))  # Increased divisor from 3 to 5
+                        similarity_score = 1 / (1 + np.exp(l2_distance / 5))
                         
                         # Skip results with very low similarity
-                        if similarity_score < 0.1:  # Reduced threshold from 0.2 to 0.1
+                        if similarity_score < 0.1:
                             continue
                         
                         # Format the result with all necessary fields
@@ -367,7 +368,7 @@ Analysis:
                             'id': interview_id,
                             'project_name': interview_data.get('project_name', 'Unknown Project'),
                             'interview_type': interview_data.get('interview_type', 'Unknown Type'),
-                            'date': interview_data.get('date', datetime.now().isoformat()),
+                            'date': interview_data.get('date') or datetime.now().isoformat(),
                             'transcript': interview_data.get('transcript', ''),
                             'analysis': interview_data.get('analysis', ''),
                             'score': similarity_score

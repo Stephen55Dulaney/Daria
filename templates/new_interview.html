@@ -31,6 +31,63 @@
                             <textarea class="form-control" id="projectDescription" rows="3" placeholder="Describe the project and its goals" required></textarea>
                             <div class="invalid-feedback">Please enter a project description</div>
                         </div>
+
+                        <h5 class="mt-4">Participant Information</h5>
+                        <div class="mb-3">
+                            <label for="participantName" class="form-label">Participant Name</label>
+                            <input type="text" class="form-control" id="participantName" placeholder="Enter participant name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="participantRole" class="form-label">Role</label>
+                            <input type="text" class="form-control" id="participantRole" placeholder="e.g., Product Manager, Developer">
+                        </div>
+                        <div class="mb-3">
+                            <label for="experienceLevel" class="form-label">Experience Level</label>
+                            <select class="form-select" id="experienceLevel">
+                                <option value="">Select experience level</option>
+                                <option value="Junior">Junior</option>
+                                <option value="Mid-Level">Mid-Level</option>
+                                <option value="Senior">Senior</option>
+                                <option value="Lead">Lead</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <input type="text" class="form-control" id="department" placeholder="e.g., Engineering, Design">
+                        </div>
+
+                        <h5 class="mt-4">Interview Metadata</h5>
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Tags</label>
+                            <input type="text" class="form-control" id="tags" placeholder="Enter tags separated by commas">
+                            <small class="text-muted">e.g., usability, mobile, performance</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="emotion" class="form-label">Primary Emotion</label>
+                            <select class="form-select" id="emotion">
+                                <option value="">Select primary emotion</option>
+                                <option value="Satisfied">Satisfied</option>
+                                <option value="Frustrated">Frustrated</option>
+                                <option value="Confused">Confused</option>
+                                <option value="Neutral">Neutral</option>
+                                <option value="Angry">Angry</option>
+                                <option value="Happy">Happy</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Interview Status</label>
+                            <select class="form-select" id="status">
+                                <option value="Draft">Draft</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Validated">Validated</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="author" class="form-label">Interviewer Name</label>
+                            <input type="text" class="form-control" id="author" placeholder="Your name">
+                        </div>
+
                         <button type="submit" class="btn btn-primary">Start Interview</button>
                     </form>
                 </div>
@@ -38,11 +95,41 @@
         </div>
 
         <div class="col-md-6">
-            <div class="card">
+            <div class="card mb-4">
                 <div class="card-body">
                     <h5 class="card-title">Interview Guidelines</h5>
                     <div id="guidelineContent">
                         <p>Select an interview type to see specific guidelines.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Analysis Template</h5>
+                    <div class="mb-3">
+                        <p>Your analysis will be structured with the following sections:</p>
+                        <pre class="bg-light p-3 rounded">
+# Interview Analysis
+
+## Key Pain Points
+- List major issues and challenges
+- Include specific examples
+
+## User Needs
+- Core requirements
+- Desired improvements
+- Feature requests
+
+## Recommendations
+1. Actionable suggestions
+2. Potential solutions
+3. Priority items
+
+## Additional Insights
+- Notable quotes
+- Unexpected findings
+- Context details</pre>
                     </div>
                 </div>
             </div>
@@ -108,6 +195,26 @@ function validateForm() {
     return { valid: true, missingFields: [] };
 }
 
+// Function to collect all form data
+function collectFormData() {
+    const formData = {
+        project_name: document.getElementById('projectName').value.trim(),
+        interview_type: document.getElementById('interviewType').value,
+        project_description: document.getElementById('projectDescription').value.trim(),
+        participant_name: document.getElementById('participantName').value.trim(),
+        role: document.getElementById('participantRole').value.trim(),
+        experience_level: document.getElementById('experienceLevel').value,
+        department: document.getElementById('department').value.trim(),
+        tags: document.getElementById('tags').value.trim().split(',').map(tag => tag.trim()).filter(tag => tag),
+        emotion: document.getElementById('emotion').value,
+        status: document.getElementById('status').value,
+        author: document.getElementById('author').value.trim()
+    };
+    
+    debugLog('Collected form data', formData);
+    return formData;
+}
+
 document.getElementById('interviewType').addEventListener('change', function() {
     const guidelines = {
         'Application Interview': `
@@ -160,9 +267,7 @@ document.getElementById('interviewForm').addEventListener('submit', async functi
         return;
     }
     
-    const projectName = document.getElementById('projectName').value.trim();
-    const interviewType = document.getElementById('interviewType').value;
-    const projectDescription = document.getElementById('projectDescription').value.trim();
+    const formData = collectFormData();
     
     try {
         debugLog('Sending request to /save_interview');
@@ -171,11 +276,7 @@ document.getElementById('interviewForm').addEventListener('submit', async functi
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({
-                project_name: projectName,
-                interview_type: interviewType,
-                project_description: projectDescription
-            })
+            body: JSON.stringify(formData)
         });
         
         debugLog('Response received:', response.status);

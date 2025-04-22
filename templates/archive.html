@@ -16,27 +16,31 @@
         {% for interview in interviews %}
         <div class="interview-card" data-interview-id="{{ interview.id }}">
             <div class="card-header">
-                <span class="type-badge {{ interview.type|lower }}">{{ interview.type }}</span>
-                <span class="status-badge {{ interview.status|lower }}">{{ interview.status }}</span>
+                <span class="type-badge {{ interview.type|lower }}">{{ interview.type|default('Interview')|title }}</span>
+                <span class="status-badge {{ interview.status|lower }}">{{ interview.status|default('Draft')|title }}</span>
             </div>
             
             <div class="card-body">
-                <h3 class="interview-title">{{ interview.title }}</h3>
+                <h3 class="interview-title">{{ interview.title|default('Untitled Interview') }}</h3>
                 <div class="interview-meta">
-                    <span class="participant">{{ interview.participant_name }}</span>
+                    {% set participant_name = interview.get('metadata', {}).get('participant', {}).get('name') %}
+                    {% if not participant_name %}
+                        {% set participant_name = interview.get('participant_name') %}
+                    {% endif %}
+                    <span class="participant">{{ participant_name|default('Anonymous') }}</span>
                     <span class="date">{{ interview.created_at|strftime }}</span>
                 </div>
                 
-                <p class="preview-text">{{ interview.preview }}</p>
+                <p class="preview-text">{{ interview.preview|default('No preview available') }}</p>
                 
                 <div class="project-info">
-                    <span class="project-name">{{ interview.project_name }}</span>
-                    {% if interview.created_by %}
+                    <span class="project-name">{{ interview.project_name|default('Unassigned') }}</span>
+                    {% if interview.created_by and interview.created_by != 'system' %}
                     <span class="author">by {{ interview.created_by }}</span>
                     {% endif %}
                 </div>
                 
-                {% if interview.tags %}
+                {% if interview.tags and interview.tags|length > 0 %}
                 <div class="tags-container">
                     {% for tag in interview.tags %}
                     <span class="tag">{{ tag }}</span>

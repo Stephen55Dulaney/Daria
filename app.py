@@ -160,19 +160,23 @@ def list_interviews():
         return []
 
 def _get_content_preview(interview: dict, max_length: int = 200) -> str:
-    """Get a preview of the interview content."""
+    """Get a preview of the interview content, showing only participant responses."""
     try:
         # Try to get content from chunks first
         chunks = interview.get('chunks', [])
         if chunks:
-            # Get the first few non-empty chunks
+            # Get the first few non-empty participant chunks
             preview_texts = []
             for chunk in chunks:
+                # Skip if no text or if speaker is interviewer/researcher
                 text = chunk.get('text', '').strip()
-                if text:
-                    preview_texts.append(text)
-                    if len(' '.join(preview_texts)) >= max_length:
-                        break
+                speaker = chunk.get('speaker', '').lower()
+                if not text or 'interviewer' in speaker or 'researcher' in speaker:
+                    continue
+                    
+                preview_texts.append(text)
+                if len(' '.join(preview_texts)) >= max_length:
+                    break
             
             if preview_texts:
                 preview = ' '.join(preview_texts)
@@ -183,11 +187,24 @@ def _get_content_preview(interview: dict, max_length: int = 200) -> str:
         # Fallback to transcript field
         transcript = interview.get('transcript', '').strip()
         if transcript:
-            if len(transcript) > max_length:
-                return transcript[:max_length] + '...'
-            return transcript
+            # Try to filter out interviewer lines from transcript
+            lines = transcript.split('\n')
+            participant_lines = []
+            for line in lines:
+                if ': ' in line:
+                    speaker, text = line.split(': ', 1)
+                    if not any(role in speaker.lower() for role in ['interviewer', 'researcher']):
+                        participant_lines.append(text.strip())
+                elif line.strip():  # If no speaker prefix, include the line
+                    participant_lines.append(line.strip())
+                    
+            if participant_lines:
+                preview = ' '.join(participant_lines)
+                if len(preview) > max_length:
+                    return preview[:max_length] + '...'
+                return preview
             
-        return 'No content available'
+        return 'No participant responses available'
         
     except Exception as e:
         logger.error(f"Error getting content preview: {str(e)}")
@@ -242,42 +259,77 @@ def delete_interview(interview_id):
 def save_interview_data(project_name, interview_type, transcript, analysis=None, form_data=None):
     """Save interview data to a JSON file using the new schema."""
     try:
-        # Create interviews directory if it doesn't exist
-        if not os.path.exists('interviews'):
-            os.makedirs('interviews')
-            
-        # Generate a unique ID for the interview
+        # Generate unique interview ID if not provided
         interview_id = str(uuid.uuid4())
         
-        # Process transcript into timestamped chunks if it's a string
+        # Process transcript into chunks if it's a string
+        transcript_chunks = []
         if isinstance(transcript, str):
-            # Split transcript into lines and process each line
-            transcript_chunks = []
+            # Split transcript into chunks by speaker
             lines = transcript.split('\n')
-            current_time = datetime.now()
+            current_chunk = {'text': '', 'speaker': '', 'start_time': None, 'end_time': None}
             
             for line in lines:
-                if line.strip():
-                    # Parse speaker and text
-                    if ': ' in line:
-                        speaker, text = line.split(': ', 1)
-                    else:
-                        speaker = 'Unknown'
-                        text = line
-                        
-                    chunk = {
-                        'chunk_id': str(uuid.uuid4()),
-                        'start_time': current_time.isoformat(),
-                        'end_time': current_time.isoformat(),  # For text imports, use same time
-                        'speaker': speaker.strip(),
-                        'text': text.strip()
-                    }
-                    transcript_chunks.append(chunk)
-                    current_time += timedelta(seconds=1)  # Increment time for visual separation
-        else:
-            # Assume transcript is already in the correct format
-            transcript_chunks = transcript
+                if ': ' in line:  # New speaker
+                    if current_chunk['text']:  # Save previous chunk
+                        transcript_chunks.append(current_chunk)
+                        current_chunk = {'text': '', 'speaker': '', 'start_time': None, 'end_time': None}
+                    
+                    speaker, text = line.split(': ', 1)
+                    current_chunk['speaker'] = speaker
+                    current_chunk['text'] = text
+                else:  # Continuation of previous speaker
+                    current_chunk['text'] += f"\n{line}"
             
+            if current_chunk['text']:  # Save last chunk
+                transcript_chunks.append(current_chunk)
+        else:
+            transcript_chunks = transcript  # Assume pre-chunked format
+
+        # Generate title based on participant name and first response
+        title = None
+        participant_name = None
+        first_response = None
+
+        # Try to get participant name from form data first
+        if form_data and form_data.get('interviewee', {}).get('name'):
+            participant_name = form_data['interviewee']['name']
+        
+        # If no name in form data, try to extract from transcript
+        if not participant_name:
+            for chunk in transcript_chunks:
+                speaker = chunk.get('speaker', '').strip()
+                # Skip system messages or empty speakers
+                if not speaker or speaker.lower() in ['system', 'assistant', 'interviewer', 'daria']:
+                    continue
+                # Extract name from common formats like "[Name]" or "Name:"
+                if '[' in speaker and ']' in speaker:
+                    participant_name = speaker[speaker.find('[')+1:speaker.find(']')]
+                    break
+                elif speaker.endswith(':'):
+                    participant_name = speaker[:-1].strip()
+                    break
+                else:
+                    participant_name = speaker
+                    break
+        
+        # If still no name, use "Anonymous"
+        if not participant_name:
+            participant_name = "Anonymous"
+
+        # Get interview date
+        interview_date = None
+        if form_data and form_data.get('metadata', {}).get('interviewDate'):
+            interview_date = form_data['metadata']['interviewDate']
+        else:
+            interview_date = datetime.now().strftime('%Y-%m-%d')
+
+        # Format the title
+        if interview_type.lower() != 'interview':
+            title = f"{interview_type} with {participant_name} - {interview_date}"
+        else:
+            title = f"Interview with {participant_name} - {interview_date}"
+
         # If analysis is not provided, create a structured template
         if not analysis:
             analysis = {
@@ -302,13 +354,24 @@ def save_interview_data(project_name, interview_type, transcript, analysis=None,
             
         # Prepare metadata
         metadata = {
-            'researcher': {},
-            'participant': {},
+            'researcher': {
+                'name': '',
+                'email': '',
+                'role': 'UX Researcher'
+            },
+            'participant': {
+                'name': participant_name,
+                'role': '',
+                'department': '',
+                'experience_level': '',
+                'consent_given': True
+            },
             'session': {
-                'date': datetime.now().isoformat(),
+                'date': interview_date,
                 'duration': None,
                 'format': 'text',
-                'language': 'en'
+                'language': 'en',
+                'notes': ''
             }
         }
         
@@ -319,43 +382,47 @@ def save_interview_data(project_name, interview_type, transcript, analysis=None,
             elif not form_data.get('tags'):
                 form_data['tags'] = []
                 
-            metadata.update({
-                'researcher': {
-                    'name': form_data.get('researcher', {}).get('name', ''),
-                    'email': form_data.get('researcher', {}).get('email', ''),
-                    'role': form_data.get('researcher', {}).get('role', '')
-                },
-                'participant': {
-                    'name': form_data.get('interviewee', {}).get('name', ''),
+            # Update metadata with form data
+            if form_data.get('researcher'):
+                metadata['researcher'].update(form_data['researcher'])
+            
+            if form_data.get('interviewee'):
+                metadata['participant'].update({
+                    'name': form_data['interviewee'].get('name', participant_name),
                     'role': form_data.get('role', ''),
                     'experience_level': form_data.get('experience_level', ''),
                     'department': form_data.get('department', ''),
-                    'consent_given': form_data.get('consent', False)
-                },
-                'session': {
-                    'date': form_data.get('metadata', {}).get('interviewDate', datetime.now().isoformat()),
-                    'duration': form_data.get('metadata', {}).get('interviewDuration', None),
-                    'format': form_data.get('metadata', {}).get('interviewFormat', 'text'),
-                    'language': form_data.get('metadata', {}).get('interviewLanguage', 'en'),
-                    'notes': form_data.get('metadata', {}).get('interviewNotes', '')
-                }
-            })
+                    'consent_given': form_data.get('consent', True)
+                })
+            
+            if form_data.get('metadata'):
+                metadata['session'].update({
+                    'date': form_data['metadata'].get('interviewDate', interview_date),
+                    'duration': form_data['metadata'].get('interviewDuration'),
+                    'format': form_data['metadata'].get('interviewFormat', 'text'),
+                    'language': form_data['metadata'].get('interviewLanguage', 'en'),
+                    'notes': form_data['metadata'].get('interviewNotes', '')
+                })
             
         # Prepare interview data according to new schema
         interview_data = {
             'id': interview_id,
             'type': interview_type,
             'project_id': None,  # To be set when project system is implemented
-            'title': form_data.get('transcriptName', 'Untitled Interview') if form_data else 'Untitled Interview',
+            'project_name': project_name or 'Unassigned',
+            'title': title,
             'created_at': datetime.now().isoformat(),
             'created_by': metadata['researcher'].get('email', 'system'),
+            'status': 'draft',
             'metadata': metadata,
             'chunks': transcript_chunks,
-            'analysis': analysis
+            'analysis': analysis,
+            'tags': form_data.get('tags', []) if form_data else []
         }
         
         # Save to JSON file
         filename = f'interviews/{interview_id}.json'
+        os.makedirs('interviews', exist_ok=True)
         with open(filename, 'w') as f:
             json.dump(interview_data, f, indent=2)
             
@@ -1154,9 +1221,14 @@ def archive():
             if not interview.get('project_name'):
                 interview['project_name'] = 'Unassigned'
                 
-            # Ensure participant name exists
-            if not interview.get('participant_name'):
-                interview['participant_name'] = 'Anonymous'
+            # Get participant name from all possible sources
+            participant_name = (
+                interview.get('transcript_name') or  # Try transcript_name first
+                interview.get('metadata', {}).get('participant', {}).get('name') or
+                interview.get('participant_name') or
+                'Anonymous'
+            )
+            interview['participant_name'] = participant_name
         
         return render_template('archive.html', interviews=interviews)
     except Exception as e:
@@ -1208,65 +1280,68 @@ def view_analysis(interview_id):
                 project_name = interview.get('project_name', '')
                 transcript = interview.get('transcript', '')
                 
-                # Generate analysis prompt based on interview type
-                if interview_type == "Application Interview":
-                    analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Application Evaluation interviews.
-#Objective: Evaluate the interviewee's experience with {project_name}
-#Instructions: Evaluate the interview transcript and provide a comprehensive analysis.
+                # Split transcript into manageable chunks (roughly 2000 tokens each)
+                transcript_chunks = []
+                current_chunk = []
+                current_length = 0
+                
+                for line in transcript.split('\n'):
+                    # Rough estimate: 1 token ≈ 4 characters
+                    line_length = len(line) / 4
+                    if current_length + line_length > 2000:
+                        transcript_chunks.append('\n'.join(current_chunk))
+                        current_chunk = [line]
+                        current_length = line_length
+                    else:
+                        current_chunk.append(line)
+                        current_length += line_length
+                
+                if current_chunk:
+                    transcript_chunks.append('\n'.join(current_chunk))
+                
+                # Generate base prompt
+                base_prompt = f"""#Role: You are Daria, an expert UX researcher conducting {interview_type}.
+#Objective: Analyze the interview about {project_name}
+#Context: You will receive the interview transcript in parts. Analyze each part and we'll combine the insights at the end.
 
-Your analysis should include:
-1. Role and Experience: Describe their role and how they use the system
-2. Key Tasks: List the main tasks they perform
-3. Pain Points: Identify any frustrations and challenges
-4. Suggestions: Note any improvements they mentioned
-5. Overall Assessment: Evaluate their experience and needs
+For each part, identify:
+1. Key points and insights
+2. User needs and pain points
+3. Notable quotes
+4. Recommendations (if any)
 
-Format your response with clear sections using headers. For each section, provide detailed insights and include relevant quotes from the transcript."""
-                elif interview_type == "Persona Interview":
-                    analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Creating a Persona interviews.
-#Objective: Generate a persona based on the interviewee's responses about {project_name}
-#Instructions: Evaluate the interview transcript and generate a detailed persona based on the interviewee's responses.
+Format your response with clear sections using headers."""
 
-Your analysis should include:
-1. Demographics: Age, role, experience level, and other relevant characteristics
-2. Behaviors: How they interact with the system, their workflow, and habits
-3. Goals: What they're trying to achieve and their motivations
-4. Challenges: Pain points, frustrations, and obstacles they face
-5. Preferences: Their likes, dislikes, and preferences in using the system
-6. Key Insights: Important quotes or observations that define their experience
+                # Analyze each chunk
+                chunk_analyses = []
+                for i, chunk in enumerate(transcript_chunks):
+                    chunk_prompt = f"{base_prompt}\n\nPart {i+1} of {len(transcript_chunks)}:\n\n{chunk}"
+                    messages = [
+                        SystemMessage(content=chunk_prompt)
+                    ]
+                    response = analysis_llm.invoke(messages)
+                    chunk_analyses.append(response.content)
+                
+                # Generate final synthesis prompt
+                synthesis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting {interview_type}.
+#Objective: Synthesize the analysis of multiple transcript parts for {project_name}
+#Context: Below are the analyses of different parts of the interview. Create a cohesive final analysis.
 
-For each section:
-- Provide at least 3-4 detailed points
-- Include specific examples and quotes from the transcript
-- Make connections between different aspects of the persona
-- Highlight patterns and recurring themes
+Previous analyses:
 
-Format your response with clear sections using headers and ensure each section has substantial content."""
-                else:  # Journey Map Interview
-                    analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Creating a Journey Map interviews.
-#Objective: Generate a comprehensive Journey Map based on the interviewee's responses about {project_name}
-#Instructions: Evaluate the interview transcript and generate a detailed journey map based on the interviewee's responses.
+{'\n\n---\n\n'.join(chunk_analyses)}
 
-Your analysis should include:
-1. User Journey Stages: Break down the experience into key stages or phases
-2. Touchpoints: Identify all interactions with the system and other stakeholders
-3. Emotions: Track emotional highs and lows throughout the journey
-4. Pain Points: Identify frustrations and challenges at each stage
-5. Moments of Delight: Note positive experiences and successful interactions
-6. Opportunities: Suggest improvements for each stage of the journey
+Create a comprehensive final analysis that:
+1. Synthesizes key findings across all parts
+2. Identifies main themes and patterns
+3. Summarizes user needs and pain points
+4. Provides actionable recommendations
 
-For each section:
-- Provide detailed descriptions and analysis
-- Include specific examples and quotes from the transcript
-- Identify patterns and trends
-- Make connections between different stages of the journey
+Format your response with clear sections using headers."""
 
-Format your response with clear sections using headers and ensure each section has substantial content."""
-
-                # Generate the analysis using invoke instead of predict
+                # Generate final synthesis
                 messages = [
-                    SystemMessage(content=analysis_prompt),
-                    HumanMessage(content=f"Here is the interview transcript to analyze:\n\n{transcript}")
+                    SystemMessage(content=synthesis_prompt)
                 ]
                 response = analysis_llm.invoke(messages)
                 analysis = response.content
@@ -1274,7 +1349,7 @@ Format your response with clear sections using headers and ensure each section h
                 # Update the interview with the new analysis
                 interview['analysis'] = analysis
                 
-                # Update the existing interview instead of creating a new one
+                # Update the existing interview
                 if not update_interview_data(interview_id, analysis):
                     raise Exception("Failed to update interview")
                 
@@ -1294,7 +1369,7 @@ Format your response with clear sections using headers and ensure each section h
                 logger.error(f"Error generating analysis: {str(e)}")
                 logger.error(traceback.format_exc())
                 flash('Error generating analysis', 'error')
-            return redirect(url_for('archive'))
+                return redirect(url_for('archive'))
         
         return render_template('analysis.html', 
                              interview=interview)

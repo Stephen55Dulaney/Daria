@@ -1,8 +1,47 @@
 {
   "id": "6146b14a-0b51-4188-bab2-02296f2cfe22",
+  "transcript_name": "Unknown",
   "project_name": "Greenland Getaway",
   "interview_type": "Persona Interview",
+  "project_description": "",
   "date": "2025-04-02T07:46:02.955439",
-  "transcript": "Daria: Hello! I'm Daria, a UX researcher and I'm conducting a Persona Interview about Greenland Getaway. I\u2019d like to understand more about your experience with planning vacations to Greenland. To start off, could you tell me a bit about yourself, perhaps your age, role and your level of travel experience?\nDaria: Of course, let's dive right in. Could you please describe your typical workflow when planning a vacation? Specifically, what steps do you usually take and in what order?\nYou: You have my permission to proceed.\nDaria: Thank you for your cooperation. Let's move forward. Can you share with me your primary motivation or goal when planning a trip to Greenland?\nDaria: Yes, that's correct. Now, could you please let me know about any specific challenges or frustrations you faced during the planning process of your Greenland vacation?\nYou: I think the biggest, uh, fru- frustration was that we spent a lot of time booking around a certain property but we weren't ready to book so we had the house in mind. And then when it was time to book, the house was not available.\nDaria: I see, that does sound frustrating. To help prevent such a situation in the future, would you prefer a feature that allows you to hold a reservation for a certain period before booking?\nDaria: Yes, I appreciate your patience. Now, could you please share your preferences when using a vacation planning tool? What are some features or aspects that you particularly like or dislike?\nYou: Okay. Well, I particularly liked the route planning tool where you could pick maybe a start and a begin, and it would suggest some intermediate stops. And then I also, uh, liked the Suggest an Adventure, because it would find, um, certain day trips. I didn't like the, um, Find a Guide. It was hard. I had to do the adventure, and then-\nDaria: I understand, so you enjoyed having a tool that suggested routes and adventures but found some difficulty with the \"Find a Guide\" feature. Could you elaborate a bit more on what made it hard to use?\nDaria: Indeed, we're discussing your experiences with planning trips to Greenland. Now, moving on to a slightly different topic, could you please share any specific goals you have when using a vacation planning tool?\nYou: Let's wrap up. Thank you.\nDaria: Thank you for your time and valuable insights. They will certainly be helpful for our research. If you have any further thoughts or experiences you'd like to share in the future, please don't hesitate to reach out. Enjoy your day!",
-  "analysis": "#Persona Analysis\n\n##1. Demographics\nThe interviewee did not provide specific information about their age, role or experience level. However, based on their responses, we can infer that they are an individual who has had some experience in planning vacations, specifically to Greenland.\n\n##2. Behaviors\nThe interviewee is methodical in their vacation planning workflow, spending time researching and booking around certain properties before making a final decision. They also engage with various features of vacation planning tools including route planning, adventure suggestions and guide finding.\n\n##3. Goals\nThe interviewee's primary goal when planning a vacation is centered around finding suitable accommodation and adventures. They also aim to maximize the efficiency of their trip through the use of route planning tools.\n\n##4. Challenges\nThe interviewee's main frustration arises from spending time on researching and deciding on a property, only to find it unavailable when ready to book. They also found difficulty in using the 'Find a Guide' feature of the vacation planning tool.\n\n> \"I think the biggest, uh, frustration was that we spent a lot of time booking around a certain property but we weren't ready to book so we had the house in mind. And then when it was time to book, the house was not available.\"\n\n##5. Preferences\nThe interviewee prefers features that aid in planning the route and suggesting adventures. They found the 'Find a Guide' feature difficult to use and would appreciate it being more user-friendly.\n\n> \"I particularly liked the route planning tool where you could pick maybe a start and a begin, and it would suggest some intermediate stops. And then I also, uh, liked the Suggest an Adventure, because it would find, um, certain day trips. I didn't like the, um, Find a Guide. It was hard. I had to do the adventure, and then-\"\n\n##6. Key Insights\nThe interviewee's experience highlights the importance of a user-friendly interface and the ability to hold a reservation before booking in a vacation planning tool. They also value features that assist in planning the route and suggesting adventures, indicating that they seek a comprehensive, all-in-one tool for vacation planning. \n\n> \"To help prevent such a situation in the future, would you prefer a feature that allows you to hold a reservation for a certain period before booking?\""
+  "transcript": "[Daria] 13:00:00\nHello! I'm Daria, a UX researcher and I'm conducting a Persona Interview about Greenland Getaway. I\u2019d like to understand more about your experience with planning vacations to Greenland. To start off, could you tell me a bit about yourself, perhaps your age, role and your level of travel experience?\n\n[Daria] 13:00:30\nOf course, let's dive right in. Could you please describe your typical workflow when planning a vacation? Specifically, what steps do you usually take and in what order?\n\n[You] 13:01:00\nYou have my permission to proceed.\n\n[Daria] 13:01:30\nThank you for your cooperation. Let's move forward. Can you share with me your primary motivation or goal when planning a trip to Greenland?\n\n[Daria] 13:02:00\nYes, that's correct. Now, could you please let me know about any specific challenges or frustrations you faced during the planning process of your Greenland vacation?\n\n[You] 13:02:30\nI think the biggest, uh, fru- frustration was that we spent a lot of time booking around a certain property but we weren't ready to book so we had the house in mind. And then when it was time to book, the house was not available.\n\n[Daria] 13:03:00\nI see, that does sound frustrating. To help prevent such a situation in the future, would you prefer a feature that allows you to hold a reservation for a certain period before booking?\n\n[Daria] 13:03:30\nYes, I appreciate your patience. Now, could you please share your preferences when using a vacation planning tool? What are some features or aspects that you particularly like or dislike?\n\n[You] 13:04:00\nOkay. Well, I particularly liked the route planning tool where you could pick maybe a start and a begin, and it would suggest some intermediate stops. And then I also, uh, liked the Suggest an Adventure, because it would find, um, certain day trips. I didn't like the, um, Find a Guide. It was hard. I had to do the adventure, and then-\n\n[Daria] 13:04:30\nI understand, so you enjoyed having a tool that suggested routes and adventures but found some difficulty with the \"Find a Guide\" feature. Could you elaborate a bit more on what made it hard to use?\n\n[Daria] 13:05:00\nIndeed, we're discussing your experiences with planning trips to Greenland. Now, moving on to a slightly different topic, could you please share any specific goals you have when using a vacation planning tool?\n\n[You] 13:05:30\nLet's wrap up. Thank you.\n\n[Daria] 13:06:00\nThank you for your time and valuable insights. They will certainly be helpful for our research. If you have any further thoughts or experiences you'd like to share in the future, please don't hesitate to reach out. Enjoy your day!\n",
+  "analysis": null,
+  "metadata": {
+    "researcher": {
+      "name": "",
+      "email": "",
+      "role": "UX Researcher"
+    },
+    "interviewee": {
+      "name": "Unknown",
+      "age": "",
+      "gender": "",
+      "location": "",
+      "occupation": "",
+      "industry": "",
+      "experience": "",
+      "education": ""
+    },
+    "technology": {
+      "primaryDevice": "",
+      "operatingSystem": "",
+      "browserPreference": "",
+      "technicalProficiency": ""
+    },
+    "interview_details": {
+      "interviewDate": "2025-04-02T07:46:02.955439",
+      "interviewDuration": "60",
+      "interviewFormat": "video-call",
+      "interviewLanguage": "english",
+      "interviewNotes": "",
+      "keyInsights": "",
+      "followUpActions": ""
+    },
+    "consent": true,
+    "participant": {
+      "name": "Unknown"
+    }
+  },
+  "title": "Interview with Unknown - 2025-04-22"
 }

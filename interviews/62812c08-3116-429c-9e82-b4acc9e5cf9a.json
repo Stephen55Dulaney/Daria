@@ -1,16 +1,17 @@
 {
   "id": "62812c08-3116-429c-9e82-b4acc9e5cf9a",
+  "transcript_name": "Michael",
   "project_name": "Gone Fishing",
   "interview_type": "Journey Map Interview",
+  "project_description": "",
   "date": "2025-04-07T13:41:00.520544",
-  "transcript": "Daria: Hello! I'm Daria, a UX researcher. Click \"Start Interview\" when you're ready to begin.\nDaria: Say 'Start' to begin the interview\nYou: Please begin the interview.\nDaria: Welcome to our user study! This research aims to test the design, not the user. We appreciate your participation. For transparency, this conversation will be recorded for research purposes. Do we have your permission to proceed?\nYou: You have my permission to proceed.\nDaria: What kind of equipment do you typically bring on your fishing trips?\nYou: It depends on the river size, but I typically bring a medium-weight, nine-foot pole. I bring as many flies as I possibly can, both, uh, wet and dry, and I'm always in a pair of waders and a hat and a walking stick.\nDaria: Can you describe the feeling you get when you finally catch a fish?\nYou: That's why you go on the river, catchin' the fish and the fight. And then you get to hold them for a little- little while and then the-\nDaria: What impact does the location and environment have on your fishing experience?\nYou: The location means that you need to figure out what kind of flies or aquatic insects are in the river, so the location determines what kind of flies you'll be using.\nDaria: Do you use any tools or techniques to identify the type of flies in the river?\nYou: Yes. You pick up a rock and you look on the bottom and you see what's in there, and then sometimes when you catch a medium-sized fish, you can suck out its stomach and spit the contents in your hand and see what they're eating.\nDaria: Can you share how fishing has impacted your life outside of the actual activity?\nYou: Well, I guess it's given me some joy outside of the activity. I'd tie flies on the weekends and there's been some recreation like that.\nDaria: Would you like to share anything else, or shall we wrap up the interview?\nYou: No, thank you. Let's wrap up the interview.",
-  "analysis": "**User Journey Stages:**\n1. Preparing for the Fishing Trip\n2. Identifying Suitable Fishing Location\n3. Engaging in Fishing Activity\n4. Catching the Fish\n5. Post-fishing Activities\n\n**Touchpoints:**\n1. Selection of fishing equipment\n2. Identifying aquatic insects in the river\n3. Selecting suitable flies\n4. Catching the fish\n5. Tying flies during leisure time \n\n**Emotions:**\n1. Anticipation: During the preparation stage\n2. Excitement: When identifying the right location\n3. Joy and Satisfaction: When finally catching a fish and during post-fishing activities like tying flies \n\n**Pain Points:**\n1. Difficulty in identifying the right kind of flies to use based on aquatic insects in the river.\n2. Potential discomfort or unease in identifying what the fish are eating by sucking out a medium-sized fish's stomach.\n\n**Moments of Delight:**\n1. The thrill of catching a fish: \"That's why you go on the river, catchin' the fish and the fight.\"\n2. Finding joy in post-fishing activities: \"I'd tie flies on the weekends and there's been some recreation like that.\"\n\n**Opportunities:**\n1. A guide or a tool to help identify suitable flies based on the aquatic insects in the river could enhance the fishing experience.\n2. Providing a more comfortable or less invasive way to identify what the fish are eating could alleviate discomfort.\n3. Offering more engaging post-fishing activities or communities to enhance the joy derived from fishing.",
+  "transcript": "[Daria] 13:00:00\nHello! I'm Daria, a UX researcher. Click \"Start Interview\" when you're ready to begin.\n\n[Daria] 13:00:30\nSay 'Start' to begin the interview\n\n[You] 13:01:00\nPlease begin the interview.\n\n[Daria] 13:01:30\nWelcome to our user study! This research aims to test the design, not the user. We appreciate your participation. For transparency, this conversation will be recorded for research purposes. Do we have your permission to proceed?\n\n[You] 13:02:00\nYou have my permission to proceed.\n\n[Daria] 13:02:30\nWhat kind of equipment do you typically bring on your fishing trips?\n\n[You] 13:03:00\nIt depends on the river size, but I typically bring a medium-weight, nine-foot pole. I bring as many flies as I possibly can, both, uh, wet and dry, and I'm always in a pair of waders and a hat and a walking stick.\n\n[Daria] 13:03:30\nCan you describe the feeling you get when you finally catch a fish?\n\n[You] 13:04:00\nThat's why you go on the river, catchin' the fish and the fight. And then you get to hold them for a little- little while and then the-\n\n[Daria] 13:04:30\nWhat impact does the location and environment have on your fishing experience?\n\n[You] 13:05:00\nThe location means that you need to figure out what kind of flies or aquatic insects are in the river, so the location determines what kind of flies you'll be using.\n\n[Daria] 13:05:30\nDo you use any tools or techniques to identify the type of flies in the river?\n\n[You] 13:06:00\nYes. You pick up a rock and you look on the bottom and you see what's in there, and then sometimes when you catch a medium-sized fish, you can suck out its stomach and spit the contents in your hand and see what they're eating.\n\n[Daria] 13:06:30\nCan you share how fishing has impacted your life outside of the actual activity?\n\n[You] 13:07:00\nWell, I guess it's given me some joy outside of the activity. I'd tie flies on the weekends and there's been some recreation like that.\n\n[Daria] 13:07:30\nWould you like to share anything else, or shall we wrap up the interview?\n\n[You] 13:08:00\nNo, thank you. Let's wrap up the interview.\n",
+  "analysis": null,
   "metadata": {
     "researcher": {
       "name": "Stephen Dulaney",
-      "role": "UX Researcher",
       "email": "sdulaney@deloitte.com",
-      "phone": "512-785-4701"
+      "role": "UX Researcher"
     },
     "interviewee": {
       "name": "Michael",
@@ -27,6 +28,20 @@
       "operatingSystem": "macos",
       "browserPreference": "firefox",
       "technicalProficiency": "beginner"
+    },
+    "interview_details": {
+      "interviewDate": "2025-04-07T13:41:00.520544",
+      "interviewDuration": "60",
+      "interviewFormat": "video-call",
+      "interviewLanguage": "english",
+      "interviewNotes": "",
+      "keyInsights": "",
+      "followUpActions": ""
+    },
+    "consent": true,
+    "participant": {
+      "name": "Michael"
     }
-  }
+  },
+  "title": "Interview with Michael - 2025-04-22"
 }

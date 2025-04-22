@@ -1,0 +1,215 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "required": ["id", "type", "projectId", "title", "created_at", "created_by", "metadata", "chunks"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "Unique identifier for the interview transcript"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["interview"],
+      "description": "Type of document"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "Reference to the parent project"
+    },
+    "title": {
+      "type": "string",
+      "description": "Title of the interview"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Creation timestamp"
+    },
+    "created_by": {
+      "type": "string",
+      "description": "ID of the researcher who created this"
+    },
+    "last_modified": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Last modification timestamp"
+    },
+    "metadata": {
+      "type": "object",
+      "required": ["researcher", "participant", "session"],
+      "properties": {
+        "researcher": {
+          "type": "object",
+          "required": ["id", "name", "email", "role"],
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "email": { "type": "string", "format": "email" },
+            "role": { "type": "string" }
+          }
+        },
+        "participant": {
+          "type": "object",
+          "required": ["id", "name", "role", "demographics"],
+          "properties": {
+            "id": { "type": "string" },
+            "name": { "type": "string" },
+            "role": { "type": "string" },
+            "demographics": {
+              "type": "object",
+              "properties": {
+                "ageRange": { "type": "string" },
+                "location": { "type": "string" },
+                "techComfort": { "type": "string" },
+                "occupation": { "type": "string" },
+                "industry": { "type": "string" },
+                "experience": { "type": "string" },
+                "education": { "type": "string" }
+              }
+            }
+          }
+        },
+        "session": {
+          "type": "object",
+          "required": ["date", "format", "consent_obtained"],
+          "properties": {
+            "date": { "type": "string", "format": "date-time" },
+            "duration_minutes": { "type": "integer" },
+            "format": { 
+              "type": "string",
+              "enum": ["video", "in_person", "phone"]
+            },
+            "language": { "type": "string" },
+            "consent_obtained": { "type": "boolean" }
+          }
+        }
+      }
+    },
+    "chunks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["chunkId", "startTime", "endTime", "speaker", "text"],
+        "properties": {
+          "chunkId": { "type": "string" },
+          "startTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}:\\d{2}$" },
+          "endTime": { "type": "string", "pattern": "^\\d{2}:\\d{2}:\\d{2}$" },
+          "speaker": {
+            "type": "string",
+            "enum": ["Interviewer", "Participant"]
+          },
+          "text": { "type": "string" },
+          "metadata": {
+            "type": "object",
+            "properties": {
+              "topic": { "type": "string" },
+              "questionId": { "type": "string" },
+              "turnIndex": { "type": "integer" },
+              "emotion": { "type": "string" },
+              "theme": {
+                "type": "array",
+                "items": { "type": "string" }
+              },
+              "insightTag": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "analysis": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": ["draft", "in_progress", "completed"]
+        },
+        "last_updated": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "key_insights": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "category", "text"],
+            "properties": {
+              "id": { "type": "string" },
+              "category": {
+                "type": "string",
+                "enum": ["pain_point", "need", "opportunity", "quote"]
+              },
+              "text": { "type": "string" },
+              "evidence": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "required": ["chunkId", "text"],
+                  "properties": {
+                    "chunkId": { "type": "string" },
+                    "text": { "type": "string" }
+                  }
+                }
+              },
+              "themes": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "title", "description", "priority"],
+            "properties": {
+              "id": { "type": "string" },
+              "title": { "type": "string" },
+              "description": { "type": "string" },
+              "priority": {
+                "type": "string",
+                "enum": ["high", "medium", "low"]
+              },
+              "supporting_insights": {
+                "type": "array",
+                "items": { "type": "string" }
+              }
+            }
+          }
+        }
+      }
+    },
+    "artifacts": {
+      "type": "object",
+      "properties": {
+        "generated": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["id", "type", "title", "created_at", "status"],
+            "properties": {
+              "id": { "type": "string" },
+              "type": {
+                "type": "string",
+                "enum": ["persona", "journey_map", "opportunity_map"]
+              },
+              "title": { "type": "string" },
+              "created_at": {
+                "type": "string",
+                "format": "date-time"
+              },
+              "file_path": { "type": "string" },
+              "status": {
+                "type": "string",
+                "enum": ["draft", "final"]
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 

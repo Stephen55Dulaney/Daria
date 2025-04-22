@@ -1,7 +1,7 @@
 import unittest
 from vector_store import InterviewVectorStore
 import os
-from datetime import datetime
+from datetime import datetime, now
 
 class TestInterviewVectorStore(unittest.TestCase):
     def setUp(self):
@@ -56,7 +56,7 @@ I use it for work
             'id': '1',
             'project_name': 'Test Project',
             'interview_type': 'Test Type',
-            'date': datetime.now().isoformat(),
+            'date': now().isoformat(),
             'transcript': """
 Daria: How do you use the system?
 You: I use it for booking flights
@@ -90,7 +90,7 @@ You: Specifically international flights
                 'id': '1',
                 'project_name': 'Test Project 1',
                 'interview_type': 'Test Type',
-                'date': datetime.now().isoformat(),
+                'date': now().isoformat(),
                 'transcript': """
 Daria: How do you use the system?
 You: I use it for booking flights
@@ -101,7 +101,7 @@ You: I use it for booking flights
                 'id': '2',
                 'project_name': 'Test Project 2',
                 'interview_type': 'Test Type',
-                'date': datetime.now().isoformat(),
+                'date': now().isoformat(),
                 'transcript': """
 Daria: What's your experience?
 You: I also book flights regularly

@@ -428,7 +428,7 @@ Analysis:
             query_embedding = self.embeddings.embed_query(query)
             
             # Search the index with a larger k to get more potential matches
-            search_k = min(k * 15, len(self.interview_ids))  # Increased from 10x to 15x
+            search_k = min(k * 20, len(self.interview_ids))  # Increased multiplier for more candidates
             distances, indices = self.index.search(
                 np.array([query_embedding]).astype('float32'),
                 search_k
@@ -455,10 +455,10 @@ Analysis:
                         # This provides better differentiation between results
                         l2_distance = float(distances[0][i])
                         # Use a more lenient sigmoid function with a larger divisor
-                        similarity_score = 1 / (1 + np.exp(l2_distance / 10))  # Increased divisor from 8 to 10
+                        similarity_score = 1 / (1 + np.exp(l2_distance / 15))  # Increased divisor for smoother falloff
                         
                         # Skip results with very low similarity
-                        if similarity_score < 0.1:  # Increased threshold from 0.05 to 0.1
+                        if similarity_score < 0.05:  # Lowered threshold to catch more near matches
                             continue
                         
                         # Format the result with all necessary fields
@@ -587,7 +587,7 @@ class VectorStore:
                 "interview_type": interview_data.get("project", {}).get("type", ""),
                 "researcher_name": interview_data.get("researcher", {}).get("name", ""),
                 "interviewee_name": interview_data.get("interviewee", {}).get("name", ""),
-                "date": interview_data.get("date", datetime.now().isoformat()),
+                "date": datetime.now().isoformat(),
             }
             
             # Process transcript
