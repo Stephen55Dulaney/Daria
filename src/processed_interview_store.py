@@ -1,13 +1,24 @@
 import json
 import os
-from typing import List, Dict, Optional, Tuple
+from typing import List, Dict, Optional, Tuple, Set
 from datetime import datetime
 import uuid
+from sentence_transformers import SentenceTransformer, util
+import torch
+import re
 
 class ProcessedInterviewStore:
     def __init__(self, base_dir: str = "interviews/processed"):
         self.base_dir = base_dir
         self.default_project_name = "Daria Research of Researchers"
+        self.model = SentenceTransformer('multi-qa-MiniLM-L6-cos-v1')
+        self.emotion_mapping = {
+            'frustration': {'frustration', 'annoyed', 'irritated', 'angry', 'upset'},
+            'positive': {'joy', 'happiness', 'excited', 'satisfied', 'pleased', 'admiration'},
+            'innovation': {'creative', 'innovative', 'novel', 'new idea', 'improvement'},
+            'negative': {'sad', 'disappointed', 'unhappy', 'frustrated', 'confused'},
+            'neutral': {'neutral', 'calm', 'balanced'}
+        }
         os.makedirs(base_dir, exist_ok=True)
 
     def _get_interview_path(self, interview_id: str) -> str:
@@ -28,43 +39,91 @@ class ProcessedInterviewStore:
         except (FileNotFoundError, json.JSONDecodeError):
             return None
 
+    def _normalize_emotion(self, emotion: str) -> Set[str]:
+        """Map an emotion to its normalized set of related emotions."""
+        emotion = emotion.lower()
+        for category, emotions in self.emotion_mapping.items():
+            if emotion in emotions or emotion == category:
+                return emotions
+        return {emotion}
+
+    def _extract_search_criteria(self, query: str) -> Dict:
+        """Extract emotion and theme criteria from natural language query."""
+        query = query.lower()
+        criteria = {
+            'emotions': set(),
+            'themes': set(),
+            'sentiment': None
+        }
+        
+        # Check for emotion indicators
+        if any(word in query for word in ['frustration', 'frustrated', 'annoying', 'annoyed']):
+            criteria['emotions'].update(self.emotion_mapping['frustration'])
+        if any(word in query for word in ['positive', 'happy', 'good', 'great']):
+            criteria['emotions'].update(self.emotion_mapping['positive'])
+        if any(word in query for word in ['negative', 'bad', 'poor', 'pain', 'painful']):
+            criteria['emotions'].update(self.emotion_mapping['negative'])
+            criteria['sentiment'] = 'negative'
+        
+        # Check for theme indicators
+        if 'innovation' in query or 'innovative' in query:
+            criteria['themes'].add('innovation')
+        if 'team' in query:
+            criteria['themes'].add('team dynamics')
+        
+        return criteria
+
     def semantic_search(self, query: str, k: int = 10) -> List[Dict]:
-        """Search through processed interviews using semantic similarity."""
+        """Enhanced semantic search with emotion and theme filtering."""
         results = []
+        search_criteria = self._extract_search_criteria(query)
+        
+        # Encode the search query
+        query_embedding = self.model.encode(query, convert_to_tensor=True)
         
         for filename in os.listdir(self.base_dir):
             if not filename.endswith('.json'):
                 continue
                 
-            interview_id = filename[:-5]  # Remove .json extension
+            interview_id = filename[:-5]
             interview_data = self.load_interview(interview_id)
             
             if not interview_data or 'chunks' not in interview_data:
                 continue
                 
             for chunk in interview_data['chunks']:
-                # For now, use text similarity as a placeholder
-                # This should be replaced with actual semantic similarity
-                score = self._text_similarity(chunk.get('content', ''), query)
-                if score > 0:
-                    results.append({
-                        'interview_id': interview_id,
-                        'chunk_id': chunk.get('id'),
-                        'project_name': self.default_project_name,
-                        'content': chunk.get('content') or chunk.get('text') or chunk.get('combined_text', ''),
-                        'timestamp': chunk.get('timestamp'),
-                        'score': score,
-                        'metadata': {
-                            'emotion': chunk.get('emotion', 'neutral'),
-                            'emotion_intensity': chunk.get('emotion_intensity', 0.5),
-                            'themes': chunk.get('themes', []),
-                            'insight_tags': chunk.get('insight_tags', []),
-                            'related_feature': chunk.get('related_feature')
-                        }
-                    })
+                content = chunk.get('content') or chunk.get('text') or chunk.get('combined_text', '')
+                if not content:
+                    continue
+
+                # Get chunk embedding
+                chunk_embedding = self.model.encode(content, convert_to_tensor=True)
+                similarity = util.pytorch_cos_sim(query_embedding, chunk_embedding)[0][0].item()
+
+                # Apply filters based on search criteria
+                chunk_emotion = chunk.get('metadata', {}).get('emotion', '').lower()
+                chunk_themes = {theme.lower() for theme in chunk.get('metadata', {}).get('themes', [])}
+                
+                # Check if chunk matches any of the search criteria
+                emotion_match = (
+                    not search_criteria['emotions'] or
+                    any(emotion in self._normalize_emotion(chunk_emotion) 
+                        for emotion in search_criteria['emotions'])
+                )
+                theme_match = (
+                    not search_criteria['themes'] or
+                    any(theme in chunk_themes for theme in search_criteria['themes'])
+                )
+                
+                if similarity > 0.3 and (emotion_match or theme_match):
+                    results.append(self._create_search_result(
+                        interview_data=interview_data,
+                        chunk=chunk,
+                        similarity=similarity
+                    ))
         
-        # Sort by score and limit results
-        results.sort(key=lambda x: x['score'], reverse=True)
+        # Sort by similarity score
+        results.sort(key=lambda x: x['similarity'], reverse=True)
         return results[:k]
 
     def _normalize_emotion_intensity(self, intensity):
@@ -85,32 +144,120 @@ class ProcessedInterviewStore:
             return 0.5
 
     def _get_interviewee_name(self, interview_data: Dict) -> str:
-        """Extract interviewee name from interview data."""
-        # Try different possible locations for the name
+        """Extract interviewee name from interview data, prioritizing participant over researcher."""
+        # Try different possible locations for the name, prioritizing participant
         name = (
-            interview_data.get('interviewee', {}).get('name') or
-            interview_data.get('participant', {}).get('name') or
-            interview_data.get('participant_name') or
-            interview_data.get('transcript_name', 'Unknown Participant')
+            interview_data.get('metadata', {}).get('interviewee', {}).get('name') or  # Interviewee from metadata
+            interview_data.get('interviewee', {}).get('name') or  # Direct interviewee name
+            interview_data.get('metadata', {}).get('participant', {}).get('name') or  # Participant from metadata
+            interview_data.get('participant', {}).get('name') or  # Direct participant name
+            interview_data.get('participant_name') or  # Legacy participant name
+            interview_data.get('metadata', {}).get('transcript_name') or  # Transcript name
+            interview_data.get('metadata', {}).get('researcher', {}).get('name') or  # Researcher name as last resort
+            ''  # Empty string if no name found
         )
         return name
 
     def _create_search_result(self, interview_data: Dict, chunk: Dict, similarity: float = 1.0) -> Dict:
         """Create a standardized search result dictionary."""
+        # Get all possible themes from various locations
+        all_themes = []
+        chunk_themes = chunk.get('themes', [])
+        if isinstance(chunk_themes, list):
+            all_themes.extend(chunk_themes)
+        analysis_themes = chunk.get('analysis', {}).get('themes', [])
+        if isinstance(analysis_themes, list):
+            all_themes.extend(analysis_themes)
+        metadata_themes = chunk.get('metadata', {}).get('themes', [])
+        if isinstance(metadata_themes, list):
+            all_themes.extend(metadata_themes)
+        
+        # Get all possible insight tags from various locations
+        all_insight_tags = []
+        chunk_tags = chunk.get('insight_tags', [])
+        if isinstance(chunk_tags, list):
+            all_insight_tags.extend(chunk_tags)
+        analysis_tags = chunk.get('analysis', {}).get('insight_tags', [])
+        if isinstance(analysis_tags, list):
+            all_insight_tags.extend(analysis_tags)
+        metadata_tags = chunk.get('metadata', {}).get('insight_tags', [])
+        if isinstance(metadata_tags, list):
+            all_insight_tags.extend(metadata_tags)
+
+        # Get emotion data from various possible locations
+        emotion = (
+            chunk.get('emotion') or 
+            chunk.get('analysis', {}).get('emotion') or 
+            chunk.get('metadata', {}).get('emotion') or 
+            'neutral'
+        )
+        
+        emotion_intensity = (
+            chunk.get('emotion_intensity') or 
+            chunk.get('analysis', {}).get('emotion_intensity') or 
+            chunk.get('metadata', {}).get('emotion_intensity') or 
+            0.5
+        )
+
+        # Handle entries and speaker information
+        entries = chunk.get('entries', [])
+        if not entries:
+            # Get speaker from the most reliable source, prioritizing participant
+            speaker = (
+                interview_data.get('metadata', {}).get('interviewee', {}).get('name') or  # Interviewee from metadata
+                interview_data.get('interviewee', {}).get('name') or  # Direct interviewee name
+                chunk.get('metadata', {}).get('participant', {}).get('name') or  # Participant name from metadata
+                chunk.get('participant', {}).get('name') or  # Direct participant name
+                chunk.get('participant_name') or  # Legacy participant name
+                chunk.get('speaker') or  # Direct speaker field
+                chunk.get('metadata', {}).get('speaker') or  # Metadata speaker
+                interview_data.get('metadata', {}).get('researcher', {}).get('name') or  # Researcher name as last resort
+                ''  # Empty string if no speaker found
+            )
+            
+            # Get content from the most appropriate source
+            content = (
+                chunk.get('combined_text') or  # First try combined_text
+                chunk.get('analysis', {}).get('text') or  # Then try analysis text
+                chunk.get('text') or  # Then try regular text
+                chunk.get('content', '')  # Finally try content
+            )
+            
+            if content:
+                entries = [{
+                    'speaker': speaker,
+                    'text': content,
+                    'timestamp': chunk.get('timestamp', '')
+                }]
+
+        # Get the content from the most appropriate source
+        content = (
+            chunk.get('combined_text') or  # First try combined_text
+            (entries[0].get('text') if entries else '') or  # Then try first entry's text
+            chunk.get('analysis', {}).get('text') or  # Then try analysis text
+            chunk.get('text') or  # Then try regular text
+            chunk.get('content', '')  # Finally try content
+        )
+
+        # Get the interviewee name
+        interviewee_name = self._get_interviewee_name(interview_data)
+
         return {
             'interview_id': interview_data.get('id'),
             'chunk_id': chunk.get('id') or str(uuid.uuid4()),
             'project_name': self.default_project_name,
-            'content': chunk.get('content') or chunk.get('text') or chunk.get('combined_text', ''),
+            'content': content,
             'timestamp': chunk.get('timestamp') or datetime.now().isoformat(),
-            'interviewee_name': self._get_interviewee_name(interview_data),
+            'interviewee_name': interviewee_name,
+            'transcript_name': interview_data.get('metadata', {}).get('transcript_name', ''),
+            'entries': entries,
             'similarity': similarity,
             'metadata': {
-                'emotion': chunk.get('emotion', 'neutral'),
-                'emotion_intensity': self._normalize_emotion_intensity(chunk.get('emotion_intensity')),
-                'themes': chunk.get('themes', []),
-                'insight_tags': chunk.get('insight_tags', []),
-                'related_feature': chunk.get('related_feature')
+                'emotion': emotion,
+                'emotion_intensity': self._normalize_emotion_intensity(emotion_intensity),
+                'themes': list(set(all_themes)),  # Remove duplicates
+                'insight_tags': list(set(all_insight_tags)),  # Remove duplicates
+                'related_feature': chunk.get('related_feature') or chunk.get('metadata', {}).get('related_feature')
             }
         }
 
@@ -296,15 +443,17 @@ class ProcessedInterviewStore:
         return results[:limit]
 
     def search(self, query: str, search_type: str = 'text', limit: int = 10) -> List[Dict]:
-        """Search through processed interviews based on the specified type."""
-        if search_type == 'text':
-            results = self.text_search(query, limit)
-        elif search_type == 'semantic':
+        """Enhanced search method that handles natural language queries."""
+        if search_type == 'semantic':
             results = self.semantic_search(query, limit)
         elif search_type == 'emotion':
             results = self.emotion_search(query, limit)
+        elif search_type == 'theme':
+            results = self.theme_search(query, limit)
         elif search_type == 'insight':
             results = self.insight_tag_search(query, limit)
+        elif search_type == 'text':
+            results = self.text_search(query, limit)
         else:
             raise ValueError(f"Invalid search type: {search_type}")
 

@@ -4057,57 +4057,86 @@ app.jinja_env.filters['markdown'] = markdown
 
 @app.route('/api/search/advanced', methods=['POST'])
 def api_advanced_search():
-    """Advanced search endpoint that supports text, semantic, emotion, and insight tag searches."""
+    """Advanced search endpoint that supports natural language queries and various search types."""
     try:
         data = request.get_json()
+        if not data:
+            app.logger.error("No JSON data received in request")
+            return jsonify({'error': 'No search data provided'}), 400
+
         query = data.get('query', '').strip()
-        search_type = data.get('type', 'text').lower()
+        search_type = data.get('type', 'semantic').lower()  # Default to semantic search
         limit = data.get('limit', 10)
+
+        app.logger.info(f"Processing advanced search - Query: '{query}', Type: {search_type}, Limit: {limit}")
 
         if not query:
             return jsonify({'error': 'Query cannot be empty'}), 400
 
-        if search_type not in ['text', 'semantic', 'emotion', 'insight']:
+        if search_type not in ['text', 'semantic', 'emotion', 'insight', 'theme']:
+            app.logger.error(f"Invalid search type received: {search_type}")
             return jsonify({'error': f'Invalid search type: {search_type}'}), 400
 
         # Initialize the ProcessedInterviewStore
         store = ProcessedInterviewStore()
         
-        # Perform the search based on type
-        results = store.search(query, search_type=search_type, limit=limit)
-        
-        # Format results for response
-        formatted_results = []
-        for result in results:
-            formatted_result = {
-                'interview_id': result['interview_id'],
-                'chunk_id': result['chunk_id'],
-                'project_name': result['project_name'],
-                'content': result['content'],
-                'similarity': result['similarity'],
-                'timestamp': result['timestamp'],
-                'interviewee_name': result.get('interviewee_name', ''),
-                'transcript_name': result.get('transcript_name', ''),
-                'metadata': {
-                    'emotion': result['metadata'].get('emotion', 'neutral'),
-                    'emotion_intensity': result['metadata'].get('emotion_intensity', 0.5),
-                    'themes': result['metadata'].get('themes', []),
-                    'insight_tags': result['metadata'].get('insight_tags', []),
-                    'related_feature': result['metadata'].get('related_feature')
+        try:
+            # Perform the search based on type
+            app.logger.info(f"Executing {search_type} search...")
+            results = store.search(query, search_type=search_type, limit=limit)
+            app.logger.info(f"Search completed. Found {len(results)} results")
+            
+            # Format results for response
+            formatted_results = []
+            for result in results:
+                formatted_result = {
+                    'interview_id': result['interview_id'],
+                    'chunk_id': result['chunk_id'],
+                    'project_name': result['project_name'],
+                    'content': result['content'],
+                    'similarity': result.get('similarity', 1.0),
+                    'timestamp': result['timestamp'],
+                    'interviewee_name': result.get('interviewee_name', ''),
+                    'transcript_name': result.get('transcript_name', ''),
+                    'metadata': {
+                        'emotion': result['metadata'].get('emotion', 'neutral'),
+                        'emotion_intensity': result['metadata'].get('emotion_intensity', 0.5),
+                        'themes': result['metadata'].get('themes', []),
+                        'insight_tags': result['metadata'].get('insight_tags', []),
+                        'related_feature': result['metadata'].get('related_feature')
+                    }
                 }
-            }
-            formatted_results.append(formatted_result)
+                formatted_results.append(formatted_result)
 
-        return jsonify({
-            'results': formatted_results,
-            'total': len(formatted_results),
-            'query': query,
-            'type': search_type
-        })
+            response_data = {
+                'results': formatted_results,
+                'total': len(formatted_results),
+                'query': query,
+                'type': search_type,
+                'message': f"Found {len(formatted_results)} results for your search"
+            }
+
+            if not formatted_results:
+                app.logger.info(f"No results found for query: '{query}'")
+                response_data['message'] = "No results found. Try adjusting your search terms or using a different search type."
+
+            return jsonify(response_data)
+
+        except Exception as search_error:
+            app.logger.error(f"Error during search operation: {str(search_error)}")
+            app.logger.error(traceback.format_exc())
+            return jsonify({
+                'error': 'Error performing search',
+                'message': 'An error occurred while searching. Please try again or contact support if the problem persists.'
+            }), 500
 
     except Exception as e:
-        app.logger.error(f"Error in advanced search: {str(e)}")
-        return jsonify({'error': 'Internal server error'}), 500
+        app.logger.error(f"Error in advanced search endpoint: {str(e)}")
+        app.logger.error(traceback.format_exc())
+        return jsonify({
+            'error': 'Internal server error',
+            'message': 'An unexpected error occurred. Please try again later.'
+        }), 500
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5003) 
