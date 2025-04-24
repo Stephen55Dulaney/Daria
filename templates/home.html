@@ -13,7 +13,7 @@
                     <p class="text-gray-600 mt-1">Manage your UX research projects and activities</p>
                 </div>
                 <div class="flex space-x-4">
-                    <button onclick="window.location.href='{{ url_for('new_project') }}'" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700">
+                    <button onclick="window.location.href='{{ url_for('new_project') }}'" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
                         Start New Project
                     </button>
                 </div>
@@ -21,59 +21,37 @@
         </div>
     </div>
 
-    <!-- Projects Section -->
+    <!-- Current Project -->
+    {% if projects %}
+    {% with project = projects[0] %}
     <div class="mb-8">
         <div class="bg-white rounded-lg shadow-lg p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Active Projects</h2>
-            {% if projects %}
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {% for project in projects %}
-                <div class="bg-white border rounded-lg shadow-sm hover:shadow-md transition-shadow">
-                    <div class="p-6">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="text-lg font-medium text-gray-900">
-                                    <a href="{{ url_for('project_dashboard', project_id=project.id) }}" class="hover:text-indigo-600">
-                                        {{ project.name }}
-                                    </a>
-                                </h3>
-                                <p class="mt-1 text-sm text-gray-500">{{ project.description }}</p>
-                            </div>
-                            <div class="flex items-start space-x-2">
-                                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium {{ 'bg-green-100 text-green-800' if project.status == 'active' else 'bg-gray-100 text-gray-800' }}">
-                                    {{ project.status|title }}
-                                </span>
-                                <button onclick="confirmDelete('project', '{{ project.id }}', '{{ project.name }}')"
-                                        class="text-gray-400 hover:text-red-500">
-                                    <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                                    </svg>
-                                </button>
-                            </div>
-                        </div>
-                        <div class="mt-4 flex justify-between items-center">
-                            <div class="text-sm text-gray-500">
-                                Started {{ project.start_date|strftime }}
-                            </div>
-                            <a href="{{ url_for('project_dashboard', project_id=project.id) }}" 
-                               class="text-sm font-medium text-indigo-600 hover:text-indigo-500">
-                                View Project →
-                            </a>
-                        </div>
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900">{{ project.name }}</h2>
+                    <p class="mt-1 text-gray-600">{{ project.description or "Research project to understand researcher workflows and needs" }}</p>
+                    <div class="mt-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Active Project
+                        </span>
                     </div>
                 </div>
-                {% endfor %}
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('project_dashboard', project_id=project.id) }}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        View Project Dashboard
+                    </a>
+                </div>
             </div>
-            {% else %}
-            <p class="text-gray-500 text-center py-4">No active projects. Click "Start New Project" to create one.</p>
-            {% endif %}
         </div>
     </div>
+    {% endwith %}
+    {% endif %}
 
     <!-- Main Grid Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
         <!-- Left Column -->
-        <div class="lg:col-span-3 space-y-8">
+        <div class="lg:col-span-4 space-y-8">
             <!-- Quick Actions -->
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
@@ -93,43 +71,28 @@
                 </div>
             </div>
 
-            <!-- Upcoming Milestones -->
+            <!-- Research Stats -->
             <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Upcoming Milestones</h2>
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Research Stats</h2>
                 <div class="space-y-3">
-                    <p class="text-gray-500 text-sm">No upcoming milestones</p>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Interviews</span>
+                        <span class="font-medium">{{ recent_interviews|length }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Personas</span>
+                        <span class="font-medium">{{ recent_personas|length }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Journey Maps</span>
+                        <span class="font-medium">{{ recent_journey_maps|length }}</span>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Middle Column -->
-        <div class="lg:col-span-6 space-y-8">
-            <!-- Resume Work -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Resume Where You Left Off</h2>
-                {% if recent_interviews %}
-                <div class="space-y-4">
-                    {% for interview in recent_interviews[:1] %}
-                    <div class="bg-gray-50 rounded-lg p-4">
-                        <div class="flex justify-between items-start">
-                            <div>
-                                <h3 class="font-medium text-gray-900">{{ interview.project_name }}</h3>
-                                <p class="text-sm text-gray-500">{{ interview.interview_type }}</p>
-                                <p class="text-xs text-gray-400 mt-1">{{ interview.date.split('T')[0] }}</p>
-                            </div>
-                            <div class="flex space-x-2">
-                                <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" 
-                                   class="text-sm text-indigo-600 hover:text-indigo-500">View</a>
-                            </div>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                {% else %}
-                <p class="text-gray-500 text-sm">No recent work to resume</p>
-                {% endif %}
-            </div>
-
+        <!-- Right Column -->
+        <div class="lg:col-span-8 space-y-8">
             <!-- Recent Activity -->
             <div class="bg-white rounded-lg shadow-lg p-6">
                 <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
@@ -148,8 +111,6 @@
                                    class="text-sm text-indigo-600 hover:text-indigo-500">Transcript</a>
                                 <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
                                    class="text-sm text-green-600 hover:text-green-500">Analysis</a>
-                                <button onclick="confirmDelete('interview', '{{ interview.id }}', '{{ interview.project_name }}')"
-                                        class="text-sm text-red-600 hover:text-red-500">Delete</button>
                             </div>
                         </div>
                     </div>
@@ -157,28 +118,6 @@
                     {% else %}
                     <p class="text-gray-500 text-sm">No recent activity</p>
                     {% endif %}
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column -->
-        <div class="lg:col-span-3 space-y-8">
-            <!-- Research Stats -->
-            <div class="bg-white rounded-lg shadow-lg p-6">
-                <h2 class="text-lg font-semibold text-gray-900 mb-4">Research Stats</h2>
-                <div class="space-y-3">
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Interviews</span>
-                        <span class="font-medium">{{ recent_interviews|length }}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Personas</span>
-                        <span class="font-medium">{{ recent_personas|length }}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                        <span class="text-gray-600">Journey Maps</span>
-                        <span class="font-medium">{{ recent_journey_maps|length }}</span>
-                    </div>
                 </div>
             </div>
 

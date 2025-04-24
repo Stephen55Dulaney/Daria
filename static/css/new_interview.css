@@ -1,0 +1,179 @@
+/* New Interview Form Styles */
+.container {
+    max-width: 1200px;
+    padding: 2rem;
+}
+
+h1 {
+    color: #2c3e50;
+    font-weight: 600;
+    margin-bottom: 2rem;
+    font-size: 2.2rem;
+}
+
+.card {
+    border: none;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    border-radius: 12px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.card-title {
+    color: #2c3e50;
+    font-weight: 600;
+    font-size: 1.25rem;
+    margin-bottom: 1.5rem;
+}
+
+.card-body {
+    padding: 2rem;
+}
+
+/* Form Controls */
+.form-label {
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 0.5rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    transition: all 0.2s ease;
+}
+
+.form-control:focus, .form-select:focus {
+    border-color: #4299e1;
+    box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.15);
+}
+
+.form-control::placeholder {
+    color: #a0aec0;
+}
+
+textarea.form-control {
+    min-height: 100px;
+}
+
+/* Section Headers */
+h5.mt-4 {
+    color: #2d3748;
+    font-weight: 600;
+    margin: 2rem 0 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 2px solid #edf2f7;
+}
+
+/* Submit Button */
+.btn-primary {
+    background-color: #4299e1;
+    border: none;
+    padding: 0.75rem 2rem;
+    font-weight: 600;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+    background-color: #3182ce;
+    transform: translateY(-1px);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+}
+
+/* Error Alert */
+.alert-danger {
+    background-color: #fff5f5;
+    border: 1px solid #feb2b2;
+    color: #c53030;
+    border-radius: 8px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+/* Guidelines Section */
+#guidelineContent {
+    color: #4a5568;
+}
+
+#guidelineContent h6 {
+    color: #2d3748;
+    font-weight: 600;
+    margin-bottom: 1rem;
+}
+
+#guidelineContent ul {
+    padding-left: 1.25rem;
+}
+
+#guidelineContent li {
+    margin-bottom: 0.5rem;
+    line-height: 1.5;
+}
+
+/* Analysis Template */
+pre.bg-light {
+    background-color: #f7fafc !important;
+    border-radius: 8px;
+    padding: 1.5rem !important;
+    color: #4a5568;
+    font-size: 0.875rem;
+    line-height: 1.7;
+    border: 1px solid #e2e8f0;
+}
+
+/* Helper Text */
+.text-muted {
+    color: #718096 !important;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+    .container {
+        padding: 1rem;
+    }
+    
+    .card-body {
+        padding: 1.5rem;
+    }
+    
+    h1 {
+        font-size: 1.8rem;
+        margin-bottom: 1.5rem;
+    }
+}
+
+/* Invalid Feedback */
+.invalid-feedback {
+    color: #e53e3e;
+    font-size: 0.875rem;
+    margin-top: 0.25rem;
+}
+
+/* Form Sections Animation */
+.mb-3 {
+    transition: opacity 0.3s ease;
+}
+
+/* Loading State */
+.form-loading {
+    opacity: 0.7;
+    pointer-events: none;
+}
+
+/* Required Field Indicator */
+.form-label.required::after {
+    content: "*";
+    color: #e53e3e;
+    margin-left: 0.25rem;
+} 

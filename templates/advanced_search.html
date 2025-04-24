@@ -1,127 +1,213 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<!-- Add Vue.js -->
+<script src="https://cdn.jsdelivr.net/npm/vue@2.6.14"></script>
+{% endblock %}
+
 {% block content %}
 <div class="container mt-4">
     <h2>Advanced Search</h2>
     
-    <div class="card mb-4">
-        <div class="card-body">
-            <form id="searchForm" onsubmit="performSearch(event)">
-                <div class="mb-3">
-                    <label for="searchQuery" class="form-label">Search Query</label>
-                    <input type="text" class="form-control" id="searchQuery" required>
-                </div>
-                
-                <div class="mb-3">
-                    <label for="searchType" class="form-label">Search Type</label>
-                    <select class="form-select" id="searchType">
-                        <option value="general">General</option>
-                        <option value="emotion">Emotion</option>
-                        <option value="sentiment">Sentiment</option>
-                    </select>
-                    <div class="form-text mt-2">
-                        <strong>Search Types:</strong>
-                        <ul class="mt-1">
-                            <li><strong>General:</strong> Basic search across all interview content</li>
-                            <li><strong>Emotion:</strong> Find specific emotional states (e.g., "happy", "sad", "anxious") and emotional experiences</li>
-                            <li><strong>Sentiment:</strong> Analyze attitudes and opinions about topics (e.g., "positive about product", "negative experience with service")</li>
-                        </ul>
+    <div id="searchApp" v-cloak>
+        {% raw %}
+        <!-- Search form -->
+        <form @submit.prevent="performSearch" class="mb-4">
+            <div class="form-group">
+                <input type="text" class="form-control" v-model="searchQuery" placeholder="Enter search query">
+            </div>
+            <div class="form-group mt-2">
+                <select class="form-control" v-model="searchType">
+                    <option value="text">Text Search</option>
+                    <option value="semantic">Semantic Search</option>
+                    <option value="emotion">Emotion Search</option>
+                    <option value="insight">Insight Tag Search</option>
+                    <option value="theme">Theme Search</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary mt-2">Search</button>
+        </form>
+
+        <!-- Message display -->
+        <div v-if="message" class="alert" :class="messageClass" v-text="message"></div>
+        
+        <!-- Loading indicator -->
+        <div v-if="loading && hasSearched" class="text-center">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Searching...</span>
+            </div>
+            <div class="mt-2">Searching...</div>
+        </div>
+
+        <!-- Results -->
+        <div v-if="hasSearched && !loading && results.length > 0">
+            <div v-for="result in results" :key="result.chunk_id" class="card mb-3">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                            <h5 class="card-title mb-1">
+                                <span v-if="result.interviewee_name" class="text-primary">{{ result.interviewee_name }}</span>
+                                <span v-else-if="result.transcript_name" class="text-primary">{{ result.transcript_name }}</span>
+                                <span v-else class="text-muted">Untitled Interview</span>
+                            </h5>
+                            <div class="d-flex align-items-center gap-2">
+                                <h6 class="card-subtitle text-muted mb-0">{{ result.project_name }}</h6>
+                                <span class="text-muted">•</span>
+                                <small class="text-muted" v-text="formatDate(result.timestamp)"></small>
+                            </div>
+                        </div>
+                        <div>
+                            <span class="badge" :class="'bg-' + getEmotionColor(result.metadata.emotion)">
+                                {{ result.metadata.emotion }} {{ Math.round(result.metadata.emotion_intensity * 100) }}%
+                            </span>
+                        </div>
+                    </div>
+                    <p class="card-text" v-text="result.content"></p>
+                    <div class="d-flex flex-wrap gap-2 mb-3">
+                        <span v-for="theme in result.metadata.themes" class="badge bg-secondary">{{ theme }}</span>
+                        <span v-for="tag in result.metadata.insight_tags" class="badge bg-info">{{ tag }}</span>
+                    </div>
+                    <div class="position-relative mb-4">
+                        <div class="progress" style="height: 24px;">
+                            <div class="progress-bar" :class="getEmotionColor(result.metadata.emotion)"
+                                :style="{ width: (result.metadata.emotion_intensity * 100) + '%' }"
+                                role="progressbar"
+                                :aria-valuenow="result.metadata.emotion_intensity * 100"
+                                aria-valuemin="0"
+                                aria-valuemax="100">
+                            </div>
+                        </div>
+                        <div class="position-absolute" :style="{ left: (result.metadata.emotion_intensity * 100) + '%', transform: 'translateX(-50%)', top: '-10px' }">
+                            <span class="badge" :class="getEmotionColor(result.metadata.emotion)">
+                                {{ result.metadata.emotion }} ({{ Math.round(result.metadata.emotion_intensity * 100) }}%)
+                            </span>
+                        </div>
+                    </div>
+                    <div class="mt-2 d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Similarity Score: {{ (result.similarity * 100).toFixed(2) }}%</small>
+                        <a :href="'/transcript/' + result.interview_id" class="btn btn-sm btn-outline-primary">View Full Interview</a>
                     </div>
                 </div>
-                
-                <div class="mb-3">
-                    <label for="resultLimit" class="form-label">Number of Results (1-20)</label>
-                    <input type="number" class="form-control" id="resultLimit" min="1" max="20" value="10">
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Search</button>
-            </form>
+            </div>
         </div>
-    </div>
-    
-    <div id="searchResults" class="mt-4" style="display: none;">
-        <h3>Search Results</h3>
-        <div id="resultsList" class="list-group">
-            <!-- Results will be populated here -->
-        </div>
+        {% endraw %}
     </div>
 </div>
 
-<script>
-async function performSearch(event) {
-    event.preventDefault();
-    
-    const query = document.getElementById('searchQuery').value;
-    const searchType = document.getElementById('searchType').value;
-    const k = parseInt(document.getElementById('resultLimit').value);
-    
-    try {
-        const response = await fetch('/advanced_search', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({
-                query: query,
-                search_type: searchType,
-                k: k
-            })
-        });
-        
-        const data = await response.json();
-        
-        if (data.error) {
-            alert(data.error);
-            return;
-        }
-        
-        displayResults(data.results);
-    } catch (error) {
-        console.error('Error:', error);
-        alert('An error occurred while performing the search');
-    }
+<style>
+[v-cloak] {
+    display: none;
 }
+</style>
+{% endblock %}
 
-function displayResults(results) {
-    const resultsDiv = document.getElementById('searchResults');
-    const resultsList = document.getElementById('resultsList');
-    resultsList.innerHTML = '';
-    
-    if (results.length === 0) {
-        resultsList.innerHTML = '<div class="list-group-item">No results found</div>';
-    } else {
-        results.forEach(result => {
-            const resultItem = document.createElement('div');
-            resultItem.className = 'list-group-item';
+{% block scripts %}
+<script>
+// Create Vue instance
+new Vue({
+    el: '#searchApp',
+    data: {
+        results: [],
+        message: '',
+        messageClass: 'alert-info',
+        loading: false,
+        searchQuery: '',
+        searchType: 'text',
+        hasSearched: false
+    },
+    methods: {
+        async performSearch() {
+            if (!this.searchQuery.trim()) {
+                this.message = 'Please enter a search query';
+                this.messageClass = 'alert-warning';
+                return;
+            }
+
+            this.loading = true;
+            this.hasSearched = true;
+            this.results = [];
+            this.message = '';
             
-            const score = Math.round(result.similarity * 100);
-            const content = result.content.replace(/\n/g, '<br>');  // Convert newlines to HTML line breaks
-            
-            resultItem.innerHTML = `
-                <div class="d-flex justify-content-between align-items-start mb-2">
-                    <div>
-                        <h5 class="mb-1">${result.project_name}</h5>
-                        <small class="text-muted">
-                            Interview Type: ${result.interview_type} | 
-                            Date: ${result.date}
-                        </small>
-                    </div>
-                    <span class="badge bg-primary">${score}% Match</span>
-                </div>
-                <div class="mb-2">
-                    <small class="text-muted">Interview ID: ${result.interview_id}</small>
-                </div>
-                <div class="content-preview mb-2">
-                    ${content}
-                </div>
-                <a href="/interview/${result.interview_id}" class="btn btn-sm btn-outline-primary">View Full Interview</a>
-            `;
-            
-            resultsList.appendChild(resultItem);
-        });
+            try {
+                const response = await fetch('/api/search/advanced', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: this.searchQuery,
+                        type: this.searchType,
+                        limit: 10
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (data.error) {
+                    this.message = data.error;
+                    this.messageClass = 'alert-danger';
+                    return;
+                }
+                
+                if (!data.results.length) {
+                    this.message = 'No results found';
+                    this.messageClass = 'alert-info';
+                    return;
+                }
+                
+                this.results = data.results;
+                this.message = data.message;
+                this.messageClass = 'alert-info';
+                
+            } catch (error) {
+                this.message = `Error performing search: ${error.message}`;
+                this.messageClass = 'alert-danger';
+            } finally {
+                this.loading = false;
+            }
+        },
+        formatDate(timestamp) {
+            return new Date(timestamp).toLocaleString();
+        },
+        getEmotionColor(emotion) {
+            const colors = {
+                // Positive emotions
+                'joy': 'success',
+                'happiness': 'success',
+                'love': 'success',
+                'gratitude': 'success',
+                'admiration': 'success',
+                'approval': 'success',
+                'optimism': 'success',
+                'amusement': 'success',
+                
+                // Negative emotions
+                'sadness': 'info',
+                'disappointment': 'info',
+                'frustration': 'danger',
+                'anger': 'danger',
+                'annoyance': 'danger',
+                'remorse': 'danger',
+                'confusion': 'warning',
+                
+                // Neutral emotions
+                'neutral': 'secondary',
+                'calm': 'secondary',
+                'caring': 'info',
+                
+                // Alert emotions
+                'fear': 'warning',
+                'anxiety': 'warning',
+                'concern': 'warning',
+                
+                // Engagement emotions
+                'surprise': 'primary',
+                'interest': 'primary',
+                'curiosity': 'primary'
+            };
+            return 'bg-' + (colors[emotion?.toLowerCase()] || 'secondary');
+        }
     }
-    
-    resultsDiv.style.display = 'block';
-}
+});
 </script>
 {% endblock %} 

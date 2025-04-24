@@ -29,6 +29,11 @@ from langchain.schema import SystemMessage, HumanMessage
 from langchain.vectorstores import VectorStore
 import MySQLdb
 from werkzeug.utils import secure_filename
+import re
+import markdown2
+from semantic_analysis import SemanticAnalyzer
+from sklearn.metrics.pairwise import cosine_similarity
+from src.processed_interview_store import ProcessedInterviewStore
 
 # Global variables
 vector_store = None
@@ -37,7 +42,7 @@ vector_store = None
 app = Flask(__name__)
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev')
 app.config['UPLOAD_FOLDER'] = 'uploads'
-app.config['INTERVIEWS_DIR'] = 'interviews'
+app.config['INTERVIEWS_DIR'] = 'interviews/raw'
 app.config['VECTOR_STORE_PATH'] = 'vector_store'
 app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')  # Add OpenAI API key configuration
 
@@ -75,8 +80,8 @@ interview_prompts = {}
 conversations = {}
 
 # Add after the existing configuration
-INTERVIEWS_DIR = Path('interviews')
-INTERVIEWS_DIR.mkdir(exist_ok=True)
+INTERVIEWS_DIR = Path('interviews/raw')
+INTERVIEWS_DIR.mkdir(parents=True, exist_ok=True)
 
 # Add after INTERVIEWS_DIR definition
 PERSONAS_DIR = Path('personas')
@@ -92,71 +97,83 @@ logger = logging.getLogger(__name__)
 # Initialize vector store
 app.vector_store = None
 
+# Initialize semantic analyzer
+semantic_analyzer = SemanticAnalyzer()
+
+# Add emotion icon filter
+@app.template_filter('emotion_icon')
+def emotion_icon_filter(emotion):
+    """Convert emotion name to emoji icon."""
+    emotion_icons = {
+        'happy': '😊',
+        'sad': '😢',
+        'angry': '😠',
+        'neutral': '😐',
+        'excited': '🤩',
+        'frustrated': '😤',
+        'confused': '😕',
+        'anxious': '😰',
+        'satisfied': '😌',
+        'disappointed': '😞'
+    }
+    return emotion_icons.get(emotion.lower(), '😐')
+
 # Helper functions
 def list_interviews():
     """List all saved interviews."""
     try:
+        logger.info("Listing saved interviews...")
+        interviews_dir = os.path.join(app.root_path, 'interviews', 'raw')
+        
+        # Create directory if it doesn't exist
+        if not os.path.exists(interviews_dir):
+            os.makedirs(interviews_dir)
+            logger.info("Created interviews directory")
+            return []
+        
         interviews = []
+        for filename in os.listdir(interviews_dir):
+            if not filename.endswith('.json'):
+                continue
+                
+            file_path = os.path.join(interviews_dir, filename)
+            try:
+                with open(file_path, 'r') as f:
+                    interview = json.load(f)
+                    
+                # Extract interview ID from filename
+                interview_id = os.path.splitext(filename)[0]
+                
+                # Create summary dictionary using transcript_name directly
+                summary = {
+                    'id': interview_id,
+                    'title': interview.get('title', 'Untitled Interview'),
+                    'type': interview.get('interview_type', 'Interview'),
+                    'created_at': interview.get('created_at', datetime.now().isoformat()),
+                    'participant_name': interview.get('transcript_name', 'Untitled Interview'),
+                    'project_name': interview.get('project_name', 'Unassigned'),
+                    'transcript_name': interview.get('transcript_name', ''),
+                    'metadata': interview.get('metadata', {}),
+                    'has_analysis': bool(interview.get('analysis')),
+                    'content_preview': _get_content_preview(interview)
+                }
+                
+                interviews.append(summary)
+                logger.info(f"Added interview: {interview_id} - {summary['participant_name']}")
+                
+            except json.JSONDecodeError as e:
+                logger.error(f"Error decoding JSON from {filename}: {str(e)}")
+                continue
+            except Exception as e:
+                logger.error(f"Error processing {filename}: {str(e)}")
+                continue
         
-        # Create interviews directory if it doesn't exist
-        if not os.path.exists('interviews'):
-            os.makedirs('interviews')
-            return interviews
-            
-        # List all JSON files in interviews directory
-        for filename in os.listdir('interviews'):
-            if filename.endswith('.json'):
-                try:
-                    with open(os.path.join('interviews', filename)) as f:
-                        interview = json.load(f)
-                        
-                    # Ensure created_at exists
-                    if not interview.get('created_at'):
-                        interview['created_at'] = datetime.now().isoformat()
-                        
-                    # Extract metadata for display
-                    interview_summary = {
-                        'id': interview.get('id', filename.replace('.json', '')),
-                        'title': interview.get('title', 'Untitled Interview'),
-                        'type': interview.get('type', 'interview'),
-                        'project_id': interview.get('project_id', ''),
-                        'created_at': interview.get('created_at'),
-                        'created_by': interview.get('created_by', ''),
-                        'participant_name': interview.get('metadata', {}).get('participant', {}).get('name', 'Anonymous'),
-                        'role': interview.get('metadata', {}).get('participant', {}).get('role', 'Unknown'),
-                        'department': interview.get('metadata', {}).get('participant', {}).get('department', ''),
-                        'date': interview.get('metadata', {}).get('session', {}).get('date'),
-                        'duration': interview.get('metadata', {}).get('session', {}).get('duration'),
-                        'format': interview.get('metadata', {}).get('session', {}).get('format', 'text'),
-                        'language': interview.get('metadata', {}).get('session', {}).get('language', 'en'),
-                        'researcher': interview.get('metadata', {}).get('researcher', {}).get('name', ''),
-                        'chunk_count': len(interview.get('chunks', [])),
-                        'has_analysis': bool(interview.get('analysis')),
-                        'content_preview': _get_content_preview(interview)
-                    }
-                    
-                    # Add to list if it has required fields
-                    if interview_summary['id'] and interview_summary['created_at']:
-                        interviews.append(interview_summary)
-                    
-                except json.JSONDecodeError as e:
-                    logger.error(f"Error decoding {filename}: {str(e)}")
-                    continue
-                except Exception as e:
-                    logger.error(f"Error processing {filename}: {str(e)}")
-                    continue
-                    
-        # Sort by date, most recent first, handling None values
-        interviews.sort(
-            key=lambda x: x.get('created_at') or '1970-01-01T00:00:00',
-            reverse=True
-        )
-        
+        # Sort by date, most recent first
+        interviews.sort(key=lambda x: x['created_at'], reverse=True)
         return interviews
         
     except Exception as e:
         logger.error(f"Error listing interviews: {str(e)}")
-        logger.error(traceback.format_exc())
         return []
 
 def _get_content_preview(interview: dict, max_length: int = 200) -> str:
@@ -267,13 +284,36 @@ def save_interview_data(project_name, interview_type, transcript, analysis=None,
         if isinstance(transcript, str):
             # Split transcript into chunks by speaker
             lines = transcript.split('\n')
-            current_chunk = {'text': '', 'speaker': '', 'start_time': None, 'end_time': None}
+            current_chunk = {
+                'text': '', 
+                'speaker': '', 
+                'start_time': None, 
+                'end_time': None,
+                'metadata': {
+                    'emotion': None,
+                    'theme': [],
+                    'insightTag': []
+                }
+            }
             
             for line in lines:
                 if ': ' in line:  # New speaker
                     if current_chunk['text']:  # Save previous chunk
+                        # Process semantic data for the chunk before saving
+                        semantic_data = analyze_chunk_semantics(current_chunk['text'])
+                        current_chunk['metadata'].update(semantic_data)
                         transcript_chunks.append(current_chunk)
-                        current_chunk = {'text': '', 'speaker': '', 'start_time': None, 'end_time': None}
+                        current_chunk = {
+                            'text': '', 
+                            'speaker': '', 
+                            'start_time': None, 
+                            'end_time': None,
+                            'metadata': {
+                                'emotion': None,
+                                'theme': [],
+                                'insightTag': []
+                            }
+                        }
                     
                     speaker, text = line.split(': ', 1)
                     current_chunk['speaker'] = speaker
@@ -282,6 +322,9 @@ def save_interview_data(project_name, interview_type, transcript, analysis=None,
                     current_chunk['text'] += f"\n{line}"
             
             if current_chunk['text']:  # Save last chunk
+                # Process semantic data for the final chunk
+                semantic_data = analyze_chunk_semantics(current_chunk['text'])
+                current_chunk['metadata'].update(semantic_data)
                 transcript_chunks.append(current_chunk)
         else:
             transcript_chunks = transcript  # Assume pre-chunked format
@@ -330,80 +373,35 @@ def save_interview_data(project_name, interview_type, transcript, analysis=None,
         else:
             title = f"Interview with {participant_name} - {interview_date}"
 
-        # If analysis is not provided, create a structured template
-        if not analysis:
-            analysis = {
-                'key_points': [],
-                'user_needs': [],
-                'pain_points': [],
-                'recommendations': [],
-                'insights': [],
-                'notable_quotes': []
-            }
-        elif isinstance(analysis, str):
-            # Convert string analysis to structured format
-            analysis = {
-                'raw_text': analysis,
-                'key_points': [],
-                'user_needs': [],
-                'pain_points': [],
-                'recommendations': [],
-                'insights': [],
-                'notable_quotes': []
-            }
-            
-        # Prepare metadata
+        # Process metadata
         metadata = {
-            'researcher': {
-                'name': '',
-                'email': '',
-                'role': 'UX Researcher'
-            },
             'participant': {
                 'name': participant_name,
-                'role': '',
-                'department': '',
-                'experience_level': '',
-                'consent_given': True
+                'role': form_data.get('role', '') if form_data else '',
+                'department': form_data.get('department', '') if form_data else '',
+                'experience_level': form_data.get('experience_level', '') if form_data else ''
+            },
+            'researcher': {
+                'name': form_data.get('author', 'system') if form_data else 'system',
+                'email': form_data.get('researcher_email', '') if form_data else ''
             },
             'session': {
                 'date': interview_date,
-                'duration': None,
+                'duration': None,  # Will be calculated from chunks if available
                 'format': 'text',
-                'language': 'en',
-                'notes': ''
+                'language': 'en'
             }
         }
-        
-        # Add form data if provided
-        if form_data:
-            if isinstance(form_data.get('tags'), str):
-                form_data['tags'] = [tag.strip() for tag in form_data['tags'].split(',') if tag.strip()]
-            elif not form_data.get('tags'):
-                form_data['tags'] = []
-                
-            # Update metadata with form data
-            if form_data.get('researcher'):
-                metadata['researcher'].update(form_data['researcher'])
-            
-            if form_data.get('interviewee'):
-                metadata['participant'].update({
-                    'name': form_data['interviewee'].get('name', participant_name),
-                    'role': form_data.get('role', ''),
-                    'experience_level': form_data.get('experience_level', ''),
-                    'department': form_data.get('department', ''),
-                    'consent_given': form_data.get('consent', True)
-                })
-            
-            if form_data.get('metadata'):
-                metadata['session'].update({
-                    'date': form_data['metadata'].get('interviewDate', interview_date),
-                    'duration': form_data['metadata'].get('interviewDuration'),
-                    'format': form_data['metadata'].get('interviewFormat', 'text'),
-                    'language': form_data['metadata'].get('interviewLanguage', 'en'),
-                    'notes': form_data['metadata'].get('interviewNotes', '')
-                })
-            
+
+        # Calculate duration if timestamps are available
+        if transcript_chunks and all(chunk.get('start_time') and chunk.get('end_time') for chunk in transcript_chunks):
+            try:
+                start = min(float(chunk['start_time']) for chunk in transcript_chunks)
+                end = max(float(chunk['end_time']) for chunk in transcript_chunks)
+                metadata['session']['duration'] = end - start
+            except (ValueError, TypeError):
+                pass
+
         # Prepare interview data according to new schema
         interview_data = {
             'id': interview_id,
@@ -435,6 +433,53 @@ def save_interview_data(project_name, interview_type, transcript, analysis=None,
         logger.error(f"Error saving interview data: {str(e)}")
         logger.error(traceback.format_exc())
         raise
+
+def analyze_chunk_semantics(text):
+    """Analyze the semantic content of a chunk using our semantic analyzer."""
+    try:
+        # Use semantic analyzer to get analysis
+        analysis = semantic_analyzer.analyze_chunk(text)
+        metadata = analysis['metadata']
+        
+        # Map the emotion and sentiment to our simplified categories
+        emotion_label = metadata['emotion']['primary']['label']
+        sentiment_label = metadata['sentiment']['label']
+        
+        # Determine overall sentiment category
+        if sentiment_label == 'POS':
+            sentiment = 'positive'
+        elif sentiment_label == 'NEG':
+            sentiment = 'negative'
+        elif emotion_label in ['anger', 'annoyance', 'disappointment']:
+            sentiment = 'frustration'
+        else:
+            sentiment = 'neutral'
+        
+        return {
+            'sentiment': sentiment,
+            'themes': metadata['themes'],
+            'insightTag': metadata['insight_tags'],
+            'relatedFeature': metadata['related_feature'],
+            'emotion': {
+                'primary': metadata['emotion']['primary'],
+                'secondary': metadata['emotion']['secondary'],
+                'confidence': metadata['emotion_confidence']
+            }
+        }
+    except Exception as e:
+        logger.error(f"Error analyzing chunk semantics: {str(e)}")
+        logger.error(traceback.format_exc())
+        return {
+            'sentiment': 'neutral',
+            'themes': [],
+            'insightTag': [],
+            'relatedFeature': None,
+            'emotion': {
+                'primary': {'label': 'neutral', 'score': 0.0},
+                'secondary': [],
+                'confidence': 0.0
+            }
+        }
 
 def create_openai_client():
     """Create an OpenAI client with consistent configuration."""
@@ -497,12 +542,13 @@ try:
     vector_store = InterviewVectorStore(openai_api_key=OPENAI_API_KEY)
     # Load all existing interviews into the vector store
     interviews = []
-    if os.path.exists('interviews'):
+    raw_interviews_dir = os.path.join('interviews', 'raw')
+    if os.path.exists(raw_interviews_dir):
         logger.info("Loading existing interviews into vector store...")
-        for filename in os.listdir('interviews'):
+        for filename in os.listdir(raw_interviews_dir):
             if filename.endswith('.json'):
                 try:
-                    with open(os.path.join('interviews', filename)) as f:
+                    with open(os.path.join(raw_interviews_dir, filename)) as f:
                         interview = json.load(f)
                         # Ensure all required fields are present
                         interview.setdefault('date', datetime.now().isoformat())
@@ -521,28 +567,54 @@ try:
         else:
             logger.warning("No interviews found to load into vector store")
     else:
-        logger.warning("Interviews directory not found")
+        logger.warning("Raw interviews directory not found")
 except Exception as e:
     logger.error(f"Error initializing vector store: {str(e)}")
     logger.error(traceback.format_exc())
     vector_store = None
 
-def save_persona(project_name: str, persona_content: str, selected_elements: list) -> dict:
-    """Save a generated persona to disk."""
-    persona_id = str(uuid.uuid4())
-    persona_data = {
-        'id': persona_id,
-        'project_name': project_name,
-        'content': persona_content,
-        'elements': selected_elements,
-        'date': datetime.now().isoformat(),
-        'last_modified': datetime.now().isoformat()
-    }
+def save_persona(project_name, content, selected_elements):
+    """
+    Save a generated persona to disk
     
-    with open(PERSONAS_DIR / f"{persona_id}.json", 'w') as f:
-        json.dump(persona_data, f, indent=2)
-    
-    return persona_data
+    Args:
+        project_name (str): Name of the project
+        content (str): JSON string containing persona data
+        selected_elements (list): List of selected persona elements
+        
+    Returns:
+        dict: Saved persona data
+    """
+    try:
+        # Create personas directory if it doesn't exist
+        os.makedirs('personas', exist_ok=True)
+        
+        # Generate unique ID for persona
+        persona_id = str(uuid.uuid4())
+        
+        # Parse content back to dict if it's a JSON string
+        if isinstance(content, str):
+            content = json.loads(content)
+            
+        # Create persona data structure
+        persona_data = {
+            'id': persona_id,
+            'project_name': project_name,
+            'content': content,
+            'selected_elements': selected_elements,
+            'created_at': datetime.now().isoformat()
+        }
+        
+        # Save to file
+        filename = f'personas/{project_name}_{persona_id}.json'
+        with open(filename, 'w') as f:
+            json.dump(persona_data, f, indent=2)
+            
+        return persona_data
+        
+    except Exception as e:
+        logger.error(f"Error saving persona: {str(e)}")
+        raise Exception(f"Failed to save persona: {str(e)}")
 
 def list_personas(limit=None):
     """List all saved personas, optionally limited to a specific number."""
@@ -599,7 +671,7 @@ def chat_page():
     return render_template('interview.html', project_name=project_name, prompt=prompt)
 
 def list_projects():
-    """List all projects."""
+    """List all active projects."""
     try:
         projects = []
         PROJECTS_DIR = Path('projects')
@@ -609,7 +681,9 @@ def list_projects():
                     with open(file, 'r') as f:
                         data = json.load(f)
                         if all(key in data for key in ['id', 'name', 'description', 'status']):
-                            projects.append(data)
+                            # Only include active projects
+                            if data.get('status', '').lower() == 'active':
+                                projects.append(data)
                 except Exception as e:
                     logger.error(f"Error loading project {file}: {str(e)}")
                     continue
@@ -710,16 +784,42 @@ def new_interview():
 @app.route('/persona')
 def persona():
     """Persona creation page"""
-    # Get list of projects for dropdown
-    projects = set()
-    if os.path.exists('interviews'):
-        for filename in os.listdir('interviews'):
-            if filename.endswith('.json'):
-                with open(os.path.join('interviews', filename)) as f:
-                    interview = json.load(f)
-                    projects.add(interview['project_name'])
-    
-    return render_template('persona.html', projects=sorted(list(projects)))
+    try:
+        # Get list of projects for dropdown
+        projects = []
+        project_names = set()
+
+        # Check both interviews and interviews/raw directories
+        interview_dirs = ['interviews', 'interviews/raw']
+        
+        for dir_path in interview_dirs:
+            if os.path.exists(dir_path):
+                for filename in os.listdir(dir_path):
+                    if filename.endswith('.json'):
+                        try:
+                            with open(os.path.join(dir_path, filename)) as f:
+                                interview = json.load(f)
+                                project_name = interview.get('project_name')
+                                if project_name:
+                                    project_names.add(project_name)
+                        except json.JSONDecodeError as e:
+                            logger.error(f"Error decoding JSON from {filename}: {str(e)}")
+                            continue
+                        except Exception as e:
+                            logger.error(f"Error reading file {filename}: {str(e)}")
+                            continue
+        
+        # Convert to list of project objects
+        projects = [{'id': name, 'name': name} for name in sorted(project_names) if name]
+        
+        logger.info(f"Found {len(projects)} projects for persona creation")
+        return render_template('persona.html', projects=projects)
+        
+    except Exception as e:
+        logger.error(f"Error in persona route: {str(e)}")
+        logger.error(traceback.format_exc())
+        # Return empty projects list if there's an error
+        return render_template('persona.html', projects=[])
 
 @app.route('/journey_map')
 def journey_map():
@@ -750,50 +850,78 @@ def journey_map():
 
 @app.route('/save_interview', methods=['POST'])
 def save_interview():
+    """Save new interview configuration and generate prompt."""
     try:
         data = request.get_json()
+        logger.debug(f"Received form data: {data}")
+        
+        # Required fields
         project_name = data.get('project_name')
         interview_type = data.get('interview_type')
         project_description = data.get('project_description')
         
-        # Get all the new metadata fields
-        form_data = {
-            'participant_name': data.get('participant_name'),
-            'role': data.get('role'),
-            'experience_level': data.get('experience_level'),
-            'department': data.get('department'),
+        # Validate required fields
+        missing_fields = []
+        if not project_name:
+            missing_fields.append('project_name')
+        if not interview_type:
+            missing_fields.append('interview_type')
+        if not project_description:
+            missing_fields.append('project_description')
+            
+        if missing_fields:
+            error_msg = f"Missing required fields: {', '.join(missing_fields)}"
+            logger.error(error_msg)
+            return jsonify({'error': error_msg}), 400
+        
+        # Get all the metadata fields
+        metadata = {
+            'participant': {
+                'name': data.get('participant_name', 'Anonymous'),
+                'role': data.get('role', ''),
+                'experience_level': data.get('experience_level', ''),
+                'department': data.get('department', '')
+            },
+            'session': {
+                'date': datetime.now().isoformat(),
+                'status': data.get('status', 'Draft')
+            },
             'tags': data.get('tags', []),
-            'emotion': data.get('emotion'),
-            'status': data.get('status', 'Draft'),
-            'author': data.get('author')
+            'emotion': data.get('emotion', 'Neutral'),
+            'researcher': {
+                'name': data.get('author', 'Unknown')
+            }
         }
 
-        if not all([project_name, interview_type, project_description]):
-            return jsonify({'error': 'Missing required parameters'}), 400
+        # Generate the interview prompt
+        try:
+            interview_prompt = get_interview_prompt(interview_type, project_name, project_description)
+        except Exception as e:
+            logger.error(f"Error generating interview prompt: {str(e)}")
+            return jsonify({'error': 'Failed to generate interview prompt'}), 500
 
-        # Generate the interview prompt using the function from daria_resources
-        interview_prompt = get_interview_prompt(interview_type, project_name, project_description)
-        
-        # Store the prompt and form data
+        # Store the interview configuration
         interview_prompts[project_name] = {
             'prompt': interview_prompt,
-            'form_data': form_data,
-            'project_description': project_description
+            'metadata': metadata,
+            'project_description': project_description,
+            'type': interview_type
         }
         
-        logger.info(f"Stored interview prompt and form data for project: {project_name}")
-        logger.debug(f"Form data: {form_data}")
+        logger.info(f"Successfully stored interview configuration for project: {project_name}")
+        logger.debug(f"Interview configuration: {interview_prompts[project_name]}")
         
         return jsonify({
             'status': 'success',
-            'message': 'Interview prompt saved successfully',
+            'message': 'Interview configuration saved successfully',
             'project_name': project_name,
             'redirect_url': url_for('interview', project_name=project_name)
         })
         
     except Exception as e:
         logger.error(f"Error saving interview: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        logger.error(traceback.format_exc())
+        return jsonify({'error': 'Internal server error occurred'}), 500
 
 @app.route('/interview/<project_name>', methods=['GET', 'POST'])
 def interview(project_name):
@@ -1203,10 +1331,14 @@ def handle_disconnect():
 def archive():
     """Display the archive page with all interviews."""
     try:
+        logger.info("Loading interviews for archive page...")
         interviews = list_interviews()
+        logger.info(f"Found {len(interviews)} interviews")
         
         # Format interviews for display
         for interview in interviews:
+            logger.info(f"Processing interview: {interview.get('id')}")
+            
             # Set type and status
             interview['type'] = interview.get('type', 'Interview').title()
             interview['status'] = interview.get('status', 'draft').title()
@@ -1214,23 +1346,100 @@ def archive():
             # Set preview text
             interview['preview'] = interview.get('content_preview', 'No preview available')
             
-            # Set tags (placeholder for now)
-            interview['tags'] = []
+            # Set project info
+            interview['project_name'] = interview.get('project_name', 'Unassigned')
             
-            # Format project info
-            if not interview.get('project_name'):
-                interview['project_name'] = 'Unassigned'
-                
-            # Get participant name from all possible sources
-            participant_name = (
-                interview.get('transcript_name') or  # Try transcript_name first
-                interview.get('metadata', {}).get('participant', {}).get('name') or
-                interview.get('participant_name') or
-                'Anonymous'
-            )
+            # Debug logging for participant name extraction
+            logger.info(f"Interview metadata: {interview.get('metadata', {})}")
+            logger.info(f"Direct participant_name: {interview.get('participant_name')}")
+            logger.info(f"Transcript name: {interview.get('transcript_name')}")
+            
+            # Standardized name extraction
+            participant_name = None
+            
+            # Try metadata.interviewee first (new format)
+            if interview.get('metadata', {}).get('interviewee', {}).get('name'):
+                participant_name = interview['metadata']['interviewee']['name']
+                logger.info(f"Found name in metadata.interviewee: {participant_name}")
+            
+            # Try metadata.participant next (alternate format)
+            elif interview.get('metadata', {}).get('participant', {}).get('name'):
+                participant_name = interview['metadata']['participant']['name']
+                logger.info(f"Found name in metadata.participant: {participant_name}")
+            
+            # Try direct participant_name
+            elif interview.get('participant_name'):
+                participant_name = interview['participant_name']
+                logger.info(f"Found direct participant_name: {participant_name}")
+            
+            # Try transcript_name (remove "'s Interview" if present)
+            elif interview.get('transcript_name'):
+                name = interview['transcript_name']
+                if "'s Interview" in name:
+                    participant_name = name.split("'s Interview")[0]
+                else:
+                    participant_name = name
+                logger.info(f"Found name in transcript_name: {participant_name}")
+            
+            # Default to Anonymous if no name found
+            if not participant_name:
+                logger.info("No participant name found, defaulting to Anonymous")
+                participant_name = 'Anonymous'
+            
             interview['participant_name'] = participant_name
+            logger.info(f"Final participant_name set to: {participant_name}")
+            
+            # Extract themes and insights if available
+            themes = set()
+            insights = set()
+            emotions = {}
+            
+            if interview.get('chunks'):
+                for chunk in interview['chunks']:
+                    if chunk.get('metadata'):
+                        # Collect themes
+                        if chunk['metadata'].get('themes'):
+                            themes.update(chunk['metadata']['themes'])
+                        
+                        # Collect insights
+                        if chunk['metadata'].get('insight_tags'):
+                            insights.update(chunk['metadata']['insight_tags'])
+                        
+                        # Track emotions and their intensities
+                        if chunk['metadata'].get('emotion'):
+                            emotion = chunk['metadata']['emotion'].lower()
+                            intensity = chunk['metadata'].get('emotion_intensity', 3)
+                            if emotion in emotions:
+                                emotions[emotion]['count'] += 1
+                                emotions[emotion]['total_intensity'] += intensity
+                            else:
+                                emotions[emotion] = {
+                                    'count': 1,
+                                    'total_intensity': intensity
+                                }
+            
+            # Convert sets to lists for JSON serialization
+            interview['themes'] = list(themes)
+            interview['insights'] = list(insights)
+            
+            # Calculate average emotion intensities
+            interview['emotions'] = [
+                {
+                    'name': emotion,
+                    'count': data['count'],
+                    'avg_intensity': round(data['total_intensity'] / data['count'], 1)
+                }
+                for emotion, data in emotions.items()
+            ]
+            
+            # Sort emotions by count
+            interview['emotions'].sort(key=lambda x: x['count'], reverse=True)
+            
+            logger.info(f"Processed interview: {interview.get('id')} - {interview['participant_name']}")
         
+        logger.info("Rendering archive template...")
         return render_template('archive.html', interviews=interviews)
+        
     except Exception as e:
         logger.error(f"Error in archive route: {str(e)}")
         logger.error(traceback.format_exc())
@@ -1238,11 +1447,201 @@ def archive():
                              error="Failed to load interviews archive",
                              details=str(e))
 
+# Add search endpoints
+@app.route('/api/search/exact', methods=['GET'])
+def search_exact():
+    """Exact match search for interviews."""
+    try:
+        query = request.args.get('q', '').lower()
+        if not query:
+            return jsonify({'success': True, 'interviews': []})
+        
+        interviews = list_interviews()
+        results = []
+        
+        for interview in interviews:
+            # Get the full interview data to search in transcript
+            interview_file = Path('interviews/raw') / f"{interview['id']}.json"
+            try:
+                with open(interview_file, 'r') as f:
+                    full_interview = json.load(f)
+                    transcript = full_interview.get('transcript', '')
+            except:
+                transcript = ''
+            
+            # Search in participant name
+            if query in interview.get('participant_name', '').lower():
+                results.append(interview)
+                continue
+            
+            # Search in project name
+            if query in interview.get('project_name', '').lower():
+                results.append(interview)
+                continue
+            
+            # Search in themes
+            if any(query in theme.lower() for theme in interview.get('themes', [])):
+                results.append(interview)
+                continue
+            
+            # Search in insights
+            if any(query in insight.lower() for insight in interview.get('insights', [])):
+                results.append(interview)
+                continue
+            
+            # Search in transcript preview
+            if query in interview.get('preview', '').lower():
+                results.append(interview)
+                continue
+                
+            # Search in full transcript
+            if transcript and query in transcript.lower():
+                # Generate a preview around the match
+                match_start = transcript.lower().find(query)
+                preview_start = max(0, match_start - 100)
+                preview_end = min(len(transcript), match_start + len(query) + 100)
+                preview = transcript[preview_start:preview_end]
+                if preview_start > 0:
+                    preview = '...' + preview
+                if preview_end < len(transcript):
+                    preview = preview + '...'
+                    
+                interview['preview'] = preview
+                results.append(interview)
+                continue
+        
+        return jsonify({'success': True, 'interviews': results})
+        
+    except Exception as e:
+        logger.error(f"Error in exact search: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
+@app.route('/api/search/fuzzy', methods=['GET'])
+def search_fuzzy():
+    """Fuzzy match search for interviews using semantic similarity."""
+    try:
+        query = request.args.get('q', '')
+        if not query:
+            return jsonify({'success': True, 'interviews': []})
+        
+        # Get semantic analyzer instance
+        analyzer = SemanticAnalyzer()
+        query_embedding = np.array(analyzer.get_embedding(query)).reshape(1, -1)  # Reshape to 2D
+        
+        interviews = list_interviews()
+        results = []
+        
+        # Process interviews in smaller batches
+        batch_size = 5
+        for i in range(0, len(interviews), batch_size):
+            batch = interviews[i:i + batch_size]
+            batch_results = []
+            
+            for interview in batch:
+                similarity_score = 0
+                preview_text = None
+                
+                # Get the full interview data
+                interview_file = Path('interviews/raw') / f"{interview['id']}.json"
+                try:
+                    with open(interview_file, 'r') as f:
+                        full_interview = json.load(f)
+                        transcript = full_interview.get('transcript', '')
+                        # Get default preview
+                        preview_text = _get_content_preview(full_interview)
+                except:
+                    transcript = ''
+                    preview_text = 'No preview available'
+                
+                # Compare with participant name and project name together
+                metadata_text = ' '.join(filter(None, [
+                    interview.get('participant_name', ''),
+                    interview.get('project_name', '')
+                ]))
+                if metadata_text:
+                    metadata_embedding = np.array(analyzer.get_embedding(metadata_text)).reshape(1, -1)
+                    similarity_score = max(similarity_score, 
+                                        cosine_similarity(query_embedding, metadata_embedding)[0][0])
+                
+                # Compare with themes and insights together
+                tags_text = ' '.join(filter(None, 
+                    interview.get('themes', []) + interview.get('insights', [])
+                ))
+                if tags_text:
+                    tags_embedding = np.array(analyzer.get_embedding(tags_text)).reshape(1, -1)
+                    similarity_score = max(similarity_score, 
+                                        cosine_similarity(query_embedding, tags_embedding)[0][0])
+                
+                # Compare with transcript content
+                if transcript:
+                    # Use larger chunks to reduce number of embeddings
+                    chunk_size = 1000
+                    for i in range(0, len(transcript), chunk_size):
+                        chunk = transcript[i:i + chunk_size]
+                        chunk_embedding = np.array(analyzer.get_embedding(chunk)).reshape(1, -1)
+                        chunk_similarity = cosine_similarity(query_embedding, chunk_embedding)[0][0]
+                        
+                        if chunk_similarity > similarity_score:
+                            similarity_score = chunk_similarity
+                            # Update preview if this is the best matching chunk
+                            preview_start = max(0, i - 100)
+                            preview_end = min(len(transcript), i + chunk_size + 100)
+                            preview_text = transcript[preview_start:preview_end]
+                            if preview_start > 0:
+                                preview_text = '...' + preview_text
+                            if preview_end < len(transcript):
+                                preview_text = preview_text + '...'
+                
+                # Add to results if similarity is above threshold
+                if similarity_score > 0.3:  # Lowered threshold to catch more matches
+                    interview['similarity_score'] = float(similarity_score)
+                    interview['preview'] = preview_text
+                    batch_results.append(interview)
+            
+            # Add batch results to main results
+            results.extend(batch_results)
+            
+            # Sort current results by similarity score
+            results.sort(key=lambda x: x['similarity_score'], reverse=True)
+            
+            # Return current batch as a response
+            response = jsonify({
+                'success': True,
+                'interviews': results,
+                'is_partial': i + batch_size < len(interviews)
+            })
+            response.headers['Content-Type'] = 'application/json'
+            return response
+        
+        # Log for debugging
+        logger.info(f"Fuzzy search for '{query}' found {len(results)} results")
+        for result in results[:3]:  # Log top 3 results
+            logger.info(f"Score: {result['similarity_score']:.3f}, Preview: {result.get('preview', '')[:100]}")
+        
+        # Return final results
+        return jsonify({
+            'success': True,
+            'interviews': results,
+            'is_partial': False
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in fuzzy search: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)})
+
 @app.route('/transcript/<interview_id>')
 def view_transcript(interview_id):
     """View interview transcript."""
     try:
-        interview = load_interview(interview_id)
+        # Load interview from raw directory
+        interview_file = Path('interviews/raw') / f"{interview_id}.json"
+        if not interview_file.exists():
+            flash('Interview not found', 'error')
+            return redirect(url_for('archive'))
+        
+        with open(interview_file, 'r') as f:
+            interview = json.load(f)
+        
         if not interview:
             flash('Interview not found', 'error')
             return redirect(url_for('archive'))
@@ -1260,119 +1659,56 @@ def view_transcript(interview_id):
 def view_analysis(interview_id):
     """View interview analysis. If analysis doesn't exist, generate it."""
     try:
-        interview = load_interview(interview_id)
+        # Try to load interview from processed directory first
+        processed_file = Path('interviews/processed') / f"{interview_id}.json"
+        raw_file = Path('interviews/raw') / f"{interview_id}.json"
+        
+        if processed_file.exists():
+            with open(processed_file, 'r') as f:
+                interview = json.load(f)
+        elif raw_file.exists():
+            with open(raw_file, 'r') as f:
+                interview = json.load(f)
+        else:
+            flash('Interview not found', 'error')
+            return redirect(url_for('archive'))
+        
         if not interview:
             flash('Interview not found', 'error')
             return redirect(url_for('archive'))
         
-        # If analysis doesn't exist or is empty, generate it
-        if not interview.get('analysis') or interview['analysis'].endswith('**'):
+        # Check if we need to generate semantic chunks
+        if not interview.get('chunks'):
             try:
-                # Initialize OpenAI client
-                analysis_llm = ChatOpenAI(
-                    temperature=0.7,
-                    model_name="gpt-4",
-                    openai_api_key=os.getenv('OPENAI_API_KEY')
-                )
-                
-                # Get interview type and generate appropriate prompt
-                interview_type = interview.get('interview_type', 'Application Interview')
-                project_name = interview.get('project_name', '')
+                # Process transcript into semantic chunks
                 transcript = interview.get('transcript', '')
+                if not transcript:
+                    flash('No transcript found', 'error')
+                    return redirect(url_for('archive'))
+                    
+                chunks = process_semantic_chunks(transcript)
                 
-                # Split transcript into manageable chunks (roughly 2000 tokens each)
-                transcript_chunks = []
-                current_chunk = []
-                current_length = 0
+                # Analyze each chunk for sentiment and themes
+                for chunk in chunks:
+                    semantic_data = analyze_chunk_semantics(chunk['combined_text'])
+                    chunk['analysis'] = semantic_data
                 
-                for line in transcript.split('\n'):
-                    # Rough estimate: 1 token ≈ 4 characters
-                    line_length = len(line) / 4
-                    if current_length + line_length > 2000:
-                        transcript_chunks.append('\n'.join(current_chunk))
-                        current_chunk = [line]
-                        current_length = line_length
-                    else:
-                        current_chunk.append(line)
-                        current_length += line_length
+                # Update interview with chunks
+                interview['chunks'] = chunks
                 
-                if current_chunk:
-                    transcript_chunks.append('\n'.join(current_chunk))
-                
-                # Generate base prompt
-                base_prompt = f"""#Role: You are Daria, an expert UX researcher conducting {interview_type}.
-#Objective: Analyze the interview about {project_name}
-#Context: You will receive the interview transcript in parts. Analyze each part and we'll combine the insights at the end.
-
-For each part, identify:
-1. Key points and insights
-2. User needs and pain points
-3. Notable quotes
-4. Recommendations (if any)
-
-Format your response with clear sections using headers."""
-
-                # Analyze each chunk
-                chunk_analyses = []
-                for i, chunk in enumerate(transcript_chunks):
-                    chunk_prompt = f"{base_prompt}\n\nPart {i+1} of {len(transcript_chunks)}:\n\n{chunk}"
-                    messages = [
-                        SystemMessage(content=chunk_prompt)
-                    ]
-                    response = analysis_llm.invoke(messages)
-                    chunk_analyses.append(response.content)
-                
-                # Generate final synthesis prompt
-                synthesis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting {interview_type}.
-#Objective: Synthesize the analysis of multiple transcript parts for {project_name}
-#Context: Below are the analyses of different parts of the interview. Create a cohesive final analysis.
-
-Previous analyses:
-
-{'\n\n---\n\n'.join(chunk_analyses)}
-
-Create a comprehensive final analysis that:
-1. Synthesizes key findings across all parts
-2. Identifies main themes and patterns
-3. Summarizes user needs and pain points
-4. Provides actionable recommendations
-
-Format your response with clear sections using headers."""
-
-                # Generate final synthesis
-                messages = [
-                    SystemMessage(content=synthesis_prompt)
-                ]
-                response = analysis_llm.invoke(messages)
-                analysis = response.content
-                
-                # Update the interview with the new analysis
-                interview['analysis'] = analysis
-                
-                # Update the existing interview
-                if not update_interview_data(interview_id, analysis):
-                    raise Exception("Failed to update interview")
-                
-                # Update vector store with new analysis
-                if vector_store:
-                    vector_store.add_texts(
-                        texts=[analysis],
-                        metadatas=[{
-                            'id': interview_id,
-                            'project_name': project_name,
-                            'type': 'analysis',
-                            'interview_type': interview_type
-                        }]
-                    )
+                # Save the updated interview to processed directory
+                processed_file.parent.mkdir(parents=True, exist_ok=True)
+                with open(processed_file, 'w') as f:
+                    json.dump(interview, f, indent=2)
                 
             except Exception as e:
-                logger.error(f"Error generating analysis: {str(e)}")
+                logger.error(f"Error generating semantic chunks: {str(e)}")
                 logger.error(traceback.format_exc())
                 flash('Error generating analysis', 'error')
                 return redirect(url_for('archive'))
         
-        return render_template('analysis.html', 
-                             interview=interview)
+        return render_template('analysis.html', interview=interview)
+        
     except Exception as e:
         logger.error(f"Error viewing analysis: {str(e)}")
         logger.error(traceback.format_exc())
@@ -1381,20 +1717,81 @@ Format your response with clear sections using headers."""
 
 @app.route('/metadata/<interview_id>')
 def view_metadata(interview_id):
-    """View interview metadata."""
+    """View interview metadata (old format)."""
     try:
-        interview = load_interview(interview_id)
+        # Load interview from raw directory
+        interview_file = Path('interviews/raw') / f"{interview_id}.json"
+        if not interview_file.exists():
+            flash('Interview not found', 'error')
+            return redirect(url_for('archive'))
+        
+        with open(interview_file, 'r') as f:
+            interview = json.load(f)
+        
         if not interview:
             flash('Interview not found', 'error')
             return redirect(url_for('archive'))
         
         return render_template('metadata.html', 
-                             interview=interview,
-                             metadata=interview.get('metadata', {}))
+                             interview=interview)
     except Exception as e:
         logger.error(f"Error viewing metadata: {str(e)}")
         logger.error(traceback.format_exc())
         flash('Error loading metadata', 'error')
+        return redirect(url_for('archive'))
+
+@app.route('/demographics/<interview_id>')
+def view_demographics(interview_id):
+    """View interview demographics (new format)."""
+    try:
+        # Load interview from raw directory
+        interview_file = Path('interviews/raw') / f"{interview_id}.json"
+        if not interview_file.exists():
+            logger.error(f"Interview file not found: {interview_file}")
+            flash('Interview not found', 'error')
+            return redirect(url_for('archive'))
+        
+        with open(interview_file, 'r') as f:
+            interview = json.load(f)
+            
+        if not interview:
+            logger.error("Interview data is empty")
+            flash('Interview not found', 'error')
+            return redirect(url_for('archive'))
+            
+        # Log the structure we're looking for
+        logger.info(f"Looking for demographics in metadata.interviewee: {interview.get('metadata', {}).get('interviewee')}")
+        logger.info(f"Looking for demographics in metadata.participant: {interview.get('metadata', {}).get('participant')}")
+        logger.info(f"Looking for demographics in participant: {interview.get('participant')}")
+        
+        # Create a processed directory if it doesn't exist
+        processed_dir = Path('interviews/processed')
+        processed_dir.mkdir(exist_ok=True)
+        
+        # Save a processed version of the interview with cleaned up structure
+        processed_interview = {
+            'id': interview.get('id'),
+            'metadata': {
+                'participant': interview.get('metadata', {}).get('interviewee') or 
+                             interview.get('metadata', {}).get('participant') or 
+                             interview.get('participant', {}),
+                'researcher': interview.get('metadata', {}).get('researcher', {}),
+                'interview_details': interview.get('metadata', {}).get('interview_details', {})
+            }
+        }
+        
+        processed_file = processed_dir / f"{interview_id}.json"
+        with open(processed_file, 'w') as f:
+            json.dump(processed_interview, f, indent=2)
+            
+        logger.info(f"Saved processed interview data to: {processed_file}")
+        
+        return render_template('demographics.html', 
+                             interview=processed_interview)
+    except Exception as e:
+        logger.error(f"Error viewing demographics: {str(e)}")
+        logger.error(traceback.format_exc())
+        flash('Error loading demographics', 'error')
         return redirect(url_for('archive'))
 
 @app.route('/analyze_interviews', methods=['POST'])
@@ -1557,7 +1954,7 @@ def create_personas(project_name):
     return render_template('create_personas.html', project_name=project_name)
 
 @app.route('/save_persona', methods=['POST'])
-def save_persona():
+def save_persona_route():
     """Save a persona configuration."""
     try:
         data = request.get_json()
@@ -1588,6 +1985,7 @@ def generate_persona():
         interviews = data['interviews']
         project_name = data.get('project_name', '')
         selected_elements = data.get('selected_elements', [])
+        model = data.get('model', 'gpt-4')  # Default to GPT-4 if not specified
         
         # Load interview data
         interview_data = []
@@ -1598,52 +1996,220 @@ def generate_persona():
                 
         if not interview_data:
             return jsonify({'error': 'No valid interviews found'}), 400
-            
-        # Create OpenAI client
-        client = create_openai_client()
-        if not client:
-            return jsonify({'error': 'Failed to initialize AI client'}), 500
-            
+
         # Generate persona content
         try:
             system_prompt = """You are an expert UX researcher and persona creator. 
             Create a detailed persona based on the interview data provided. 
-            Format the response as valid JSON with the following structure:
+            Return ONLY the JSON data without any markdown formatting or code blocks.
+            Format the response with the following structure:
             {
                 "name": "Name and title",
                 "summary": "Brief summary",
                 "image_prompt": "Detailed prompt for image generation",
-                "details": {
-                    "goals": ["goal1", "goal2"],
-                    "pain_points": ["pain1", "pain2"],
-                    "needs": ["need1", "need2"]
-                }
+                "demographics": {
+                    "age_range": "Age range (e.g. 25-35)",
+                    "gender": "Gender",
+                    "occupation": "Current occupation",
+                    "location": "Location",
+                    "education": "Education level"
+                },
+                "background": "Detailed background information",
+                "goals": [
+                    {
+                        "goal": "Goal description",
+                        "motivation": "Motivation behind the goal",
+                        "supporting_quotes": ["quote1", "quote2"]
+                    }
+                ],
+                "pain_points": [
+                    {
+                        "pain_point": "Pain point description",
+                        "impact": "Impact description",
+                        "supporting_quotes": ["quote1", "quote2"]
+                    }
+                ]
             }"""
             
             user_prompt = f"Create a persona based on these interviews: {json.dumps(interview_data, indent=2)}"
+
+            content = None
+            if model == 'claude-3.7-sonnet':
+                # Use Claude via AWS Bedrock
+                try:
+                    import boto3
+                    
+                    # Get AWS credentials from environment
+                    aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
+                    aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+                    
+                    if not aws_access_key or not aws_secret_key:
+                        logger.error("AWS credentials not found in environment variables")
+                        return jsonify({'error': 'AWS credentials not found in environment variables'}), 500
+                    
+                    # Initialize Bedrock client
+                    logger.info("Initializing AWS Bedrock client...")
+                    bedrock_runtime = boto3.client(
+                        service_name='bedrock-runtime',
+                        region_name='us-east-2',
+                        aws_access_key_id=aws_access_key,
+                        aws_secret_access_key=aws_secret_key
+                    )
+                    
+                    # Prepare the request body
+                    body = json.dumps({
+                        "messages": [
+                            {
+                                "role": "user",
+                                "content": user_prompt
+                            }
+                        ],
+                        "system": system_prompt,
+                        "max_tokens": 4096,
+                        "temperature": 0.7,
+                        "top_p": 1,
+                        "anthropic_version": "bedrock-2023-05-31"
+                    })
+                    
+                    logger.info("Sending request to Claude via AWS Bedrock...")
+                    response = bedrock_runtime.invoke_model(
+                        body=body,
+                        modelId='arn:aws:bedrock:us-east-2:522814696964:inference-profile/us.anthropic.claude-3-5-haiku-20241022-v1:0',
+                        accept="application/json",
+                        contentType="application/json"
+                    )
+                    
+                    response_body = json.loads(response.get('body').read())
+                    logger.info(f"Raw Claude response: {json.dumps(response_body, indent=2)}")
+                    
+                    # Extract content from Claude response
+                    if 'content' in response_body:
+                        # Handle the new response format where content is a list of message parts
+                        content_list = response_body['content']
+                        if isinstance(content_list, list) and len(content_list) > 0:
+                            # Get the text from the first content item
+                            content = content_list[0].get('text', '')
+                        else:
+                            content = ''
+                    elif 'completion' in response_body:
+                        content = response_body['completion']
+                    else:
+                        logger.error(f"Unexpected Claude response structure: {json.dumps(response_body, indent=2)}")
+                        raise ValueError("Unexpected response structure from Claude")
+                        
+                    logger.info("Successfully received response from Claude")
+                    logger.info(f"Extracted content: {content}")
+                    
+                    if not content:
+                        raise ValueError("Empty response from Claude")
+
+                    # Clean and parse the content
+                    content = content.strip()
+                    if content.startswith('```'):
+                        content = content.split('```')[1]
+                        if content.startswith('json'):
+                            content = content[4:]
+                        content = content.strip()
+                    
+                    try:
+                        persona_data = json.loads(content)
+                        logger.info(f"Parsed persona data: {json.dumps(persona_data, indent=2)}")
+                        
+                        # Basic validation of required fields
+                        required_fields = ['name', 'summary', 'demographics', 'goals', 'pain_points']
+                        if not all(field in persona_data for field in required_fields):
+                            missing_fields = [field for field in required_fields if field not in persona_data]
+                            raise ValueError(f"Missing required fields in persona data: {', '.join(missing_fields)}")
+                        
+                        # Validate demographics fields
+                        required_demographics = ['age_range', 'gender', 'occupation', 'location', 'education']
+                        if not all(field in persona_data['demographics'] for field in required_demographics):
+                            missing_demographics = [field for field in required_demographics if field not in persona_data['demographics']]
+                            raise ValueError(f"Missing required demographics fields: {', '.join(missing_demographics)}")
+                        
+                        # Save persona
+                        save_persona_data = {
+                            'project_name': project_name,
+                            'content': json.dumps(persona_data),  # Convert to JSON string
+                            'selected_elements': selected_elements
+                        }
+                        result = save_persona(**save_persona_data)
+                        
+                        return jsonify({
+                            'status': 'success',
+                            'persona': generate_persona_html(persona_data)
+                        }), 200
+                        
+                    except json.JSONDecodeError as e:
+                        logger.error(f"Error parsing persona JSON: {str(e)}")
+                        logger.error(f"Raw content: {content}")
+                        return jsonify({'error': 'Invalid persona format from AI'}), 500
+                        
+                except Exception as e:
+                    logger.error(f"Error using Claude via AWS Bedrock: {str(e)}")
+                    logger.error(f"Error type: {type(e).__name__}")
+                    logger.error(traceback.format_exc())
+                    return jsonify({'error': f'Failed to generate persona with Claude: {str(e)}'}), 500
+            else:
+                # Use OpenAI
+                client = create_openai_client()
+                if not client:
+                    return jsonify({'error': 'Failed to initialize AI client'}), 500
+                    
+                response = client.chat.completions.create(
+                    model="gpt-4-turbo-preview" if model == 'gpt-4' else "gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    temperature=0.7
+                )
+                content = response.choices[0].message.content
             
-            response = client.chat.completions.create(
-                model="gpt-4-turbo-preview",
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                temperature=0.7
-            )
+            if not content:
+                return jsonify({'error': 'No content generated'}), 500
+
+            # Clean and parse the content
+            content = content.strip()
+            if content.startswith('```'):
+                content = content.split('```')[1]
+                if content.startswith('json'):
+                    content = content[4:]
+                content = content.strip()
             
-            # Parse and validate response
-            content = response.choices[0].message.content
-            persona_data = json.loads(content)
-            
-            # Save persona
-            result = save_persona(project_name, content, selected_elements)
-            
-            return jsonify(result), 200
-            
-        except json.JSONDecodeError as e:
-            logger.error(f"Error parsing persona JSON: {str(e)}")
-            logger.error(f"Raw content: {content}")
-            return jsonify({'error': 'Invalid persona format from AI'}), 500
+            try:
+                persona_data = json.loads(content)
+                
+                # Basic validation of required fields
+                required_fields = ['name', 'summary', 'demographics', 'goals', 'pain_points']
+                if not all(field in persona_data for field in required_fields):
+                    missing_fields = [field for field in required_fields if field not in persona_data]
+                    raise ValueError(f"Missing required fields in persona data: {', '.join(missing_fields)}")
+                
+                # Validate demographics fields
+                required_demographics = ['age_range', 'gender', 'occupation', 'location', 'education']
+                if not all(field in persona_data['demographics'] for field in required_demographics):
+                    missing_demographics = [field for field in required_demographics if field not in persona_data['demographics']]
+                    raise ValueError(f"Missing required demographics fields: {', '.join(missing_demographics)}")
+                
+                # Save persona
+                save_persona_data = {
+                    'project_name': project_name,
+                    'content': json.dumps(persona_data),  # Convert to JSON string
+                    'selected_elements': selected_elements
+                }
+                result = save_persona(**save_persona_data)
+                
+                return jsonify({
+                    'status': 'success',
+                    'persona': generate_persona_html(persona_data)
+                }), 200
+                
+            except json.JSONDecodeError as e:
+                logger.error(f"Error parsing persona JSON: {str(e)}")
+                logger.error(f"Raw content: {content}")
+                return jsonify({'error': 'Invalid persona format from AI'}), 500
+                
         except Exception as e:
             logger.error(f"Error generating persona content: {str(e)}")
             logger.error(traceback.format_exc())
@@ -1656,331 +2222,162 @@ def generate_persona():
 
 def generate_persona_html(persona_data):
     """Generate HTML representation of the persona data."""
-    
-    # Check if we have the enhanced persona format or the standard format
-    if 'name' in persona_data and 'summary' in persona_data:
-        # Enhanced format from Persona Architect GPT
+    try:
+        # Basic validation
+        if not isinstance(persona_data, dict):
+            logger.error(f"persona_data is not a dictionary: {type(persona_data)}")
+            return '<div class="error">Invalid persona data format</div>'
+            
+        logger.info(f"Generating HTML for persona data: {json.dumps(persona_data, indent=2)}")
+        
+        # Get required fields with defaults
+        name = persona_data.get('name', 'Unnamed Persona')
+        summary = persona_data.get('summary', 'No summary available')
+        demographics = persona_data.get('demographics', {})
+        background = persona_data.get('background', 'No background information available')
+        goals = persona_data.get('goals', [])
+        pain_points = persona_data.get('pain_points', [])
+        
+        # Build HTML
         html = f"""
         <div class="persona-container space-y-8">
             <div class="header-section bg-indigo-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-indigo-800 mb-2">{persona_data['name']}</h2>
-                <p class="text-gray-700">{persona_data['summary']}</p>
-            </div>
+                <h2 class="text-2xl font-bold text-indigo-800 mb-2">{name}</h2>
+                <p class="text-gray-700">{summary}</p>
+            </div>"""
             
+        # Add demographics if available
+        if demographics:
+            demo_fields = {
+                'age_range': 'Age Range',
+                'gender': 'Gender',
+                'occupation': 'Occupation',
+                'location': 'Location',
+                'education': 'Education'
+            }
+            
+            html += """
             <div class="demographics-section bg-blue-50 p-6 rounded-lg shadow-md">
                 <h2 class="text-2xl font-bold text-blue-800 mb-4">Demographics</h2>
-                <div class="grid grid-cols-2 gap-4">
+                <div class="grid grid-cols-2 gap-4">"""
+                
+            for field_key, field_label in demo_fields.items():
+                value = demographics.get(field_key, 'Not specified')
+                html += f"""
                     <div>
-                        <p class="text-sm font-medium text-blue-700">Age Range</p>
-                        <p class="text-gray-600">{persona_data['demographics']['age_range']}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">Gender</p>
-                        <p class="text-gray-600">{persona_data['demographics']['gender']}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">Occupation</p>
-                        <p class="text-gray-600">{persona_data['demographics']['occupation']}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">Location</p>
-                        <p class="text-gray-600">{persona_data['demographics']['location']}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">Education</p>
-                        <p class="text-gray-600">{persona_data['demographics']['education']}</p>
-                    </div>
+                        <p class="text-sm font-medium text-blue-700">{field_label}</p>
+                        <p class="text-gray-600">{value}</p>
+                    </div>"""
+                    
+            html += """
                 </div>
-            </div>
+            </div>"""
             
+        # Add background section
+        html += f"""
             <div class="background-section bg-gray-50 p-6 rounded-lg shadow-md">
                 <h2 class="text-2xl font-bold text-gray-800 mb-4">Background & Context</h2>
-                <p class="text-gray-700">{persona_data.get('background', 'No background information provided.')}</p>
-            </div>
+                <p class="text-gray-700">{background}</p>
+            </div>"""
             
+        # Add goals section if available
+        if goals:
+            html += """
             <div class="goals-section bg-green-50 p-6 rounded-lg shadow-md">
                 <h2 class="text-2xl font-bold text-green-800 mb-4">Goals & Motivations</h2>
-                <div class="space-y-4">
-                    {''.join(f'''
+                <div class="space-y-4">"""
+                
+            for goal in goals:
+                if isinstance(goal, dict):
+                    goal_text = goal.get('goal', '')
+                    motivation = goal.get('motivation', '')
+                    quotes = goal.get('supporting_quotes', [])
+                    
+                    if goal_text:
+                        html += f"""
                         <div class="goal-card bg-white p-4 rounded-lg shadow-sm">
-                            <h3 class="font-semibold text-green-700 mb-2">{goal['goal']}</h3>
-                            <p class="text-gray-600 mb-2">{goal['motivation']}</p>
+                            <h3 class="font-semibold text-green-700 mb-2">{goal_text}</h3>"""
+                        
+                        if motivation:
+                            html += f'<p class="text-gray-600 mb-2">{motivation}</p>'
+                            
+                        if quotes:
+                            html += """
                             <div class="mt-2">
                                 <p class="text-sm font-medium text-green-600">Supporting Quotes:</p>
-                                <ul class="list-disc list-inside text-sm text-gray-600">
-                                    {''.join(f'<li>{quote}</li>' for quote in goal['supporting_quotes'])}
+                                <ul class="list-disc list-inside text-sm text-gray-600">"""
+                            for quote in quotes:
+                                html += f'<li>{quote}</li>'
+                            html += """
                                 </ul>
-                            </div>
-                        </div>
-                    ''' for goal in persona_data['goals'])}
+                            </div>"""
+                            
+                        html += """
+                        </div>"""
+                elif isinstance(goal, str):
+                    html += f"""
+                    <div class="goal-card bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-green-700 mb-2">{goal}</h3>
+                    </div>"""
+                    
+            html += """
                 </div>
-            </div>
+            </div>"""
             
+        # Add pain points section if available
+        if pain_points:
+            html += """
             <div class="pain-points-section bg-red-50 p-6 rounded-lg shadow-md">
                 <h2 class="text-2xl font-bold text-red-800 mb-4">Pain Points & Challenges</h2>
-                <div class="space-y-4">
-                    {''.join(f'''
+                <div class="space-y-4">"""
+                
+            for pain_point in pain_points:
+                if isinstance(pain_point, dict):
+                    point_text = pain_point.get('pain_point', '')
+                    impact = pain_point.get('impact', '')
+                    quotes = pain_point.get('supporting_quotes', [])
+                    
+                    if point_text:
+                        html += f"""
                         <div class="pain-point-card bg-white p-4 rounded-lg shadow-sm">
-                            <h3 class="font-semibold text-red-700 mb-2">{pain_point['pain_point']}</h3>
-                            <p class="text-gray-600 mb-2">Impact: {pain_point['impact']}</p>
+                            <h3 class="font-semibold text-red-700 mb-2">{point_text}</h3>"""
+                            
+                        if impact:
+                            html += f'<p class="text-gray-600 mb-2">Impact: {impact}</p>'
+                            
+                        if quotes:
+                            html += """
                             <div class="mt-2">
                                 <p class="text-sm font-medium text-red-600">Supporting Quotes:</p>
-                                <ul class="list-disc list-inside text-sm text-gray-600">
-                                    {''.join(f'<li>{quote}</li>' for quote in pain_point['supporting_quotes'])}
+                                <ul class="list-disc list-inside text-sm text-gray-600">"""
+                            for quote in quotes:
+                                html += f'<li>{quote}</li>'
+                            html += """
                                 </ul>
-                            </div>
-                        </div>
-                    ''' for pain_point in persona_data['pain_points'])}
+                            </div>"""
+                            
+                        html += """
+                        </div>"""
+                elif isinstance(pain_point, str):
+                    html += f"""
+                    <div class="pain-point-card bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-red-700 mb-2">{pain_point}</h3>
+                    </div>"""
+                    
+            html += """
                 </div>
-            </div>
+            </div>"""
             
-            <div class="behaviors-section bg-yellow-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-yellow-800 mb-4">Behaviors & Habits</h2>
-                <div class="space-y-4">
-                    {''.join(f'''
-                        <div class="behavior-card bg-white p-4 rounded-lg shadow-sm">
-                            <h3 class="font-semibold text-yellow-700 mb-2">{behavior['behavior']}</h3>
-                            <p class="text-gray-600 mb-2">Frequency: {behavior['frequency']}</p>
-                            <p class="text-gray-600 mb-2">Context: {behavior['context']}</p>
-                            <div class="mt-2">
-                                <p class="text-sm font-medium text-yellow-600">Supporting Quotes:</p>
-                                <ul class="list-disc list-inside text-sm text-gray-600">
-                                    {''.join(f'<li>{quote}</li>' for quote in behavior['supporting_quotes'])}
-                                </ul>
-                            </div>
-                        </div>
-                    ''' for behavior in persona_data['behaviors'])}
-                </div>
-            </div>
-            
-            {f"""
-            <div class="technology-section bg-blue-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-blue-800 mb-4">Technology Usage</h2>
-                <div class="space-y-4">
-                    <div class="bg-white p-4 rounded-lg shadow-sm">
-                        <h3 class="font-semibold text-blue-700 mb-2">Devices</h3>
-                        <ul class="list-disc list-inside text-gray-600">
-                            {''.join(f'<li>{device}</li>' for device in persona_data['technology'].get('devices', []))}
-                        </ul>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm">
-                        <h3 class="font-semibold text-blue-700 mb-2">Software</h3>
-                        <ul class="list-disc list-inside text-gray-600">
-                            {''.join(f'<li>{software}</li>' for software in persona_data['technology'].get('software', []))}
-                        </ul>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm">
-                        <h3 class="font-semibold text-blue-700 mb-2">Tech Comfort Level</h3>
-                        <p class="text-gray-600">{persona_data['technology'].get('comfort_level', 'Not specified')}</p>
-                    </div>
-                    <div class="bg-white p-4 rounded-lg shadow-sm">
-                        <h3 class="font-semibold text-blue-700 mb-2">Supporting Quotes</h3>
-                        <ul class="list-disc list-inside text-gray-600">
-                            {''.join(f'<li>{quote}</li>' for quote in persona_data['technology'].get('supporting_quotes', []))}
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            """ if 'technology' in persona_data else ''}
-            
-            <div class="quotes-section bg-indigo-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-indigo-800 mb-4">Key Quotes</h2>
-                <div class="space-y-4">
-                    <ul class="list-disc list-inside text-gray-600">
-                        {''.join(f'<li class="mb-2">"{quote}"</li>' for quote in persona_data.get('key_quotes', []))}
-                    </ul>
-                </div>
-            </div>
-            
-            <div class="opportunities-section bg-emerald-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-emerald-800 mb-4">Opportunities & Recommendations</h2>
-                <div class="space-y-4">
-                    {''.join(f'''
-                        <div class="opportunity-card bg-white p-4 rounded-lg shadow-sm">
-                            <h3 class="font-semibold text-emerald-700 mb-2">{opportunity['opportunity']}</h3>
-                            <p class="text-gray-600 mb-2">Impact: {opportunity['impact']}</p>
-                            <p class="text-gray-600 mb-2">Implementation: {opportunity['implementation']}</p>
-                        </div>
-                    ''' for opportunity in persona_data.get('opportunities', []))}
-                </div>
-            </div>
-            
-            <div class="needs-section bg-purple-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-purple-800 mb-4">Needs & Preferences</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Needs</h3>
-                        <div class="space-y-4">
-                            {''.join(f'''
-                                <div class="need-card bg-white p-4 rounded-lg shadow-sm">
-                                    <h4 class="font-semibold text-purple-600 mb-2">{need['need']}</h4>
-                                    <p class="text-gray-600 mb-2">Priority: {need['priority']}</p>
-                                    <div class="mt-2">
-                                        <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
-                                        <ul class="list-disc list-inside text-sm text-gray-600">
-                                            {''.join(f'<li>{quote}</li>' for quote in need['supporting_quotes'])}
-                                        </ul>
-                                    </div>
-                                </div>
-                            ''' for need in persona_data['needs'])}
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Preferences</h3>
-                        <div class="space-y-4">
-                            {''.join(f'''
-                                <div class="preference-card bg-white p-4 rounded-lg shadow-sm">
-                                    <h4 class="font-semibold text-purple-600 mb-2">{preference['preference']}</h4>
-                                    <p class="text-gray-600 mb-2">Reason: {preference['reason']}</p>
-                                    <div class="mt-2">
-                                        <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
-                                        <ul class="list-disc list-inside text-sm text-gray-600">
-                                            {''.join(f'<li>{quote}</li>' for quote in preference['supporting_quotes'])}
-                                        </ul>
-                                    </div>
-                                </div>
-                            ''' for preference in persona_data['preferences'])}
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="image-prompt-section bg-gray-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-gray-800 mb-4">Image Generation Prompt</h2>
-                <div class="bg-white p-4 rounded-lg shadow-sm">
-                    <p class="text-gray-600">{persona_data.get('image_prompt', 'No image prompt provided.')}</p>
-                </div>
-            </div>
-        </div>
-        """
-    else:
-        # Standard format
-        html = f"""
-        <div class="persona-container space-y-8">
-            <div class="demographics-section bg-blue-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-blue-800 mb-4">Demographics</h2>
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">Age Range</p>
-                        <p class="text-gray-600">{persona_data['demographics']['age_range']}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">Gender</p>
-                        <p class="text-gray-600">{persona_data['demographics']['gender']}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">Occupation</p>
-                        <p class="text-gray-600">{persona_data['demographics']['occupation']}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">Location</p>
-                        <p class="text-gray-600">{persona_data['demographics']['location']}</p>
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-blue-700">Education</p>
-                        <p class="text-gray-600">{persona_data['demographics']['education']}</p>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="goals-section bg-green-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-green-800 mb-4">Goals & Motivations</h2>
-                <div class="space-y-4">
-                    {''.join(f'''
-                        <div class="goal-card bg-white p-4 rounded-lg shadow-sm">
-                            <h3 class="font-semibold text-green-700 mb-2">{goal['goal']}</h3>
-                            <p class="text-gray-600 mb-2">{goal['motivation']}</p>
-                            <div class="mt-2">
-                                <p class="text-sm font-medium text-green-600">Supporting Quotes:</p>
-                                <ul class="list-disc list-inside text-sm text-gray-600">
-                                    {''.join(f'<li>{quote}</li>' for quote in goal['supporting_quotes'])}
-                                </ul>
-                            </div>
-                        </div>
-                    ''' for goal in persona_data['goals'])}
-                </div>
-            </div>
-            
-            <div class="behaviors-section bg-yellow-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-yellow-800 mb-4">Behaviors & Habits</h2>
-                <div class="space-y-4">
-                    {''.join(f'''
-                        <div class="behavior-card bg-white p-4 rounded-lg shadow-sm">
-                            <h3 class="font-semibold text-yellow-700 mb-2">{behavior['behavior']}</h3>
-                            <p class="text-gray-600 mb-2">Frequency: {behavior['frequency']}</p>
-                            <p class="text-gray-600 mb-2">Context: {behavior['context']}</p>
-                            <div class="mt-2">
-                                <p class="text-sm font-medium text-yellow-600">Supporting Quotes:</p>
-                                <ul class="list-disc list-inside text-sm text-gray-600">
-                                    {''.join(f'<li>{quote}</li>' for quote in behavior['supporting_quotes'])}
-                                </ul>
-                            </div>
-                        </div>
-                    ''' for behavior in persona_data['behaviors'])}
-                </div>
-            </div>
-            
-            <div class="pain-points-section bg-red-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-red-800 mb-4">Pain Points</h2>
-                <div class="space-y-4">
-                    {''.join(f'''
-                        <div class="pain-point-card bg-white p-4 rounded-lg shadow-sm">
-                            <h3 class="font-semibold text-red-700 mb-2">{pain_point['pain_point']}</h3>
-                            <p class="text-gray-600 mb-2">Impact: {pain_point['impact']}</p>
-                            <div class="mt-2">
-                                <p class="text-sm font-medium text-red-600">Supporting Quotes:</p>
-                                <ul class="list-disc list-inside text-sm text-gray-600">
-                                    {''.join(f'<li>{quote}</li>' for quote in pain_point['supporting_quotes'])}
-                                </ul>
-                            </div>
-                        </div>
-                    ''' for pain_point in persona_data['pain_points'])}
-                </div>
-            </div>
-            
-            <div class="needs-section bg-purple-50 p-6 rounded-lg shadow-md">
-                <h2 class="text-2xl font-bold text-purple-800 mb-4">Needs & Preferences</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div>
-                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Needs</h3>
-                        <div class="space-y-4">
-                            {''.join(f'''
-                                <div class="need-card bg-white p-4 rounded-lg shadow-sm">
-                                    <h4 class="font-semibold text-purple-600 mb-2">{need['need']}</h4>
-                                    <p class="text-gray-600 mb-2">Priority: {need['priority']}</p>
-                                    <div class="mt-2">
-                                        <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
-                                        <ul class="list-disc list-inside text-sm text-gray-600">
-                                            {''.join(f'<li>{quote}</li>' for quote in need['supporting_quotes'])}
-                                        </ul>
-                                    </div>
-                                </div>
-                            ''' for need in persona_data['needs'])}
-                        </div>
-                    </div>
-                    <div>
-                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Preferences</h3>
-                        <div class="space-y-4">
-                            {''.join(f'''
-                                <div class="preference-card bg-white p-4 rounded-lg shadow-sm">
-                                    <h4 class="font-semibold text-purple-600 mb-2">{preference['preference']}</h4>
-                                    <p class="text-gray-600 mb-2">Reason: {preference['reason']}</p>
-                                    <div class="mt-2">
-                                        <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
-                                        <ul class="list-disc list-inside text-sm text-gray-600">
-                                            {''.join(f'<li>{quote}</li>' for quote in preference['supporting_quotes'])}
-                                        </ul>
-                                    </div>
-                                </div>
-                            ''' for preference in persona_data['preferences'])}
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        """
+        html += """
+        </div>"""
         
-    return html
+        return html
+        
+    except Exception as e:
+        logger.error(f"Error generating persona HTML: {str(e)}")
+        logger.error(f"Persona data: {json.dumps(persona_data, indent=2)}")
+        logger.error(traceback.format_exc())
+        return '<div class="error">Error generating persona display</div>'
 
 @app.route('/api/save-persona', methods=['POST'])
 def save_persona_api():
@@ -2225,48 +2622,71 @@ def save_transcript():
 def get_project_interviews(project_id):
     """Get all interviews for a specific project."""
     try:
-        # Get all interview files
-        interview_files = list(Path('interviews').glob('*.json'))
         interviews = []
         project_name = None
         
+        # Check both interviews and interviews/raw directories
+        interview_dirs = ['interviews', 'interviews/raw']
+        
         # First, find the project name from any interview with this project ID
-        for file in interview_files:
-            with open(file) as f:
-                interview_data = json.load(f)
-                if interview_data.get('project_id') == project_id:
-                    project_name = interview_data.get('project_name')
+        for dir_path in interview_dirs:
+            if os.path.exists(dir_path):
+                for file in Path(dir_path).glob('*.json'):
+                    try:
+                        with open(file) as f:
+                            interview_data = json.load(f)
+                            if interview_data.get('project_id') == project_id:
+                                project_name = interview_data.get('project_name')
+                                break
+                            # If we're using project name as ID
+                            elif interview_data.get('project_name') == project_id:
+                                project_name = project_id
+                                break
+                    except json.JSONDecodeError:
+                        continue
+                    except Exception as e:
+                        logger.error(f"Error reading file {file}: {str(e)}")
+                        continue
+                if project_name:
                     break
         
-        # If we didn't find by project_id, try matching by project_name
-        if not project_name:
-            for file in interview_files:
-                with open(file) as f:
-                    interview_data = json.load(f)
-                    if interview_data.get('project_name') == project_id:  # Try using project_id as project_name
-                        project_name = project_id
-                        break
-        
         if project_name:
-            # Now get all interviews for this project
-            for file in interview_files:
-                with open(file) as f:
-                    interview_data = json.load(f)
-                    if interview_data.get('project_name') == project_name:
-                        # Format date for display
-                        date = datetime.fromisoformat(interview_data.get('date', ''))
-                        formatted_date = date.strftime('%B %d, %Y')
-                        
-                        interviews.append({
-                            'id': interview_data.get('id'),
-                            'date': formatted_date,
-                            'interview_type': interview_data.get('interview_type', 'Unknown Type')
-                        })
+            # Now get all interviews for this project from both directories
+            for dir_path in interview_dirs:
+                if os.path.exists(dir_path):
+                    for file in Path(dir_path).glob('*.json'):
+                        try:
+                            with open(file) as f:
+                                interview_data = json.load(f)
+                                if interview_data.get('project_name') == project_name:
+                                    # Format date for display
+                                    date = interview_data.get('date', '')
+                                    if date:
+                                        try:
+                                            date = datetime.fromisoformat(date)
+                                            formatted_date = date.strftime('%B %d, %Y')
+                                        except ValueError:
+                                            formatted_date = date
+                                    else:
+                                        formatted_date = 'No date'
+                                    
+                                    interviews.append({
+                                        'id': interview_data.get('id'),
+                                        'title': interview_data.get('title', 'Untitled Interview'),
+                                        'date': formatted_date,
+                                        'interview_type': interview_data.get('interview_type', 'Unknown Type')
+                                    })
+                        except json.JSONDecodeError:
+                            continue
+                        except Exception as e:
+                            logger.error(f"Error reading file {file}: {str(e)}")
+                            continue
         
         logger.info(f"Found {len(interviews)} interviews for project {project_name}")
         return jsonify(interviews)
     except Exception as e:
         logger.error(f"Error getting project interviews: {str(e)}")
+        logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 @app.route('/api/interviews/<interview_id>/<content_type>')
@@ -3004,42 +3424,80 @@ def start_interview():
 def upload_transcript():
     if request.method == 'GET':
         return render_template('upload_transcript.html')
-    
+        
     try:
-        # Get form data
+        # Extract form data
         researcher = json.loads(request.form.get('researcher', '{}'))
         project = json.loads(request.form.get('project', '{}'))
         interviewee = json.loads(request.form.get('interviewee', '{}'))
         technology = json.loads(request.form.get('technology', '{}'))
-        consent = request.form.get('consent') == 'true'
         transcript_name = request.form.get('transcriptName')
+        consent = request.form.get('consent') == 'true'
         
+        if not all([researcher, project, transcript_name, consent]):
+            return jsonify({'error': 'Missing required fields'}), 400
+            
         # Get the transcript file
         transcript_file = request.files.get('transcriptFile')
         if not transcript_file:
             return jsonify({'error': 'No transcript file provided'}), 400
+            
+        # Read and process the transcript
+        transcript_text = transcript_file.read().decode('utf-8')
         
-        # Get file extension
-        file_ext = transcript_file.filename.split('.')[-1].lower()
+        # Process transcript into chunks
+        chunks = []
+        current_chunk = {
+            'text': '',
+            'speaker': '',
+            'start_time': None,
+            'end_time': None,
+            'metadata': {
+                'emotion': None,
+                'emotion_intensity': 0,
+                'theme': [],
+                'insightTag': [],
+                'sentiment_score': 0
+            }
+        }
         
-        # Read the file content based on file type
-        if file_ext in ['txt']:
-            # For text files, read directly
-            transcript_text = transcript_file.read().decode('utf-8')
-        elif file_ext in ['docx']:
-            # For Word documents, use python-docx to extract text
-            try:
-                import docx
-                doc = docx.Document(transcript_file)
-                transcript_text = '\n'.join([paragraph.text for paragraph in doc.paragraphs])
-            except ImportError:
-                return jsonify({'error': 'python-docx package is required for Word document processing. Please install it with: pip install python-docx'}), 400
-        elif file_ext in ['doc']:
-            return jsonify({'error': 'Old .doc format is not supported. Please convert to .docx or .txt format'}), 400
-        elif file_ext in ['pdf']:
-            return jsonify({'error': 'PDF support is not yet implemented. Please convert to .docx or .txt format'}), 400
-        else:
-            return jsonify({'error': f'Unsupported file type: {file_ext}'}), 400
+        # Split transcript into chunks by speaker
+        lines = transcript_text.split('\n')
+        for line in lines:
+            if ': ' in line:  # New speaker
+                if current_chunk['text']:  # Save previous chunk
+                    # Analyze chunk semantics
+                    semantic_data = analyze_chunk_semantics(current_chunk['text'])
+                    current_chunk['metadata'].update(semantic_data)
+                    chunks.append(current_chunk.copy())
+                    
+                    # Reset current chunk
+                    current_chunk = {
+                        'text': '',
+                        'speaker': '',
+                        'start_time': None,
+                        'end_time': None,
+                        'metadata': {
+                            'emotion': None,
+                            'emotion_intensity': 0,
+                            'theme': [],
+                            'insightTag': [],
+                            'sentiment_score': 0
+                        }
+                    }
+                
+                # Process new line
+                speaker, text = line.split(': ', 1)
+                current_chunk['speaker'] = speaker
+                current_chunk['text'] = text
+            else:  # Continuation of previous speaker
+                current_chunk['text'] += f" {line.strip()}"
+        
+        # Don't forget to process the last chunk
+        if current_chunk['text']:
+            semantic_data = analyze_chunk_semantics(current_chunk['text'])
+            current_chunk['metadata'].update(semantic_data)
+            chunks.append(current_chunk)
         
         # Generate a unique ID for the transcript
         transcript_id = str(uuid.uuid4())
@@ -3053,7 +3511,7 @@ def upload_transcript():
             'project_description': project.get('description'),
             'date': datetime.now().isoformat(),
             'transcript': transcript_text,
-            'analysis': None,
+            'chunks': chunks,  # Add the processed chunks
             'metadata': {
                 'researcher': researcher,
                 'interviewee': interviewee,
@@ -3095,142 +3553,88 @@ def upload_transcript():
 
 @app.route('/advanced_search', methods=['GET', 'POST'])
 def advanced_search():
-    """Handle advanced search requests."""
+    """Advanced search endpoint that supports text, semantic, emotion, and insight tag searches."""
     if request.method == 'GET':
         return render_template('advanced_search.html')
         
     try:
-        # Get search parameters
-        query = request.form.get('query', '').strip()
-        search_type = request.form.get('type', 'text')  # 'text' or 'semantic'
-        
+        data = request.form
+        query = data.get('query', '').strip()
+        search_type = data.get('type', 'text').lower()
+        limit = int(data.get('limit', 10))
+
         if not query:
-            return jsonify({'results': [], 'message': 'Please enter a search query'})
-            
-        # Get all interviews
-        interviews = list_interviews()
-        if not interviews:
-            return jsonify({'results': [], 'message': 'No interviews found'})
-            
+            return jsonify({'error': 'Query cannot be empty'}), 400
+
+        if search_type not in ['text', 'semantic', 'emotion', 'insight']:
+            return jsonify({'error': f'Invalid search type: {search_type}'}), 400
+
+        # Initialize the ProcessedInterviewStore
+        store = ProcessedInterviewStore()
+        
+        # Perform the search based on type
+        results = store.search(query, search_type=search_type, limit=limit)
+        
+        # Format results for response
         formatted_results = []
-        
-        # Try semantic search if requested and vector store is available
-        if search_type == 'semantic':
-            try:
-                # Initialize vector store if needed
-                if not hasattr(app, 'vector_store') or app.vector_store is None:
-                    from src.vector_store import InterviewVectorStore
-                    app.vector_store = InterviewVectorStore(
-                        openai_api_key=app.config['OPENAI_API_KEY'],
-                        vector_store_path='vector_store'
-                    )
-                    # Add interviews to vector store
-                    app.vector_store.add_interviews(interviews)
-                
-                # Perform semantic search
-                results = app.vector_store.semantic_search(query, k=5)
-                if results:
-                    for result in results:
-                        # Extract relevant content for display
-                        content = result.get('transcript', '')
-                        if len(content) > 300:
-                            content = content[:300] + '...'
-                            
-                        formatted_results.append({
-                            'interview_id': result['id'],
-                            'content': content,
-                            'similarity': result['score'],
-                            'project_name': result.get('project_name', 'Unknown Project'),
-                            'interview_type': result.get('interview_type', 'Unknown Type'),
-                            'date': result.get('date')
-                        })
-                        
-            except Exception as e:
-                logger.error(f"Semantic search failed: {str(e)}")
-                logger.error(traceback.format_exc())
-                search_type = 'text'  # Fall back to text search
-        
-        # If no semantic results or text search requested, perform text search
-        if not formatted_results:
-            query_lower = query.lower()
-            for interview in interviews:
-                if not interview:
-                    continue
-                    
-                # Convert interview data to searchable text
-                interview_text = json.dumps(interview, default=str).lower()
-                
-                if query_lower in interview_text:
-                    # Find the context around the match
-                    match_start = interview_text.find(query_lower)
-                    context_start = max(0, match_start - 100)
-                    context_end = min(len(interview_text), match_start + len(query) + 100)
-                    context = interview_text[context_start:context_end]
-                    
-                    formatted_results.append({
-                        'interview_id': interview.get('id'),
-                        'content': context,
-                        'similarity': 1.0 if query_lower in interview_text else 0.0,
-                        'project_name': interview.get('project_name', 'Unknown Project'),
-                        'interview_type': interview.get('type', 'Unknown Type'),
-                        'date': interview.get('created_at')
-                    })
-        
-        # Sort results by similarity
-        formatted_results.sort(key=lambda x: x.get('similarity', 0), reverse=True)
-        
+        for result in results:
+            formatted_result = {
+                'interview_id': result['interview_id'],
+                'chunk_id': result['chunk_id'],
+                'project_name': result['project_name'],
+                'content': result['content'],
+                'similarity': result['similarity'],
+                'timestamp': result['timestamp'],
+                'metadata': {
+                    'emotion': result['metadata'].get('emotion', 'neutral'),
+                    'emotion_intensity': result['metadata'].get('emotion_intensity', 0.5),
+                    'themes': result['metadata'].get('themes', []),
+                    'insight_tags': result['metadata'].get('insight_tags', []),
+                    'related_feature': result['metadata'].get('related_feature')
+                }
+            }
+            formatted_results.append(formatted_result)
+
         return jsonify({
             'results': formatted_results,
-            'message': f"Found {len(formatted_results)} results using {search_type} search",
-            'search_type': search_type
+            'total': len(formatted_results),
+            'query': query,
+            'type': search_type,
+            'message': f'Found {len(formatted_results)} results for {search_type} search: "{query}"'
         })
-        
+
     except Exception as e:
-        logger.error(f"Advanced search error: {str(e)}")
-        logger.error(traceback.format_exc())
-        return jsonify({
-            'error': 'An error occurred during search',
-            'message': str(e)
-        }), 500
+        app.logger.error(f"Error in advanced search: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 @app.route('/interviews')
 def interviews_page():
     """Display the interviews page with interviews grouped by project."""
     try:
-        # Get interviews grouped by project
-        projects = list_interviews(group_by_project=True)
+        # Get all interviews
+        interviews = list_interviews()
         
-        # If no projects found, initialize with just "All Projects"
-        if not projects:
-            return render_template('interviews.html', projects=[{
-                'name': 'All Projects',
-                'interview_list': []  # Changed from 'items' to 'interview_list' to avoid conflict
-            }])
+        # Group interviews by project
+        projects_dict = {}
+        for interview in interviews:
+            project_name = interview.get('project_name', 'Unassigned')
+            if project_name not in projects_dict:
+                projects_dict[project_name] = {
+                    'name': project_name,
+                    'interview_list': []
+                }
+            projects_dict[project_name]['interview_list'].append(interview)
         
-        # Ensure each project has the correct structure
-        formatted_projects = []
-        for project in projects:
-            if isinstance(project, dict):
-                # Create new dict with renamed 'items' key to avoid conflict with dict.items() method
-                formatted_projects.append({
-                    'name': project.get('name', 'Unknown Project'),
-                    'interview_list': list(project.get('items', []))  # Changed from 'items' to 'interview_list'
-                })
-            else:
-                # Project is not a dict, create proper structure
-                formatted_projects.append({
-                    'name': str(project),
-                    'interview_list': []  # Changed from 'items' to 'interview_list'
-                })
-        
-        # Sort projects by name
+        # Convert to list and sort by project name
+        formatted_projects = list(projects_dict.values())
         formatted_projects.sort(key=lambda x: x['name'])
         
         # Add "All Projects" as the first option
-        formatted_projects.insert(0, {
+        all_projects = {
             'name': 'All Projects',
-            'interview_list': []  # Changed from 'items' to 'interview_list'
-        })
+            'interview_list': interviews
+        }
+        formatted_projects.insert(0, all_projects)
         
         return render_template('interviews.html', projects=formatted_projects)
     except Exception as e:
@@ -3239,7 +3643,7 @@ def interviews_page():
         # Return a list with just the "All Projects" option on error
         return render_template('interviews.html', projects=[{
             'name': 'All Projects',
-            'interview_list': []  # Changed from 'items' to 'interview_list'
+            'interview_list': []
         }])
 
 @app.template_filter('strftime')
@@ -3492,6 +3896,218 @@ def save_interview(interview_data):
         logger.error(f"Error saving interview: {str(e)}")
         logger.error(traceback.format_exc())
         return False
+
+def process_semantic_chunks(transcript_text):
+    """Process transcript into semantic chunks, filtering out low-information responses."""
+    try:
+        chunks = []
+        current_chunk = None
+        current_speaker = None
+        
+        for line in transcript_text.split('\n'):
+            line = line.strip()
+            if not line:
+                continue
+                
+            # Check for speaker change
+            if '[' in line and ']' in line:
+                speaker_match = re.search(r'\[(.*?)\]', line)
+                if speaker_match:
+                    speaker = speaker_match.group(1)
+                    # Save previous chunk if it exists
+                    if current_chunk:
+                        # Analyze the chunk
+                        chunk_id = str(uuid.uuid4())
+                        analysis = semantic_analyzer.analyze_chunk(current_chunk['text'])
+                        current_chunk['metadata'].update(analysis['metadata'])
+                        current_chunk['id'] = chunk_id
+                        chunks.append(current_chunk)
+                    
+                    # Start new chunk
+                    current_chunk = {
+                        'speaker': speaker,
+                        'text': '',
+                        'metadata': {}
+                    }
+                    current_speaker = speaker
+            else:
+                # Add line to current chunk
+                if current_chunk:
+                    if current_chunk['text']:
+                        current_chunk['text'] += ' '
+                    current_chunk['text'] += line
+        
+        # Add final chunk
+        if current_chunk and current_chunk['text'].strip():
+            chunk_id = str(uuid.uuid4())
+            analysis = semantic_analyzer.analyze_chunk(current_chunk['text'])
+            current_chunk['metadata'].update(analysis['metadata'])
+            current_chunk['id'] = chunk_id
+            chunks.append(current_chunk)
+        
+        return chunks
+        
+    except Exception as e:
+        logger.error(f"Error processing semantic chunks: {str(e)}")
+        logger.error(traceback.format_exc())
+        return []
+
+@app.route('/api/analyze/<interview_id>', methods=['POST'])
+def analyze_interview(interview_id):
+    """Generate semantic analysis for an interview if it doesn't exist."""
+    try:
+        interview_file = Path('interviews/raw') / f"{interview_id}.json"
+        if not interview_file.exists():
+            return jsonify({'error': 'Interview not found'}), 404
+            
+        with open(interview_file) as f:
+            interview_data = json.load(f)
+            
+        # Check if semantic chunks already exist
+        if interview_data.get('chunks'):
+            return jsonify({
+                'status': 'exists',
+                'message': 'Interview already has semantic analysis'
+            })
+        
+        # Process transcript into semantic chunks
+        transcript = interview_data.get('transcript', '')
+        if not transcript:
+            return jsonify({'error': 'No transcript found'}), 400
+            
+        chunks = process_semantic_chunks(transcript)
+        
+        # Analyze each chunk for sentiment and themes
+        for chunk in chunks:
+            if chunk['speaker'] != 'Stephen':  # Only analyze participant responses
+                semantic_data = analyze_chunk_semantics(chunk['text'])
+                chunk['metadata'].update({
+                    'sentiment': semantic_data.get('emotion', 'neutral'),
+                    'themes': semantic_data.get('theme', []),
+                    'insightTag': semantic_data.get('insightTag', []),
+                    'relatedFeature': semantic_data.get('theme')[0] if semantic_data.get('theme') else None
+                })
+        
+        # Update interview with chunks
+        interview_data['chunks'] = chunks
+        
+        # Save updated interview back to the same location
+        with open(interview_file, 'w') as f:
+            json.dump(interview_data, f, indent=2)
+            
+        return jsonify({
+            'status': 'success',
+            'message': 'Semantic analysis completed',
+            'chunks': chunks
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in semantic analysis: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/chunks/<chunk_id>', methods=['PUT'])
+def update_chunk(chunk_id):
+    """Update a specific chunk in an interview."""
+    try:
+        data = request.get_json()
+        if not data:
+            return jsonify({'error': 'No data provided'}), 400
+            
+        # Get the interview ID from the chunk ID (format: interview_id_chunk_number)
+        interview_id = chunk_id.split('_')[0]
+        
+        # Load the interview
+        interview = load_interview(interview_id)
+        if not interview:
+            return jsonify({'error': 'Interview not found'}), 404
+            
+        # Find and update the chunk
+        for chunk in interview.get('chunks', []):
+            if chunk.get('chunkId') == chunk_id:
+                # Update text if provided
+                if 'text' in data:
+                    chunk['text'] = data['text']
+                
+                # Update metadata if provided
+                if 'metadata' in data:
+                    chunk['metadata'].update(data['metadata'])
+                
+                # Save the updated interview
+                if not update_interview_data(interview_id, interview):
+                    return jsonify({'error': 'Failed to save changes'}), 500
+                    
+                return jsonify({
+                    'status': 'success',
+                    'message': 'Chunk updated successfully',
+                    'chunk': chunk
+                })
+        
+        return jsonify({'error': 'Chunk not found'}), 404
+        
+    except Exception as e:
+        logger.error(f"Error updating chunk: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+def markdown(text):
+    return markdown2.markdown(text)
+
+app.jinja_env.filters['markdown'] = markdown
+
+@app.route('/api/search/advanced', methods=['POST'])
+def api_advanced_search():
+    """Advanced search endpoint that supports text, semantic, emotion, and insight tag searches."""
+    try:
+        data = request.get_json()
+        query = data.get('query', '').strip()
+        search_type = data.get('type', 'text').lower()
+        limit = data.get('limit', 10)
+
+        if not query:
+            return jsonify({'error': 'Query cannot be empty'}), 400
+
+        if search_type not in ['text', 'semantic', 'emotion', 'insight']:
+            return jsonify({'error': f'Invalid search type: {search_type}'}), 400
+
+        # Initialize the ProcessedInterviewStore
+        store = ProcessedInterviewStore()
+        
+        # Perform the search based on type
+        results = store.search(query, search_type=search_type, limit=limit)
+        
+        # Format results for response
+        formatted_results = []
+        for result in results:
+            formatted_result = {
+                'interview_id': result['interview_id'],
+                'chunk_id': result['chunk_id'],
+                'project_name': result['project_name'],
+                'content': result['content'],
+                'similarity': result['similarity'],
+                'timestamp': result['timestamp'],
+                'interviewee_name': result.get('interviewee_name', ''),
+                'transcript_name': result.get('transcript_name', ''),
+                'metadata': {
+                    'emotion': result['metadata'].get('emotion', 'neutral'),
+                    'emotion_intensity': result['metadata'].get('emotion_intensity', 0.5),
+                    'themes': result['metadata'].get('themes', []),
+                    'insight_tags': result['metadata'].get('insight_tags', []),
+                    'related_feature': result['metadata'].get('related_feature')
+                }
+            }
+            formatted_results.append(formatted_result)
+
+        return jsonify({
+            'results': formatted_results,
+            'total': len(formatted_results),
+            'query': query,
+            'type': search_type
+        })
+
+    except Exception as e:
+        app.logger.error(f"Error in advanced search: {str(e)}")
+        return jsonify({'error': 'Internal server error'}), 500
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5003) 

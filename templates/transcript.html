@@ -8,9 +8,9 @@
         <a href="{{ url_for('archive') }}" class="text-blue-600 hover:text-blue-800">← Back to Archive</a>
     </div>
 
-    <div class="bg-white rounded-lg shadow-lg p-6">
-        <div class="space-y-6">
-            <div>
+    <div class="bg-white rounded-lg shadow-lg">
+        <div class="space-y-6 p-6">
+            <div class="pl-6">
                 <h2 class="text-xl font-semibold mb-4">Project Information</h2>
                 <p><strong>Project Name:</strong> {{ interview.project_name }}</p>
                 <p><strong>Interview Type:</strong> {{ interview.interview_type }}</p>
@@ -21,8 +21,8 @@
             </div>
 
             <div class="border-t pt-6">
-                <h1 class="text-2xl font-bold mb-6">Interview Transcript</h1>
-                <div class="space-y-4">
+                <h1 class="text-2xl font-bold mb-6 pl-6">Interview Transcript</h1>
+                <div class="space-y-4 pl-6">
                     {% for line in interview.transcript.split('\n') %}
                         {% if line.strip() %}
                             {% if 'Daria:' in line %}
@@ -42,13 +42,15 @@
             </div>
         </div>
 
-        <div class="mt-8 flex space-x-4">
-            <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
-               class="text-blue-600 hover:text-blue-800">View Analysis</a>
-            {% if interview.metadata %}
-                <a href="{{ url_for('view_metadata', interview_id=interview.id) }}" 
-                   class="text-blue-600 hover:text-blue-800">View Metadata</a>
-            {% endif %}
+        <div class="border-t p-6">
+            <div class="flex space-x-4 pl-6">
+                <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
+                   class="text-blue-600 hover:text-blue-800">View Analysis</a>
+                {% if interview.metadata %}
+                    <a href="{{ url_for('view_metadata', interview_id=interview.id) }}" 
+                       class="text-blue-600 hover:text-blue-800">View Metadata</a>
+                {% endif %}
+            </div>
         </div>
     </div>
 </div>

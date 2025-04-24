@@ -743,3 +743,283 @@ class VectorStore:
         except Exception as e:
             print(f"Error deleting interview: {e}")
             return False 
+
+class RawInterviewStore:
+    """Vector store for raw interview transcripts using FAISS."""
+    
+    def __init__(self, openai_api_key: str):
+        """Initialize the raw interview store."""
+        self.api_key = openai_api_key
+        self.embeddings = OpenAIEmbeddings()
+        self.raw_dir = Path('interviews/raw')
+        self.index_path = Path('vector_store/raw')
+        self.index_path.mkdir(parents=True, exist_ok=True)
+        
+        # Initialize or load FAISS index
+        self.load_or_create_store()
+        
+    def load_or_create_store(self) -> None:
+        """Load existing vector store or create new one."""
+        try:
+            index_file = self.index_path / 'index.faiss'
+            if index_file.exists():
+                self.vector_store = FAISS.load_local(
+                    str(self.index_path),
+                    self.embeddings
+                )
+                logger.info("Loaded existing raw interview vector store")
+            else:
+                # Create new store with empty document
+                self.vector_store = FAISS.from_documents(
+                    [{'page_content': '', 'metadata': {}}],
+                    self.embeddings
+                )
+                self.save_store()
+                logger.info("Created new raw interview vector store")
+        except Exception as e:
+            logger.error(f"Error in load_or_create_store: {str(e)}")
+            raise
+
+    def save_store(self) -> None:
+        """Save the vector store to disk."""
+        if self.vector_store:
+            self.vector_store.save_local(str(self.index_path))
+            
+    def add_interview(self, interview_data: Dict[str, Any]) -> None:
+        """Add a raw interview to the vector store."""
+        try:
+            # Create document from interview transcript
+            transcript = ' '.join(
+                f"{msg['speaker']}: {msg['text']}"
+                for msg in interview_data.get('transcript', [])
+            )
+            
+            metadata = {
+                'id': interview_data.get('id'),
+                'project_name': interview_data.get('project_name'),
+                'title': interview_data.get('title'),
+                'created_at': interview_data.get('created_at'),
+                'type': interview_data.get('type')
+            }
+            
+            document = {
+                'page_content': transcript,
+                'metadata': metadata
+            }
+            
+            # Add to vector store
+            if not self.vector_store:
+                self.vector_store = FAISS.from_documents([document], self.embeddings)
+            else:
+                self.vector_store.add_documents([document])
+            
+            self.save_store()
+            logger.info(f"Added raw interview {metadata['id']} to vector store")
+            
+        except Exception as e:
+            logger.error(f"Error adding raw interview: {str(e)}")
+            raise
+            
+    def exact_match_search(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+        """Perform exact text match search on raw interviews."""
+        try:
+            # Load all raw interviews
+            results = []
+            for file in self.raw_dir.glob('*.json'):
+                with file.open() as f:
+                    interview = json.load(f)
+                    transcript = ' '.join(
+                        f"{msg['speaker']}: {msg['text']}"
+                        for msg in interview.get('transcript', [])
+                    )
+                    if query.lower() in transcript.lower():
+                        results.append({
+                            'id': interview.get('id'),
+                            'title': interview.get('title'),
+                            'project_name': interview.get('project_name'),
+                            'match_type': 'exact',
+                            'score': 1.0
+                        })
+                        
+            return results[:k]
+            
+        except Exception as e:
+            logger.error(f"Error in exact match search: {str(e)}")
+            return []
+            
+    def similarity_search(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+        """Perform semantic similarity search on raw interviews."""
+        try:
+            if not self.vector_store:
+                return []
+                
+            results = self.vector_store.similarity_search_with_score(query, k=k)
+            
+            return [
+                {
+                    'id': doc.metadata.get('id'),
+                    'title': doc.metadata.get('title'),
+                    'project_name': doc.metadata.get('project_name'),
+                    'match_type': 'semantic',
+                    'score': float(score)
+                }
+                for doc, score in results
+            ]
+            
+        except Exception as e:
+            logger.error(f"Error in similarity search: {str(e)}")
+            return []
+
+class ProcessedInterviewStore:
+    """Vector store for processed interview chunks using Qdrant."""
+    
+    def __init__(self):
+        """Initialize the processed interview store."""
+        from qdrant_client import QdrantClient
+        from qdrant_client.http import models
+        
+        self.processed_dir = Path('interviews/processed')
+        self.semantic_analyzer = SemanticAnalyzer()
+        
+        # Initialize Qdrant client
+        self.qdrant = QdrantClient(":memory:")
+        self.collection_name = "interview_chunks"
+        
+        # Create collection for chunks
+        self.qdrant.recreate_collection(
+            collection_name=self.collection_name,
+            vectors_config=models.VectorParams(
+                size=384,  # MiniLM-L6-v2 embedding size
+                distance=models.Distance.COSINE
+            )
+        )
+        
+    def add_interview(self, interview_data: Dict[str, Any]) -> None:
+        """Add a processed interview's chunks to the vector store."""
+        try:
+            for chunk in interview_data.get('chunks', []):
+                # Get chunk embedding
+                embedding = self.semantic_analyzer.get_embedding(chunk['text'])
+                
+                # Add to Qdrant
+                self.qdrant.upsert(
+                    collection_name=self.collection_name,
+                    points=[{
+                        'id': f"{interview_data['id']}_{chunk['timestamp']}",
+                        'vector': embedding,
+                        'payload': {
+                            'interview_id': interview_data['id'],
+                            'project_name': interview_data['project_name'],
+                            'text': chunk['text'],
+                            'speaker': chunk['speaker'],
+                            'timestamp': chunk['timestamp'],
+                            'metadata': chunk['metadata']
+                        }
+                    }]
+                )
+                
+            logger.info(f"Added processed interview {interview_data['id']} chunks to vector store")
+            
+        except Exception as e:
+            logger.error(f"Error adding processed interview: {str(e)}")
+            raise
+            
+    def semantic_search(self, query: str, k: int = 5) -> List[Dict[str, Any]]:
+        """Search for semantically similar chunks."""
+        try:
+            # Get query embedding
+            query_embedding = self.semantic_analyzer.get_embedding(query)
+            
+            # Search in Qdrant
+            results = self.qdrant.search(
+                collection_name=self.collection_name,
+                query_vector=query_embedding,
+                limit=k
+            )
+            
+            return [
+                {
+                    'chunk_id': hit.id,
+                    'interview_id': hit.payload['interview_id'],
+                    'project_name': hit.payload['project_name'],
+                    'text': hit.payload['text'],
+                    'speaker': hit.payload['speaker'],
+                    'timestamp': hit.payload['timestamp'],
+                    'metadata': hit.payload['metadata'],
+                    'score': hit.score
+                }
+                for hit in results
+            ]
+            
+        except Exception as e:
+            logger.error(f"Error in semantic search: {str(e)}")
+            return []
+            
+    def emotion_search(self, emotion: str, k: int = 5) -> List[Dict[str, Any]]:
+        """Search for chunks with specific emotion."""
+        try:
+            results = self.qdrant.search(
+                collection_name=self.collection_name,
+                query_vector=[0.0] * 384,  # Dummy vector for filtering
+                limit=k,
+                query_filter={
+                    'must': [{
+                        'key': 'metadata.emotion',
+                        'match': {'value': emotion}
+                    }]
+                }
+            )
+            
+            return [
+                {
+                    'chunk_id': hit.id,
+                    'interview_id': hit.payload['interview_id'],
+                    'project_name': hit.payload['project_name'],
+                    'text': hit.payload['text'],
+                    'speaker': hit.payload['speaker'],
+                    'timestamp': hit.payload['timestamp'],
+                    'metadata': hit.payload['metadata'],
+                    'score': hit.score
+                }
+                for hit in results
+            ]
+            
+        except Exception as e:
+            logger.error(f"Error in emotion search: {str(e)}")
+            return []
+            
+    def find_similar_chunks(self, chunk_id: str, k: int = 5) -> List[Dict[str, Any]]:
+        """Find chunks similar to a given chunk across all interviews."""
+        try:
+            # Get the chunk's vector
+            chunk_info = self.qdrant.retrieve(
+                collection_name=self.collection_name,
+                ids=[chunk_id]
+            )[0]
+            
+            # Search for similar chunks
+            results = self.qdrant.search(
+                collection_name=self.collection_name,
+                query_vector=chunk_info.vector,
+                limit=k + 1  # Add 1 to account for the query chunk
+            )
+            
+            # Filter out the query chunk and format results
+            return [
+                {
+                    'chunk_id': hit.id,
+                    'interview_id': hit.payload['interview_id'],
+                    'project_name': hit.payload['project_name'],
+                    'text': hit.payload['text'],
+                    'speaker': hit.payload['speaker'],
+                    'timestamp': hit.payload['timestamp'],
+                    'metadata': hit.payload['metadata'],
+                    'score': hit.score
+                }
+                for hit in results
+                if hit.id != chunk_id
+            ]
+            
+        except Exception as e:
+            logger.error(f"Error finding similar chunks: {str(e)}")
+            return [] 

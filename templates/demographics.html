@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Demographics{% endblock %}
+
+{% block extra_css %}
+<style>
+    .container {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    .grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 2rem;
+    }
+    .card {
+        background: #f8f9fa;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .card h2 {
+        color: #2d3748;
+        font-size: 1.5rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+    .info-group {
+        margin-bottom: 1rem;
+    }
+    .info-label {
+        color: #4a5568;
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+    .info-value {
+        color: #1a202c;
+    }
+    .section-title {
+        font-size: 2rem;
+        font-weight: bold;
+        color: #2d3748;
+        margin-bottom: 1.5rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="section-title">Interview Demographics</h1>
+
+    {% if interview %}
+        <div class="grid">
+            <!-- Participant Information -->
+            <div class="card">
+                <h2>Participant Information</h2>
+                {% set metadata = interview.get('metadata', {}) %}
+                {% set participant = metadata.get('participant') or metadata.get('interviewee', {}) %}
+                {% if participant %}
+                    <div class="info-group">
+                        <div class="info-label">Name</div>
+                        <div class="info-value">{{ participant.get('name', 'Not provided') }}</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Age</div>
+                        <div class="info-value">{{ participant.get('age', 'Not provided') }}</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Gender</div>
+                        <div class="info-value">{{ participant.get('gender', 'Not provided') }}</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Location</div>
+                        <div class="info-value">{{ participant.get('location', 'Not provided') }}</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Occupation</div>
+                        <div class="info-value">{{ participant.get('occupation', 'Not provided') }}</div>
+                    </div>
+                    <div class="info-group">
+                        <div class="info-label">Industry</div>
+                        <div class="info-value">{{ participant.get('industry', 'Not provided') }}</div>
+                    </div>
+                    {% if participant.get('experience') %}
+                    <div class="info-group">
+                        <div class="info-label">Years of Experience</div>
+                        <div class="info-value">{{ participant.get('experience') }}</div>
+                    </div>
+                    {% endif %}
+                    {% if participant.get('education') %}
+                    <div class="info-group">
+                        <div class="info-label">Education</div>
+                        <div class="info-value">{{ participant.get('education')|title }}</div>
+                    </div>
+                    {% endif %}
+                {% else %}
+                    <p class="text-gray-600">No demographic information is available for this participant.</p>
+                {% endif %}
+            </div>
+
+            <!-- Session Information -->
+            <div class="card">
+                <h2>Session Information</h2>
+                {% set interview_details = metadata.get('interview_details', {}) %}
+                <div class="info-group">
+                    <div class="info-label">Date</div>
+                    <div class="info-value">{{ interview_details.get('interviewDate', 'Not provided') }}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Duration</div>
+                    <div class="info-value">{{ interview_details.get('interviewDuration', 'Not provided') }} minutes</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Format</div>
+                    <div class="info-value">{{ interview_details.get('interviewFormat', 'Not provided')|title }}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Language</div>
+                    <div class="info-value">{{ interview_details.get('interviewLanguage', 'Not provided')|title }}</div>
+                </div>
+
+                {% set researcher = metadata.get('researcher', {}) %}
+                {% if researcher %}
+                <h2 class="mt-6">Researcher Information</h2>
+                <div class="info-group">
+                    <div class="info-label">Name</div>
+                    <div class="info-value">{{ researcher.get('name', 'Not provided') }}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Role</div>
+                    <div class="info-value">{{ researcher.get('role', 'Not provided') }}</div>
+                </div>
+                <div class="info-group">
+                    <div class="info-label">Contact</div>
+                    <div class="info-value">{{ researcher.get('email', 'Not provided') }}</div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    {% else %}
+        <p class="text-gray-600">No demographic information is available for this interview.</p>
+    {% endif %}
+</div>
+{% endblock %}
