@@ -35,7 +35,9 @@ class ProcessedInterviewStore:
         file_path = self._get_interview_path(interview_id)
         try:
             with open(file_path, 'r') as f:
-                return json.load(f)
+                data = json.load(f)
+                data['_file_path'] = file_path  # Add file path to data
+                return data
         except (FileNotFoundError, json.JSONDecodeError):
             return None
 
@@ -160,6 +162,37 @@ class ProcessedInterviewStore:
 
     def _create_search_result(self, interview_data: Dict, chunk: Dict, similarity: float = 1.0) -> Dict:
         """Create a standardized search result dictionary."""
+        # Extract interview_id from the chunk_id or from interview_data
+        interview_id = (
+            chunk.get('chunk_id', '').split('_')[0] or  # Try to get from chunk_id
+            interview_data.get('interview_id') or  # Try direct interview_id
+            interview_data.get('id')  # Try id field
+        )
+        
+        # If no ID found, try to get it from the file path
+        if not interview_id:
+            file_path = interview_data.get('_file_path', '')  # We'll need to add this when loading the file
+            if file_path:
+                interview_id = os.path.splitext(os.path.basename(file_path))[0]
+            else:
+                interview_id = str(uuid.uuid4())  # Only generate UUID if absolutely necessary
+
+        # Get timestamp from entries if available
+        timestamp = None
+        if 'entries' in chunk:
+            # If multiple entries, use the first one's timestamp
+            entries = chunk['entries']
+            if entries and isinstance(entries, list) and len(entries) > 0:
+                timestamp = entries[0].get('timestamp', '')
+        
+        # If no timestamp in entries, try other locations
+        if not timestamp:
+            timestamp = (
+                chunk.get('timestamp', '') or  # Direct timestamp
+                chunk.get('metadata', {}).get('timestamp', '') or  # Metadata timestamp
+                interview_data.get('metadata', {}).get('date', '')  # Interview date as fallback
+            )
+
         # Get all possible themes from various locations
         all_themes = []
         chunk_themes = chunk.get('themes', [])
@@ -199,65 +232,33 @@ class ProcessedInterviewStore:
             0.5
         )
 
-        # Handle entries and speaker information
-        entries = chunk.get('entries', [])
-        if not entries:
-            # Get speaker from the most reliable source, prioritizing participant
-            speaker = (
-                interview_data.get('metadata', {}).get('interviewee', {}).get('name') or  # Interviewee from metadata
-                interview_data.get('interviewee', {}).get('name') or  # Direct interviewee name
-                chunk.get('metadata', {}).get('participant', {}).get('name') or  # Participant name from metadata
-                chunk.get('participant', {}).get('name') or  # Direct participant name
-                chunk.get('participant_name') or  # Legacy participant name
-                chunk.get('speaker') or  # Direct speaker field
-                chunk.get('metadata', {}).get('speaker') or  # Metadata speaker
-                interview_data.get('metadata', {}).get('researcher', {}).get('name') or  # Researcher name as last resort
-                ''  # Empty string if no speaker found
-            )
-            
-            # Get content from the most appropriate source
-            content = (
-                chunk.get('combined_text') or  # First try combined_text
-                chunk.get('analysis', {}).get('text') or  # Then try analysis text
-                chunk.get('text') or  # Then try regular text
-                chunk.get('content', '')  # Finally try content
-            )
-            
-            if content:
-                entries = [{
-                    'speaker': speaker,
-                    'text': content,
-                    'timestamp': chunk.get('timestamp', '')
-                }]
+        # Get content from entries if available
+        content = None
+        if 'entries' in chunk:
+            entries = chunk['entries']
+            if entries and isinstance(entries, list):
+                # Combine text from all entries
+                content = ' '.join(entry.get('text', '') for entry in entries if entry.get('text'))
 
-        # Get the content from the most appropriate source
-        content = (
-            chunk.get('combined_text') or  # First try combined_text
-            (entries[0].get('text') if entries else '') or  # Then try first entry's text
-            chunk.get('analysis', {}).get('text') or  # Then try analysis text
-            chunk.get('text') or  # Then try regular text
-            chunk.get('content', '')  # Finally try content
-        )
-
-        # Get the interviewee name
-        interviewee_name = self._get_interviewee_name(interview_data)
+        # If no content from entries, try other locations
+        if not content:
+            content = chunk.get('content') or chunk.get('text') or chunk.get('combined_text', '')
 
         return {
-            'interview_id': interview_data.get('id'),
-            'chunk_id': chunk.get('id') or str(uuid.uuid4()),
-            'project_name': self.default_project_name,
+            'interview_id': interview_id,
+            'chunk_id': chunk.get('chunk_id', str(uuid.uuid4())),
+            'project_name': interview_data.get('project_name', self.default_project_name),
             'content': content,
-            'timestamp': chunk.get('timestamp') or datetime.now().isoformat(),
-            'interviewee_name': interviewee_name,
-            'transcript_name': interview_data.get('metadata', {}).get('transcript_name', ''),
-            'entries': entries,
             'similarity': similarity,
+            'timestamp': timestamp,
+            'interviewee_name': self._get_interviewee_name(interview_data),
+            'transcript_name': interview_data.get('transcript_name', ''),
             'metadata': {
                 'emotion': emotion,
                 'emotion_intensity': self._normalize_emotion_intensity(emotion_intensity),
-                'themes': list(set(all_themes)),  # Remove duplicates
-                'insight_tags': list(set(all_insight_tags)),  # Remove duplicates
-                'related_feature': chunk.get('related_feature') or chunk.get('metadata', {}).get('related_feature')
+                'themes': list(set(all_themes)),
+                'insight_tags': list(set(all_insight_tags)),
+                'related_feature': chunk.get('metadata', {}).get('related_feature')
             }
         }
 

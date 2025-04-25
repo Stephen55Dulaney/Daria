@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session
+from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session, current_app
 from flask_socketio import SocketIO, emit
 from elevenlabs import stream
 from elevenlabs.client import ElevenLabs
@@ -827,26 +827,38 @@ def journey_map():
     try:
         # Get list of projects with their IDs and names
         projects = []
-        if os.path.exists('interviews'):
-            project_dict = {}
-            for filename in os.listdir('interviews'):
-                if filename.endswith('.json'):
-                    with open(os.path.join('interviews', filename)) as f:
-                        interview = json.load(f)
-                        project_name = interview.get('project_name')
-                        if project_name and project_name not in project_dict:
-                            project_dict[project_name] = {
-                                'id': str(uuid.uuid4()),  # Generate a unique ID for each project
-                                'name': project_name
-                            }
-            projects = list(project_dict.values())
+        project_dict = {}
         
+        # Check both raw and processed interview directories
+        interview_dirs = ['interviews/raw', 'interviews/processed']
+        
+        for dir_path in interview_dirs:
+            if os.path.exists(dir_path):
+                for filename in os.listdir(dir_path):
+                    if filename.endswith('.json'):
+                        try:
+                            with open(os.path.join(dir_path, filename)) as f:
+                                interview = json.load(f)
+                                project_name = interview.get('project_name')
+                                if project_name and project_name not in project_dict:
+                                    project_dict[project_name] = {
+                                        'id': project_name,  # Use project name as ID for consistency
+                                        'name': project_name
+                                    }
+                        except Exception as e:
+                            logger.error(f"Error reading interview file {filename}: {str(e)}")
+                            continue
+        
+        projects = list(project_dict.values())
         logger.info(f"Found {len(projects)} projects for journey map")
-        return render_template('journey_map.html', projects=sorted(projects, key=lambda x: x['name']))
+        
+        return render_template('journey_map.html', 
+                             projects=sorted(projects, key=lambda x: x['name']),
+                             current_project=request.args.get('project', ''))
     except Exception as e:
         logger.error(f"Error in journey_map route: {str(e)}")
         logger.error(traceback.format_exc())
-        return render_template('journey_map.html', projects=[])
+        return render_template('journey_map.html', projects=[], current_project='')
 
 @app.route('/save_interview', methods=['POST'])
 def save_interview():
@@ -1979,183 +1991,177 @@ def generate_persona():
     """Generate a persona based on selected interviews."""
     try:
         data = request.get_json()
+        logger.info(f"Received persona generation request: {json.dumps(data, indent=2)}")
+        
         if not data or 'interviews' not in data:
+            logger.error("No interviews provided in request")
             return jsonify({'error': 'No interviews provided'}), 400
             
         interviews = data['interviews']
         project_name = data.get('project_name', '')
         selected_elements = data.get('selected_elements', [])
-        model = data.get('model', 'gpt-4')  # Default to GPT-4 if not specified
+        model = data.get('model', 'gpt-4')
         
         # Load interview data
         interview_data = []
         for interview_id in interviews:
             interview = get_interview(interview_id)
-            if interview:
-                interview_data.append(interview)
-                
+            if not interview:
+                logger.warning(f"Could not load interview data for ID {interview_id}")
+                continue
+            interview_data.append(interview)
+            
         if not interview_data:
+            logger.error("No valid interviews found")
             return jsonify({'error': 'No valid interviews found'}), 400
 
-        # Generate persona content
-        try:
-            system_prompt = """You are an expert UX researcher and persona creator. 
-            Create a detailed persona based on the interview data provided. 
-            Return ONLY the JSON data without any markdown formatting or code blocks.
-            Format the response with the following structure:
-            {
-                "name": "Name and title",
-                "summary": "Brief summary",
-                "image_prompt": "Detailed prompt for image generation",
-                "demographics": {
-                    "age_range": "Age range (e.g. 25-35)",
-                    "gender": "Gender",
-                    "occupation": "Current occupation",
-                    "location": "Location",
-                    "education": "Education level"
-                },
-                "background": "Detailed background information",
-                "goals": [
+        # Get model context limits
+        model_limits = {
+            'gpt-3.5-turbo': 16385,
+            'gpt-4': 128000,
+            'gpt-4-turbo-preview': 128000,
+            'claude-3.7-sonnet': 200000
+        }
+        
+        max_tokens = model_limits.get(model, 16385)  # Default to smallest limit if unknown
+        
+        # Prepare interview data based on model limits
+        def prepare_interview_data(interviews, max_tokens):
+            prepared_data = []
+            for interview in interviews:
+                # Extract key information
+                metadata = interview.get('metadata', {})
+                transcript = interview.get('transcript', '')
+                
+                # If transcript is a list of messages, join them
+                if isinstance(transcript, list):
+                    transcript = ' '.join([msg.get('text', '') for msg in transcript if msg.get('speaker') == 'You'])
+                
+                # Get the first 1000 characters of transcript for smaller models
+                if model == 'gpt-3.5-turbo':
+                    transcript = transcript[:1000] + '...' if len(transcript) > 1000 else transcript
+                
+                prepared_data.append({
+                    'metadata': metadata,
+                    'transcript_excerpt': transcript,
+                    'key_insights': interview.get('analysis', {}).get('key_insights', [])[:5]  # Limit to top 5 insights
+                })
+            return prepared_data
+
+        # Generate system prompt
+        system_prompt = """You are an expert UX researcher and persona creator. 
+        Create a detailed persona based on the interview data provided. 
+        Return ONLY the JSON data without any markdown formatting or code blocks.
+        Format the response with the following structure:
+        {
+            "name": "Name and title",
+            "summary": "Brief summary",
+            "image_prompt": "Detailed prompt for image generation",
+            "demographics": {
+                "age_range": "Age range (e.g. 25-35)",
+                "gender": "Gender",
+                "occupation": "Current occupation",
+                "location": "Location",
+                "education": "Education level"
+            },
+            "background": "Detailed background information",
+            "goals": [
+                {
+                    "goal": "Goal description",
+                    "motivation": "Motivation behind the goal",
+                    "supporting_quotes": ["quote1", "quote2"]
+                }
+            ],
+            "pain_points": [
+                {
+                    "pain_point": "Pain point description",
+                    "impact": "Impact description",
+                    "supporting_quotes": ["quote1", "quote2"]
+                }
+            ]
+        }"""
+
+        # Prepare data based on model
+        prepared_interviews = prepare_interview_data(interview_data, max_tokens)
+        
+        # Create user prompt with prepared data
+        user_prompt = f"Create a persona based on these interviews: {json.dumps(prepared_interviews, indent=2)}"
+
+        content = None
+        if model == 'claude-3.7-sonnet':
+            try:
+                import boto3
+                
+                aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
+                aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+                region = 'us-east-2'
+                
+                if not aws_access_key or not aws_secret_key:
+                    logger.error("AWS credentials not found")
+                    return jsonify({'error': 'AWS credentials not configured'}), 500
+                
+                logger.info("Initializing AWS Bedrock client...")
+                bedrock_runtime = boto3.client(
+                    service_name='bedrock-runtime',
+                    region_name=region,
+                    aws_access_key_id=aws_access_key,
+                    aws_secret_access_key=aws_secret_key
+                )
+                
+                # Format messages for Claude
+                messages = [
                     {
-                        "goal": "Goal description",
-                        "motivation": "Motivation behind the goal",
-                        "supporting_quotes": ["quote1", "quote2"]
-                    }
-                ],
-                "pain_points": [
-                    {
-                        "pain_point": "Pain point description",
-                        "impact": "Impact description",
-                        "supporting_quotes": ["quote1", "quote2"]
+                        "role": "user",
+                        "content": user_prompt
                     }
                 ]
-            }"""
-            
-            user_prompt = f"Create a persona based on these interviews: {json.dumps(interview_data, indent=2)}"
-
-            content = None
-            if model == 'claude-3.7-sonnet':
-                # Use Claude via AWS Bedrock
-                try:
-                    import boto3
-                    
-                    # Get AWS credentials from environment
-                    aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
-                    aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-                    
-                    if not aws_access_key or not aws_secret_key:
-                        logger.error("AWS credentials not found in environment variables")
-                        return jsonify({'error': 'AWS credentials not found in environment variables'}), 500
-                    
-                    # Initialize Bedrock client
-                    logger.info("Initializing AWS Bedrock client...")
-                    bedrock_runtime = boto3.client(
-                        service_name='bedrock-runtime',
-                        region_name='us-east-2',
-                        aws_access_key_id=aws_access_key,
-                        aws_secret_access_key=aws_secret_key
-                    )
-                    
-                    # Prepare the request body
-                    body = json.dumps({
-                        "messages": [
-                            {
-                                "role": "user",
-                                "content": user_prompt
-                            }
-                        ],
-                        "system": system_prompt,
-                        "max_tokens": 4096,
-                        "temperature": 0.7,
-                        "top_p": 1,
-                        "anthropic_version": "bedrock-2023-05-31"
-                    })
-                    
-                    logger.info("Sending request to Claude via AWS Bedrock...")
-                    response = bedrock_runtime.invoke_model(
-                        body=body,
-                        modelId='arn:aws:bedrock:us-east-2:522814696964:inference-profile/us.anthropic.claude-3-5-haiku-20241022-v1:0',
-                        accept="application/json",
-                        contentType="application/json"
-                    )
-                    
-                    response_body = json.loads(response.get('body').read())
-                    logger.info(f"Raw Claude response: {json.dumps(response_body, indent=2)}")
-                    
-                    # Extract content from Claude response
-                    if 'content' in response_body:
-                        # Handle the new response format where content is a list of message parts
-                        content_list = response_body['content']
-                        if isinstance(content_list, list) and len(content_list) > 0:
-                            # Get the text from the first content item
-                            content = content_list[0].get('text', '')
-                        else:
-                            content = ''
-                    elif 'completion' in response_body:
-                        content = response_body['completion']
-                    else:
-                        logger.error(f"Unexpected Claude response structure: {json.dumps(response_body, indent=2)}")
-                        raise ValueError("Unexpected response structure from Claude")
-                        
-                    logger.info("Successfully received response from Claude")
-                    logger.info(f"Extracted content: {content}")
-                    
-                    if not content:
-                        raise ValueError("Empty response from Claude")
-
-                    # Clean and parse the content
-                    content = content.strip()
-                    if content.startswith('```'):
-                        content = content.split('```')[1]
-                        if content.startswith('json'):
-                            content = content[4:]
-                        content = content.strip()
-                    
-                    try:
-                        persona_data = json.loads(content)
-                        logger.info(f"Parsed persona data: {json.dumps(persona_data, indent=2)}")
-                        
-                        # Basic validation of required fields
-                        required_fields = ['name', 'summary', 'demographics', 'goals', 'pain_points']
-                        if not all(field in persona_data for field in required_fields):
-                            missing_fields = [field for field in required_fields if field not in persona_data]
-                            raise ValueError(f"Missing required fields in persona data: {', '.join(missing_fields)}")
-                        
-                        # Validate demographics fields
-                        required_demographics = ['age_range', 'gender', 'occupation', 'location', 'education']
-                        if not all(field in persona_data['demographics'] for field in required_demographics):
-                            missing_demographics = [field for field in required_demographics if field not in persona_data['demographics']]
-                            raise ValueError(f"Missing required demographics fields: {', '.join(missing_demographics)}")
-                        
-                        # Save persona
-                        save_persona_data = {
-                            'project_name': project_name,
-                            'content': json.dumps(persona_data),  # Convert to JSON string
-                            'selected_elements': selected_elements
-                        }
-                        result = save_persona(**save_persona_data)
-                        
-                        return jsonify({
-                            'status': 'success',
-                            'persona': generate_persona_html(persona_data)
-                        }), 200
-                        
-                    except json.JSONDecodeError as e:
-                        logger.error(f"Error parsing persona JSON: {str(e)}")
-                        logger.error(f"Raw content: {content}")
-                        return jsonify({'error': 'Invalid persona format from AI'}), 500
-                        
-                except Exception as e:
-                    logger.error(f"Error using Claude via AWS Bedrock: {str(e)}")
-                    logger.error(f"Error type: {type(e).__name__}")
-                    logger.error(traceback.format_exc())
-                    return jsonify({'error': f'Failed to generate persona with Claude: {str(e)}'}), 500
-            else:
-                # Use OpenAI
+                
+                body = json.dumps({
+                    "messages": messages,
+                    "system": system_prompt,
+                    "max_tokens": 4096,
+                    "temperature": 0.7,
+                    "top_p": 1,
+                    "anthropic_version": "bedrock-2023-05-31"
+                })
+                
+                logger.info("Sending request to Claude via Bedrock...")
+                response = bedrock_runtime.invoke_model(
+                    body=body,
+                    modelId='arn:aws:bedrock:us-east-2:522814696964:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+                    accept="application/json",
+                    contentType="application/json"
+                )
+                
+                response_body = json.loads(response.get('body').read())
+                logger.info(f"Raw Claude response: {json.dumps(response_body, indent=2)}")
+                
+                # Extract content from Claude response
+                content = ''
+                if 'content' in response_body:
+                    content_list = response_body['content']
+                    if isinstance(content_list, list) and len(content_list) > 0:
+                        # Get the text from the first content item
+                        content = content_list[0].get('text', '')
+                
+                if not content:
+                    logger.error("Empty response from Claude")
+                    raise ValueError("Empty response from Claude")
+                
+                logger.info(f"Extracted content from Claude: {content}")
+            except Exception as e:
+                logger.error(f"Error using Claude: {str(e)}")
+                logger.error(traceback.format_exc())
+                return jsonify({'error': f'Failed to generate persona with Claude: {str(e)}'}), 500
+        else:
+            # Use OpenAI
+            try:
                 client = create_openai_client()
                 if not client:
+                    logger.error("Failed to initialize OpenAI client")
                     return jsonify({'error': 'Failed to initialize AI client'}), 500
                     
+                logger.info("Sending request to OpenAI...")
                 response = client.chat.completions.create(
                     model="gpt-4-turbo-preview" if model == 'gpt-4' else "gpt-3.5-turbo",
                     messages=[
@@ -2165,60 +2171,45 @@ def generate_persona():
                     temperature=0.7
                 )
                 content = response.choices[0].message.content
-            
-            if not content:
-                return jsonify({'error': 'No content generated'}), 500
+                logger.info("Received response from OpenAI")
+            except Exception as e:
+                logger.error(f"Error using OpenAI: {str(e)}")
+                logger.error(traceback.format_exc())
+                return jsonify({'error': f'Failed to generate persona with OpenAI: {str(e)}'}), 500
+        
+        if not content:
+            logger.error("No content generated")
+            return jsonify({'error': 'No content generated'}), 500
 
-            # Clean and parse the content
+        # Clean and parse the content
+        content = content.strip()
+        if content.startswith('```'):
+            content = content.split('```')[1]
+            if content.startswith('json'):
+                content = content[4:]
             content = content.strip()
-            if content.startswith('```'):
-                content = content.split('```')[1]
-                if content.startswith('json'):
-                    content = content[4:]
-                content = content.strip()
-            
-            try:
-                persona_data = json.loads(content)
-                
-                # Basic validation of required fields
-                required_fields = ['name', 'summary', 'demographics', 'goals', 'pain_points']
-                if not all(field in persona_data for field in required_fields):
-                    missing_fields = [field for field in required_fields if field not in persona_data]
-                    raise ValueError(f"Missing required fields in persona data: {', '.join(missing_fields)}")
-                
-                # Validate demographics fields
-                required_demographics = ['age_range', 'gender', 'occupation', 'location', 'education']
-                if not all(field in persona_data['demographics'] for field in required_demographics):
-                    missing_demographics = [field for field in required_demographics if field not in persona_data['demographics']]
-                    raise ValueError(f"Missing required demographics fields: {', '.join(missing_demographics)}")
-                
-                # Save persona
-                save_persona_data = {
-                    'project_name': project_name,
-                    'content': json.dumps(persona_data),  # Convert to JSON string
-                    'selected_elements': selected_elements
-                }
-                result = save_persona(**save_persona_data)
-                
-                return jsonify({
-                    'status': 'success',
-                    'persona': generate_persona_html(persona_data)
-                }), 200
-                
-            except json.JSONDecodeError as e:
-                logger.error(f"Error parsing persona JSON: {str(e)}")
-                logger.error(f"Raw content: {content}")
-                return jsonify({'error': 'Invalid persona format from AI'}), 500
-                
+        
+        logger.info(f"Cleaned content: {content}")
+        
+        try:
+            persona_data = json.loads(content)
+        except json.JSONDecodeError as e:
+            logger.error(f"Error parsing persona JSON: {str(e)}")
+            return jsonify({'error': 'Invalid persona data format'}), 500
+
+        # Generate HTML from persona data
+        try:
+            persona_html = generate_persona_html(persona_data)
+            logger.info("Successfully generated persona HTML")
+            return jsonify({'persona': persona_html})
         except Exception as e:
-            logger.error(f"Error generating persona content: {str(e)}")
-            logger.error(traceback.format_exc())
-            return jsonify({'error': 'Failed to generate persona'}), 500
-            
+            logger.error(f"Error generating persona HTML: {str(e)}")
+            return jsonify({'error': 'Failed to generate persona HTML'}), 500
+
     except Exception as e:
-        logger.error(f"Error in generate_persona: {str(e)}")
+        logger.error(f"Unexpected error in generate_persona: {str(e)}")
         logger.error(traceback.format_exc())
-        return jsonify({'error': 'Internal server error'}), 500
+        return jsonify({'error': str(e)}), 500
 
 def generate_persona_html(persona_data):
     """Generate HTML representation of the persona data."""
@@ -2693,12 +2684,19 @@ def get_project_interviews(project_id):
 def get_interview_content(interview_id, content_type):
     """Get specific content (transcript, analysis, or metadata) for an interview."""
     try:
-        interview_file = Path('interviews') / f"{interview_id}.json"
-        if not interview_file.exists():
+        # Check multiple directories for the interview file
+        interview_dirs = ['interviews', 'interviews/raw', 'interviews/processed']
+        interview_data = None
+        
+        for dir_path in interview_dirs:
+            interview_file = Path(dir_path) / f"{interview_id}.json"
+            if interview_file.exists():
+                with open(interview_file) as f:
+                    interview_data = json.load(f)
+                break
+        
+        if not interview_data:
             return jsonify({'error': 'Interview not found'}), 404
-            
-        with open(interview_file) as f:
-            interview_data = json.load(f)
             
         if content_type == 'transcript':
             content = interview_data.get('transcript', '')
@@ -2739,17 +2737,25 @@ def create_journey_map():
             
         # Load all selected interviews
         interviews = []
+        interview_dirs = ['interviews', 'interviews/raw', 'interviews/processed']
+        
         for interview_id in interview_ids:
-            interview_file = Path('interviews') / f"{interview_id}.json"
-            logger.info(f"Loading interview file: {interview_file}")
+            interview_data = None
             
-            if interview_file.exists():
-                with open(interview_file) as f:
-                    interview_data = json.load(f)
-                    interviews.append(interview_data)
-                    logger.info(f"Successfully loaded interview {interview_id}")
-            else:
-                logger.error(f"Interview file not found: {interview_file}")
+            # Try each directory
+            for dir_path in interview_dirs:
+                interview_file = Path(dir_path) / f"{interview_id}.json"
+                logger.info(f"Checking for interview file: {interview_file}")
+                
+                if interview_file.exists():
+                    with open(interview_file) as f:
+                        interview_data = json.load(f)
+                        interviews.append(interview_data)
+                        logger.info(f"Successfully loaded interview {interview_id} from {dir_path}")
+                        break
+            
+            if not interview_data:
+                logger.warning(f"Interview file not found for ID: {interview_id}")
         
         if not interviews:
             logger.error("No valid interviews found")
@@ -2777,234 +2783,161 @@ def generate_journey_map_html(interviews):
         # Log interview data
         logger.info(f"Processing {len(interviews)} interviews for journey map")
         
-        # Package interview data with clear structure
+        # Package interview data with clear structure and handle large content
         interview_packages = []
         for i, interview in enumerate(interviews):
+            # Get the transcript and analysis
+            transcript = interview.get('transcript', '')
+            analysis = interview.get('analysis', '')
+            
+            # If transcript is too long, extract key sections
+            if len(transcript) > 4000:  # Conservative limit to stay under token limit
+                # Split into chunks and extract key insights
+                chunks = [transcript[i:i+4000] for i in range(0, len(transcript), 4000)]
+                key_insights = []
+                
+                for chunk in chunks:
+                    try:
+                        # Extract key points from each chunk
+                        response = client.chat.completions.create(
+                            model="gpt-4",
+                            messages=[
+                                {"role": "system", "content": "You are a research analyst. Extract the key points and insights from this interview transcript chunk, focusing on user journey relevant information. Be concise."},
+                                {"role": "user", "content": chunk}
+                            ],
+                            max_tokens=500,
+                            temperature=0.3
+                        )
+                        key_insights.append(response.choices[0].message.content)
+                    except Exception as e:
+                        logger.error(f"Error processing chunk: {str(e)}")
+                        continue
+                
+                # Join key insights
+                processed_transcript = "\n\n".join(key_insights)
+            else:
+                processed_transcript = transcript
+            
+            # Similarly handle analysis if it's too long
+            if len(analysis) > 2000:
+                processed_analysis = analysis[:2000] + "...\n[Analysis truncated for length]"
+            else:
+                processed_analysis = analysis
+            
             interview_package = {
                 'id': interview.get('id'),
                 'date': interview.get('date'),
                 'type': interview.get('interview_type'),
-                'transcript': interview.get('transcript', ''),
-                'analysis': interview.get('analysis', '')
+                'transcript': processed_transcript,
+                'analysis': processed_analysis
             }
             interview_packages.append(interview_package)
             logger.info(f"Interview {i+1} ID: {interview_package['id']}")
-            logger.info(f"Interview {i+1} transcript length: {len(interview_package['transcript'])}")
-            logger.info(f"Interview {i+1} analysis length: {len(interview_package['analysis'])}")
+            logger.info(f"Processed transcript length: {len(processed_transcript)}")
+            logger.info(f"Processed analysis length: {len(processed_analysis)}")
         
         # Create a structured prompt for the journey map
         analysis_prompt = f"""As a UX research expert, analyze these {len(interview_packages)} interviews and create a detailed journey map. 
 Focus on extracting specific, actionable insights from the interviews.
 
 For each interview, I'll provide:
-1. The interview transcript
-2. The individual analysis
+1. The key points from the interview transcript
+2. The analysis summary
 3. The interview date and type
 
-Please create a comprehensive journey map and return it as a JSON object with the following structure:
+Please create a comprehensive journey map that includes:
 
-{{
-    "journey_stages": [
-        {{
-            "stage_number": 1,
-            "name": "Stage name",
-            "description": "What the user is doing",
-            "thoughts": "What they're thinking",
-            "feelings": "How they're feeling",
-            "supporting_quotes": ["Quote 1", "Quote 2"]
-        }}
-    ],
-    "touchpoints": [
-        {{
-            "stage": "Stage name",
-            "interactions": ["Interaction 1", "Interaction 2"],
-            "tools": ["Tool 1", "Tool 2"],
-            "channels": ["Channel 1", "Channel 2"],
-            "support": ["Support mechanism 1", "Support mechanism 2"],
-            "examples": ["Example 1", "Example 2"]
-        }}
-    ],
-    "emotions": [
-        {{
-            "stage": "Stage name",
-            "emotion": "Primary emotion",
-            "triggers": ["Trigger 1", "Trigger 2"],
-            "quotes": ["Quote 1", "Quote 2"]
-        }}
-    ],
-    "pain_points": [
-        {{
-            "stage": "Stage name",
-            "challenge": "Description of the challenge",
-            "impact": "Impact on the user",
-            "quotes": ["Quote 1", "Quote 2"]
-        }}
-    ],
-    "opportunities": [
-        {{
-            "stage": "Stage name",
-            "improvement": "Description of the improvement",
-            "type": "Quick win or long-term solution",
-            "impact": "Expected impact",
-            "priority": "High, Medium, or Low"
-        }}
-    ]
-}}
+1. Key stages of the user journey
+2. Important touchpoints at each stage
+3. User emotions and pain points
+4. Opportunities for improvement
 
-Interview Data:
-{json.dumps(interview_packages, indent=2)}
+Format the response as HTML with appropriate styling classes. Use the following structure:
 
-Please ensure your response is a valid JSON object with all the sections and fields as shown above. Include specific quotes from the interviews to support each insight."""
+<div class="journey-map-container">
+    <div class="journey-map-section stages">
+        <h2>Journey Stages</h2>
+        [Stage cards...]
+    </div>
+    <div class="journey-map-section touchpoints">
+        <h2>Key Touchpoints</h2>
+        [Touchpoint cards...]
+    </div>
+    <div class="journey-map-section emotions">
+        <h2>User Emotions</h2>
+        [Emotion cards...]
+    </div>
+    <div class="journey-map-section pain-points">
+        <h2>Pain Points</h2>
+        [Pain point cards...]
+    </div>
+    <div class="journey-map-section opportunities">
+        <h2>Opportunities</h2>
+        [Opportunity cards...]
+    </div>
+</div>
+
+Here are the interviews to analyze:
+
+"""
+
+        # Add interview data to prompt
+        for i, interview in enumerate(interview_packages, 1):
+            analysis_prompt += f"""
+Interview {i}:
+Date: {interview['date']}
+Type: {interview['type']}
+
+Key Points:
+{interview['transcript']}
+
+Analysis:
+{interview['analysis']}
+
+---
+"""
 
         logger.info("Sending request to OpenAI")
-        # Get analysis from OpenAI
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
-                {"role": "system", "content": "You are a UX research expert specializing in journey mapping. Your task is to analyze interview data and create a detailed, evidence-based journey map. Return your analysis as a structured JSON object."},
+                {"role": "system", "content": "You are a UX research expert skilled at creating journey maps from interview data."},
                 {"role": "user", "content": analysis_prompt}
             ],
+            max_tokens=4000,
             temperature=0.7
         )
         
-        # Log the raw response
-        analysis = response.choices[0].message.content
-        logger.info(f"Received analysis from OpenAI, length: {len(analysis)}")
-        logger.info("Analysis content preview:")
-        logger.info(analysis[:500] + "...")
+        journey_map_html = response.choices[0].message.content
         
-        # Parse the JSON response
-        try:
-            journey_map_data = json.loads(analysis)
-            logger.info("Successfully parsed JSON response")
-        except json.JSONDecodeError as e:
-            logger.error(f"Error parsing JSON response: {str(e)}")
-            logger.error("Raw response:")
-            logger.error(analysis)
-            raise
+        # Add wrapper and styling
+        final_html = f"""
+<div class="journey-map-wrapper p-6 bg-white rounded-lg shadow-lg">
+    <div class="mb-6">
+        <h1 class="text-2xl font-bold text-gray-900 mb-2">User Journey Map</h1>
+        <p class="text-gray-600">Based on {len(interviews)} interview{'' if len(interviews) == 1 else 's'}</p>
+    </div>
+    {journey_map_html}
+</div>
+"""
         
-        # Generate HTML structure with the extracted insights
-        html = f"""
-        <div class="journey-map space-y-8 p-6">
-            <div class="stages-section">
-                <h3 class="text-xl font-semibold mb-4">Journey Stages</h3>
-                <div class="grid grid-cols-1 md:grid-cols-{max(len(journey_map_data['journey_stages']), 1)} gap-4">
-                    {''.join(f'''
-                        <div class="stage-card p-4 bg-blue-50 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <p class="font-medium text-blue-800 mb-2">Stage {stage['stage_number']}: {stage['name']}</p>
-                            <div class="space-y-2">
-                                <p class="text-sm text-gray-600"><strong>What they're doing:</strong> {stage['description']}</p>
-                                <p class="text-sm text-gray-600"><strong>What they're thinking:</strong> {stage['thoughts']}</p>
-                                <p class="text-sm text-gray-600"><strong>How they're feeling:</strong> {stage['feelings']}</p>
-                                <div class="mt-2">
-                                    <p class="text-sm font-medium text-blue-700">Supporting Quotes:</p>
-                                    <ul class="list-disc list-inside text-sm text-gray-600">
-                                        {''.join(f'<li>{quote}</li>' for quote in stage['supporting_quotes'])}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    ''' for stage in journey_map_data['journey_stages'])}
-                </div>
-            </div>
-            
-            <div class="touchpoints-section">
-                <h3 class="text-xl font-semibold mb-4">Touchpoints</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {''.join(f'''
-                        <div class="touchpoint-card p-4 bg-green-50 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <p class="font-medium text-green-800 mb-2">{touchpoint['stage']}</p>
-                            <div class="space-y-2">
-                                <p class="text-sm text-gray-600"><strong>Interactions:</strong> {', '.join(touchpoint['interactions'])}</p>
-                                <p class="text-sm text-gray-600"><strong>Tools:</strong> {', '.join(touchpoint['tools'])}</p>
-                                <p class="text-sm text-gray-600"><strong>Channels:</strong> {', '.join(touchpoint['channels'])}</p>
-                                <p class="text-sm text-gray-600"><strong>Support:</strong> {', '.join(touchpoint['support'])}</p>
-                                <div class="mt-2">
-                                    <p class="text-sm font-medium text-green-700">Examples:</p>
-                                    <ul class="list-disc list-inside text-sm text-gray-600">
-                                        {''.join(f'<li>{example}</li>' for example in touchpoint['examples'])}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    ''' for touchpoint in journey_map_data['touchpoints'])}
-                </div>
-            </div>
-            
-            <div class="emotions-section">
-                <h3 class="text-xl font-semibold mb-4">User Emotions</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {''.join(f'''
-                        <div class="emotion-card p-4 bg-yellow-50 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <p class="font-medium text-yellow-800 mb-2">{emotion['stage']}</p>
-                            <div class="space-y-2">
-                                <p class="text-sm text-gray-600"><strong>Emotion:</strong> {emotion['emotion']}</p>
-                                <p class="text-sm text-gray-600"><strong>Triggers:</strong> {', '.join(emotion['triggers'])}</p>
-                                <div class="mt-2">
-                                    <p class="text-sm font-medium text-yellow-700">Supporting Quotes:</p>
-                                    <ul class="list-disc list-inside text-sm text-gray-600">
-                                        {''.join(f'<li>{quote}</li>' for quote in emotion['quotes'])}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    ''' for emotion in journey_map_data['emotions'])}
-                </div>
-            </div>
-            
-            <div class="pain-points-section">
-                <h3 class="text-xl font-semibold mb-4">Pain Points</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {''.join(f'''
-                        <div class="pain-point-card p-4 bg-red-50 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <p class="font-medium text-red-800 mb-2">{pain_point['stage']}</p>
-                            <div class="space-y-2">
-                                <p class="text-sm text-gray-600"><strong>Challenge:</strong> {pain_point['challenge']}</p>
-                                <p class="text-sm text-gray-600"><strong>Impact:</strong> {pain_point['impact']}</p>
-                                <div class="mt-2">
-                                    <p class="text-sm font-medium text-red-700">Supporting Quotes:</p>
-                                    <ul class="list-disc list-inside text-sm text-gray-600">
-                                        {''.join(f'<li>{quote}</li>' for quote in pain_point['quotes'])}
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    ''' for pain_point in journey_map_data['pain_points'])}
-                </div>
-            </div>
-            
-            <div class="opportunities-section">
-                <h3 class="text-xl font-semibold mb-4">Opportunities</h3>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    {''.join(f'''
-                        <div class="opportunity-card p-4 bg-purple-50 rounded-lg shadow-md hover:shadow-lg transition-shadow">
-                            <p class="font-medium text-purple-800 mb-2">{opportunity['stage']}</p>
-                            <div class="space-y-2">
-                                <p class="text-sm text-gray-600"><strong>Improvement:</strong> {opportunity['improvement']}</p>
-                                <p class="text-sm text-gray-600"><strong>Type:</strong> {opportunity['type']}</p>
-                                <p class="text-sm text-gray-600"><strong>Impact:</strong> {opportunity['impact']}</p>
-                                <p class="text-sm text-gray-600"><strong>Priority:</strong> {opportunity['priority']}</p>
-                            </div>
-                        </div>
-                    ''' for opportunity in journey_map_data['opportunities'])}
-                </div>
-            </div>
-        </div>
-        """
-        
-        logger.info("Generated HTML content")
-        return html
+        return final_html
         
     except Exception as e:
         logger.error(f"Error generating journey map HTML: {str(e)}")
         logger.error(traceback.format_exc())
+        # Return an error message as HTML
         return f"""
-        <div class="journey-map">
-            <div class="error-message p-4 bg-red-50 rounded-lg">
-                <p class="text-red-600">Error generating journey map: {str(e)}</p>
-            </div>
-        </div>
-        """
+<div class="error-message">
+    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+    </svg>
+    <div>
+        <h3 class="font-semibold">Error Generating Journey Map</h3>
+        <p class="text-sm">{str(e)}</p>
+    </div>
+</div>
+"""
 
 @app.route('/generate_report', methods=['POST'])
 def generate_report():
@@ -3814,54 +3747,32 @@ def delete_project_route(project_id):
         return jsonify({'status': 'error', 'error': str(e)}), 500
 
 def get_interview(interview_id):
-    """Get a specific interview by ID."""
+    """Get interview data by ID."""
     try:
-        # Ensure interviews directory exists
-        if not os.path.exists('interviews'):
-            logger.error("Interviews directory does not exist")
-            return None
-            
-        # Construct file path
-        file_path = os.path.join('interviews', f"{interview_id}.json")
+        # Check both regular and raw interview directories
+        possible_paths = [
+            os.path.join('interviews', f'{interview_id}.json'),
+            os.path.join('interviews', 'raw', f'{interview_id}.json'),
+            os.path.join('interviews', 'processed', f'{interview_id}.json')
+        ]
         
-        # Check if file exists
-        if not os.path.exists(file_path):
-            logger.error(f"Interview file not found: {interview_id}")
-            return None
-            
-        # Load and return interview data
-        with open(file_path) as f:
-            interview = json.load(f)
-            
-        # Add computed fields
-        interview['chunk_count'] = len(interview.get('chunks', []))
-        interview['has_analysis'] = bool(interview.get('analysis'))
-        
-        # Format timestamps in chunks
-        for chunk in interview.get('chunks', []):
-            if 'start_time' in chunk:
-                chunk['start_time_formatted'] = format_timestamp(chunk['start_time'])
-            if 'end_time' in chunk:
-                chunk['end_time_formatted'] = format_timestamp(chunk['end_time'])
-                
-        return interview
-        
-    except json.JSONDecodeError as e:
-        logger.error(f"Error decoding interview {interview_id}: {str(e)}")
+        for file_path in possible_paths:
+            if os.path.exists(file_path):
+                logger.info(f"Found interview file at: {file_path}")
+                with open(file_path, 'r') as f:
+                    interview_data = json.load(f)
+                    # Add file path to data for reference
+                    interview_data['_file_path'] = file_path
+                    return interview_data
+                    
+        logger.error(f"Interview file not found: {interview_id}")
+        logger.error(f"Checked paths: {possible_paths}")
         return None
+        
     except Exception as e:
-        logger.error(f"Error getting interview {interview_id}: {str(e)}")
+        logger.error(f"Error loading interview {interview_id}: {str(e)}")
         logger.error(traceback.format_exc())
         return None
-        
-def format_timestamp(seconds):
-    """Format seconds into MM:SS format."""
-    try:
-        minutes = int(seconds) // 60
-        remaining_seconds = int(seconds) % 60
-        return f"{minutes:02d}:{remaining_seconds:02d}"
-    except:
-        return "00:00"
 
 def save_interview(interview_data):
     """Save interview data to a JSON file."""
@@ -4137,6 +4048,98 @@ def api_advanced_search():
             'error': 'Internal server error',
             'message': 'An unexpected error occurred. Please try again later.'
         }), 500
+
+@app.route('/annotated-transcript/<interview_id>')
+@app.route('/annotated-transcript/<interview_id>/<int:page>')
+def view_annotated_transcript(interview_id, page=1):
+    try:
+        app.logger.debug(f"Accessing annotated transcript route for interview {interview_id}, page {page}")
+        
+        # Load the processed interview
+        processed_file = f'interviews/processed/{interview_id}.json'
+        app.logger.debug(f"Looking for processed file at: {processed_file}")
+        
+        if not os.path.exists(processed_file):
+            app.logger.error(f"Interview file not found: {processed_file}")
+            flash('Interview not found', 'error')
+            return redirect(url_for('advanced_search'))
+
+        with open(processed_file, 'r') as f:
+            interview_data = json.load(f)
+
+        app.logger.info(f"Successfully loaded interview data for {interview_id}")
+        app.logger.debug(f"Interview data keys: {list(interview_data.keys())}")
+
+        # Extract chunks directly from the interview data
+        chunks = []
+        for chunk in interview_data.get('chunks', []):
+            # Process each entry in the chunk
+            for entry in chunk.get('entries', []):
+                chunk_data = {
+                    'speaker': entry.get('speaker', ''),
+                    'timestamp': entry.get('timestamp', ''),
+                    'text': entry.get('text', ''),
+                    'emotion': chunk.get('analysis', {}).get('emotion', ''),
+                    'themes': chunk.get('analysis', {}).get('themes', []),
+                    'insight_tags': chunk.get('analysis', {}).get('insight_tags', [])
+                }
+                chunks.append(chunk_data)
+
+        # Check if we need to find a specific timestamp's page
+        target_timestamp = request.args.get('timestamp')
+        if target_timestamp:
+            # Find the index of the chunk with this timestamp
+            for i, chunk in enumerate(chunks):
+                if chunk['timestamp'] == target_timestamp:
+                    # Calculate which page this chunk should be on
+                    page = (i // 50) + 1
+                    break
+
+        # Pagination - increased to 50 items per page
+        items_per_page = 50
+        total_chunks = len(chunks)
+        total_pages = (total_chunks + items_per_page - 1) // items_per_page
+        
+        # Validate page number
+        page = max(1, min(page, total_pages))
+        
+        # Slice chunks for current page
+        start_idx = (page - 1) * items_per_page
+        end_idx = start_idx + items_per_page
+        current_chunks = chunks[start_idx:end_idx]
+
+        # Prepare interview metadata
+        metadata = interview_data.get('metadata', {})
+        interviewee = metadata.get('interviewee', {})
+        researcher = metadata.get('researcher', {})
+        
+        interview = {
+            'id': interview_id,
+            'participant_name': interviewee.get('name', ''),
+            'researcher_name': researcher.get('name', ''),
+            'researcher_role': researcher.get('role', 'UX Researcher'),
+            'researcher_email': researcher.get('email', ''),
+            'date': metadata.get('date', ''),
+            'timestamp': metadata.get('date', ''),  # Using date as timestamp
+            'age_range': interviewee.get('age', ''),
+            'location': interviewee.get('location', ''),
+            'occupation': interviewee.get('occupation', ''),
+            'industry': interviewee.get('industry', '')
+        }
+
+        app.logger.info(f"Rendering annotated transcript page {page} of {total_pages}")
+        app.logger.debug(f"Chunks on this page: {len(current_chunks)}")
+        
+        return render_template('view_annotated_transcript.html',
+                             interview=interview,
+                             chunks=current_chunks,
+                             current_page=page,
+                             total_pages=total_pages)
+
+    except Exception as e:
+        app.logger.error(f"Error loading annotated transcript: {str(e)}", exc_info=True)
+        flash('Error loading interview transcript', 'error')
+        return redirect(url_for('advanced_search'))
 
 if __name__ == '__main__':
     socketio.run(app, debug=True, port=5003) 

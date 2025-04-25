@@ -82,7 +82,7 @@
                                             <div class="d-flex align-items-center gap-2">
                                                 <h6 class="card-subtitle text-muted mb-0">{{ result.project_name }}</h6>
                                                 <span class="text-muted">•</span>
-                                                <small class="text-muted" v-text="formatDate(result.timestamp)"></small>
+                                                <small class="text-muted" v-if="result.timestamp">{{ formatDate(result.timestamp) }}</small>
                                             </div>
                                         </div>
                                         <div>
@@ -157,7 +157,10 @@
                                     </div>
                                     <div class="mt-2 d-flex justify-content-between align-items-center">
                                         <small class="text-muted">Similarity Score: {{ (result.similarity * 100).toFixed(2) }}%</small>
-                                        <a :href="'/transcript/' + result.interview_id" class="btn btn-sm btn-outline-primary">View Full Interview</a>
+                                        <div>
+                                            <a :href="'/annotated-transcript/' + result.interview_id + '?timestamp=' + encodeURIComponent(result.timestamp)" class="btn btn-sm btn-outline-secondary me-2">View Annotated Transcript</a>
+                                            <a :href="'/transcript/' + result.interview_id" class="btn btn-sm btn-outline-primary">View Full Interview</a>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -290,7 +293,13 @@ new Vue({
             }
         },
         formatDate(timestamp) {
-            return new Date(timestamp).toLocaleString();
+            if (!timestamp) return '';
+            try {
+                return new Date(timestamp).toLocaleString();
+            } catch (err) {
+                console.warn('Invalid timestamp:', timestamp);
+                return timestamp; // Return the raw timestamp if parsing fails
+            }
         },
         getEmotionColor(emotion) {
             const colors = {
