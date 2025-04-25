@@ -51,11 +51,12 @@
         "emotion_intensity": 3,
         "themes": [
           "testing",
-          "transcript system"
+          "transcript system",
+          "technology"
         ],
         "insight_tags": [
-          "accuracy check",
-          "system functionality",
+          "accuracy",
+          "efficiency",
           "user experience"
         ],
         "sentiment_score": 0.80292809009552
@@ -86,13 +87,13 @@
         "emotion_intensity": 3,
         "themes": [
           "technology challenges",
-          "work environment",
-          "communication"
+          "workplace communication",
+          "time management"
         ],
         "insight_tags": [
           "adaptability",
           "preparedness",
-          "connection"
+          "communication"
         ],
         "sentiment_score": 0.35719650983810425
       }
@@ -121,14 +122,14 @@
         "emotion": "remorse",
         "emotion_intensity": 3,
         "themes": [
-          "video settings",
-          "recording process",
-          "technology usage"
+          "video recording",
+          "technology usage",
+          "forgetfulness"
         ],
         "insight_tags": [
-          "communication error",
-          "forgetfulness",
-          "nostalgia"
+          "communication preferences",
+          "auto admit feature",
+          "facial recognition"
         ],
         "sentiment_score": 0.2393507957458496
       }
@@ -163,8 +164,8 @@
         ],
         "insight_tags": [
           "efficiency",
-          "information collection",
-          "confidentiality"
+          "engagement",
+          "boundaries"
         ],
         "sentiment_score": 0.18782435357570648
       }
@@ -268,8 +269,8 @@
           "problem-solving"
         ],
         "insight_tags": [
-          "goal setting",
-          "user-centric approach"
+          "user-centric approach",
+          "goal setting"
         ],
         "sentiment_score": 0.31759586930274963
       }
@@ -298,13 +299,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "identifying business problems",
+          "identifying business problem",
           "helping users",
           "project planning"
         ],
         "insight_tags": [
-          "user-centric approach",
-          "frustrations with project planning"
+          "primary goal alignment",
+          "frustrations",
+          "recent experiences"
         ],
         "sentiment_score": 0.47687116265296936
       }
@@ -337,8 +339,8 @@
           "time constraints"
         ],
         "insight_tags": [
-          "underestimation of research impact",
-          "project management issues"
+          "overlooked research impact",
+          "inefficient project management"
         ],
         "sentiment_score": 0.31227946281433105
       }
@@ -368,11 +370,12 @@
         "emotion_intensity": 3,
         "themes": [
           "importance of research education",
-          "integration of research in design process"
+          "integrating research into design process"
         ],
         "insight_tags": [
-          "educate sales team",
-          "highlight research as crucial for problem-solving"
+          "sales team education",
+          "client education",
+          "research as problem-solving"
         ],
         "sentiment_score": 0.4759928286075592
       }
@@ -402,12 +405,12 @@
         "emotion_intensity": 3,
         "themes": [
           "advocacy for user research",
-          "education and resources for designers"
+          "education for designers"
         ],
         "insight_tags": [
-          "advocacy",
-          "education",
-          "resources"
+          "importance of user research",
+          "empowering designers",
+          "resource allocation"
         ],
         "sentiment_score": 0.2333056628704071
       }
@@ -443,7 +446,7 @@
         "insight_tags": [
           "persistence",
           "adaptability",
-          "realism"
+          "resilience"
         ],
         "sentiment_score": 0.19747015833854675
       }
@@ -472,14 +475,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "overpromising to clients",
-          "lack of time for project",
+          "poor project planning",
+          "lack of research and testing",
           "budget constraints"
         ],
         "insight_tags": [
-          "poor project planning",
-          "client expectation management",
-          "importance of research and testing"
+          "overpromising to clients",
+          "inadequate project scope",
+          "financial challenges"
         ],
         "sentiment_score": 0.42352914810180664
       }
@@ -549,7 +552,7 @@
           "card sorting"
         ],
         "insight_tags": [
-          "understanding employee terminologies",
+          "understanding employee needs",
           "qualitative research",
           "navigation improvement"
         ],
@@ -581,13 +584,13 @@
         "emotion_intensity": 3,
         "themes": [
           "participant recruitment challenges",
-          "moderated research",
-          "employee availability"
+          "employee availability",
+          "research moderation"
         ],
         "insight_tags": [
           "limited time frame for recruitment",
-          "impact of end-of-year timing",
-          "remote work challenges"
+          "impact of end-of-year period on recruitment",
+          "importance of understanding employee mental models"
         ],
         "sentiment_score": 0.15160386264324188
       }
@@ -616,13 +619,14 @@
         "emotion": "approval",
         "emotion_intensity": 3,
         "themes": [
+          "miscommunication",
           "lack of interest",
-          "reluctance to participate"
+          "resistance"
         ],
         "insight_tags": [
-          "disengagement",
-          "unwillingness",
-          "lack of enthusiasm"
+          "confusion",
+          "disinterest",
+          "reluctance"
         ],
         "sentiment_score": 0.36410626769065857
       }
@@ -652,13 +656,13 @@
         "emotion_intensity": 3,
         "themes": [
           "AI tools",
-          "Card sorting",
-          "Knowledge"
+          "card sorting",
+          "knowledge"
         ],
         "insight_tags": [
-          "Missed opportunity",
-          "Interest in AI",
-          "Potential for improvement"
+          "underutilization",
+          "potential",
+          "desire for learning"
         ],
         "sentiment_score": 0.3261675238609314
       }
@@ -687,14 +691,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "strategic planning",
-          "research and analysis",
-          "reporting and sharing"
+          "planning",
+          "discovery activities",
+          "analysis and reporting"
         ],
         "insight_tags": [
-          "budget allocation",
-          "tool optimization",
-          "process efficiency"
+          "strategic planning",
+          "tool utilization",
+          "team collaboration"
         ],
         "sentiment_score": 0.3411247432231903
       }
@@ -723,14 +727,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "user research process",
           "problem understanding",
-          "research methodology selection"
+          "research methodology selection",
+          "target audience identification"
         ],
         "insight_tags": [
-          "problem identification",
-          "stakeholder collaboration",
-          "research methodology alignment"
+          "collaboration",
+          "problem-solving",
+          "user-centric approach"
         ],
         "sentiment_score": 0.4997439384460449
       }
@@ -795,14 +799,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
+          "challenges in the process",
           "need for support",
-          "asking the right question",
-          "pitfalls in process"
+          "importance of asking the right question"
         ],
         "insight_tags": [
-          "early stage",
-          "questioning process",
-          "continuous improvement"
+          "pitfalls in the process",
+          "requirement for support",
+          "early stage questioning"
         ],
         "sentiment_score": 0.5018630027770996
       }
@@ -836,9 +840,9 @@
           "research planning"
         ],
         "insight_tags": [
-          "importance of problem understanding",
-          "seeking stakeholder validation",
-          "importance of second opinion"
+          "importance of clarity",
+          "validation through feedback",
+          "diligence in process"
         ],
         "sentiment_score": 0.5061772465705872
       }
@@ -868,13 +872,13 @@
         "emotion_intensity": 3,
         "themes": [
           "importance of reassurance",
-          "seeking external opinions for perspective",
-          "deep dive into mental models"
+          "benefits of seeking other opinions",
+          "challenges of narrowing focus"
         ],
         "insight_tags": [
           "importance of feedback",
-          "avoiding tunnel vision",
-          "collaborative design process"
+          "expanding perspectives",
+          "overcoming mental barriers"
         ],
         "sentiment_score": 0.2828003764152527
       }
@@ -905,12 +909,12 @@
         "themes": [
           "feeling stuck",
           "seeking validation",
-          "indecision"
+          "uncertainty"
         ],
         "insight_tags": [
-          "self-reflection",
-          "seeking guidance",
-          "uncertainty"
+          "introspection",
+          "seeking feedback",
+          "lack of clarity"
         ],
         "sentiment_score": 0.630763590335846
       }
@@ -941,7 +945,7 @@
         "themes": [
           "research planning",
           "resource allocation",
-          "team capacity"
+          "team management"
         ],
         "insight_tags": [
           "adequate manpower planning",
@@ -975,14 +979,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "progression",
           "efficiency",
-          "technology"
+          "technology",
+          "organization"
         ],
         "insight_tags": [
           "automation",
-          "organization",
-          "ease of use"
+          "ease of use",
+          "benefits of AI"
         ],
         "sentiment_score": 0.4576779007911682
       }
@@ -1018,7 +1022,7 @@
         "insight_tags": [
           "tools in Figma",
           "fake jam",
-          "agreement"
+          "validating a statement"
         ],
         "sentiment_score": 0.62522953748703
       }
@@ -1085,12 +1089,12 @@
         "themes": [
           "customer focus",
           "researcher identity",
-          "work-life balance"
+          "life purpose"
         ],
         "insight_tags": [
-          "customer relationship",
+          "customer perspective",
           "self-reflection",
-          "prioritization"
+          "purpose-driven"
         ],
         "sentiment_score": 0.7265650629997253
       }
@@ -1120,11 +1124,12 @@
         "emotion_intensity": 3,
         "themes": [
           "job preference",
-          "business stakeholders"
+          "importance of business stakeholders"
         ],
         "insight_tags": [
-          "importance of job opportunity",
-          "consideration of business stakeholders"
+          "candidate perspective",
+          "project involvement",
+          "stakeholder importance"
         ],
         "sentiment_score": 0.30747660994529724
       }
@@ -1158,9 +1163,9 @@
           "business alignment"
         ],
         "insight_tags": [
-          "reversed priority in different contexts",
-          "consideration of PM and PO",
-          "reflection on user importance"
+          "different perspectives based on role",
+          "importance of understanding user needs",
+          "consideration of business stakeholders"
         ],
         "sentiment_score": 0.29571059346199036
       }
@@ -1260,12 +1265,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "interview process",
-          "tools used for work"
+          "interruption",
+          "tools",
+          "work setup"
         ],
         "insight_tags": [
-          "personal connection to interviewee's work",
-          "lack of specific tools mentioned"
+          "related industry",
+          "tool development",
+          "work efficiency"
         ],
         "sentiment_score": 0.3440585732460022
       }
@@ -1296,12 +1303,12 @@
         "themes": [
           "stakeholder interview organization",
           "template utilization",
-          "thought organization tools"
+          "tool usage"
         ],
         "insight_tags": [
-          "digital tools for organization",
-          "importance of templates",
-          "collaborative platforms"
+          "document organization",
+          "presentation tools",
+          "brainstorming tools"
         ],
         "sentiment_score": 0.7650556564331055
       }
@@ -1330,12 +1337,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "interview process optimization",
-          "user research methods"
+          "interview preparation",
+          "user research",
+          "interview types"
         ],
         "insight_tags": [
-          "template creation",
-          "user interview types"
+          "preparation",
+          "user feedback",
+          "research methods"
         ],
         "sentiment_score": 0.7383066415786743
       }
@@ -1364,14 +1373,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "customer interview",
-          "interview types",
-          "qualitative research"
+          "types of interviews",
+          "qualitative interviews",
+          "customer interviews"
         ],
         "insight_tags": [
           "varied interview approaches",
-          "user-centered research",
-          "customer feedback"
+          "user-centered approach",
+          "interview consistency"
         ],
         "sentiment_score": 0.43503063917160034
       }
@@ -1402,12 +1411,12 @@
         "themes": [
           "customer interviews",
           "questioning techniques",
-          "data recording"
+          "data recording tools"
         ],
         "insight_tags": [
-          "follow-up questions",
-          "transcript management",
-          "customer feedback"
+          "customer engagement",
+          "adaptive questioning",
+          "transcript management"
         ],
         "sentiment_score": 0.615391731262207
       }
@@ -1437,13 +1446,13 @@
         "emotion_intensity": 3,
         "themes": [
           "note-taking methods",
-          "recording limitations",
+          "limitations of recording",
           "technology vs traditional methods"
         ],
         "insight_tags": [
-          "efficiency",
-          "data security",
-          "user preference"
+          "importance of note-taking",
+          "challenges in recording interviews",
+          "preference for note-taking tools"
         ],
         "sentiment_score": 0.19756998121738434
       }
@@ -1472,14 +1481,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "Data Privacy",
-          "Consent Management",
-          "Client Communication"
+          "data privacy",
+          "consent management",
+          "client communication"
         ],
         "insight_tags": [
-          "Importance of Consent",
-          "Adapting to Company Policies",
-          "Client Relationship Building"
+          "importance of consent",
+          "adapting to company policies",
+          "communication etiquette"
         ],
         "sentiment_score": 0.665499210357666
       }
@@ -1509,11 +1518,11 @@
         "emotion_intensity": 3,
         "themes": [
           "confidentiality in meetings",
-          "customer interview process"
+          "customer interview differences based on product stage"
         ],
         "insight_tags": [
-          "importance of confidentiality",
-          "adapting customer interviews based on product stage"
+          "meeting recording policies",
+          "customer interview approach"
         ],
         "sentiment_score": 0.46234530210494995
       }
@@ -1544,12 +1553,12 @@
         "themes": [
           "adaptability",
           "flexibility",
-          "individuality"
+          "variability"
         ],
         "insight_tags": [
-          "reflexive behavior",
-          "script variability",
-          "template challenges"
+          "individual approach",
+          "lack of standardization",
+          "reflexive behavior"
         ],
         "sentiment_score": 0.599399745464325
       }
@@ -1579,13 +1588,13 @@
         "emotion_intensity": 3,
         "themes": [
           "communication style",
-          "sharing artifacts",
-          "interaction differences"
+          "engagement with artifacts",
+          "interaction dynamics"
         ],
         "insight_tags": [
-          "adaptation",
-          "engagement",
-          "personalization"
+          "adaptability",
+          "personalization",
+          "engagement"
         ],
         "sentiment_score": 0.483641117811203
       }
@@ -1619,7 +1628,7 @@
           "report analysis"
         ],
         "insight_tags": [
-          "task management",
+          "task efficiency",
           "data utilization",
           "research process"
         ],
@@ -1655,7 +1664,7 @@
           "interview process"
         ],
         "insight_tags": [
-          "design research",
+          "design process",
           "evaluation methods",
           "artifact creation"
         ],
@@ -1688,12 +1697,12 @@
         "themes": [
           "information processing",
           "note-taking",
-          "synthesizing"
+          "detail-oriented"
         ],
         "insight_tags": [
-          "attention to detail",
-          "importance of preparation",
-          "accuracy"
+          "thorough review of materials",
+          "importance of accuracy",
+          "effort in synthesizing information"
         ],
         "sentiment_score": 0.3409290909767151
       }
@@ -1722,14 +1731,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "affinity mapping",
-          "grouping information",
-          "identifying common problems"
+          "Affinity mapping",
+          "Grouping information",
+          "Identifying common problems"
         ],
         "insight_tags": [
-          "organizing data",
-          "identifying patterns",
-          "clarifying user needs"
+          "Organizing data",
+          "Problem identification",
+          "User understanding"
         ],
         "sentiment_score": 0.48967188596725464
       }
@@ -1758,14 +1767,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "User research and testing process",
-          "Recommendations for product improvement",
-          "Affinity mapping for decision-making"
+          "User Research and Testing Process",
+          "Recommendations and Changes",
+          "Affinity Mapping"
         ],
         "insight_tags": [
-          "Process efficiency",
-          "User feedback analysis",
-          "Data-driven decision-making"
+          "Process Efficiency",
+          "Data Analysis",
+          "Presentation Skills"
         ],
         "sentiment_score": 0.5749639868736267
       }
@@ -1799,9 +1808,9 @@
           "behavior change"
         ],
         "insight_tags": [
-          "monitoring for repeated information",
-          "triggered behavior change",
-          "importance of consistency"
+          "monitoring for consistency",
+          "identifying key points",
+          "adapting note-taking approach"
         ],
         "sentiment_score": 0.5641644597053528
       }
@@ -1831,12 +1840,12 @@
         "emotion_intensity": 3,
         "themes": [
           "repetition",
-          "common problems",
+          "common problem",
           "uncertainty"
         ],
         "insight_tags": [
           "pattern recognition",
-          "communication challenges",
+          "communication",
           "ambiguity"
         ],
         "sentiment_score": 0.2783086597919464
@@ -1870,9 +1879,8 @@
           "importance of capturing quotes"
         ],
         "insight_tags": [
-          "attention to detail",
-          "value of customer feedback",
-          "importance of documentation"
+          "attention-grabbing verbatims",
+          "value in capturing moments"
         ],
         "sentiment_score": 0.20356623828411102
       }
@@ -1938,13 +1946,12 @@
         "emotion_intensity": 3,
         "themes": [
           "listening skills",
-          "progressive understanding",
-          "confirmation"
+          "progressive tuning"
         ],
         "insight_tags": [
-          "pattern recognition",
-          "tuning in",
-          "repetition"
+          "acquisition of expertise",
+          "progressive refinement",
+          "attentiveness"
         ],
         "sentiment_score": 0.5594262480735779
       }
@@ -1978,9 +1985,9 @@
           "magic"
         ],
         "insight_tags": [
-          "pattern recognition",
-          "process improvement",
-          "desire for change"
+          "recognition",
+          "improvement",
+          "wishful thinking"
         ],
         "sentiment_score": 0.4609653055667877
       }
@@ -2013,9 +2020,9 @@
           "research process"
         ],
         "insight_tags": [
-          "data analysis",
-          "information synthesis",
-          "research methodology"
+          "analysis",
+          "data processing",
+          "decision-making"
         ],
         "sentiment_score": 0.42573830485343933
       }
@@ -2046,12 +2053,12 @@
         "themes": [
           "magic wand",
           "efficiency",
-          "customer needs"
+          "reliability"
         ],
         "insight_tags": [
           "innovation",
           "time-saving",
-          "customer-centric"
+          "reusability"
         ],
         "sentiment_score": 0.5822935104370117
       }
@@ -2087,7 +2094,7 @@
         "insight_tags": [
           "word association",
           "seeking opinions",
-          "exploration"
+          "exploring preferences"
         ],
         "sentiment_score": 0.3165717124938965
       }
@@ -2118,12 +2125,12 @@
         "themes": [
           "communication",
           "appreciation",
-          "efficiency"
+          "achievement"
         ],
         "insight_tags": [
+          "word choice",
           "positive feedback",
-          "prioritization",
-          "personal connection"
+          "overwhelm"
         ],
         "sentiment_score": 0.6906603574752808
       }
@@ -2153,13 +2160,12 @@
         "emotion_intensity": 3,
         "themes": [
           "research challenges",
-          "impact of research",
-          "work-life balance"
+          "impact of research"
         ],
         "insight_tags": [
-          "stress",
-          "dedication",
-          "passion"
+          "work-life balance",
+          "stress management",
+          "passion for research"
         ],
         "sentiment_score": 0.39493173360824585
       }
@@ -2190,12 +2196,12 @@
         "themes": [
           "uncertainty",
           "survey design",
-          "perception"
+          "people's perception"
         ],
         "insight_tags": [
           "challenges of uncertainty",
           "importance of survey design",
-          "consideration of perception"
+          "considering audience perception"
         ],
         "sentiment_score": 0.3668684959411621
       }
@@ -2229,9 +2235,9 @@
           "self-doubt"
         ],
         "insight_tags": [
-          "importance of question design",
-          "impact of survey creation on well-being",
-          "self-criticism in writing"
+          "importance of question clarity",
+          "impact of survey design on sleep",
+          "self-perception as a writer"
         ],
         "sentiment_score": 0.22994114458560944
       }
@@ -2261,13 +2267,13 @@
         "emotion_intensity": 3,
         "themes": [
           "stress",
-          "anxiety",
-          "workload"
+          "workload",
+          "anxiety"
         ],
         "insight_tags": [
           "pressure",
           "impact on sleep",
-          "work challenges"
+          "storytelling"
         ],
         "sentiment_score": 0.35526522994041443
       }
@@ -2302,7 +2308,7 @@
         "insight_tags": [
           "achievement",
           "competition",
-          "determination"
+          "motivation"
         ],
         "sentiment_score": 0.9647459387779236
       }
@@ -2331,14 +2337,14 @@
         "emotion": "curiosity",
         "emotion_intensity": 3,
         "themes": [
-          "communication",
-          "technology",
-          "collaboration"
+          "technology use",
+          "screen sharing",
+          "communication"
         ],
         "insight_tags": [
-          "screen sharing",
+          "collaboration",
           "technical difficulties",
-          "collaborative tools"
+          "remote work"
         ],
         "sentiment_score": 0.3717328906059265
       }
@@ -2369,12 +2375,12 @@
         "themes": [
           "interview process",
           "AI technology",
-          "data collection"
+          "data fields"
         ],
         "insight_tags": [
-          "new interview screen",
-          "configuring interviews",
-          "AI question generation"
+          "configuration",
+          "questioning AI",
+          "new interview setup"
         ],
         "sentiment_score": 0.7354865670204163
       }
@@ -2410,7 +2416,7 @@
         "insight_tags": [
           "user needs",
           "tool usability",
-          "interview efficiency"
+          "interview process"
         ],
         "sentiment_score": 0.3482571244239807
       }
@@ -2439,14 +2445,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "repetition",
+          "interview process",
           "building from scratch",
-          "interview process"
+          "repeating questions"
         ],
         "insight_tags": [
           "experience sharing",
           "reflection",
-          "researcher perspective"
+          "communication style"
         ],
         "sentiment_score": 0.45698282122612
       }
@@ -2475,14 +2481,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "Different interview emphases based on task type",
-          "Variability in interview approach based on task",
-          "Considering interview types for different research goals"
+          "Different interview approaches based on purpose",
+          "Emphasis on open-ended background for Persona interviews",
+          "Focus on process for journey map interviews"
         ],
         "insight_tags": [
-          "Task-specific interview techniques",
-          "Adapting interview style to research objectives",
-          "Importance of tailoring interviews to research needs"
+          "Variety in interview types",
+          "Tailoring questions based on interview purpose",
+          "Importance of aligning interview approach with goals"
         ],
         "sentiment_score": 0.3045055568218231
       }
@@ -2513,12 +2519,12 @@
         "themes": [
           "types of interviews",
           "focus on user and customer interviews",
-          "not doing stakeholders interviews"
+          "exclusion of stakeholders"
         ],
         "insight_tags": [
           "importance of user and customer feedback",
-          "prioritizing user needs over stakeholders",
-          "clear focus on specific interview types"
+          "prioritizing user needs",
+          "potential oversight of stakeholder perspectives"
         ],
         "sentiment_score": 0.201265349984169
       }
@@ -2548,13 +2554,12 @@
         "emotion_intensity": 3,
         "themes": [
           "interview process",
-          "questioning",
-          "self-reflection"
+          "questioning approach"
         ],
         "insight_tags": [
-          "unconventional approach",
-          "importance of self-directed inquiry",
-          "lack of awareness of interview types"
+          "unfamiliar interview type",
+          "personalized questions",
+          "reflective process"
         ],
         "sentiment_score": 0.34261181950569153
       }
@@ -2584,8 +2589,8 @@
         "emotion_intensity": 3,
         "themes": [
           "technology",
-          "automation",
-          "convenience"
+          "convenience",
+          "automation"
         ],
         "insight_tags": [
           "efficiency",
@@ -2620,12 +2625,12 @@
         "emotion_intensity": 3,
         "themes": [
           "interview techniques",
-          "problem description",
+          "problem-solving",
           "types of interviews"
         ],
         "insight_tags": [
           "questioning approach",
-          "interview preparation",
+          "problem description",
           "interview strategy"
         ],
         "sentiment_score": 0.382038414478302
@@ -2655,9 +2660,8 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "research project",
-          "interviews",
-          "consistency"
+          "perception of interviews",
+          "consistency in approach"
         ],
         "insight_tags": [
           "different perspectives",
@@ -2692,7 +2696,7 @@
         "emotion_intensity": 3,
         "themes": [
           "interpretation",
-          "adaptability",
+          "adaptation",
           "communication"
         ],
         "insight_tags": [
@@ -2727,14 +2731,14 @@
         "emotion": "gratitude",
         "emotion_intensity": 3,
         "themes": [
-          "legacy",
-          "gratitude",
-          "company impact"
+          "Legacy",
+          "Gratitude",
+          "Company Impact"
         ],
         "insight_tags": [
-          "personal growth",
-          "appreciation",
-          "professional development"
+          "Personal Growth",
+          "Appreciation",
+          "Professional Development"
         ],
         "sentiment_score": 0.537129282951355
       }
@@ -2764,13 +2768,13 @@
         "emotion_intensity": 3,
         "themes": [
           "interview techniques",
-          "problem description",
-          "different types of interviews"
+          "different types of interviews",
+          "clarifying terminology"
         ],
         "insight_tags": [
-          "knowledge gap",
-          "importance of clarity",
-          "skill development"
+          "problem description",
+          "persona interview",
+          "journey map interview"
         ],
         "sentiment_score": 0.8589670062065125
       }
@@ -2805,7 +2809,7 @@
         ],
         "insight_tags": [
           "interview process",
-          "uncertainty",
+          "confusion",
           "research focus"
         ],
         "sentiment_score": 0.5672256350517273
@@ -2840,8 +2844,8 @@
           "persona development"
         ],
         "insight_tags": [
-          "customer types",
-          "customer experience",
+          "customer type differentiation",
+          "mapping tools",
           "customer analysis"
         ],
         "sentiment_score": 0.3144740164279938
@@ -2875,7 +2879,7 @@
           "challenges in imagining outcomes"
         ],
         "insight_tags": [
-          "experience in e-commerce",
+          "experience with e-commerce projects",
           "difficulty in conceptualizing outcomes"
         ],
         "sentiment_score": 0.3898923397064209
@@ -2910,9 +2914,9 @@
           "technology use"
         ],
         "insight_tags": [
-          "data organization",
-          "screening process",
-          "data collection"
+          "importance of data tracking",
+          "screening process for demographic information",
+          "inquiry about technology use"
         ],
         "sentiment_score": 0.47639235854148865
       }
@@ -2941,12 +2945,12 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "technology use in interviews",
-          "screen management skills assessment"
+          "Technology proficiency assessment",
+          "Behavior observation during interviews"
         ],
         "insight_tags": [
-          "behavior observation",
-          "experience level categorization"
+          "Screen management skills evaluation",
+          "Categorization based on screen management abilities"
         ],
         "sentiment_score": 0.6175603866577148
       }
@@ -3012,12 +3016,12 @@
         "emotion_intensity": 3,
         "themes": [
           "interview configuration",
-          "operating systems"
+          "operating system differences"
         ],
         "insight_tags": [
+          "recommendations",
           "pre-interview screen",
-          "Android vs iOS",
-          "recommendations"
+          "Android and iOS"
         ],
         "sentiment_score": 0.28054431080818176
       }
@@ -3052,7 +3056,7 @@
         ],
         "insight_tags": [
           "collaboration",
-          "information processing",
+          "analysis",
           "visualization"
         ],
         "sentiment_score": 0.3328878581523895
@@ -3088,7 +3092,8 @@
         ],
         "insight_tags": [
           "predefined personas",
-          "efficiency in persona creation"
+          "efficiency",
+          "client collaboration"
         ],
         "sentiment_score": 0.32962942123413086
       }
@@ -3122,8 +3127,8 @@
           "journey mapping"
         ],
         "insight_tags": [
-          "efficiency",
-          "tool-specificity",
+          "tool-specific research",
+          "efficiency in research methods",
           "importance of journey mapping"
         ],
         "sentiment_score": 0.26035553216934204
@@ -3155,11 +3160,11 @@
         "themes": [
           "interview management",
           "organization",
-          "searchability"
+          "search functionality"
         ],
         "insight_tags": [
           "efficiency",
-          "user-friendly interface",
+          "user experience",
           "data accessibility"
         ],
         "sentiment_score": 0.6934933662414551
@@ -3193,8 +3198,8 @@
           "interview process"
         ],
         "insight_tags": [
-          "tool usage",
-          "card sorting",
+          "tool usability",
+          "interview categorization",
           "project management"
         ],
         "sentiment_score": 0.433585524559021
@@ -3230,7 +3235,7 @@
         "insight_tags": [
           "data collection",
           "importance of demographics",
-          "organization of data"
+          "evaluation criteria"
         ],
         "sentiment_score": 0.512153685092926
       }
@@ -3265,8 +3270,8 @@
         ],
         "insight_tags": [
           "clarity",
-          "importance of layout",
-          "acknowledgment"
+          "emphasis",
+          "comprehension"
         ],
         "sentiment_score": 0.24922913312911987
       }
@@ -3296,13 +3301,13 @@
         "emotion_intensity": 3,
         "themes": [
           "data analysis",
-          "qualitative and quantitative research",
-          "segmentation"
+          "qualitative research",
+          "quantitative research"
         ],
         "insight_tags": [
-          "data slicing",
-          "age segmentation",
-          "research methodology"
+          "data segmentation",
+          "research methodology",
+          "age group analysis"
         ],
         "sentiment_score": 0.692183256149292
       }
@@ -3331,14 +3336,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "demographics",
+          "demographic analysis",
           "data collection",
-          "search"
+          "interview insights"
         ],
         "insight_tags": [
           "age range",
           "quote analysis",
-          "data analysis"
+          "search capabilities"
         ],
         "sentiment_score": 0.7696597576141357
       }
@@ -3369,12 +3374,12 @@
         "themes": [
           "data visualization",
           "practice",
-          "emotional analysis"
+          "emotional search"
         ],
         "insight_tags": [
           "tool utilization",
           "practice importance",
-          "emotional analysis development"
+          "emotional analysis"
         ],
         "sentiment_score": 0.35186144709587097
       }
@@ -3403,8 +3408,8 @@
         "emotion": "admiration",
         "emotion_intensity": 3,
         "themes": [
-          "exploration",
           "excitement",
+          "exploration",
           "outdoor activities"
         ],
         "insight_tags": [
@@ -3439,14 +3444,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "data organization",
-          "research collaboration",
+          "research data organization",
+          "transcript generation",
           "metadata utilization"
         ],
         "insight_tags": [
-          "transcript generation",
-          "researcher profiling",
-          "information structuring"
+          "data management",
+          "research collaboration",
+          "research efficiency"
         ],
         "sentiment_score": 0.5984951853752136
       }
@@ -3482,7 +3487,7 @@
         "insight_tags": [
           "user choice",
           "interview selection",
-          "personalization"
+          "persona development"
         ],
         "sentiment_score": 0.7921577095985413
       }
@@ -3549,12 +3554,12 @@
         "themes": [
           "user journey mapping",
           "collaboration",
-          "exploration"
+          "technology integration"
         ],
         "insight_tags": [
-          "technology integration",
-          "teamwork",
-          "innovation"
+          "potential for user journey mapping",
+          "desire for collaboration",
+          "excitement about technology integration"
         ],
         "sentiment_score": 0.1523352563381195
       }
@@ -3583,13 +3588,10 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "unclear communication",
-          "interview process"
+          "unclear"
         ],
         "insight_tags": [
-          "confusion",
-          "incomplete information",
-          "request for clarification"
+          "needs review"
         ],
         "sentiment_score": 0.29357343912124634
       }
@@ -3624,7 +3626,7 @@
         ],
         "insight_tags": [
           "engagement",
-          "information sharing",
+          "interaction",
           "exploration"
         ],
         "sentiment_score": 0.536997377872467
@@ -3661,7 +3663,7 @@
         "insight_tags": [
           "tour interest",
           "location uncertainty",
-          "name confusion"
+          "name recall"
         ],
         "sentiment_score": 0.29015809297561646
       }
@@ -3691,12 +3693,12 @@
         "emotion_intensity": 3,
         "themes": [
           "image generation",
-          "portrait",
+          "portrait creation",
           "religious reference"
         ],
         "insight_tags": [
           "creativity",
-          "personalization",
+          "artistic expression",
           "spirituality"
         ],
         "sentiment_score": 0.9295250177383423
@@ -3733,7 +3735,7 @@
         "insight_tags": [
           "confusion",
           "delayed action",
-          "technical issue"
+          "software navigation"
         ],
         "sentiment_score": 0.35087135434150696
       }
@@ -3800,13 +3802,12 @@
         "themes": [
           "research and analysis",
           "service design",
-          "user experience"
+          "persona and journey mapping"
         ],
         "insight_tags": [
           "expensive tools",
-          "deep research",
-          "personas",
-          "journey maps"
+          "deep research required",
+          "collaboration with Odyssea"
         ],
         "sentiment_score": 0.40826377272605896
       }
@@ -3836,13 +3837,13 @@
         "emotion_intensity": 3,
         "themes": [
           "technology",
-          "forgetfulness",
-          "frustration"
+          "password management",
+          "digital assets"
         ],
         "insight_tags": [
-          "password management",
-          "image quality",
-          "preparedness"
+          "convenience",
+          "forgetfulness",
+          "preparation"
         ],
         "sentiment_score": 0.25342416763305664
       }
@@ -3871,14 +3872,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
+          "cooking process",
           "data management",
-          "user interface",
           "journey mapping"
         ],
         "insight_tags": [
-          "technology integration",
-          "content sharing",
-          "model organization"
+          "multitasking",
+          "file management",
+          "organizational structure"
         ],
         "sentiment_score": 0.3614111840724945
       }
@@ -3909,7 +3910,7 @@
         "themes": [
           "journey mapping",
           "quality improvement",
-          "meeting expectations"
+          "expectation management"
         ],
         "insight_tags": [
           "planning",
@@ -3943,14 +3944,14 @@
         "emotion": "approval",
         "emotion_intensity": 3,
         "themes": [
-          "time management",
-          "information organization",
-          "effort"
+          "time consuming",
+          "reading",
+          "putting together"
         ],
         "insight_tags": [
-          "efficiency",
-          "prioritization",
-          "workload"
+          "effort",
+          "starting point",
+          "challenging"
         ],
         "sentiment_score": 0.41574689745903015
       }
@@ -3979,14 +3980,14 @@
         "emotion": "love",
         "emotion_intensity": 3,
         "themes": [
-          "early access to tool",
-          "appreciation for tool features",
-          "humor"
+          "early access",
+          "tool demonstration",
+          "enthusiasm"
         ],
         "insight_tags": [
-          "excitement",
-          "appreciation",
-          "amusement"
+          "exclusive opportunity",
+          "user engagement",
+          "humor"
         ],
         "sentiment_score": 0.4953107237815857
       }
@@ -4020,9 +4021,9 @@
           "diversifying content"
         ],
         "insight_tags": [
-          "creativity in interviews",
+          "creativity",
           "break from routine",
-          "engagement strategy"
+          "engagement"
         ],
         "sentiment_score": 0.49184197187423706
       }
@@ -4056,9 +4057,9 @@
           "homepage design"
         ],
         "insight_tags": [
-          "creativity",
-          "user experience",
-          "prioritization"
+          "pain points",
+          "saving journey maps",
+          "homepage content"
         ],
         "sentiment_score": 0.37669384479522705
       }
@@ -4089,12 +4090,12 @@
         "themes": [
           "excitement",
           "desire",
-          "appreciation"
+          "limitation"
         ],
         "insight_tags": [
+          "innovation",
           "potential",
-          "need",
-          "gratitude"
+          "frustration"
         ],
         "sentiment_score": 0.6487649083137512
       }
@@ -4123,13 +4124,13 @@
         "emotion": "admiration",
         "emotion_intensity": 3,
         "themes": [
+          "project utilization",
           "investment",
-          "project development",
           "encouragement"
         ],
         "insight_tags": [
-          "utilization of resources",
-          "progress tracking",
+          "entrepreneurial spirit",
+          "project progress",
           "positive feedback"
         ],
         "sentiment_score": 0.7255545258522034
@@ -4195,14 +4196,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "AI technology",
-          "custom models",
-          "natural language processing"
+          "technology",
+          "artificial intelligence",
+          "machine learning"
         ],
         "insight_tags": [
-          "transcripts",
-          "open AI tool",
-          "custom gpts"
+          "tools",
+          "custom models",
+          "open AI"
         ],
         "sentiment_score": 0.8190165758132935
       }
@@ -4236,8 +4237,8 @@
           "coding challenges"
         ],
         "insight_tags": [
-          "visionary approach",
-          "leveraging existing tools",
+          "visionary ideas",
+          "tool functionality",
           "file management"
         ],
         "sentiment_score": 0.315678209066391
@@ -4267,14 +4268,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "data integration",
-          "design collaboration",
-          "workflow efficiency"
+          "integration of tools",
+          "design workflow",
+          "enhancing creativity"
         ],
         "insight_tags": [
-          "tool integration",
-          "design iteration",
-          "workflow optimization"
+          "tool interoperability",
+          "workflow efficiency",
+          "creative process"
         ],
         "sentiment_score": 0.3505306541919708
       }
@@ -4304,13 +4305,13 @@
         "emotion_intensity": 3,
         "themes": [
           "new discovery",
-          "tools integration",
+          "digital design tools",
           "knowledge sharing"
         ],
         "insight_tags": [
           "surprise",
           "learning",
-          "communication"
+          "collaboration"
         ],
         "sentiment_score": 0.26582232117652893
       }
@@ -4376,12 +4377,12 @@
         "emotion_intensity": 3,
         "themes": [
           "confusion",
-          "work-related",
-          "project management"
+          "work-related communication",
+          "task management"
         ],
         "insight_tags": [
           "lack of clarity",
-          "communication breakdown",
+          "miscommunication",
           "task delegation"
         ],
         "sentiment_score": 0.19102518260478973
@@ -4412,12 +4413,13 @@
         "emotion_intensity": 3,
         "themes": [
           "misalignment of skills",
-          "expectation mismatch"
+          "expectation mismatch",
+          "job termination"
         ],
         "insight_tags": [
           "skill assessment",
           "clear communication",
-          "role fit"
+          "job fit"
         ],
         "sentiment_score": 0.24941129982471466
       }
@@ -4453,7 +4455,7 @@
         "insight_tags": [
           "lack of organization",
           "template usage",
-          "need for improvement"
+          "work in progress"
         ],
         "sentiment_score": 0.8804231882095337
       }
@@ -4518,14 +4520,14 @@
         "emotion": "admiration",
         "emotion_intensity": 3,
         "themes": [
-          "research collaboration",
-          "tool development",
-          "user feedback"
+          "collaboration",
+          "research",
+          "tool development"
         ],
         "insight_tags": [
           "importance of user feedback",
-          "collaboration with researchers",
-          "tool improvement"
+          "real-world application",
+          "collaborative work"
         ],
         "sentiment_score": 0.7000519037246704
       }
@@ -4595,9 +4597,9 @@
           "technology"
         ],
         "insight_tags": [
-          "data retrieval",
+          "data organization",
           "time-saving",
-          "automation"
+          "AI transcription"
         ],
         "sentiment_score": 0.5730577111244202
       }
@@ -4627,13 +4629,13 @@
         "emotion_intensity": 3,
         "themes": [
           "AI technology",
-          "transcript analysis",
-          "interview summarization"
+          "text transcripts",
+          "summarization"
         ],
         "insight_tags": [
-          "efficiency improvement",
-          "automation",
-          "data parsing"
+          "automated video analysis",
+          "efficiency in data processing",
+          "importance of summarization"
         ],
         "sentiment_score": 0.2925727665424347
       }
@@ -4664,12 +4666,12 @@
         "themes": [
           "efficiency",
           "communication",
-          "accuracy"
+          "quality"
         ],
         "insight_tags": [
           "quick results",
-          "team collaboration",
-          "top-line findings"
+          "effective team communication",
+          "top-line results"
         ],
         "sentiment_score": 0.777959942817688
       }
@@ -4699,13 +4701,13 @@
         "emotion_intensity": 3,
         "themes": [
           "efficiency",
-          "data analysis",
-          "team collaboration"
+          "thoroughness",
+          "teamwork"
         ],
         "insight_tags": [
-          "speed",
-          "nuance exploration",
-          "verbatims support"
+          "faster data analysis",
+          "in-depth understanding",
+          "collaboration"
         ],
         "sentiment_score": 0.4236932694911957
       }
@@ -4740,8 +4742,8 @@
         ],
         "insight_tags": [
           "opportunity for collaboration",
-          "seeking feedback",
-          "professional development"
+          "interest in user feedback",
+          "professional background"
         ],
         "sentiment_score": 0.9623552560806274
       }
@@ -4776,8 +4778,8 @@
         ],
         "insight_tags": [
           "technology integration",
-          "improving accessibility",
-          "expanding reach"
+          "user outreach",
+          "efficiency improvement"
         ],
         "sentiment_score": 0.6955044865608215
       }
@@ -4808,12 +4810,12 @@
         "themes": [
           "interview process",
           "questioning technique",
-          "interview initiation"
+          "instructional prompts"
         ],
         "insight_tags": [
-          "demonstration of interview process",
-          "clear instructions for interview initiation",
-          "emphasis on starting the interview"
+          "simulation",
+          "engagement",
+          "clarity"
         ],
         "sentiment_score": 0.4338933527469635
       }
@@ -4844,12 +4846,12 @@
         "themes": [
           "user testing",
           "design evaluation",
-          "screen comparison"
+          "participant consent"
         ],
         "insight_tags": [
           "transparency",
-          "participant engagement",
-          "audio-visual testing"
+          "comparison testing",
+          "audio-visual feedback"
         ],
         "sentiment_score": 0.2661755084991455
       }
@@ -4878,14 +4880,14 @@
         "emotion": "neutral",
         "emotion_intensity": 3,
         "themes": [
-          "AI processing of audio data",
-          "Vector representation",
-          "Semantic search"
+          "Audio Processing",
+          "Vector Store",
+          "AI Algorithms"
         ],
         "insight_tags": [
-          "User preference for mouse moments in audio",
-          "Utilization of dot and cross products for similarity and difference analysis",
-          "Magic of AI in transforming audio data"
+          "Data Representation",
+          "Similarity Analysis",
+          "Semantic Search"
         ],
         "sentiment_score": 0.8808826804161072
       }
@@ -4920,8 +4922,8 @@
         ],
         "insight_tags": [
           "versatility of data processing",
-          "dimensionality reduction",
-          "pattern recognition"
+          "potential applications of vectorization",
+          "complexity of data analysis"
         ],
         "sentiment_score": 0.33144423365592957
       }
@@ -4955,8 +4957,8 @@
         ],
         "insight_tags": [
           "vectorization",
-          "search optimization",
-          "user interaction"
+          "versatility",
+          "ease of use"
         ],
         "sentiment_score": 0.782039225101471
       }
@@ -4986,13 +4988,13 @@
         "emotion_intensity": 3,
         "themes": [
           "interview preparation",
-          "research topics",
-          "nervousness"
+          "nervousness",
+          "research collaboration"
         ],
         "insight_tags": [
           "comprehensive coverage",
-          "self-doubt",
-          "peer comparison"
+          "impostor syndrome",
+          "academic qualifications"
         ],
         "sentiment_score": 0.11672547459602356
       }
@@ -5021,14 +5023,14 @@
         "emotion": "approval",
         "emotion_intensity": 3,
         "themes": [
-          "mobile technology",
-          "starting point",
+          "mobile usage",
+          "encouragement",
           "usefulness"
         ],
         "insight_tags": [
-          "encouragement",
-          "potential",
-          "positive outlook"
+          "starting point",
+          "potential usefulness",
+          "encouragement"
         ],
         "sentiment_score": 0.3577602803707123
       }
@@ -5052,9 +5054,9 @@
           "anticipation"
         ],
         "insight_tags": [
-          "visual",
+          "vision",
           "expectation",
-          "interest"
+          "hope"
         ],
         "sentiment_score": 0.595456063747406
       }
