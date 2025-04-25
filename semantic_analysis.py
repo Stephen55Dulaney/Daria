@@ -23,15 +23,19 @@ class SemanticAnalyzer:
     def __init__(self):
         """Initialize semantic analysis models and vector store."""
         try:
-            # Initialize embedding model
-            self.embedding_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+            # Initialize sentence transformer for embeddings
+            self.sentence_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
             
-            # Initialize emotion detection models
-            self.emotion_model = pipeline(
-                "text-classification",
-                model="bhadresh-savani/bert-base-go-emotion",
-                return_all_scores=True
-            )
+            # Use a simpler emotion classification model
+            try:
+                self.emotion_model = pipeline(
+                    "text-classification",
+                    model="j-hartmann/emotion-english-distilroberta-base",
+                    return_all_scores=True
+                )
+            except Exception as e:
+                logger.error(f"Error loading emotion model: {str(e)}")
+                self.emotion_model = None
             
             # Initialize OpenAI client for theme extraction
             self.openai_client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
@@ -55,20 +59,30 @@ class SemanticAnalyzer:
             logger.error(f"Error initializing semantic analyzer: {str(e)}")
             raise
 
-    def get_embedding(self, text: str) -> List[float]:
-        """Get embedding for a piece of text."""
+    def get_embeddings(self, text):
         try:
-            return self.embedding_model.encode(text).tolist()
+            return self.sentence_model.encode(text)
         except Exception as e:
-            logger.error(f"Error getting embedding: {str(e)}")
-            return [0.0] * 384  # Return zero vector as fallback
+            logger.error(f"Error getting embeddings: {str(e)}")
+            return None
+
+    def analyze_emotions(self, text):
+        if self.emotion_model is None:
+            return None
+            
+        try:
+            emotions = self.emotion_model(text)
+            return emotions[0] if emotions else None
+        except Exception as e:
+            logger.error(f"Error analyzing emotions: {str(e)}")
+            return None
 
     def analyze_chunk(self, text: str) -> Dict[str, Any]:
         """Analyze a chunk of text for emotions and semantic meaning."""
         try:
             # Get emotions
-            emotions = self.emotion_model(text)[0]
-            primary_emotion = max(emotions, key=lambda x: x['score'])
+            emotions = self.analyze_emotions(text)
+            primary_emotion = max(emotions, key=lambda x: x['score']) if emotions else None
             
             # Extract themes and insights using OpenAI
             themes_response = self.openai_client.chat.completions.create(
@@ -120,11 +134,11 @@ Respond with ONLY this exact JSON structure, no other text:
             
             return {
                 'text': text,
-                'emotion': primary_emotion['label'],
+                'emotion': primary_emotion['label'] if primary_emotion else 'neutral',
                 'emotion_intensity': analysis.get('emotion_intensity', 3),
                 'themes': analysis.get('themes', []),
                 'insight_tags': analysis.get('insight_tags', []),
-                'sentiment_score': primary_emotion['score']
+                'sentiment_score': primary_emotion['score'] if primary_emotion else 0.5
             }
             
         except Exception as e:
@@ -154,7 +168,7 @@ Respond with ONLY this exact JSON structure, no other text:
                 points=[
                     models.PointStruct(
                         id=chunk_id,
-                        vector=self.get_embedding(text),
+                        vector=self.get_embeddings(text),
                         payload={
                             "text": text,
                             "metadata": analysis
@@ -172,7 +186,7 @@ Respond with ONLY this exact JSON structure, no other text:
         """Search for similar chunks with optional emotion filtering."""
         try:
             # Encode query
-            query_vector = self.embedding_model.encode(query)
+            query_vector = self.get_embeddings(query)
             
             # Prepare search filters
             search_params = models.SearchParams(hnsw_ef=128)

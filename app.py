@@ -1,5 +1,9 @@
+import eventlet
+eventlet.monkey_patch()
+
 from flask import Flask, render_template, request, jsonify, send_file, redirect, url_for, flash, session, current_app
 from flask_socketio import SocketIO, emit
+from flask_cors import CORS
 from elevenlabs import stream
 from elevenlabs.client import ElevenLabs
 import os
@@ -46,7 +50,24 @@ app.config['INTERVIEWS_DIR'] = 'interviews/raw'
 app.config['VECTOR_STORE_PATH'] = 'vector_store'
 app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')  # Add OpenAI API key configuration
 
-socketio = SocketIO(app)
+# Configure CORS
+CORS(app, resources={
+    r"/api/*": {
+        "origins": ["http://localhost:5173"],  # React dev server
+        "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+        "allow_headers": ["Content-Type", "Authorization"],
+        "supports_credentials": True
+    }
+})
+
+# Configure SocketIO with CORS
+socketio = SocketIO(app, 
+    cors_allowed_origins=["http://localhost:5173"],
+    async_mode='eventlet',
+    logger=True,
+    engineio_logger=True
+)
+
 load_dotenv()
 
 # Add markdown filter
@@ -4142,4 +4163,9 @@ def view_annotated_transcript(interview_id, page=1):
         return redirect(url_for('advanced_search'))
 
 if __name__ == '__main__':
-    socketio.run(app, debug=True, port=5003) 
+    socketio.run(app, 
+        host='0.0.0.0',
+        port=5003,
+        debug=True,
+        use_reloader=True
+    ) 
