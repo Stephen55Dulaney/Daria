@@ -21,7 +21,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime, timedelta
 from pathlib import Path
 from src.vector_store import InterviewVectorStore
-from src.persona_gpt import generate_persona_with_architect
 import traceback
 import logging
 from markupsafe import Markup
@@ -41,6 +40,7 @@ from src.processed_interview_store import ProcessedInterviewStore
 import sys
 from src.discovery_gpt import DiscoveryGPT
 from asgiref.sync import async_to_sync
+from src.persona_gpt import generate_persona_from_interviews
 
 # Configure logging with a more detailed format
 logging.basicConfig(
@@ -4140,7 +4140,7 @@ def view_annotated_transcript(interview_id, page=1):
         # Prepare the response data
         response_data = {
             'interviewee_name': metadata.get('interviewee', {}).get('name', 'Unknown'),
-            'project_name': metadata.get('project_name', 'Unknown Project'),
+            'project_name': metadata.get('project', {}).get('name', 'Unknown Project'),
             'date': metadata.get('date', 'No Date'),
             'chunks': current_chunks,
             'pagination': {
@@ -4252,10 +4252,286 @@ def discovery_conversation():
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
+@app.route('/interviews/raw/<interview_id>.json')
+def get_raw_interview(interview_id):
+    """Serve a raw interview file."""
+    try:
+        file_path = Path('interviews/raw') / f"{interview_id}.json"
+        if not file_path.exists():
+            return jsonify({'error': 'Interview not found'}), 404
+            
+        with open(file_path) as f:
+            return jsonify(json.load(f))
+    except Exception as e:
+        logger.error(f"Error serving raw interview: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/interviews/raw')
+def list_raw_interviews():
+    """List all raw interviews."""
+    try:
+        interviews = []
+        raw_dir = Path('interviews/raw')
+        
+        if not raw_dir.exists():
+            return jsonify([])
+            
+        for file in raw_dir.glob('*.json'):
+            try:
+                with open(file) as f:
+                    interview = json.load(f)
+                    # Extract interview ID from filename
+                    interview_id = file.stem
+                    
+                    # Create summary dictionary
+                    summary = {
+                        'id': interview_id,
+                        'title': interview.get('title', 'Untitled Interview'),
+                        'project_name': interview.get('project_name', 'Unassigned'),
+                        'interview_type': interview.get('interview_type', 'Interview'),
+                        'date': interview.get('date', ''),
+                        'transcript': interview.get('transcript', ''),
+                        'interviewee': interview.get('interviewee', ''),
+                        'metadata': interview.get('metadata', {}),
+                        'preview': interview.get('preview', '')
+                    }
+                    interviews.append(summary)
+            except Exception as e:
+                logger.error(f"Error reading interview file {file}: {str(e)}")
+                continue
+                
+        # Sort by date, most recent first
+        interviews.sort(key=lambda x: x.get('date', ''), reverse=True)
+        return jsonify(interviews)
+        
+    except Exception as e:
+        logger.error(f"Error listing raw interviews: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/projects', methods=['GET'])
+def get_projects():
+    """Get list of all projects with interviews."""
+    try:
+        projects = []
+        project_names = set()
+
+        # Check both interviews and interviews/raw directories
+        interview_dirs = ['interviews', 'interviews/raw']
+        
+        for dir_path in interview_dirs:
+            if os.path.exists(dir_path):
+                for filename in os.listdir(dir_path):
+                    if filename.endswith('.json'):
+                        try:
+                            with open(os.path.join(dir_path, filename)) as f:
+                                interview = json.load(f)
+                                project_name = interview.get('project_name')
+                                if project_name:
+                                    project_names.add(project_name)
+                        except Exception as e:
+                            logger.error(f"Error reading file {filename}: {str(e)}")
+                            continue
+        
+        # Convert to list of project objects
+        projects = [{'id': name, 'name': name} for name in sorted(project_names) if name]
+        
+        return jsonify(projects)
+        
+    except Exception as e:
+        logger.error(f"Error in get_projects: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+        if project_name:
+            # Now get all interviews for this project from both directories
+            for dir_path in interview_dirs:
+                if os.path.exists(dir_path):
+                    for file in Path(dir_path).glob('*.json'):
+                        try:
+                            with open(file) as f:
+                                interview_data = json.load(f)
+                                if interview_data.get('project_name') == project_name:
+                                    # Format date for display
+                                    date = interview_data.get('date', '')
+                                    if date:
+                                        try:
+                                            date = datetime.fromisoformat(date)
+                                            formatted_date = date.strftime('%B %d, %Y')
+                                        except ValueError:
+                                            formatted_date = date
+                                    else:
+                                        formatted_date = 'No date'
+                                    
+                                    interviews.append({
+                                        'id': interview_data.get('id'),
+                                        'title': interview_data.get('title', 'Untitled Interview'),
+                                        'date': formatted_date,
+                                        'interview_type': interview_data.get('interview_type', 'Unknown Type')
+                                    })
+                        except json.JSONDecodeError:
+                            continue
+                        except Exception as e:
+                            logger.error(f"Error reading file {file}: {str(e)}")
+                            continue
+        
+        logger.info(f"Found {len(interviews)} interviews for project {project_name}")
+        return jsonify(interviews)
+    except Exception as e:
+        logger.error(f"Error getting project interviews: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/generate_persona', methods=['POST'])
+def api_generate_persona():
+    """API endpoint: Generate a persona and return JSON for React frontend."""
+    try:
+        data = request.get_json()
+        logger.info(f"[API] Received persona generation request: {json.dumps(data, indent=2)}")
+
+        # Accept both 'interviews' and 'interview_ids' for compatibility
+        interviews = data.get('interviews') or data.get('interview_ids')
+        if not interviews:
+            logger.error("No interviews provided in request")
+            return jsonify({'error': 'No interviews provided'}), 400
+
+        project_name = data.get('project_name', '')
+        selected_elements = data.get('selected_elements', [])
+        model = data.get('model', 'gpt-4')
+
+        # Load interview data
+        interview_data = []
+        for interview_id in interviews:
+            interview = get_interview(interview_id)
+            if not interview:
+                logger.warning(f"Could not load interview data for ID {interview_id}")
+                continue
+            interview_data.append(interview)
+
+        if not interview_data:
+            logger.error("No valid interviews found")
+            return jsonify({'error': 'No valid interviews found'}), 400
+
+        # Model context limits
+        model_limits = {
+            'gpt-3.5-turbo': 16385,
+            'gpt-4': 128000,
+            'gpt-4-turbo-preview': 128000,
+            'claude-3.7-sonnet': 200000
+        }
+        max_tokens = model_limits.get(model, 16385)
+
+        # Prepare interview data (reuse logic from /generate_persona)
+        def prepare_interview_data(interviews, max_tokens):
+            prepared_data = []
+            for interview in interviews:
+                metadata = interview.get('metadata', {})
+                transcript = interview.get('transcript', '')
+                if isinstance(transcript, list):
+                    transcript = ' '.join([msg.get('text', '') for msg in transcript if msg.get('speaker') == 'You'])
+                if model == 'gpt-3.5-turbo':
+                    transcript = transcript[:1000] + '...' if len(transcript) > 1000 else transcript
+                prepared_data.append({
+                    'metadata': metadata,
+                    'transcript_excerpt': transcript,
+                    'key_insights': interview.get('analysis', {}).get('key_insights', [])[:5]
+                })
+            return prepared_data
+
+        system_prompt = """You are an expert UX researcher and persona creator. \nCreate a detailed persona based on the interview data provided. \nReturn ONLY the JSON data without any markdown formatting or code blocks.\nFormat the response with the following structure:\n{...}"""
+        prepared_interviews = prepare_interview_data(interview_data, max_tokens)
+        user_prompt = f"Create a persona based on these interviews: {json.dumps(prepared_interviews, indent=2)}"
+
+        content = None
+        if model == 'claude-3.7-sonnet':
+            try:
+                import boto3
+                aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
+                aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+                region = 'us-east-2'
+                if not aws_access_key or not aws_secret_key:
+                    logger.error("AWS credentials not found")
+                    return jsonify({'error': 'AWS credentials not configured'}), 500
+                bedrock_runtime = boto3.client(
+                    service_name='bedrock-runtime',
+                    region_name=region,
+                    aws_access_key_id=aws_access_key,
+                    aws_secret_access_key=aws_secret_key
+                )
+                messages = [{"role": "user", "content": user_prompt}]
+                body = json.dumps({
+                    "messages": messages,
+                    "system": system_prompt,
+                    "max_tokens": 4096,
+                    "temperature": 0.7,
+                    "top_p": 1,
+                    "anthropic_version": "bedrock-2023-05-31"
+                })
+                response = bedrock_runtime.invoke_model(
+                    body=body,
+                    modelId='arn:aws:bedrock:us-east-2:522814696964:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0',
+                    accept="application/json",
+                    contentType="application/json"
+                )
+                response_body = json.loads(response.get('body').read())
+                content = ''
+                if 'content' in response_body:
+                    content_list = response_body['content']
+                    if isinstance(content_list, list) and len(content_list) > 0:
+                        content = content_list[0].get('text', '')
+                if not content:
+                    logger.error("Empty response from Claude")
+                    raise ValueError("Empty response from Claude")
+            except Exception as e:
+                logger.error(f"Error using Claude: {str(e)}")
+                logger.error(traceback.format_exc())
+                return jsonify({'error': f'Failed to generate persona with Claude: {str(e)}'}), 500
+        else:
+            try:
+                client = create_openai_client()
+                if not client:
+                    logger.error("Failed to initialize OpenAI client")
+                    return jsonify({'error': 'Failed to initialize AI client'}), 500
+                response = client.chat.completions.create(
+                    model="gpt-4-turbo-preview" if model == 'gpt-4' else "gpt-3.5-turbo",
+                    messages=[
+                        {"role": "system", "content": system_prompt},
+                        {"role": "user", "content": user_prompt}
+                    ],
+                    temperature=0.7
+                )
+                content = response.choices[0].message.content
+            except Exception as e:
+                logger.error(f"Error using OpenAI: {str(e)}")
+                logger.error(traceback.format_exc())
+                return jsonify({'error': f'Failed to generate persona with OpenAI: {str(e)}'}), 500
+
+        if not content:
+            logger.error("No content generated")
+            return jsonify({'error': 'No content generated'}), 500
+
+        content = content.strip()
+        if content.startswith('```'):
+            content = content.split('```')[1]
+            if content.startswith('json'):
+                content = content[4:]
+            content = content.strip()
+        logger.info(f"[API] Cleaned content: {content}")
+        try:
+            persona_data = json.loads(content)
+        except json.JSONDecodeError as e:
+            logger.error(f"Error parsing persona JSON: {str(e)}")
+            return jsonify({'error': 'Invalid persona data format'}), 500
+        # Return persona JSON for React
+        return jsonify(persona_data)
+    except Exception as e:
+        logger.error(f"Unexpected error in /api/generate_persona: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
 if __name__ == '__main__':
     socketio.run(app, 
         host='0.0.0.0',
         port=5003,
         debug=True,
         use_reloader=True
-    ) 
+    )
+

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { useParams, useSearchParams } from 'react-router-dom'
+import { useParams, useSearchParams, Link } from 'react-router-dom'
 import axios from 'axios'
 
 interface TranscriptChunk {
@@ -16,6 +16,14 @@ interface TranscriptChunk {
     timestamp: string
     text: string
   }>
+  metadata?: {
+    project_name?: string
+    emotion?: string
+    emotion_intensity?: number
+    insight_tags?: string[]
+    related_feature?: string | null
+    themes?: string[]
+  }
 }
 
 interface PaginationInfo {
@@ -56,6 +64,9 @@ const AnnotatedTranscript: React.FC = () => {
       if (response.data.error) {
         setError(response.data.error);
       } else {
+        console.log('Full transcript response:', response.data);
+        console.log('First chunk:', response.data.chunks?.[0]);
+        console.log('Transcript metadata:', response.data.metadata);
         setTranscript(response.data);
       }
     } catch (err: any) {
@@ -142,30 +153,60 @@ const AnnotatedTranscript: React.FC = () => {
   }
 
   const renderThemes = (themes: string[] | undefined) => {
-    if (!themes || themes.length === 0) return null
+    if (!themes || themes.length === 0) return null;
     return (
-      <div className="flex flex-wrap gap-2">
-        {themes.map((theme, i) => (
-          <span key={i} className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full border border-purple-200">
-            {theme}
-          </span>
-        ))}
+      <div className="space-y-1">
+        <div className="text-sm font-medium text-gray-700">Themes:</div>
+        <div className="flex flex-wrap gap-2">
+          {themes.map((theme, i) => (
+            <span 
+              key={i} 
+              className="px-3 py-1 bg-purple-100 text-purple-800 text-sm rounded-full border border-purple-200 hover:bg-purple-200 transition-colors"
+            >
+              {theme}
+            </span>
+          ))}
+        </div>
       </div>
-    )
-  }
+    );
+  };
 
-  const renderInsights = (insights: string[] | undefined) => {
-    if (!insights || insights.length === 0) return null
+  const renderInsightTags = (insights: string[] | undefined) => {
+    if (!insights || insights.length === 0) return null;
+
+    // Color mapping for different types of insights
+    const insightColors: { [key: string]: string } = {
+      pain_point: 'bg-red-100 text-red-800 border-red-200 hover:bg-red-200',
+      opportunity: 'bg-green-100 text-green-800 border-green-200 hover:bg-green-200',
+      need: 'bg-blue-100 text-blue-800 border-blue-200 hover:bg-blue-200',
+      quote: 'bg-purple-100 text-purple-800 border-purple-200 hover:bg-purple-200',
+      behavior: 'bg-orange-100 text-orange-800 border-orange-200 hover:bg-orange-200',
+      preference: 'bg-indigo-100 text-indigo-800 border-indigo-200 hover:bg-indigo-200',
+      feedback: 'bg-teal-100 text-teal-800 border-teal-200 hover:bg-teal-200'
+    };
+
+    const getInsightColor = (insight: string): string => {
+      // Check if the insight starts with any of our known types
+      const type = Object.keys(insightColors).find(key => insight.toLowerCase().startsWith(key));
+      return type ? insightColors[type] : insightColors.feedback; // Default to feedback style
+    };
+
     return (
-      <div className="flex flex-wrap gap-2">
-        {insights.map((insight, i) => (
-          <span key={i} className="px-3 py-1 bg-blue-100 text-blue-800 text-sm rounded-full border border-blue-200">
-            {insight}
-          </span>
-        ))}
+      <div className="space-y-1">
+        <div className="text-sm font-medium text-gray-700">Insights:</div>
+        <div className="flex flex-wrap gap-2">
+          {insights.map((insight, i) => (
+            <span 
+              key={i} 
+              className={`px-3 py-1 text-sm rounded-full border transition-colors ${getInsightColor(insight)}`}
+            >
+              {insight}
+            </span>
+          ))}
+        </div>
       </div>
-    )
-  }
+    );
+  };
 
   if (isLoading) {
     return (
@@ -187,6 +228,24 @@ const AnnotatedTranscript: React.FC = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6">
+      {/* Back Link */}
+      <Link
+        to="/advanced-search"
+        className="inline-flex items-center text-gray-600 hover:text-gray-900 mb-6"
+      >
+        <svg 
+          xmlns="http://www.w3.org/2000/svg" 
+          fill="none" 
+          viewBox="0 0 24 24" 
+          strokeWidth={1.5} 
+          stroke="currentColor" 
+          className="w-5 h-5 mr-2"
+        >
+          <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+        </svg>
+        Back to Advanced Search
+      </Link>
+
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold mb-2">{transcript.interviewee_name}</h1>
@@ -194,6 +253,11 @@ const AnnotatedTranscript: React.FC = () => {
           <p>{transcript.project_name}</p>
           <p>{transcript.date}</p>
         </div>
+      </div>
+
+      {/* Top Pagination */}
+      <div className="mb-3">
+        {renderPagination()}
       </div>
 
       {/* Transcript Chunks */}
@@ -235,19 +299,9 @@ const AnnotatedTranscript: React.FC = () => {
                 </div>
               )}
               
-              {chunk.themes && chunk.themes.length > 0 && (
-                <div className="space-y-1">
-                  <div className="text-sm font-medium text-gray-700">Themes:</div>
-                  {renderThemes(chunk.themes)}
-                </div>
-              )}
+              {chunk.themes && chunk.themes.length > 0 && renderThemes(chunk.themes)}
               
-              {chunk.insight_tags && chunk.insight_tags.length > 0 && (
-                <div className="space-y-1">
-                  <div className="text-sm font-medium text-gray-700">Insights:</div>
-                  {renderInsights(chunk.insight_tags)}
-                </div>
-              )}
+              {chunk.insight_tags && chunk.insight_tags.length > 0 && renderInsightTags(chunk.insight_tags)}
 
               {chunk.related_feature && (
                 <div className="space-y-1">

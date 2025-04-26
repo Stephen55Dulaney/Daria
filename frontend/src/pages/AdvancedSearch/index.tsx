@@ -161,7 +161,7 @@ const AdvancedSearch: React.FC = () => {
                   </div>
                   {result.interview_id && (
                     <Link
-                      to={`/annotated-transcript/${result.interview_id}`}
+                      to={`/annotated-transcript/${result.interview_id}?timestamp=${encodeURIComponent(result.timestamp)}`}
                       className="text-blue-600 hover:text-blue-800"
                     >
                       View Annotated Transcript

@@ -11,6 +11,7 @@ from qdrant_client.http import models
 from openai import OpenAI
 import os
 from dotenv import load_dotenv
+import re
 
 # Load environment variables
 load_dotenv()
@@ -18,6 +19,148 @@ load_dotenv()
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
+
+def split_transcript_safe(transcript, max_length=400):
+    """
+    Split a transcript into safe-sized chunks that won't exceed model token limits.
+    
+    Args:
+        transcript (str): The text to split
+        max_length (int): Maximum number of words per chunk (default: 400)
+        
+    Returns:
+        List[str]: List of text chunks, each below the maximum length
+    """
+    logger.info(f"Splitting transcript into chunks (max length: {max_length} words)")
+    
+    # Split by speaker turns if transcript contains speaker markers
+    if '[' in transcript and ']' in transcript:
+        # Try to split by speaker turns first
+        speaker_pattern = r'\[.*?\]'
+        turns = re.split(f'({speaker_pattern}\\s+)', transcript)
+        
+        # Group speaker with their text
+        i = 0
+        grouped_turns = []
+        while i < len(turns) - 1:
+            if re.match(speaker_pattern, turns[i]):
+                # Speaker marker is in this element
+                grouped_turns.append(turns[i] + (turns[i+1] if i+1 < len(turns) else ""))
+                i += 2
+            else:
+                # No speaker marker, just add the text
+                grouped_turns.append(turns[i])
+                i += 1
+        
+        # Add any remaining turn
+        if i < len(turns):
+            grouped_turns.append(turns[i])
+            
+        chunks = []
+        current_chunk = []
+        current_length = 0
+        
+        for turn in grouped_turns:
+            if not turn.strip():
+                continue
+                
+            turn_length = len(turn.split())
+            
+            # If this turn alone exceeds max length, split it further
+            if turn_length > max_length:
+                # Process the current chunk if it's not empty
+                if current_chunk:
+                    chunks.append(' '.join(current_chunk))
+                    current_chunk = []
+                    current_length = 0
+                
+                # Split the long turn by sentences
+                sentences = re.split(r'(?<=[.!?]) +', turn)
+                sub_chunk = []
+                sub_length = 0
+                
+                for sentence in sentences:
+                    sentence_length = len(sentence.split())
+                    
+                    if sub_length + sentence_length <= max_length:
+                        sub_chunk.append(sentence)
+                        sub_length += sentence_length
+                    else:
+                        if sub_chunk:  # Add accumulated sentences as a chunk
+                            chunks.append(' '.join(sub_chunk))
+                            sub_chunk = [sentence]
+                            sub_length = sentence_length
+                        else:  # Single sentence is too long, split by words
+                            words = sentence.split()
+                            for i in range(0, len(words), max_length):
+                                word_chunk = ' '.join(words[i:i+max_length])
+                                if word_chunk:
+                                    chunks.append(word_chunk)
+                
+                # Add any remaining sub-chunk
+                if sub_chunk:
+                    chunks.append(' '.join(sub_chunk))
+            
+            # If adding this turn would exceed max length, create a new chunk
+            elif current_length + turn_length > max_length:
+                chunks.append(' '.join(current_chunk))
+                current_chunk = [turn]
+                current_length = turn_length
+            else:
+                current_chunk.append(turn)
+                current_length += turn_length
+        
+        # Add the last chunk if there's anything left
+        if current_chunk:
+            chunks.append(' '.join(current_chunk))
+    
+    else:
+        # No speaker markers, just split by paragraphs and sentences
+        paragraphs = transcript.split('\n\n')
+        chunks = []
+        
+        for para in paragraphs:
+            if not para.strip():
+                continue
+                
+            para_length = len(para.split())
+            
+            # If paragraph is too long, split it
+            if para_length > max_length:
+                # Split by sentences
+                sentences = re.split(r'(?<=[.!?]) +', para)
+                current = []
+                current_length = 0
+                
+                for sent in sentences:
+                    sent_length = len(sent.split())
+                    
+                    if current_length + sent_length <= max_length:
+                        current.append(sent)
+                        current_length += sent_length
+                    else:
+                        if current:  # Add accumulated sentences as a chunk
+                            chunks.append(' '.join(current))
+                            current = [sent]
+                            current_length = sent_length
+                        else:  # Single sentence is too long, split by words
+                            words = sent.split()
+                            for i in range(0, len(words), max_length):
+                                word_chunk = ' '.join(words[i:i+max_length])
+                                if word_chunk:
+                                    chunks.append(word_chunk)
+                
+                # Add any remaining sentences
+                if current:
+                    chunks.append(' '.join(current))
+            else:
+                chunks.append(para)
+    
+    # Remove empty chunks and log
+    result = [c.strip() for c in chunks if c.strip()]
+    logger.info(f"Split transcript into {len(result)} chunks")
+    
+    return result
 
 class SemanticAnalyzer:
     def __init__(self):
@@ -80,25 +223,53 @@ class SemanticAnalyzer:
         """Analyze emotions in text."""
         if not self.emotion_model:
             logger.warning("Emotion model not available")
-            return None
+            return {'label': 'neutral', 'score': 0.0}
+            
+        # Handle empty or whitespace-only text
+        if not text or not text.strip():
+            return {'label': 'neutral', 'score': 0.0}
             
         try:
             result = self.emotion_model(text)
             if result and len(result) > 0:
-                return result[0]
-            return None
+                # The model returns a list with a single dict containing label and score
+                return result[0]  # Returns {'label': 'emotion', 'score': 0.123}
+            return {'label': 'neutral', 'score': 0.0}
         except Exception as e:
             logger.error(f"Error analyzing emotions: {str(e)}")
-            return None
+            return {'label': 'neutral', 'score': 0.0}
 
     def analyze_chunk(self, text: str) -> Dict[str, Any]:
         """Analyze a chunk of text for emotions and semantic meaning."""
+        # Initialize default values
+        emotion_result = {'label': 'neutral', 'score': 0.0}
+        analysis = {
+            "themes": [],
+            "insight_tags": [],
+            "emotion_intensity": 3
+        }
+        
         try:
-            # Get emotions
-            emotions = self.analyze_emotions(text)
-            primary_emotion = max(emotions, key=lambda x: x['score']) if emotions else None
+            # Extract participant's response if present
+            if '[Participant]' in text:
+                parts = text.split('[Participant]')
+                if len(parts) > 1:
+                    # Use the participant's response for emotion analysis
+                    participant_text = parts[1]
+                    # Remove any remaining speaker markers
+                    participant_text = re.sub(r'\[[^\]]+\]', '', participant_text).strip()
+                    emotion_result = self.analyze_emotions(participant_text)
+                else:
+                    emotion_result = self.analyze_emotions(text)
+            else:
+                emotion_result = self.analyze_emotions(text)
+                
+        except Exception as e:
+            logger.error(f"Error in emotion analysis: {str(e)}")
+            # Continue with theme analysis even if emotion fails
             
-            # Extract themes and insights using OpenAI
+        # Extract themes and insights using OpenAI (use full text including context)
+        try:
             themes_response = self.openai_client.chat.completions.create(
                 model="gpt-3.5-turbo",
                 messages=[
@@ -124,47 +295,39 @@ Respond with ONLY this exact JSON structure, no other text:
                 
                 # Validate expected fields are present
                 if not all(k in analysis for k in ["themes", "insight_tags", "emotion_intensity"]):
-                    logging.error(f"Missing required fields in OpenAI response: {analysis}")
+                    logger.error(f"Missing required fields in OpenAI response: {analysis}")
                     raise ValueError("Invalid response structure")
                     
                 # Ensure lists are not empty
                 if not analysis["themes"] or not analysis["insight_tags"]:
-                    logging.error(f"Empty themes or insights in response: {analysis}")
+                    logger.error(f"Empty themes or insights in response: {analysis}")
                     raise ValueError("Empty themes or insights")
                     
                 # Validate emotion_intensity is in range 1-5
                 if not (1 <= analysis["emotion_intensity"] <= 5):
-                    logging.error(f"Invalid emotion intensity: {analysis['emotion_intensity']}")
+                    logger.error(f"Invalid emotion intensity: {analysis['emotion_intensity']}")
                     raise ValueError("Invalid emotion intensity")
                     
             except (json.JSONDecodeError, ValueError, KeyError) as e:
-                logging.error(f"Error parsing OpenAI response: {e}")
-                logging.error(f"Raw response: {themes_response.choices[0].message.content}")
+                logger.error(f"Error parsing OpenAI response: {e}")
+                logger.error(f"Raw response: {themes_response.choices[0].message.content}")
                 analysis = {
                     "themes": ["unclear"],
                     "insight_tags": ["needs review"],
                     "emotion_intensity": 3
                 }
-            
-            return {
-                'text': text,
-                'emotion': primary_emotion['label'] if primary_emotion else 'neutral',
-                'emotion_intensity': analysis.get('emotion_intensity', 3),
-                'themes': analysis.get('themes', []),
-                'insight_tags': analysis.get('insight_tags', []),
-                'sentiment_score': primary_emotion['score'] if primary_emotion else 0.5
-            }
-            
         except Exception as e:
-            logger.error(f"Error analyzing chunk: {str(e)}")
-            return {
-                'text': text,
-                'emotion': 'neutral',
-                'emotion_intensity': 3,
-                'themes': [],
-                'insight_tags': [],
-                'sentiment_score': 0.5
-            }
+            logger.error(f"Error in theme analysis: {str(e)}")
+            # Keep default analysis values
+            
+        return {
+            'text': text,
+            'emotion': emotion_result['label'],
+            'emotion_intensity': analysis.get('emotion_intensity', 3),
+            'themes': analysis.get('themes', []),
+            'insight_tags': analysis.get('insight_tags', []),
+            'sentiment_score': emotion_result['score']
+        }
 
     def add_chunk(self, chunk_id: str, text: str, metadata: Optional[Dict] = None) -> bool:
         """Add a chunk to the vector store."""

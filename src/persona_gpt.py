@@ -4,7 +4,13 @@ Persona generation module using Thesia, the Persona Architect GPT.
 import json
 import logging
 from typing import List, Dict, Any
+from openai import OpenAI
+import os
+from dotenv import load_dotenv
 from .thesia_resources import get_complete_system_prompt
+
+# Load environment variables
+load_dotenv()
 
 # Configure logger
 logger = logging.getLogger(__name__)
@@ -31,17 +37,6 @@ PERSONA_JSON_TEMPLATE = """{
             "motivation": "Why this goal is important",
             "supporting_quotes": ["Quote 1", "Quote 2"]
         }
-        {
-            "goal": "Secondary goal",
-            "motivation": "Why this goal is important",
-            "supporting_quotes": ["Quote 1", "Quote 2"]
-        }  
-        {
-            "goal": "Tertiary goal",
-            "motivation": "Why this goal is important",
-            "supporting_quotes": ["Quote 1", "Quote 2"]
-        } 
-                       
     ],
     "pain_points": [
         {
@@ -88,150 +83,79 @@ PERSONA_JSON_TEMPLATE = """{
     ]
 }"""
 
-def generate_persona_architect_prompt(interviews: List[Dict[str, Any]]) -> str:
-    """Generate the analysis prompt for Thesia."""
-    prompt = f"""You are Thesia, an expert UX researcher specializing in persona creation. Your task is to analyze the following interviews and create a detailed, evidence-based persona.
-
-Focus only on the interviewee's responses, not the interviewer's questions. Extract insights, behaviors, and patterns from what the interviewee actually said.
-
-For each interview, I will provide:
-1. Project context
-2. Interview metadata
-3. Transcript (focusing only on interviewee responses)
-4. Analysis (if available)
-
-Please analyze the interviews and generate a detailed persona in the following JSON format:
-
-{PERSONA_JSON_TEMPLATE}
-
-Ensure all insights are supported by direct quotes from the interviewee's responses. Do not include any quotes from the interviewer (Daria)."""
-
-    # Add each interview's data
-    for interview in interviews:
-        prompt += "\n\nInterview Data:"
-        
-        # Add project context
-        prompt += f"\nProject: {interview.get('project_name', 'Unknown Project')}"
-        prompt += f"\nType: {interview.get('interview_type', 'Unknown Type')}"
-        
-        # Add metadata if available
-        metadata = interview.get('metadata', {})
-        if metadata:
-            prompt += "\nMetadata:"
-            for key, value in metadata.items():
-                prompt += f"\n- {key}: {value}"
-            
-            if 'technology' in metadata:
-                prompt += "\nTechnology Usage:"
-                prompt += f"\n- Primary Device: {metadata['technology'].get('primaryDevice', 'Unknown')}"
-                prompt += f"\n- Operating System: {metadata['technology'].get('operatingSystem', 'Unknown')}"
-                prompt += f"\n- Browser Preference: {metadata['technology'].get('browserPreference', 'Unknown')}"
-                prompt += f"\n- Technical Proficiency: {metadata['technology'].get('technicalProficiency', 'Unknown')}"
-        
-        # Handle transcript - extract only interviewee responses
-        transcript = interview.get('transcript', '')
-        if isinstance(transcript, str):
-            # Split into lines and filter for interviewee responses
-            lines = transcript.split('\n')
-            interviewee_responses = []
-            for line in lines:
-                if line.startswith('You:'):
-                    response = line[4:].strip()  # Remove 'You: ' prefix
-                    if response and not response.startswith('Daria:'):  # Extra check to ensure no Daria responses
-                        interviewee_responses.append(response)
-            
-            prompt += "\nInterviewee Responses:"
-            for response in interviewee_responses:
-                prompt += f"\n- {response}"
-        else:
-            prompt += "\nInterviewee Responses:"
-            for message in transcript[:5]:  # Limit to first 5 messages
-                if isinstance(message, dict) and message.get('speaker') == 'You':
-                    prompt += f"\n- {message.get('text', '')[:100]}..."  # Limit message length
-        
-        # Handle analysis - limit to first 300 characters
-        if 'analysis' in interview:
-            analysis = interview['analysis']
-            if isinstance(analysis, dict):
-                content = analysis.get('content', '')
-                prompt += f"\n\nAnalysis: {content[:300]}..."
-            else:
-                prompt += f"\n\nAnalysis: {str(analysis)[:300]}..."
-    
-    # Add the JSON template at the end
-    prompt += f"""
-
-Please analyze the interviews and generate a detailed persona in the following JSON format:
-
-{PERSONA_JSON_TEMPLATE}
-
-Ensure all insights are supported by quotes from the interviewee's responses only. Do not include any quotes from the interviewer (Daria). Use the metadata provided to inform the persona's demographics and technology usage sections."""
-    
-    return prompt
-
-def generate_persona_with_architect(openai_client, interviews: List[Dict[str, Any]]) -> Dict[str, Any]:
+def generate_persona_from_interviews(
+    interview_texts: List[str],
+    project_name: str,
+    model: str = "gpt-4"
+) -> Dict[str, Any]:
     """
-    Generate a persona using Thesia, the Persona Architect GPT.
+    Generate a persona from a list of interview transcripts.
     
     Args:
-        openai_client: OpenAI client instance
-        interviews: List of interview data objects
+        interview_texts (List[str]): List of interview transcripts
+        project_name (str): Name of the project
+        model (str): Model to use for generation (default: gpt-4)
         
     Returns:
-        dict: The generated persona data
+        Dict[str, Any]: Generated persona data
     """
-    analysis_prompt = generate_persona_architect_prompt(interviews)
-    
     try:
-        response = openai_client.chat.completions.create(
-            model="gpt-4-0125-preview",  # Use GPT-4-turbo-preview with 128k context length
+        # Initialize OpenAI client
+        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+        
+        # Combine interview texts with clear separation
+        combined_text = "\n\n---INTERVIEW SEPARATOR---\n\n".join(interview_texts)
+        
+        # Create system message with instructions
+        system_message = f"""You are Thesia, an expert UX Research Assistant specializing in persona creation.
+{PERSONA_ARCHITECT_SYSTEM_PROMPT}
+
+Your task is to analyze the provided interview transcripts and create a detailed persona that represents the key patterns and insights found across the interviews.
+
+The persona should follow this exact JSON structure:
+{PERSONA_JSON_TEMPLATE}
+
+Important guidelines:
+1. Focus on patterns and themes that appear across multiple interviews
+2. Use direct quotes from the interviews to support your insights
+3. Make the persona specific and actionable
+4. Ensure all fields in the JSON structure are filled out
+5. Keep the summary concise (under 600 characters)
+6. Make the image prompt detailed and specific
+7. Include 3-5 items for each list (goals, pain points, etc.)"""
+
+        # Create completion request
+        response = client.chat.completions.create(
+            model=model,
             messages=[
-                {"role": "system", "content": PERSONA_ARCHITECT_SYSTEM_PROMPT},
-                {"role": "user", "content": analysis_prompt}
+                {"role": "system", "content": system_message},
+                {"role": "user", "content": f"Project: {project_name}\n\nInterview Transcripts:\n\n{combined_text}"}
             ],
-            temperature=0.7
+            temperature=0.7,
+            max_tokens=4000,
+            response_format={ "type": "json_object" }
         )
         
-        # Extract the response content
-        analysis = response.choices[0].message.content
-        
-        # Log the response for debugging
-        logger.info(f"Raw response from GPT: {analysis[:200]}...")  # Log first 200 chars
-        
-        # Parse the JSON response
+        # Parse response
         try:
-            # Try to find JSON content within the response
-            start_idx = analysis.find('{')
-            end_idx = analysis.rfind('}') + 1
-            if start_idx >= 0 and end_idx > start_idx:
-                json_str = analysis[start_idx:end_idx]
-                
-                # Clean up the JSON string
-                json_str = json_str.replace('...', '')  # Remove any ellipsis
-                json_str = json_str.replace('\n', ' ')  # Replace newlines with spaces
-                
-                # Try to parse the cleaned JSON
-                try:
-                    persona_data = json.loads(json_str)
+            persona_data = json.loads(response.choices[0].message.content)
+            
+            # Validate required fields
+            required_fields = [
+                "name", "summary", "image_prompt", "demographics",
+                "background", "goals", "pain_points"
+            ]
+            
+            for field in required_fields:
+                if field not in persona_data:
+                    raise ValueError(f"Missing required field: {field}")
                     
-                    # Validate the persona data structure
-                    required_fields = ['name', 'summary', 'demographics', 'technology']
-                    for field in required_fields:
-                        if field not in persona_data:
-                            raise ValueError(f"Missing required field in persona data: {field}")
-                    
-                    return persona_data
-                except json.JSONDecodeError as e:
-                    logger.error(f"Error parsing cleaned JSON: {str(e)}")
-                    logger.error(f"Cleaned JSON string: {json_str[:500]}...")
-                    raise ValueError(f"Error parsing JSON response: {str(e)}")
-            else:
-                raise ValueError("No valid JSON object found in response")
+            return persona_data
             
         except json.JSONDecodeError as e:
-            logger.error(f"Error parsing JSON response: {str(e)}")
-            logger.error(f"Response content: {analysis[:500]}...")  # Log first 500 chars
-            raise ValueError(f"Error parsing JSON response: {str(e)}")
+            logger.error(f"Error parsing persona JSON: {str(e)}")
+            logger.error(f"Raw response: {response.choices[0].message.content}")
+            raise
             
     except Exception as e:
         logger.error(f"Error generating persona: {str(e)}")
