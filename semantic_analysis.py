@@ -21,20 +21,29 @@ logger = logging.getLogger(__name__)
 
 class SemanticAnalyzer:
     def __init__(self):
-        """Initialize semantic analysis models and vector store."""
+        """Initialize the semantic analyzer with models."""
+        logging.info("Initializing SemanticAnalyzer...")
+        
+        # Force CPU usage
+        if torch.cuda.is_available():
+            torch.cuda.empty_cache()
+        device = torch.device('cpu')
+        
         try:
             # Initialize sentence transformer for embeddings
-            self.sentence_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2')
+            self.sentence_model = SentenceTransformer('sentence-transformers/all-MiniLM-L6-v2', device=device)
+            logging.info("Loaded sentence transformer model")
             
-            # Use a simpler emotion classification model
+            # Initialize emotion classification model
             try:
                 self.emotion_model = pipeline(
                     "text-classification",
                     model="j-hartmann/emotion-english-distilroberta-base",
-                    return_all_scores=True
+                    device=device
                 )
+                logging.info("Loaded emotion classification model")
             except Exception as e:
-                logger.error(f"Error loading emotion model: {str(e)}")
+                logging.error(f"Failed to load emotion model: {str(e)}")
                 self.emotion_model = None
             
             # Initialize OpenAI client for theme extraction
@@ -60,6 +69,7 @@ class SemanticAnalyzer:
             raise
 
     def get_embeddings(self, text):
+        """Get embeddings for a piece of text."""
         try:
             return self.sentence_model.encode(text)
         except Exception as e:
@@ -67,12 +77,16 @@ class SemanticAnalyzer:
             return None
 
     def analyze_emotions(self, text):
-        if self.emotion_model is None:
+        """Analyze emotions in text."""
+        if not self.emotion_model:
+            logger.warning("Emotion model not available")
             return None
             
         try:
-            emotions = self.emotion_model(text)
-            return emotions[0] if emotions else None
+            result = self.emotion_model(text)
+            if result and len(result) > 0:
+                return result[0]
+            return None
         except Exception as e:
             logger.error(f"Error analyzing emotions: {str(e)}")
             return None

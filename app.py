@@ -38,6 +38,21 @@ import markdown2
 from semantic_analysis import SemanticAnalyzer
 from sklearn.metrics.pairwise import cosine_similarity
 from src.processed_interview_store import ProcessedInterviewStore
+import sys
+from src.discovery_gpt import DiscoveryGPT
+from asgiref.sync import async_to_sync
+
+# Configure logging with a more detailed format
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+
+# Create logger for this module
+logger = logging.getLogger(__name__)
 
 # Global variables
 vector_store = None
@@ -57,6 +72,11 @@ CORS(app, resources={
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True
+    },
+    r"/annotated-transcript/*": {
+        "origins": ["http://localhost:5174"],
+        "methods": ["GET"],
+        "allow_headers": ["Content-Type"]
     }
 })
 
@@ -110,10 +130,6 @@ PERSONAS_DIR.mkdir(exist_ok=True)
 
 # Add maximum rounds constant
 MAX_ROUNDS = 3
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Initialize vector store
 app.vector_store = None
@@ -503,18 +519,23 @@ def analyze_chunk_semantics(text):
         }
 
 def create_openai_client():
-    """Create an OpenAI client with consistent configuration."""
+    """Create and configure OpenAI client."""
     try:
-        client = OpenAI(
-            api_key=OPENAI_API_KEY,
-            base_url="https://api.openai.com/v1"
-        )
-        logger.info("OpenAI client created successfully")
+        logger.info("Creating OpenAI client")
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            logger.error("OpenAI API key not found in environment")
+            return None
+            
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+        logger.info("Successfully created OpenAI client")
         return client
+        
     except Exception as e:
         logger.error(f"Error creating OpenAI client: {str(e)}")
         logger.error(traceback.format_exc())
-        raise
+        return None
 
 def extract_value(prompt, field_name, context):
     """Extract a value from the interview prompt based on the field name and context."""
@@ -4074,93 +4095,162 @@ def api_advanced_search():
 @app.route('/annotated-transcript/<interview_id>/<int:page>')
 def view_annotated_transcript(interview_id, page=1):
     try:
-        app.logger.debug(f"Accessing annotated transcript route for interview {interview_id}, page {page}")
-        
-        # Load the processed interview
+        # Look for the processed file
         processed_file = f'interviews/processed/{interview_id}.json'
-        app.logger.debug(f"Looking for processed file at: {processed_file}")
-        
         if not os.path.exists(processed_file):
-            app.logger.error(f"Interview file not found: {processed_file}")
-            flash('Interview not found', 'error')
-            return redirect(url_for('advanced_search'))
+            return jsonify({'error': 'Interview not found'}), 404
 
         with open(processed_file, 'r') as f:
             interview_data = json.load(f)
 
-        app.logger.info(f"Successfully loaded interview data for {interview_id}")
-        app.logger.debug(f"Interview data keys: {list(interview_data.keys())}")
+        # Extract metadata and chunks
+        metadata = interview_data.get('metadata', {})
+        raw_chunks = interview_data.get('chunks', [])
 
-        # Extract chunks directly from the interview data
-        chunks = []
-        for chunk in interview_data.get('chunks', []):
-            # Process each entry in the chunk
-            for entry in chunk.get('entries', []):
-                chunk_data = {
-                    'speaker': entry.get('speaker', ''),
-                    'timestamp': entry.get('timestamp', ''),
-                    'text': entry.get('text', ''),
-                    'emotion': chunk.get('analysis', {}).get('emotion', ''),
-                    'themes': chunk.get('analysis', {}).get('themes', []),
-                    'insight_tags': chunk.get('analysis', {}).get('insight_tags', [])
-                }
-                chunks.append(chunk_data)
+        # Process chunks to flatten the structure
+        processed_chunks = []
+        for chunk in raw_chunks:
+            chunk_analysis = chunk.get('analysis', {})
+            chunk_data = {
+                'id': chunk.get('id', str(uuid.uuid4())),
+                'timestamp': chunk.get('timestamp', ''),
+                'text': chunk.get('combined_text', ''),
+                'emotion': chunk_analysis.get('emotion', ''),
+                'emotion_intensity': chunk_analysis.get('emotion_intensity', 0),
+                'themes': chunk_analysis.get('themes', []),
+                'insight_tags': chunk_analysis.get('insight_tags', []),
+                'related_feature': chunk_analysis.get('related_feature'),
+                'entries': chunk.get('entries', [])
+            }
+            processed_chunks.append(chunk_data)
 
-        # Check if we need to find a specific timestamp's page
-        target_timestamp = request.args.get('timestamp')
-        if target_timestamp:
-            # Find the index of the chunk with this timestamp
-            for i, chunk in enumerate(chunks):
-                if chunk['timestamp'] == target_timestamp:
-                    # Calculate which page this chunk should be on
-                    page = (i // 50) + 1
-                    break
-
-        # Pagination - increased to 50 items per page
+        # Pagination
         items_per_page = 50
-        total_chunks = len(chunks)
+        total_chunks = len(processed_chunks)
         total_pages = (total_chunks + items_per_page - 1) // items_per_page
-        
+
         # Validate page number
         page = max(1, min(page, total_pages))
-        
-        # Slice chunks for current page
         start_idx = (page - 1) * items_per_page
         end_idx = start_idx + items_per_page
-        current_chunks = chunks[start_idx:end_idx]
 
-        # Prepare interview metadata
-        metadata = interview_data.get('metadata', {})
-        interviewee = metadata.get('interviewee', {})
-        researcher = metadata.get('researcher', {})
+        # Get chunks for current page
+        current_chunks = processed_chunks[start_idx:end_idx]
         
-        interview = {
-            'id': interview_id,
-            'participant_name': interviewee.get('name', ''),
-            'researcher_name': researcher.get('name', ''),
-            'researcher_role': researcher.get('role', 'UX Researcher'),
-            'researcher_email': researcher.get('email', ''),
-            'date': metadata.get('date', ''),
-            'timestamp': metadata.get('date', ''),  # Using date as timestamp
-            'age_range': interviewee.get('age', ''),
-            'location': interviewee.get('location', ''),
-            'occupation': interviewee.get('occupation', ''),
-            'industry': interviewee.get('industry', '')
+        # Prepare the response data
+        response_data = {
+            'interviewee_name': metadata.get('interviewee', {}).get('name', 'Unknown'),
+            'project_name': metadata.get('project_name', 'Unknown Project'),
+            'date': metadata.get('date', 'No Date'),
+            'chunks': current_chunks,
+            'pagination': {
+                'current_page': page,
+                'total_pages': total_pages,
+                'total_chunks': total_chunks,
+                'items_per_page': items_per_page
+            }
         }
-
-        app.logger.info(f"Rendering annotated transcript page {page} of {total_pages}")
-        app.logger.debug(f"Chunks on this page: {len(current_chunks)}")
         
-        return render_template('view_annotated_transcript.html',
-                             interview=interview,
-                             chunks=current_chunks,
-                             current_page=page,
-                             total_pages=total_pages)
-
+        return jsonify(response_data)
+        
     except Exception as e:
-        app.logger.error(f"Error loading annotated transcript: {str(e)}", exc_info=True)
-        flash('Error loading interview transcript', 'error')
-        return redirect(url_for('advanced_search'))
+        print(f"Error loading transcript: {str(e)}")
+        return jsonify({'error': 'Failed to load transcript'}), 500
+
+@app.route('/api/discovery/conversation', methods=['POST'])
+def discovery_conversation():
+    """Handle messages in the discovery conversation."""
+    # Immediate debug logging
+    logger.info("=== Starting discovery conversation request ===")
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"Request headers: {dict(request.headers)}")
+    logger.info(f"Request raw data: {request.get_data(as_text=True)}")
+    
+    try:
+        logger.info("Parsing request JSON")
+        data = request.get_json()
+        logger.info(f"Request data: {json.dumps(data, indent=2)}")
+        
+        if not data or 'message' not in data:
+            logger.error("No message provided in request")
+            return jsonify({'error': 'No message provided'}), 400
+            
+        message = data['message']
+        conversation_history = data.get('conversation_history', [])
+        
+        logger.info(f"Processing message: {message}")
+        logger.info(f"Conversation history: {json.dumps(conversation_history, indent=2)}")
+        
+        # Initialize OpenAI client
+        try:
+            logger.info("Creating OpenAI client")
+            client = create_openai_client()
+            if not client:
+                logger.error("Failed to initialize OpenAI client")
+                return jsonify({'error': 'Failed to initialize AI client: No API key found'}), 500
+            logger.info("Successfully initialized OpenAI client")
+        except Exception as e:
+            logger.error(f"Error initializing OpenAI client: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': f'Failed to initialize AI client: {str(e)}'}), 500
+            
+        # Initialize DiscoveryGPT
+        try:
+            discovery_gpt = DiscoveryGPT(client)
+            logger.info("Successfully initialized DiscoveryGPT")
+        except Exception as e:
+            logger.error(f"Error initializing DiscoveryGPT: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': f'Failed to initialize DiscoveryGPT: {str(e)}'}), 500
+        
+        # Process the message using async_to_sync
+        try:
+            logger.info("Processing message with DiscoveryGPT")
+            result = async_to_sync(discovery_gpt.process_message)(message, conversation_history)
+            logger.info(f"Received result: {json.dumps(result, indent=2)}")
+        except Exception as e:
+            logger.error(f"Error processing message: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': f'Error processing message: {str(e)}'}), 500
+        
+        # If the conversation is complete and we have project data
+        if result.get('isComplete') and 'project' in result:
+            try:
+                # Save the project data
+                project_data = result['project']
+                
+                # Create project directory if it doesn't exist
+                project_dir = os.path.join('projects', project_data['name'])
+                os.makedirs(project_dir, exist_ok=True)
+                
+                # Save conversation history
+                conversation_file = os.path.join(project_dir, 'discovery_conversation.json')
+                with open(conversation_file, 'w') as f:
+                    json.dump({
+                        'conversation': conversation_history + [
+                            {'role': 'user', 'content': message},
+                            {'role': 'assistant', 'content': result['response']}
+                        ],
+                        'completed_at': datetime.now().isoformat()
+                    }, f, indent=2)
+                    
+                # Save project data
+                project_file = os.path.join(project_dir, 'project.json')
+                with open(project_file, 'w') as f:
+                    json.dump(project_data, f, indent=2)
+                    
+                logger.info(f"Saved project data for {project_data['name']}")
+            except Exception as e:
+                logger.error(f"Error saving project data: {str(e)}")
+                logger.error(traceback.format_exc())
+                # Continue even if saving fails
+                
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Unexpected error in discovery conversation: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     socketio.run(app, 
