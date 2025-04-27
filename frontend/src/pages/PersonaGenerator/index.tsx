@@ -10,6 +10,8 @@ interface Interview {
   title: string;
   date: string;
   type: string;
+  preview?: string;
+  transcript?: string;
 }
 
 interface Project {
@@ -85,25 +87,18 @@ const PersonaGenerator: React.FC = () => {
 
   const renderInterviewCard = (interview: Interview) => {
     const isSelected = selectedInterviews.includes(interview.id);
+    // Add a preview of the transcript or summary if available
+    const preview = interview.preview || interview.transcript?.slice(0, 120) || 'No preview available';
     const previewContent = (
-      <div style={{ maxWidth: 350 }}>
-        <div className="mb-2">
-          <strong>Transcript Preview:</strong>
-          <div className="text-gray-600 text-xs">(Coming soon: actual preview)</div>
-        </div>
-        <div className="mb-2">
-          <strong>Demographics:</strong>
-          <div className="text-gray-600 text-xs">(Coming soon: demographic data)</div>
-        </div>
-        <div>
-          <strong>Analysis:</strong>
-          <div className="text-gray-600 text-xs">(Coming soon: analysis summary)</div>
-        </div>
+      <div className="space-y-2">
+        <div className="font-semibold text-base">{interview.title}</div>
+        <div className="text-xs text-gray-500">{interview.type}</div>
+        <div className="text-xs text-gray-400">{interview.date}</div>
+        <div className="text-xs text-gray-700 mt-2 line-clamp-3">{preview}</div>
       </div>
     );
-
     return (
-      <Popover content={previewContent} title="Metadata Preview" placement="bottom">
+      <Popover content={previewContent} title="Metadata Preview" placement="bottom" key={interview.id}>
         <Card
           key={interview.id}
           className={`transition-all flex flex-col justify-between items-start ${isSelected ? 'border-blue-500 shadow-md' : ''}`}
@@ -136,6 +131,8 @@ const PersonaGenerator: React.FC = () => {
             <Link to={`/analysis/${interview.id}`}>Analysis</Link>
             <Link to={`/metadata/${interview.id}`}>Metadata</Link>
           </div>
+          {/* Add preview at the bottom of the card */}
+          <div className="mt-4 text-xs text-gray-700 line-clamp-3">{preview}</div>
         </Card>
       </Popover>
     );
@@ -232,7 +229,7 @@ const PersonaGenerator: React.FC = () => {
                 onChange={value => setSelectedModel(value)}
               >
                 <Select.Option value="gpt-4">GPT-4</Select.Option>
-                <Select.Option value="claude-3">Claude 3</Select.Option>
+                <Select.Option value="claude-3.7-sonnet">Claude 3.7 Sonnet</Select.Option>
                 <Select.Option value="gpt-3.5-turbo">GPT-3.5 Turbo</Select.Option>
               </Select>
             </div>
@@ -271,6 +268,30 @@ const PersonaGenerator: React.FC = () => {
 
       {/* Persona display area: full width, stacked below all form elements */}
       {renderPersonaTemplate()}
+      {/* Raw persona JSON dump for debugging */}
+      {generatedPersona && (
+        <div className="mt-8 p-4 bg-gray-100 rounded-lg">
+          <h2 className="text-xl font-bold mb-2">Raw Persona Object</h2>
+          <pre className="whitespace-pre-wrap text-xs bg-white p-2 rounded border overflow-x-auto">
+            {JSON.stringify(generatedPersona, null, 2)}
+          </pre>
+          {/* Also show key-value pairs for top-level keys */}
+          <div className="mt-4 space-y-4">
+            {Object.entries(generatedPersona).map(([key, value]) => (
+              <div key={key} className="bg-white p-2 rounded border">
+                <div className="font-semibold text-indigo-700 mb-1">{key}</div>
+                <div className="text-xs text-gray-800">
+                  {typeof value === 'object' ? (
+                    <pre className="whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</pre>
+                  ) : (
+                    String(value)
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 };

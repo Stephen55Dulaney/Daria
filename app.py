@@ -2041,9 +2041,9 @@ def generate_persona():
             
         interviews = data['interviews']
         project_name = data.get('project_name', '')
-        selected_elements = data.get('selected_elements', [])
         model = data.get('model', 'gpt-4')
-        
+        selected_elements = data.get('selected_elements', [])
+
         # Load interview data
         interview_data = []
         for interview_id in interviews:
@@ -2052,192 +2052,32 @@ def generate_persona():
                 logger.warning(f"Could not load interview data for ID {interview_id}")
                 continue
             interview_data.append(interview)
-            
+        
         if not interview_data:
             logger.error("No valid interviews found")
             return jsonify({'error': 'No valid interviews found'}), 400
 
-        # Get model context limits
-        model_limits = {
-            'gpt-3.5-turbo': 16385,
-            'gpt-4': 128000,
-            'gpt-4-turbo-preview': 128000,
-            'claude-3.7-sonnet': 200000
-        }
-        
-        max_tokens = model_limits.get(model, 16385)  # Default to smallest limit if unknown
-        
-        # Prepare interview data based on model limits
-        def prepare_interview_data(interviews, max_tokens):
-            prepared_data = []
-            for interview in interviews:
-                # Extract key information
-                metadata = interview.get('metadata', {})
-                transcript = interview.get('transcript', '')
-                
-                # If transcript is a list of messages, join them
-                if isinstance(transcript, list):
-                    transcript = ' '.join([msg.get('text', '') for msg in transcript if msg.get('speaker') == 'You'])
-                
-                # Get the first 1000 characters of transcript for smaller models
-                if model == 'gpt-3.5-turbo':
-                    transcript = transcript[:1000] + '...' if len(transcript) > 1000 else transcript
-                
-                prepared_data.append({
-                    'metadata': metadata,
-                    'transcript_excerpt': transcript,
-                    'key_insights': interview.get('analysis', {}).get('key_insights', [])[:5]  # Limit to top 5 insights
-                })
-            return prepared_data
+        # Extract full transcripts for persona synthesis
+        interview_texts = []
+        for interview in interview_data:
+            transcript = interview.get('transcript', '')
+            # If transcript is a list of messages, join them
+            if isinstance(transcript, list):
+                transcript = ' '.join([msg.get('text', '') for msg in transcript])
+            interview_texts.append(transcript)
 
-        # Generate system prompt
-        system_prompt = """You are an expert UX researcher and persona creator. 
-        Create a detailed persona based on the interview data provided. 
-        Return ONLY the JSON data without any markdown formatting or code blocks.
-        Format the response with the following structure:
-        {
-            "name": "Name and title",
-            "summary": "Brief summary",
-            "image_prompt": "Detailed prompt for image generation",
-            "demographics": {
-                "age_range": "Age range (e.g. 25-35)",
-                "gender": "Gender",
-                "occupation": "Current occupation",
-                "location": "Location",
-                "education": "Education level"
-            },
-            "background": "Detailed background information",
-            "goals": [
-                {
-                    "goal": "Goal description",
-                    "motivation": "Motivation behind the goal",
-                    "supporting_quotes": ["quote1", "quote2"]
-                }
-            ],
-            "pain_points": [
-                {
-                    "pain_point": "Pain point description",
-                    "impact": "Impact description",
-                    "supporting_quotes": ["quote1", "quote2"]
-                }
-            ]
-        }"""
-
-        # Prepare data based on model
-        prepared_interviews = prepare_interview_data(interview_data, max_tokens)
-        
-        # Create user prompt with prepared data
-        user_prompt = f"Create a persona based on these interviews: {json.dumps(prepared_interviews, indent=2)}"
-
-        content = None
-        if model == 'claude-3.7-sonnet':
-            try:
-                import boto3
-                
-                aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
-                aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-                region = 'us-east-2'
-                
-                if not aws_access_key or not aws_secret_key:
-                    logger.error("AWS credentials not found")
-                    return jsonify({'error': 'AWS credentials not configured'}), 500
-                
-                logger.info("Initializing AWS Bedrock client...")
-                bedrock_runtime = boto3.client(
-                    service_name='bedrock-runtime',
-                    region_name=region,
-                    aws_access_key_id=aws_access_key,
-                    aws_secret_access_key=aws_secret_key
-                )
-                
-                # Format messages for Claude
-                messages = [
-                    {
-                        "role": "user",
-                        "content": user_prompt
-                    }
-                ]
-                
-                body = json.dumps({
-                    "messages": messages,
-                    "system": system_prompt,
-                    "max_tokens": 4096,
-                    "temperature": 0.7,
-                    "top_p": 1,
-                    "anthropic_version": "bedrock-2023-05-31"
-                })
-                
-                logger.info("Sending request to Claude via Bedrock...")
-                response = bedrock_runtime.invoke_model(
-                    body=body,
-                    modelId='arn:aws:bedrock:us-east-2:522814696964:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0',
-                    accept="application/json",
-                    contentType="application/json"
-                )
-                
-                response_body = json.loads(response.get('body').read())
-                logger.info(f"Raw Claude response: {json.dumps(response_body, indent=2)}")
-                
-                # Extract content from Claude response
-                content = ''
-                if 'content' in response_body:
-                    content_list = response_body['content']
-                    if isinstance(content_list, list) and len(content_list) > 0:
-                        # Get the text from the first content item
-                        content = content_list[0].get('text', '')
-                
-                if not content:
-                    logger.error("Empty response from Claude")
-                    raise ValueError("Empty response from Claude")
-                
-                logger.info(f"Extracted content from Claude: {content}")
-            except Exception as e:
-                logger.error(f"Error using Claude: {str(e)}")
-                logger.error(traceback.format_exc())
-                return jsonify({'error': f'Failed to generate persona with Claude: {str(e)}'}), 500
-        else:
-            # Use OpenAI
-            try:
-                client = create_openai_client()
-                if not client:
-                    logger.error("Failed to initialize OpenAI client")
-                    return jsonify({'error': 'Failed to initialize AI client'}), 500
-                    
-                logger.info("Sending request to OpenAI...")
-                response = client.chat.completions.create(
-                    model="gpt-4-turbo-preview" if model == 'gpt-4' else "gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    temperature=0.7
-                )
-                content = response.choices[0].message.content
-                logger.info("Received response from OpenAI")
-            except Exception as e:
-                logger.error(f"Error using OpenAI: {str(e)}")
-                logger.error(traceback.format_exc())
-                return jsonify({'error': f'Failed to generate persona with OpenAI: {str(e)}'}), 500
-        
-        if not content:
-            logger.error("No content generated")
-            return jsonify({'error': 'No content generated'}), 500
-
-        # Clean and parse the content
-        content = content.strip()
-        if content.startswith('```'):
-            content = content.split('```')[1]
-            if content.startswith('json'):
-                content = content[4:]
-            content = content.strip()
-        
-        logger.info(f"Cleaned content: {content}")
-        
+        # Use the robust persona synthesis function
+        from src.persona_gpt import generate_persona_from_interviews
         try:
-            persona_data = json.loads(content)
-        except json.JSONDecodeError as e:
-            logger.error(f"Error parsing persona JSON: {str(e)}")
-            return jsonify({'error': 'Invalid persona data format'}), 500
+            persona_data = generate_persona_from_interviews(
+                interview_texts=interview_texts,
+                project_name=project_name,
+                model=model
+            )
+        except Exception as e:
+            logger.error(f"Error generating persona: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': f'Failed to generate persona: {str(e)}'}), 500
 
         # Generate HTML from persona data
         try:
@@ -2817,166 +2657,128 @@ def create_journey_map():
         return jsonify({'error': str(e)}), 500
 
 def generate_journey_map_html(interviews):
-    """Generate HTML for the journey map based on interview data."""
+    """Generate HTML for the journey map based on interview data, optimized for token limits and API usage."""
     try:
-        # Create OpenAI client
         client = OpenAI(api_key=OPENAI_API_KEY)
-        
-        # Log interview data
-        logger.info(f"Processing {len(interviews)} interviews for journey map")
-        
-        # Package interview data with clear structure and handle large content
-        interview_packages = []
+        logger.info(f"Processing {len(interviews)} interviews for journey map (optimized)")
+
+        # Limit the number of interviews to avoid context overflow
+        MAX_INTERVIEWS = 5
+        if len(interviews) > MAX_INTERVIEWS:
+            logger.warning(f"Too many interviews selected ({len(interviews)}); only using the first {MAX_INTERVIEWS}.")
+            interviews = interviews[:MAX_INTERVIEWS]
+
+        interview_summaries = []
         for i, interview in enumerate(interviews):
-            # Get the transcript and analysis
             transcript = interview.get('transcript', '')
             analysis = interview.get('analysis', '')
-            
-            # If transcript is too long, extract key sections
-            if len(transcript) > 4000:  # Conservative limit to stay under token limit
-                # Split into chunks and extract key insights
-                chunks = [transcript[i:i+4000] for i in range(0, len(transcript), 4000)]
-                key_insights = []
-                
-                for chunk in chunks:
+            logger.info(f"Summarizing interview {i+1}/{len(interviews)} (ID: {interview.get('id')})")
+
+            # Step 1: Summarize transcript in chunks if too long
+            if len(transcript) > 3000:
+                logger.info(f"Transcript is long ({len(transcript)} chars), chunking and summarizing...")
+                chunk_size = 2000
+                chunks = [transcript[j:j+chunk_size] for j in range(0, len(transcript), chunk_size)]
+                chunk_summaries = []
+                for k, chunk in enumerate(chunks):
+                    logger.info(f"Summarizing chunk {k+1}/{len(chunks)} of interview {i+1}")
                     try:
-                        # Extract key points from each chunk
                         response = client.chat.completions.create(
                             model="gpt-4",
                             messages=[
-                                {"role": "system", "content": "You are a research analyst. Extract the key points and insights from this interview transcript chunk, focusing on user journey relevant information. Be concise."},
+                                {"role": "system", "content": "You are a research analyst. Summarize the following interview transcript chunk for journey mapping. Focus on key events, actions, pain points, and emotions. Be concise."},
                                 {"role": "user", "content": chunk}
                             ],
-                            max_tokens=500,
+                            max_tokens=300,
                             temperature=0.3
                         )
-                        key_insights.append(response.choices[0].message.content)
+                        chunk_summaries.append(response.choices[0].message.content)
                     except Exception as e:
-                        logger.error(f"Error processing chunk: {str(e)}")
+                        logger.error(f"Error summarizing chunk {k+1}: {str(e)}")
                         continue
-                
-                # Join key insights
-                processed_transcript = "\n\n".join(key_insights)
+                # Step 2: Combine chunk summaries into one interview summary
+                combined_summary = "\n".join(chunk_summaries)
+                logger.info(f"Combining {len(chunk_summaries)} chunk summaries for interview {i+1}")
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-4",
+                        messages=[
+                            {"role": "system", "content": "You are a research analyst. Combine the following chunk summaries into a single, concise summary for journey mapping. Focus on key stages, touchpoints, pain points, and emotions."},
+                            {"role": "user", "content": combined_summary}
+                        ],
+                        max_tokens=400,
+                        temperature=0.3
+                    )
+                    interview_summary = response.choices[0].message.content
+                except Exception as e:
+                    logger.error(f"Error combining chunk summaries: {str(e)}")
+                    interview_summary = combined_summary
             else:
-                processed_transcript = transcript
-            
-            # Similarly handle analysis if it's too long
-            if len(analysis) > 2000:
-                processed_analysis = analysis[:2000] + "...\n[Analysis truncated for length]"
+                interview_summary = transcript
+
+            # Step 3: Truncate or summarize analysis if too long
+            if len(analysis) > 1500:
+                processed_analysis = analysis[:1500] + "... [truncated]"
             else:
                 processed_analysis = analysis
-            
-            interview_package = {
+
+            interview_summaries.append({
                 'id': interview.get('id'),
                 'date': interview.get('date'),
                 'type': interview.get('interview_type'),
-                'transcript': processed_transcript,
+                'summary': interview_summary,
                 'analysis': processed_analysis
-            }
-            interview_packages.append(interview_package)
-            logger.info(f"Interview {i+1} ID: {interview_package['id']}")
-            logger.info(f"Processed transcript length: {len(processed_transcript)}")
-            logger.info(f"Processed analysis length: {len(processed_analysis)}")
-        
-        # Create a structured prompt for the journey map
-        analysis_prompt = f"""As a UX research expert, analyze these {len(interview_packages)} interviews and create a detailed journey map. 
-Focus on extracting specific, actionable insights from the interviews.
+            })
+            logger.info(f"Finished summary for interview {i+1}")
 
-For each interview, I'll provide:
-1. The key points from the interview transcript
-2. The analysis summary
-3. The interview date and type
-
-Please create a comprehensive journey map that includes:
-
-1. Key stages of the user journey
-2. Important touchpoints at each stage
-3. User emotions and pain points
-4. Opportunities for improvement
-
-Format the response as HTML with appropriate styling classes. Use the following structure:
-
-<div class="journey-map-container">
-    <div class="journey-map-section stages">
-        <h2>Journey Stages</h2>
-        [Stage cards...]
-    </div>
-    <div class="journey-map-section touchpoints">
-        <h2>Key Touchpoints</h2>
-        [Touchpoint cards...]
-    </div>
-    <div class="journey-map-section emotions">
-        <h2>User Emotions</h2>
-        [Emotion cards...]
-    </div>
-    <div class="journey-map-section pain-points">
-        <h2>Pain Points</h2>
-        [Pain point cards...]
-    </div>
-    <div class="journey-map-section opportunities">
-        <h2>Opportunities</h2>
-        [Opportunity cards...]
-    </div>
-</div>
-
-Here are the interviews to analyze:
-
-"""
-
-        # Add interview data to prompt
-        for i, interview in enumerate(interview_packages, 1):
+        # Step 4: Build the final journey map prompt using only summaries
+        analysis_prompt = f"""As a UX research expert, analyze these {len(interview_summaries)} interviews and create a detailed journey map.\nFocus on extracting specific, actionable insights from the interviews.\n\nFor each interview, I'll provide:\n1. The summary of the interview transcript\n2. The analysis summary\n3. The interview date and type\n\nPlease create a comprehensive journey map that includes:\n1. Key stages of the user journey\n2. Important touchpoints at each stage\n3. User emotions and pain points\n4. Opportunities for improvement\n\nFormat the response as HTML with appropriate styling classes. Use the following structure:\n\n<div class=\"journey-map-container\">\n    <div class=\"journey-map-section stages\">\n        <h2>Journey Stages</h2>\n        [Stage cards...]\n    </div>\n    <div class=\"journey-map-section touchpoints\">\n        <h2>Key Touchpoints</h2>\n        [Touchpoint cards...]\n    </div>\n    <div class=\"journey-map-section emotions\">\n        <h2>User Emotions</h2>\n        [Emotion cards...]\n    </div>\n    <div class=\"journey-map-section pain-points\">\n        <h2>Pain Points</h2>\n        [Pain point cards...]\n    </div>\n    <div class=\"journey-map-section opportunities\">\n        <h2>Opportunities</h2>\n        [Opportunity cards...]\n    </div>\n</div>\n\nHere are the interviews to analyze:\n"""
+        for i, interview in enumerate(interview_summaries, 1):
             analysis_prompt += f"""
 Interview {i}:
 Date: {interview['date']}
 Type: {interview['type']}
 
-Key Points:
-{interview['transcript']}
+Summary:
+{interview['summary']}
 
 Analysis:
 {interview['analysis']}
 
 ---
 """
-
-        logger.info("Sending request to OpenAI")
+        logger.info("Sending final journey map prompt to OpenAI (optimized)")
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a UX research expert skilled at creating journey maps from interview data."},
                 {"role": "user", "content": analysis_prompt}
             ],
-            max_tokens=4000,
+            max_tokens=3500,
             temperature=0.7
         )
-        
         journey_map_html = response.choices[0].message.content
-        
-        # Add wrapper and styling
         final_html = f"""
-<div class="journey-map-wrapper p-6 bg-white rounded-lg shadow-lg">
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">User Journey Map</h1>
-        <p class="text-gray-600">Based on {len(interviews)} interview{'' if len(interviews) == 1 else 's'}</p>
+<div class=\"journey-map-wrapper p-6 bg-white rounded-lg shadow-lg\">
+    <div class=\"mb-6\">
+        <h1 class=\"text-2xl font-bold text-gray-900 mb-2\">User Journey Map</h1>
+        <p class=\"text-gray-600\">Based on {len(interviews)} interview{'' if len(interviews) == 1 else 's'}</p>
     </div>
     {journey_map_html}
 </div>
 """
-        
         return final_html
-        
     except Exception as e:
         logger.error(f"Error generating journey map HTML: {str(e)}")
         logger.error(traceback.format_exc())
-        # Return an error message as HTML
         return f"""
-<div class="error-message">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+<div class=\"error-message\">
+    <svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">
+        <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\" />
     </svg>
     <div>
-        <h3 class="font-semibold">Error Generating Journey Map</h3>
-        <p class="text-sm">{str(e)}</p>
+        <h3 class=\"font-semibold\">Error Generating Journey Map</h3>
+        <p class=\"text-sm\">{str(e)}</p>
     </div>
 </div>
 """

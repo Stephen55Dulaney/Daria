@@ -100,9 +100,6 @@ def generate_persona_from_interviews(
         Dict[str, Any]: Generated persona data
     """
     try:
-        # Initialize OpenAI client
-        client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
-        
         # Combine interview texts with clear separation
         combined_text = "\n\n---INTERVIEW SEPARATOR---\n\n".join(interview_texts)
         
@@ -124,39 +121,95 @@ Important guidelines:
 6. Make the image prompt detailed and specific
 7. Include 3-5 items for each list (goals, pain points, etc.)"""
 
-        # Create completion request
-        response = client.chat.completions.create(
-            model=model,
-            messages=[
-                {"role": "system", "content": system_message},
-                {"role": "user", "content": f"Project: {project_name}\n\nInterview Transcripts:\n\n{combined_text}"}
-            ],
-            temperature=0.7,
-            max_tokens=4000,
-            response_format={ "type": "json_object" }
-        )
-        
-        # Parse response
-        try:
-            persona_data = json.loads(response.choices[0].message.content)
-            
-            # Validate required fields
-            required_fields = [
-                "name", "summary", "image_prompt", "demographics",
-                "background", "goals", "pain_points"
-            ]
-            
-            for field in required_fields:
-                if field not in persona_data:
-                    raise ValueError(f"Missing required field: {field}")
-                    
-            return persona_data
-            
-        except json.JSONDecodeError as e:
-            logger.error(f"Error parsing persona JSON: {str(e)}")
-            logger.error(f"Raw response: {response.choices[0].message.content}")
-            raise
-            
+        if model == "claude-3.7-sonnet":
+            import boto3
+            aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
+            aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
+            region = 'us-east-2'
+            model_arn = 'arn:aws:bedrock:us-east-2:522814696964:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0'
+            if not aws_access_key or not aws_secret_key:
+                logger.error("AWS credentials not found for Bedrock call, falling back to GPT-4")
+                model = "gpt-4"  # fallback
+            else:
+                bedrock_runtime = boto3.client(
+                    service_name='bedrock-runtime',
+                    region_name=region,
+                    aws_access_key_id=aws_access_key,
+                    aws_secret_access_key=aws_secret_key
+                )
+                user_prompt = f"Project: {project_name}\n\nInterview Transcripts:\n\n{combined_text}"
+                messages = [{"role": "user", "content": user_prompt}]
+                body = json.dumps({
+                    "messages": messages,
+                    "system": system_message,
+                    "max_tokens": 4096,
+                    "temperature": 0.7,
+                    "top_p": 1,
+                    "anthropic_version": "bedrock-2023-05-31"
+                })
+                try:
+                    response = bedrock_runtime.invoke_model(
+                        body=body,
+                        modelId=model_arn,
+                        accept="application/json",
+                        contentType="application/json"
+                    )
+                    response_body = json.loads(response.get('body').read())
+                    content = ''
+                    if 'content' in response_body:
+                        content_list = response_body['content']
+                        if isinstance(content_list, list) and len(content_list) > 0:
+                            content = content_list[0].get('text', '')
+                    if not content:
+                        logger.error("Empty response from Claude 3.7 Sonnet (Bedrock), falling back to GPT-4")
+                        model = "gpt-4"  # fallback
+                    else:
+                        try:
+                            persona_data = json.loads(content)
+                            # Validate required fields
+                            required_fields = [
+                                "name", "summary", "image_prompt", "demographics",
+                                "background", "goals", "pain_points"
+                            ]
+                            for field in required_fields:
+                                if field not in persona_data:
+                                    raise ValueError(f"Missing required field: {field}")
+                            return persona_data
+                        except json.JSONDecodeError as e:
+                            logger.error(f"Error parsing persona JSON from Claude: {str(e)}. Falling back to GPT-4.")
+                            logger.error(f"Raw response: {content}")
+                            model = "gpt-4"  # fallback
+                except Exception as e:
+                    logger.error(f"Error generating persona with Claude 3.7 Sonnet (Bedrock): {str(e)}. Falling back to GPT-4.")
+                    model = "gpt-4"  # fallback
+        else:
+            # Use OpenAI client for OpenAI models
+            client = OpenAI(api_key=os.getenv('OPENAI_API_KEY'))
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": system_message},
+                    {"role": "user", "content": f"Project: {project_name}\n\nInterview Transcripts:\n\n{combined_text}"}
+                ],
+                temperature=0.7,
+                max_tokens=4000,
+                response_format={ "type": "json_object" }
+            )
+            try:
+                persona_data = json.loads(response.choices[0].message.content)
+                # Validate required fields
+                required_fields = [
+                    "name", "summary", "image_prompt", "demographics",
+                    "background", "goals", "pain_points"
+                ]
+                for field in required_fields:
+                    if field not in persona_data:
+                        raise ValueError(f"Missing required field: {field}")
+                return persona_data
+            except json.JSONDecodeError as e:
+                logger.error(f"Error parsing persona JSON: {str(e)}")
+                logger.error(f"Raw response: {response.choices[0].message.content}")
+                raise
     except Exception as e:
         logger.error(f"Error generating persona: {str(e)}")
         raise 

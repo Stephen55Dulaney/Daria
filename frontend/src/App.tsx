@@ -11,6 +11,8 @@ import JourneyMap from './pages/JourneyMap'
 import AnnotatedTranscript from './pages/AnnotatedTranscript'
 import PersonaGenerator from './pages/PersonaGenerator'
 import AdvancedSearch from './pages/AdvancedSearch'
+import UploadTranscript from './pages/UploadTranscript'
+import CreateInterview from './pages/CreateInterview'
 
 const App: React.FC = () => {
   return (
@@ -28,6 +30,8 @@ const App: React.FC = () => {
           <Route path="/annotated-transcript/:transcriptId" element={<AnnotatedTranscript />} />
           <Route path="/persona-generator" element={<PersonaGenerator />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
+          <Route path="/upload-transcript" element={<UploadTranscript />} />
+          <Route path="/create-interview" element={<CreateInterview />} />
           {/* Add more routes as we build them */}
         </Routes>
       </Layout>
