@@ -33,18 +33,20 @@ const JourneyMap: React.FC = () => {
   const fetchProjects = async () => {
     try {
       const response = await axios.get('/api/projects');
-      setProjects(response.data);
+      setProjects(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching projects:', error);
+      setProjects([]);
     }
   };
 
   const fetchInterviews = async (projectId: string) => {
     try {
       const response = await axios.get(`/api/projects/${projectId}/interviews`);
-      setInterviews(response.data);
+      setInterviews(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching interviews:', error);
+      setInterviews([]);
     }
   };
 

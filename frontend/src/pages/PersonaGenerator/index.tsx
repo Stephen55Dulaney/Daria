@@ -36,20 +36,26 @@ const PersonaGenerator: React.FC = () => {
   const fetchProjects = async () => {
     try {
       const response = await axios.get('/api/projects');
-      setProjects(response.data);
+      // Ensure we always set an array
+      setProjects(Array.isArray(response.data) ? response.data : []);
     } catch (error) {
       console.error('Error fetching projects:', error);
+      // Default to empty array on error
+      setProjects([]);
     }
   };
 
   const fetchInterviews = async (projectId: string) => {
     try {
       const response = await axios.get(`/api/projects/${projectId}/interviews`);
-      setInterviews(response.data);
+      // Ensure we always set an array
+      setInterviews(Array.isArray(response.data) ? response.data : []);
       // Debug: log interviews to console
       console.log('Loaded interviews:', response.data);
     } catch (error) {
       console.error('Error fetching interviews:', error);
+      // Default to empty array on error
+      setInterviews([]);
     }
   };
 
