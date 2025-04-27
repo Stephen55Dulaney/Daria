@@ -13,6 +13,9 @@ import PersonaGenerator from './pages/PersonaGenerator'
 import AdvancedSearch from './pages/AdvancedSearch'
 import UploadTranscript from './pages/UploadTranscript'
 import CreateInterview from './pages/CreateInterview'
+import ResearchSurvey from './pages/ResearchSurvey'
+import SurveyResults from './pages/SurveyResults'
+import ResearchAdventure from './pages/ResearchAdventure'
 
 const App: React.FC = () => {
   return (
@@ -32,6 +35,9 @@ const App: React.FC = () => {
           <Route path="/advanced-search" element={<AdvancedSearch />} />
           <Route path="/upload-transcript" element={<UploadTranscript />} />
           <Route path="/create-interview" element={<CreateInterview />} />
+          <Route path="/research-survey" element={<ResearchSurvey />} />
+          <Route path="/survey-results" element={<SurveyResults />} />
+          <Route path="/research-adventure" element={<ResearchAdventure />} />
           {/* Add more routes as we build them */}
         </Routes>
       </Layout>

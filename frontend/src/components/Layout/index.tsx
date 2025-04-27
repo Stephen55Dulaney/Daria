@@ -8,7 +8,8 @@ import {
   RocketOutlined,
   TeamOutlined,
   FileTextOutlined,
-  PlusOutlined
+  PlusOutlined,
+  FormOutlined
 } from '@ant-design/icons';
 
 const { Header, Content } = AntLayout;
@@ -27,7 +28,10 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     '/upload-interview',
     '/annotated-transcript',
     '/transcript',
-    '/persona-generator'
+    '/persona-generator',
+    '/research-survey',
+    '/survey-results',
+    '/research-adventure'
   ].some(path => location.pathname.startsWith(path));
 
   // Refactored menu items array for Ant Design v5+
@@ -62,6 +66,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           key: '/create-interview',
           icon: <PlusOutlined />,
           label: <Link to="/create-interview">Create Interview</Link>,
+        },
+        {
+          key: '/research-survey',
+          icon: <FormOutlined />,
+          label: <Link to="/research-survey">Research Survey</Link>,
         },
       ],
     },
