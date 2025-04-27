@@ -9,7 +9,16 @@
   }
 
   body {
-    @apply bg-gray-50 text-gray-900;
+    @apply bg-gray-50 text-gray-800;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight leading-tight;
+  }
+
+  /* Fix for overlapping text */
+  p, li, span, label {
+    @apply leading-normal;
   }
 }
 
@@ -20,7 +29,7 @@
   }
 
   .btn-primary {
-    @apply bg-indigo-600 text-white hover:bg-indigo-700;
+    @apply bg-blue-600 text-white hover:bg-blue-700;
   }
 
   .btn-secondary {
@@ -28,11 +37,32 @@
   }
 
   .input {
-    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500;
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
   }
 
   .card {
     @apply bg-white rounded-lg shadow-sm p-6;
+  }
+  
+  /* Survey styles */
+  .survey-question {
+    @apply mb-8;
+  }
+  
+  .survey-option {
+    @apply p-4 border rounded-lg mb-4 transition-all hover:shadow-md;
+  }
+  
+  .survey-option-content {
+    @apply ml-2;
+  }
+  
+  .survey-option-title {
+    @apply font-medium text-lg;
+  }
+  
+  .survey-option-description {
+    @apply text-gray-600 mt-1;
   }
 }
 

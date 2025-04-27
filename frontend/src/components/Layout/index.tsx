@@ -97,19 +97,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
   ];
 
   return (
-    <AntLayout className="min-h-screen">
-      <Header className="bg-white px-4 border-b border-gray-200">
+    <AntLayout className="min-h-screen bg-gray-50">
+      <Header className="bg-white px-4 border-b border-gray-200 shadow-sm">
         <div className="flex items-center justify-between h-full">
           <Link to="/" className="flex items-center">
             <img src="/static/images/daria-logo.png" alt="Logo" className="w-8 h-8 mr-2 object-contain" />
-            <span className="text-lg font-semibold">DARIA</span>
+            <span className="text-lg font-semibold text-blue-700">DARIA</span>
           </Link>
           {/* Use items prop instead of children */}
           <Menu mode="horizontal" selectedKeys={[location.pathname]} className="flex-1 justify-end border-0" items={menuItems} />
         </div>
       </Header>
       <Content className="p-6">
-        <div className="max-w-7xl mx-auto">
+        <div className="max-w-7xl mx-auto bg-white rounded-lg shadow-sm p-6">
           {children}
         </div>
       </Content>

@@ -144,31 +144,31 @@ const ResearchSurvey: React.FC = () => {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white rounded-lg shadow-lg" onClick={handleInteraction}>
-      <Title level={2} className="text-center mb-8">Research Discovery Plan</Title>
-      <Paragraph className="text-center mb-8">
+    <div onClick={handleInteraction}>
+      <Title level={2} className="text-center mb-6">Research Discovery Plan</Title>
+      <Paragraph className="text-center mb-8 text-lg">
         Answer these questions to help us create your personalized research plan and discovery game.
       </Paragraph>
 
       {/* Round 1 */}
       {currentRound === 1 && (
-        <div className="mb-8">
-          <Title level={3} className="flex items-center">
+        <div className="survey-question">
+          <Title level={3} className="flex items-center mb-6">
             What is your primary research objective?
             {speaking && <SoundOutlined spin className="ml-2 text-blue-500" />}
           </Title>
           <Radio.Group onChange={(e) => handleOptionSelect(1, e.target.value)} value={responses[1]} className="w-full">
             <Space direction="vertical" className="w-full">
-              <Radio value="user_needs" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>Understand User Needs</Title>
-                  <Paragraph>I need to discover what my users really want and need</Paragraph>
+              <Radio value="user_needs" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">Understand User Needs</div>
+                  <div className="survey-option-description">I need to discover what my users really want and need</div>
                 </div>
               </Radio>
-              <Radio value="market_validation" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>Market Validation</Title>
-                  <Paragraph>I need to validate if there's a market for my product/idea</Paragraph>
+              <Radio value="market_validation" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">Market Validation</div>
+                  <div className="survey-option-description">I need to validate if there's a market for my product/idea</div>
                 </div>
               </Radio>
             </Space>
@@ -178,23 +178,23 @@ const ResearchSurvey: React.FC = () => {
 
       {/* Round 2 */}
       {currentRound === 2 && (
-        <div className="mb-8">
-          <Title level={3} className="flex items-center">
+        <div className="survey-question">
+          <Title level={3} className="flex items-center mb-6">
             What type of research data do you prefer?
             {speaking && <SoundOutlined spin className="ml-2 text-blue-500" />}
           </Title>
           <Radio.Group onChange={(e) => handleOptionSelect(2, e.target.value)} value={responses[2]} className="w-full">
             <Space direction="vertical" className="w-full">
-              <Radio value="qualitative" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>Qualitative Insights</Title>
-                  <Paragraph>I prefer rich, detailed insights from fewer people</Paragraph>
+              <Radio value="qualitative" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">Qualitative Insights</div>
+                  <div className="survey-option-description">I prefer rich, detailed insights from fewer people</div>
                 </div>
               </Radio>
-              <Radio value="quantitative" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>Quantitative Data</Title>
-                  <Paragraph>I prefer numerical data from larger sample sizes</Paragraph>
+              <Radio value="quantitative" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">Quantitative Data</div>
+                  <div className="survey-option-description">I prefer numerical data from larger sample sizes</div>
                 </div>
               </Radio>
             </Space>
@@ -204,23 +204,23 @@ const ResearchSurvey: React.FC = () => {
 
       {/* Round 3 */}
       {currentRound === 3 && (
-        <div className="mb-8">
-          <Title level={3} className="flex items-center">
+        <div className="survey-question">
+          <Title level={3} className="flex items-center mb-6">
             What is your project timeline?
             {speaking && <SoundOutlined spin className="ml-2 text-blue-500" />}
           </Title>
           <Radio.Group onChange={(e) => handleOptionSelect(3, e.target.value)} value={responses[3]} className="w-full">
             <Space direction="vertical" className="w-full">
-              <Radio value="urgent" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>Urgent (1-2 weeks)</Title>
-                  <Paragraph>I need results very quickly</Paragraph>
+              <Radio value="urgent" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">Urgent (1-2 weeks)</div>
+                  <div className="survey-option-description">I need results very quickly</div>
                 </div>
               </Radio>
-              <Radio value="standard" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>Standard (1-2 months)</Title>
-                  <Paragraph>I have a reasonable timeframe</Paragraph>
+              <Radio value="standard" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">Standard (1-2 months)</div>
+                  <div className="survey-option-description">I have a reasonable timeframe</div>
                 </div>
               </Radio>
             </Space>
@@ -230,23 +230,23 @@ const ResearchSurvey: React.FC = () => {
 
       {/* Round 4 */}
       {currentRound === 4 && (
-        <div className="mb-8">
-          <Title level={3} className="flex items-center">
+        <div className="survey-question">
+          <Title level={3} className="flex items-center mb-6">
             What's your budget range?
             {speaking && <SoundOutlined spin className="ml-2 text-blue-500" />}
           </Title>
           <Radio.Group onChange={(e) => handleOptionSelect(4, e.target.value)} value={responses[4]} className="w-full">
             <Space direction="vertical" className="w-full">
-              <Radio value="limited" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>Limited Budget</Title>
-                  <Paragraph>I need cost-effective research methods</Paragraph>
+              <Radio value="limited" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">Limited Budget</div>
+                  <div className="survey-option-description">I need cost-effective research methods</div>
                 </div>
               </Radio>
-              <Radio value="flexible" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>Flexible Budget</Title>
-                  <Paragraph>I can invest in comprehensive research</Paragraph>
+              <Radio value="flexible" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">Flexible Budget</div>
+                  <div className="survey-option-description">I can invest in comprehensive research</div>
                 </div>
               </Radio>
             </Space>
@@ -256,23 +256,23 @@ const ResearchSurvey: React.FC = () => {
 
       {/* Round 5 */}
       {currentRound === 5 && (
-        <div className="mb-8">
-          <Title level={3} className="flex items-center">
+        <div className="survey-question">
+          <Title level={3} className="flex items-center mb-6">
             What research methods are you familiar with?
             {speaking && <SoundOutlined spin className="ml-2 text-blue-500" />}
           </Title>
           <Radio.Group onChange={(e) => handleOptionSelect(5, e.target.value)} value={responses[5]} className="w-full">
             <Space direction="vertical" className="w-full">
-              <Radio value="interviews" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>User Interviews</Title>
-                  <Paragraph>I'm comfortable with one-on-one interviews</Paragraph>
+              <Radio value="interviews" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">User Interviews</div>
+                  <div className="survey-option-description">I'm comfortable with one-on-one interviews</div>
                 </div>
               </Radio>
-              <Radio value="surveys" className="p-4 border rounded mb-2 w-full">
-                <div className="ml-2">
-                  <Title level={5}>Surveys & Analytics</Title>
-                  <Paragraph>I prefer data collection at scale</Paragraph>
+              <Radio value="surveys" className="survey-option">
+                <div className="survey-option-content">
+                  <div className="survey-option-title">Surveys & Analytics</div>
+                  <div className="survey-option-description">I prefer data collection at scale</div>
                 </div>
               </Radio>
             </Space>
@@ -280,7 +280,7 @@ const ResearchSurvey: React.FC = () => {
         </div>
       )}
 
-      {error && <div className="text-red-500 mb-4">{error}</div>}
+      {error && <div className="text-red-500 mb-6 font-medium">{error}</div>}
 
       <div className="flex justify-between mt-8">
         {currentRound > 1 && (
@@ -288,16 +288,19 @@ const ResearchSurvey: React.FC = () => {
             size="large" 
             onClick={() => setCurrentRound(prev => prev - 1)}
             disabled={loading}
+            className="px-6 h-10"
           >
             Previous
           </Button>
         )}
+        <div className="flex-1"></div>
         {currentRound < 5 ? (
           <Button 
             type="primary" 
             size="large" 
             onClick={handleNext}
             disabled={!responses[currentRound] || loading}
+            className="px-8 h-10 font-medium"
           >
             Next
           </Button>
@@ -307,6 +310,7 @@ const ResearchSurvey: React.FC = () => {
             size="large" 
             onClick={handleSubmit}
             disabled={!responses[currentRound] || loading}
+            className="px-8 h-10 font-medium"
           >
             {loading ? <Spin size="small" /> : 'Reveal My Research Plan'}
           </Button>
