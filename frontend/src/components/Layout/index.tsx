@@ -101,7 +101,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       <Header className="bg-white px-4 border-b border-gray-200">
         <div className="flex items-center justify-between h-full">
           <Link to="/" className="flex items-center">
-            <img src="/static/images/daria-logo.png" alt="Logo" className="h-8 mr-2" />
+            <img src="/static/images/daria-logo.png" alt="Logo" className="w-8 h-8 mr-2 object-contain" />
             <span className="text-lg font-semibold">DARIA</span>
           </Link>
           {/* Use items prop instead of children */}
