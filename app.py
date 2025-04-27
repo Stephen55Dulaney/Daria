@@ -21,7 +21,6 @@ from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime, timedelta
 from pathlib import Path
 from src.vector_store import InterviewVectorStore
-from src.persona_gpt import generate_persona_with_architect
 import traceback
 import logging
 from markupsafe import Markup
@@ -38,6 +37,25 @@ import markdown2
 from semantic_analysis import SemanticAnalyzer
 from sklearn.metrics.pairwise import cosine_similarity
 from src.processed_interview_store import ProcessedInterviewStore
+import sys
+from src.discovery_gpt import DiscoveryGPT
+from asgiref.sync import async_to_sync
+from src.persona_gpt import generate_persona_from_interviews
+from flask_sqlalchemy import SQLAlchemy
+from PIL import Image, ImageDraw, ImageFont
+import random
+
+# Configure logging with a more detailed format
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+
+# Create logger for this module
+logger = logging.getLogger(__name__)
 
 # Global variables
 vector_store = None
@@ -49,6 +67,31 @@ app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['INTERVIEWS_DIR'] = 'interviews/raw'
 app.config['VECTOR_STORE_PATH'] = 'vector_store'
 app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')  # Add OpenAI API key configuration
+app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize SQLAlchemy
+db = SQLAlchemy(app)
+
+# Database models for the research survey functionality
+class ResearchSurveyResponse(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    created_at = db.Column(db.DateTime, default=datetime.utcnow)
+    primary_objective = db.Column(db.String(50))
+    research_type = db.Column(db.String(50))
+    timeline = db.Column(db.String(50))
+    budget = db.Column(db.String(50))
+    methods = db.Column(db.String(50))
+    avatar_path = db.Column(db.String(255))
+    recommendations = db.Column(db.JSON)
+
+# Create database tables if they don't exist
+with app.app_context():
+    try:
+        db.create_all()
+        logger.info("Database tables created successfully")
+    except Exception as e:
+        logger.error(f"Error creating database tables: {str(e)}")
 
 # Configure CORS
 CORS(app, resources={
@@ -57,7 +100,13 @@ CORS(app, resources={
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True
-    }
+    },
+    r"/annotated-transcript/*": {
+        "origins": ["http://localhost:5174"],
+        "methods": ["GET"],
+        "allow_headers": ["Content-Type"]
+    },
+    r"/text_to_speech": {"origins": ["http://localhost:5174"]},
 })
 
 # Configure SocketIO with CORS
@@ -110,10 +159,6 @@ PERSONAS_DIR.mkdir(exist_ok=True)
 
 # Add maximum rounds constant
 MAX_ROUNDS = 3
-
-# Set up logging
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
 
 # Initialize vector store
 app.vector_store = None
@@ -503,18 +548,23 @@ def analyze_chunk_semantics(text):
         }
 
 def create_openai_client():
-    """Create an OpenAI client with consistent configuration."""
+    """Create and configure OpenAI client."""
     try:
-        client = OpenAI(
-            api_key=OPENAI_API_KEY,
-            base_url="https://api.openai.com/v1"
-        )
-        logger.info("OpenAI client created successfully")
+        logger.info("Creating OpenAI client")
+        api_key = os.getenv('OPENAI_API_KEY')
+        if not api_key:
+            logger.error("OpenAI API key not found in environment")
+            return None
+            
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+        logger.info("Successfully created OpenAI client")
         return client
+        
     except Exception as e:
         logger.error(f"Error creating OpenAI client: {str(e)}")
         logger.error(traceback.format_exc())
-        raise
+        return None
 
 def extract_value(prompt, field_name, context):
     """Extract a value from the interview prompt based on the field name and context."""
@@ -1092,13 +1142,15 @@ def process_audio():
 def text_to_speech():
     try:
         text = request.json.get('text')
+        voice_id = request.json.get('voice_id', AVAILABLE_VOICES['rachel'])  # Default to Rachel if not specified
+        
         if not text:
             return jsonify({'error': 'No text provided'}), 400
         
         # Convert text to speech using ElevenLabs
         audio_stream = elevenlabs_client.text_to_speech.convert_as_stream(
             text=text,
-            voice_id=AVAILABLE_VOICES['rachel'],
+            voice_id=voice_id,
             model_id="eleven_multilingual_v2"
         )
         
@@ -2020,9 +2072,9 @@ def generate_persona():
             
         interviews = data['interviews']
         project_name = data.get('project_name', '')
-        selected_elements = data.get('selected_elements', [])
         model = data.get('model', 'gpt-4')
-        
+        selected_elements = data.get('selected_elements', [])
+
         # Load interview data
         interview_data = []
         for interview_id in interviews:
@@ -2031,192 +2083,32 @@ def generate_persona():
                 logger.warning(f"Could not load interview data for ID {interview_id}")
                 continue
             interview_data.append(interview)
-            
+        
         if not interview_data:
             logger.error("No valid interviews found")
             return jsonify({'error': 'No valid interviews found'}), 400
 
-        # Get model context limits
-        model_limits = {
-            'gpt-3.5-turbo': 16385,
-            'gpt-4': 128000,
-            'gpt-4-turbo-preview': 128000,
-            'claude-3.7-sonnet': 200000
-        }
-        
-        max_tokens = model_limits.get(model, 16385)  # Default to smallest limit if unknown
-        
-        # Prepare interview data based on model limits
-        def prepare_interview_data(interviews, max_tokens):
-            prepared_data = []
-            for interview in interviews:
-                # Extract key information
-                metadata = interview.get('metadata', {})
-                transcript = interview.get('transcript', '')
-                
-                # If transcript is a list of messages, join them
-                if isinstance(transcript, list):
-                    transcript = ' '.join([msg.get('text', '') for msg in transcript if msg.get('speaker') == 'You'])
-                
-                # Get the first 1000 characters of transcript for smaller models
-                if model == 'gpt-3.5-turbo':
-                    transcript = transcript[:1000] + '...' if len(transcript) > 1000 else transcript
-                
-                prepared_data.append({
-                    'metadata': metadata,
-                    'transcript_excerpt': transcript,
-                    'key_insights': interview.get('analysis', {}).get('key_insights', [])[:5]  # Limit to top 5 insights
-                })
-            return prepared_data
+        # Extract full transcripts for persona synthesis
+        interview_texts = []
+        for interview in interview_data:
+            transcript = interview.get('transcript', '')
+            # If transcript is a list of messages, join them
+            if isinstance(transcript, list):
+                transcript = ' '.join([msg.get('text', '') for msg in transcript])
+            interview_texts.append(transcript)
 
-        # Generate system prompt
-        system_prompt = """You are an expert UX researcher and persona creator. 
-        Create a detailed persona based on the interview data provided. 
-        Return ONLY the JSON data without any markdown formatting or code blocks.
-        Format the response with the following structure:
-        {
-            "name": "Name and title",
-            "summary": "Brief summary",
-            "image_prompt": "Detailed prompt for image generation",
-            "demographics": {
-                "age_range": "Age range (e.g. 25-35)",
-                "gender": "Gender",
-                "occupation": "Current occupation",
-                "location": "Location",
-                "education": "Education level"
-            },
-            "background": "Detailed background information",
-            "goals": [
-                {
-                    "goal": "Goal description",
-                    "motivation": "Motivation behind the goal",
-                    "supporting_quotes": ["quote1", "quote2"]
-                }
-            ],
-            "pain_points": [
-                {
-                    "pain_point": "Pain point description",
-                    "impact": "Impact description",
-                    "supporting_quotes": ["quote1", "quote2"]
-                }
-            ]
-        }"""
-
-        # Prepare data based on model
-        prepared_interviews = prepare_interview_data(interview_data, max_tokens)
-        
-        # Create user prompt with prepared data
-        user_prompt = f"Create a persona based on these interviews: {json.dumps(prepared_interviews, indent=2)}"
-
-        content = None
-        if model == 'claude-3.7-sonnet':
-            try:
-                import boto3
-                
-                aws_access_key = os.getenv('AWS_ACCESS_KEY_ID')
-                aws_secret_key = os.getenv('AWS_SECRET_ACCESS_KEY')
-                region = 'us-east-2'
-                
-                if not aws_access_key or not aws_secret_key:
-                    logger.error("AWS credentials not found")
-                    return jsonify({'error': 'AWS credentials not configured'}), 500
-                
-                logger.info("Initializing AWS Bedrock client...")
-                bedrock_runtime = boto3.client(
-                    service_name='bedrock-runtime',
-                    region_name=region,
-                    aws_access_key_id=aws_access_key,
-                    aws_secret_access_key=aws_secret_key
-                )
-                
-                # Format messages for Claude
-                messages = [
-                    {
-                        "role": "user",
-                        "content": user_prompt
-                    }
-                ]
-                
-                body = json.dumps({
-                    "messages": messages,
-                    "system": system_prompt,
-                    "max_tokens": 4096,
-                    "temperature": 0.7,
-                    "top_p": 1,
-                    "anthropic_version": "bedrock-2023-05-31"
-                })
-                
-                logger.info("Sending request to Claude via Bedrock...")
-                response = bedrock_runtime.invoke_model(
-                    body=body,
-                    modelId='arn:aws:bedrock:us-east-2:522814696964:inference-profile/us.anthropic.claude-3-7-sonnet-20250219-v1:0',
-                    accept="application/json",
-                    contentType="application/json"
-                )
-                
-                response_body = json.loads(response.get('body').read())
-                logger.info(f"Raw Claude response: {json.dumps(response_body, indent=2)}")
-                
-                # Extract content from Claude response
-                content = ''
-                if 'content' in response_body:
-                    content_list = response_body['content']
-                    if isinstance(content_list, list) and len(content_list) > 0:
-                        # Get the text from the first content item
-                        content = content_list[0].get('text', '')
-                
-                if not content:
-                    logger.error("Empty response from Claude")
-                    raise ValueError("Empty response from Claude")
-                
-                logger.info(f"Extracted content from Claude: {content}")
-            except Exception as e:
-                logger.error(f"Error using Claude: {str(e)}")
-                logger.error(traceback.format_exc())
-                return jsonify({'error': f'Failed to generate persona with Claude: {str(e)}'}), 500
-        else:
-            # Use OpenAI
-            try:
-                client = create_openai_client()
-                if not client:
-                    logger.error("Failed to initialize OpenAI client")
-                    return jsonify({'error': 'Failed to initialize AI client'}), 500
-                    
-                logger.info("Sending request to OpenAI...")
-                response = client.chat.completions.create(
-                    model="gpt-4-turbo-preview" if model == 'gpt-4' else "gpt-3.5-turbo",
-                    messages=[
-                        {"role": "system", "content": system_prompt},
-                        {"role": "user", "content": user_prompt}
-                    ],
-                    temperature=0.7
-                )
-                content = response.choices[0].message.content
-                logger.info("Received response from OpenAI")
-            except Exception as e:
-                logger.error(f"Error using OpenAI: {str(e)}")
-                logger.error(traceback.format_exc())
-                return jsonify({'error': f'Failed to generate persona with OpenAI: {str(e)}'}), 500
-        
-        if not content:
-            logger.error("No content generated")
-            return jsonify({'error': 'No content generated'}), 500
-
-        # Clean and parse the content
-        content = content.strip()
-        if content.startswith('```'):
-            content = content.split('```')[1]
-            if content.startswith('json'):
-                content = content[4:]
-            content = content.strip()
-        
-        logger.info(f"Cleaned content: {content}")
-        
+        # Use the robust persona synthesis function
+        from src.persona_gpt import generate_persona_from_interviews
         try:
-            persona_data = json.loads(content)
-        except json.JSONDecodeError as e:
-            logger.error(f"Error parsing persona JSON: {str(e)}")
-            return jsonify({'error': 'Invalid persona data format'}), 500
+            persona_data = generate_persona_from_interviews(
+                interview_texts=interview_texts,
+                project_name=project_name,
+                model=model
+            )
+        except Exception as e:
+            logger.error(f"Error generating persona: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': f'Failed to generate persona: {str(e)}'}), 500
 
         # Generate HTML from persona data
         try:
@@ -2796,166 +2688,128 @@ def create_journey_map():
         return jsonify({'error': str(e)}), 500
 
 def generate_journey_map_html(interviews):
-    """Generate HTML for the journey map based on interview data."""
+    """Generate HTML for the journey map based on interview data, optimized for token limits and API usage."""
     try:
-        # Create OpenAI client
         client = OpenAI(api_key=OPENAI_API_KEY)
-        
-        # Log interview data
-        logger.info(f"Processing {len(interviews)} interviews for journey map")
-        
-        # Package interview data with clear structure and handle large content
-        interview_packages = []
+        logger.info(f"Processing {len(interviews)} interviews for journey map (optimized)")
+
+        # Limit the number of interviews to avoid context overflow
+        MAX_INTERVIEWS = 5
+        if len(interviews) > MAX_INTERVIEWS:
+            logger.warning(f"Too many interviews selected ({len(interviews)}); only using the first {MAX_INTERVIEWS}.")
+            interviews = interviews[:MAX_INTERVIEWS]
+
+        interview_summaries = []
         for i, interview in enumerate(interviews):
-            # Get the transcript and analysis
             transcript = interview.get('transcript', '')
             analysis = interview.get('analysis', '')
-            
-            # If transcript is too long, extract key sections
-            if len(transcript) > 4000:  # Conservative limit to stay under token limit
-                # Split into chunks and extract key insights
-                chunks = [transcript[i:i+4000] for i in range(0, len(transcript), 4000)]
-                key_insights = []
-                
-                for chunk in chunks:
+            logger.info(f"Summarizing interview {i+1}/{len(interviews)} (ID: {interview.get('id')})")
+
+            # Step 1: Summarize transcript in chunks if too long
+            if len(transcript) > 3000:
+                logger.info(f"Transcript is long ({len(transcript)} chars), chunking and summarizing...")
+                chunk_size = 2000
+                chunks = [transcript[j:j+chunk_size] for j in range(0, len(transcript), chunk_size)]
+                chunk_summaries = []
+                for k, chunk in enumerate(chunks):
+                    logger.info(f"Summarizing chunk {k+1}/{len(chunks)} of interview {i+1}")
                     try:
-                        # Extract key points from each chunk
                         response = client.chat.completions.create(
                             model="gpt-4",
                             messages=[
-                                {"role": "system", "content": "You are a research analyst. Extract the key points and insights from this interview transcript chunk, focusing on user journey relevant information. Be concise."},
+                                {"role": "system", "content": "You are a research analyst. Summarize the following interview transcript chunk for journey mapping. Focus on key events, actions, pain points, and emotions. Be concise."},
                                 {"role": "user", "content": chunk}
                             ],
-                            max_tokens=500,
+                            max_tokens=300,
                             temperature=0.3
                         )
-                        key_insights.append(response.choices[0].message.content)
+                        chunk_summaries.append(response.choices[0].message.content)
                     except Exception as e:
-                        logger.error(f"Error processing chunk: {str(e)}")
+                        logger.error(f"Error summarizing chunk {k+1}: {str(e)}")
                         continue
-                
-                # Join key insights
-                processed_transcript = "\n\n".join(key_insights)
+                # Step 2: Combine chunk summaries into one interview summary
+                combined_summary = "\n".join(chunk_summaries)
+                logger.info(f"Combining {len(chunk_summaries)} chunk summaries for interview {i+1}")
+                try:
+                    response = client.chat.completions.create(
+                        model="gpt-4",
+                        messages=[
+                            {"role": "system", "content": "You are a research analyst. Combine the following chunk summaries into a single, concise summary for journey mapping. Focus on key stages, touchpoints, pain points, and emotions."},
+                            {"role": "user", "content": combined_summary}
+                        ],
+                        max_tokens=400,
+                        temperature=0.3
+                    )
+                    interview_summary = response.choices[0].message.content
+                except Exception as e:
+                    logger.error(f"Error combining chunk summaries: {str(e)}")
+                    interview_summary = combined_summary
             else:
-                processed_transcript = transcript
-            
-            # Similarly handle analysis if it's too long
-            if len(analysis) > 2000:
-                processed_analysis = analysis[:2000] + "...\n[Analysis truncated for length]"
+                interview_summary = transcript
+
+            # Step 3: Truncate or summarize analysis if too long
+            if len(analysis) > 1500:
+                processed_analysis = analysis[:1500] + "... [truncated]"
             else:
                 processed_analysis = analysis
-            
-            interview_package = {
+
+            interview_summaries.append({
                 'id': interview.get('id'),
                 'date': interview.get('date'),
                 'type': interview.get('interview_type'),
-                'transcript': processed_transcript,
+                'summary': interview_summary,
                 'analysis': processed_analysis
-            }
-            interview_packages.append(interview_package)
-            logger.info(f"Interview {i+1} ID: {interview_package['id']}")
-            logger.info(f"Processed transcript length: {len(processed_transcript)}")
-            logger.info(f"Processed analysis length: {len(processed_analysis)}")
-        
-        # Create a structured prompt for the journey map
-        analysis_prompt = f"""As a UX research expert, analyze these {len(interview_packages)} interviews and create a detailed journey map. 
-Focus on extracting specific, actionable insights from the interviews.
+            })
+            logger.info(f"Finished summary for interview {i+1}")
 
-For each interview, I'll provide:
-1. The key points from the interview transcript
-2. The analysis summary
-3. The interview date and type
-
-Please create a comprehensive journey map that includes:
-
-1. Key stages of the user journey
-2. Important touchpoints at each stage
-3. User emotions and pain points
-4. Opportunities for improvement
-
-Format the response as HTML with appropriate styling classes. Use the following structure:
-
-<div class="journey-map-container">
-    <div class="journey-map-section stages">
-        <h2>Journey Stages</h2>
-        [Stage cards...]
-    </div>
-    <div class="journey-map-section touchpoints">
-        <h2>Key Touchpoints</h2>
-        [Touchpoint cards...]
-    </div>
-    <div class="journey-map-section emotions">
-        <h2>User Emotions</h2>
-        [Emotion cards...]
-    </div>
-    <div class="journey-map-section pain-points">
-        <h2>Pain Points</h2>
-        [Pain point cards...]
-    </div>
-    <div class="journey-map-section opportunities">
-        <h2>Opportunities</h2>
-        [Opportunity cards...]
-    </div>
-</div>
-
-Here are the interviews to analyze:
-
-"""
-
-        # Add interview data to prompt
-        for i, interview in enumerate(interview_packages, 1):
+        # Step 4: Build the final journey map prompt using only summaries
+        analysis_prompt = f"""As a UX research expert, analyze these {len(interview_summaries)} interviews and create a detailed journey map.\nFocus on extracting specific, actionable insights from the interviews.\n\nFor each interview, I'll provide:\n1. The summary of the interview transcript\n2. The analysis summary\n3. The interview date and type\n\nPlease create a comprehensive journey map that includes:\n1. Key stages of the user journey\n2. Important touchpoints at each stage\n3. User emotions and pain points\n4. Opportunities for improvement\n\nFormat the response as HTML with appropriate styling classes. Use the following structure:\n\n<div class=\"journey-map-container\">\n    <div class=\"journey-map-section stages\">\n        <h2>Journey Stages</h2>\n        [Stage cards...]\n    </div>\n    <div class=\"journey-map-section touchpoints\">\n        <h2>Key Touchpoints</h2>\n        [Touchpoint cards...]\n    </div>\n    <div class=\"journey-map-section emotions\">\n        <h2>User Emotions</h2>\n        [Emotion cards...]\n    </div>\n    <div class=\"journey-map-section pain-points\">\n        <h2>Pain Points</h2>\n        [Pain point cards...]\n    </div>\n    <div class=\"journey-map-section opportunities\">\n        <h2>Opportunities</h2>\n        [Opportunity cards...]\n    </div>\n</div>\n\nHere are the interviews to analyze:\n"""
+        for i, interview in enumerate(interview_summaries, 1):
             analysis_prompt += f"""
 Interview {i}:
 Date: {interview['date']}
 Type: {interview['type']}
 
-Key Points:
-{interview['transcript']}
+Summary:
+{interview['summary']}
 
 Analysis:
 {interview['analysis']}
 
 ---
 """
-
-        logger.info("Sending request to OpenAI")
+        logger.info("Sending final journey map prompt to OpenAI (optimized)")
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": "You are a UX research expert skilled at creating journey maps from interview data."},
                 {"role": "user", "content": analysis_prompt}
             ],
-            max_tokens=4000,
+            max_tokens=3500,
             temperature=0.7
         )
-        
         journey_map_html = response.choices[0].message.content
-        
-        # Add wrapper and styling
         final_html = f"""
-<div class="journey-map-wrapper p-6 bg-white rounded-lg shadow-lg">
-    <div class="mb-6">
-        <h1 class="text-2xl font-bold text-gray-900 mb-2">User Journey Map</h1>
-        <p class="text-gray-600">Based on {len(interviews)} interview{'' if len(interviews) == 1 else 's'}</p>
+<div class=\"journey-map-wrapper p-6 bg-white rounded-lg shadow-lg\">
+    <div class=\"mb-6\">
+        <h1 class=\"text-2xl font-bold text-gray-900 mb-2\">User Journey Map</h1>
+        <p class=\"text-gray-600\">Based on {len(interviews)} interview{'' if len(interviews) == 1 else 's'}</p>
     </div>
     {journey_map_html}
 </div>
 """
-        
         return final_html
-        
     except Exception as e:
         logger.error(f"Error generating journey map HTML: {str(e)}")
         logger.error(traceback.format_exc())
-        # Return an error message as HTML
         return f"""
-<div class="error-message">
-    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+<div class=\"error-message\">
+    <svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">
+        <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\" />
     </svg>
     <div>
-        <h3 class="font-semibold">Error Generating Journey Map</h3>
-        <p class="text-sm">{str(e)}</p>
+        <h3 class=\"font-semibold\">Error Generating Journey Map</h3>
+        <p class=\"text-sm\">{str(e)}</p>
     </div>
 </div>
 """
@@ -4074,93 +3928,741 @@ def api_advanced_search():
 @app.route('/annotated-transcript/<interview_id>/<int:page>')
 def view_annotated_transcript(interview_id, page=1):
     try:
-        app.logger.debug(f"Accessing annotated transcript route for interview {interview_id}, page {page}")
-        
-        # Load the processed interview
+        # Look for the processed file
         processed_file = f'interviews/processed/{interview_id}.json'
-        app.logger.debug(f"Looking for processed file at: {processed_file}")
-        
         if not os.path.exists(processed_file):
-            app.logger.error(f"Interview file not found: {processed_file}")
-            flash('Interview not found', 'error')
-            return redirect(url_for('advanced_search'))
+            return jsonify({'error': 'Interview not found'}), 404
 
         with open(processed_file, 'r') as f:
             interview_data = json.load(f)
 
-        app.logger.info(f"Successfully loaded interview data for {interview_id}")
-        app.logger.debug(f"Interview data keys: {list(interview_data.keys())}")
+        # Extract metadata and chunks
+        metadata = interview_data.get('metadata', {})
+        raw_chunks = interview_data.get('chunks', [])
 
-        # Extract chunks directly from the interview data
-        chunks = []
-        for chunk in interview_data.get('chunks', []):
-            # Process each entry in the chunk
-            for entry in chunk.get('entries', []):
-                chunk_data = {
-                    'speaker': entry.get('speaker', ''),
-                    'timestamp': entry.get('timestamp', ''),
-                    'text': entry.get('text', ''),
-                    'emotion': chunk.get('analysis', {}).get('emotion', ''),
-                    'themes': chunk.get('analysis', {}).get('themes', []),
-                    'insight_tags': chunk.get('analysis', {}).get('insight_tags', [])
-                }
-                chunks.append(chunk_data)
+        # Process chunks to flatten the structure
+        processed_chunks = []
+        for chunk in raw_chunks:
+            chunk_analysis = chunk.get('analysis', {})
+            chunk_data = {
+                'id': chunk.get('id', str(uuid.uuid4())),
+                'timestamp': chunk.get('timestamp', ''),
+                'text': chunk.get('combined_text', ''),
+                'emotion': chunk_analysis.get('emotion', ''),
+                'emotion_intensity': chunk_analysis.get('emotion_intensity', 0),
+                'themes': chunk_analysis.get('themes', []),
+                'insight_tags': chunk_analysis.get('insight_tags', []),
+                'related_feature': chunk_analysis.get('related_feature'),
+                'entries': chunk.get('entries', [])
+            }
+            processed_chunks.append(chunk_data)
 
-        # Check if we need to find a specific timestamp's page
-        target_timestamp = request.args.get('timestamp')
-        if target_timestamp:
-            # Find the index of the chunk with this timestamp
-            for i, chunk in enumerate(chunks):
-                if chunk['timestamp'] == target_timestamp:
-                    # Calculate which page this chunk should be on
-                    page = (i // 50) + 1
-                    break
-
-        # Pagination - increased to 50 items per page
+        # Pagination
         items_per_page = 50
-        total_chunks = len(chunks)
+        total_chunks = len(processed_chunks)
         total_pages = (total_chunks + items_per_page - 1) // items_per_page
-        
+
         # Validate page number
         page = max(1, min(page, total_pages))
-        
-        # Slice chunks for current page
         start_idx = (page - 1) * items_per_page
         end_idx = start_idx + items_per_page
-        current_chunks = chunks[start_idx:end_idx]
 
-        # Prepare interview metadata
-        metadata = interview_data.get('metadata', {})
-        interviewee = metadata.get('interviewee', {})
-        researcher = metadata.get('researcher', {})
+        # Get chunks for current page
+        current_chunks = processed_chunks[start_idx:end_idx]
         
-        interview = {
-            'id': interview_id,
-            'participant_name': interviewee.get('name', ''),
-            'researcher_name': researcher.get('name', ''),
-            'researcher_role': researcher.get('role', 'UX Researcher'),
-            'researcher_email': researcher.get('email', ''),
-            'date': metadata.get('date', ''),
-            'timestamp': metadata.get('date', ''),  # Using date as timestamp
-            'age_range': interviewee.get('age', ''),
-            'location': interviewee.get('location', ''),
-            'occupation': interviewee.get('occupation', ''),
-            'industry': interviewee.get('industry', '')
+        # Prepare the response data
+        response_data = {
+            'interviewee_name': metadata.get('interviewee', {}).get('name', 'Unknown'),
+            'project_name': metadata.get('project', {}).get('name', 'Unknown Project'),
+            'date': metadata.get('date', 'No Date'),
+            'chunks': current_chunks,
+            'pagination': {
+                'current_page': page,
+                'total_pages': total_pages,
+                'total_chunks': total_chunks,
+                'items_per_page': items_per_page
+            }
         }
-
-        app.logger.info(f"Rendering annotated transcript page {page} of {total_pages}")
-        app.logger.debug(f"Chunks on this page: {len(current_chunks)}")
         
-        return render_template('view_annotated_transcript.html',
-                             interview=interview,
-                             chunks=current_chunks,
-                             current_page=page,
-                             total_pages=total_pages)
-
+        return jsonify(response_data)
+        
     except Exception as e:
-        app.logger.error(f"Error loading annotated transcript: {str(e)}", exc_info=True)
-        flash('Error loading interview transcript', 'error')
-        return redirect(url_for('advanced_search'))
+        print(f"Error loading transcript: {str(e)}")
+        return jsonify({'error': 'Failed to load transcript'}), 500
+
+@app.route('/api/discovery/conversation', methods=['POST'])
+def discovery_conversation():
+    """Handle messages in the discovery conversation."""
+    # Immediate debug logging
+    logger.info("=== Starting discovery conversation request ===")
+    logger.info(f"Request method: {request.method}")
+    logger.info(f"Request headers: {dict(request.headers)}")
+    logger.info(f"Request raw data: {request.get_data(as_text=True)}")
+    
+    try:
+        logger.info("Parsing request JSON")
+        data = request.get_json()
+        logger.info(f"Request data: {json.dumps(data, indent=2)}")
+        
+        if not data or 'message' not in data:
+            logger.error("No message provided in request")
+            return jsonify({'error': 'No message provided'}), 400
+            
+        message = data['message']
+        conversation_history = data.get('conversation_history', [])
+        
+        logger.info(f"Processing message: {message}")
+        logger.info(f"Conversation history: {json.dumps(conversation_history, indent=2)}")
+        
+        # Initialize OpenAI client
+        try:
+            logger.info("Creating OpenAI client")
+            client = create_openai_client()
+            if not client:
+                logger.error("Failed to initialize OpenAI client")
+                return jsonify({'error': 'Failed to initialize AI client: No API key found'}), 500
+            logger.info("Successfully initialized OpenAI client")
+        except Exception as e:
+            logger.error(f"Error initializing OpenAI client: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': f'Failed to initialize AI client: {str(e)}'}), 500
+            
+        # Initialize DiscoveryGPT
+        try:
+            discovery_gpt = DiscoveryGPT(client)
+            logger.info("Successfully initialized DiscoveryGPT")
+        except Exception as e:
+            logger.error(f"Error initializing DiscoveryGPT: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': f'Failed to initialize DiscoveryGPT: {str(e)}'}), 500
+        
+        # Process the message using async_to_sync
+        try:
+            logger.info("Processing message with DiscoveryGPT")
+            result = async_to_sync(discovery_gpt.process_message)(message, conversation_history)
+            logger.info(f"Received result: {json.dumps(result, indent=2)}")
+        except Exception as e:
+            logger.error(f"Error processing message: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': f'Error processing message: {str(e)}'}), 500
+        
+        # If the conversation is complete and we have project data
+        if result.get('isComplete') and 'project' in result:
+            try:
+                # Save the project data
+                project_data = result['project']
+                
+                # Create project directory if it doesn't exist
+                project_dir = os.path.join('projects', project_data['name'])
+                os.makedirs(project_dir, exist_ok=True)
+                
+                # Save conversation history
+                conversation_file = os.path.join(project_dir, 'discovery_conversation.json')
+                with open(conversation_file, 'w') as f:
+                    json.dump({
+                        'conversation': conversation_history + [
+                            {'role': 'user', 'content': message},
+                            {'role': 'assistant', 'content': result['response']}
+                        ],
+                        'completed_at': datetime.now().isoformat()
+                    }, f, indent=2)
+                    
+                # Save project data
+                project_file = os.path.join(project_dir, 'project.json')
+                with open(project_file, 'w') as f:
+                    json.dump(project_data, f, indent=2)
+                    
+                logger.info(f"Saved project data for {project_data['name']}")
+            except Exception as e:
+                logger.error(f"Error saving project data: {str(e)}")
+                logger.error(traceback.format_exc())
+                # Continue even if saving fails
+                
+        return jsonify(result)
+        
+    except Exception as e:
+        logger.error(f"Unexpected error in discovery conversation: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/interviews/raw/<interview_id>.json')
+def get_raw_interview(interview_id):
+    """Serve a raw interview file."""
+    try:
+        file_path = Path('interviews/raw') / f"{interview_id}.json"
+        if not file_path.exists():
+            return jsonify({'error': 'Interview not found'}), 404
+            
+        with open(file_path) as f:
+            return jsonify(json.load(f))
+    except Exception as e:
+        logger.error(f"Error serving raw interview: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/interviews/raw')
+def list_raw_interviews():
+    """List all raw interviews."""
+    try:
+        interviews = []
+        raw_dir = Path('interviews/raw')
+        
+        if not raw_dir.exists():
+            return jsonify([])
+            
+        for file in raw_dir.glob('*.json'):
+            try:
+                with open(file) as f:
+                    interview = json.load(f)
+                    # Extract interview ID from filename
+                    interview_id = file.stem
+                    
+                    # Create summary dictionary
+                    summary = {
+                        'id': interview_id,
+                        'title': interview.get('title', 'Untitled Interview'),
+                        'project_name': interview.get('project_name', 'Unassigned'),
+                        'interview_type': interview.get('interview_type', 'Interview'),
+                        'date': interview.get('date', ''),
+                        'transcript': interview.get('transcript', ''),
+                        'interviewee': interview.get('interviewee', ''),
+                        'metadata': interview.get('metadata', {}),
+                        'preview': interview.get('preview', '')
+                    }
+                    interviews.append(summary)
+            except Exception as e:
+                logger.error(f"Error reading interview file {file}: {str(e)}")
+                continue
+                
+        # Sort by date, most recent first
+        interviews.sort(key=lambda x: x.get('date', ''), reverse=True)
+        return jsonify(interviews)
+        
+    except Exception as e:
+        logger.error(f"Error listing raw interviews: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/projects', methods=['GET'])
+def get_projects():
+    try:
+        logger.info("Getting all projects")
+        # Get all project names from both interview directories
+        project_names = set()
+        
+        for dir_path in interview_dirs:
+            if os.path.exists(dir_path):
+                for file in Path(dir_path).glob('*.json'):
+                    try:
+                        with open(file) as f:
+                            interview_data = json.load(f)
+                            project_name = interview_data.get('project_name')
+                            if project_name:
+                                project_names.add(project_name)
+                    except json.JSONDecodeError:
+                        continue
+                    except Exception as e:
+                        logger.error(f"Error reading file {file}: {str(e)}")
+                        continue
+        
+        projects = [{'id': name, 'name': name} for name in sorted(project_names) if name]
+        
+        return jsonify(projects)
+        
+    except Exception as e:
+        logger.error(f"Error in get_projects: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/project/<project_name>/interviews', methods=['GET'])
+def get_project_interviews_alt(project_name):
+    try:
+        logger.info(f"Getting interviews for project: {project_name}")
+        interviews = []
+        
+        if project_name:
+            # Now get all interviews for this project from both directories
+            for dir_path in interview_dirs:
+                if os.path.exists(dir_path):
+                    for file in Path(dir_path).glob('*.json'):
+                        try:
+                            with open(file) as f:
+                                interview_data = json.load(f)
+                                if interview_data.get('project_name') == project_name:
+                                    # Format date for display
+                                    date = interview_data.get('date', '')
+                                    if date:
+                                        try:
+                                            date = datetime.fromisoformat(date)
+                                            formatted_date = date.strftime('%B %d, %Y')
+                                        except ValueError:
+                                            formatted_date = date
+                                    else:
+                                        formatted_date = 'No date'
+                                    
+                                    interviews.append({
+                                        'id': interview_data.get('id'),
+                                        'title': interview_data.get('title', 'Untitled Interview'),
+                                        'date': formatted_date,
+                                        'interview_type': interview_data.get('interview_type', 'Unknown Type')
+                                    })
+                        except json.JSONDecodeError:
+                            continue
+                        except Exception as e:
+                            logger.error(f"Error reading file {file}: {str(e)}")
+                            continue
+        
+        logger.info(f"Found {len(interviews)} interviews for project {project_name}")
+        return jsonify(interviews)
+    except Exception as e:
+        logger.error(f"Error getting project interviews: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/generate_persona', methods=['POST'])
+def api_generate_persona():
+    try:
+        data = request.json
+        # Process the request data here
+        return jsonify({"status": "success"})
+    except Exception as e:
+        logger.error(f"Error in API generate persona: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+# Helper function to generate researcher avatar
+def generate_researcher_avatar(survey_responses):
+    try:
+        # Create a simple avatar based on survey responses
+        avatar_id = random.randint(1000, 9999)
+        img_width, img_height = 400, 400
+        
+        # Background color based on research type
+        if survey_responses.get('research_type') == 'qualitative':
+            bg_color = (65, 105, 225)  # Royal Blue for qualitative
+        else:
+            bg_color = (46, 139, 87)   # Sea Green for quantitative
+        
+        # Create image with background
+        image = Image.new('RGB', (img_width, img_height), bg_color)
+        draw = ImageDraw.Draw(image)
+        
+        # Add some visual elements based on survey responses
+        # Method preference
+        if survey_responses.get('methods') == 'interviews':
+            # Draw interview icon (two circles representing people)
+            draw.ellipse((100, 100, 180, 180), fill=(255, 255, 255, 128))
+            draw.ellipse((220, 100, 300, 180), fill=(255, 255, 255, 128))
+        else:
+            # Draw survey icon (paper with lines)
+            draw.rectangle((150, 100, 250, 200), fill=(255, 255, 255, 128))
+            draw.line((170, 130, 230, 130), fill=(0, 0, 0), width=2)
+            draw.line((170, 150, 230, 150), fill=(0, 0, 0), width=2)
+            draw.line((170, 170, 230, 170), fill=(0, 0, 0), width=2)
+        
+        # Timeline affects border
+        if survey_responses.get('timeline') == 'urgent':
+            # Red border for urgent timeline
+            border_width = 10
+            draw.rectangle((0, 0, img_width-1, img_height-1), outline=(220, 20, 60), width=border_width)
+        
+        # Budget impacts bottom text
+        if survey_responses.get('budget') == 'limited':
+            budget_text = "Cost-Effective Approach"
+        else:
+            budget_text = "Comprehensive Approach"
+        
+        # Use a default font if available
+        try:
+            font = ImageFont.truetype("Arial", 20)
+            draw.text((img_width//2, img_height-50), budget_text, fill=(255, 255, 255), anchor="ms", font=font)
+        except IOError:
+            # If font is not available, skip text
+            pass
+        
+        # Save the image
+        avatar_path = f"static/images/researcher_avatar_{avatar_id}.png"
+        os.makedirs(os.path.dirname(os.path.join(app.root_path, avatar_path)), exist_ok=True)
+        image.save(os.path.join(app.root_path, avatar_path))
+        
+        return avatar_path
+    except Exception as e:
+        logger.error(f"Error generating avatar: {str(e)}")
+        return "static/images/default_researcher.png"
+
+# Generate recommendations based on survey responses
+def generate_research_recommendations(survey_responses):
+    """Generate research method recommendations based on survey responses."""
+    recommendations = {}
+    
+    # Primary objective
+    objective = survey_responses.get('primary_objective')
+    research_type = survey_responses.get('research_type')
+    timeline = survey_responses.get('timeline')
+    budget = survey_responses.get('budget')
+    methods = survey_responses.get('methods')
+    
+    # Primary method
+    if objective == 'user_needs':
+        if research_type == 'qualitative':
+            recommendations['primary_method'] = "In-depth user interviews focusing on needs, pain points, and goals"
+        else:
+            recommendations['primary_method'] = "Large-scale survey with targeted questions about user priorities and pain points"
+    else:  # market validation
+        if research_type == 'qualitative':
+            recommendations['primary_method'] = "Competitor analysis and stakeholder interviews to validate market potential"
+        else:
+            recommendations['primary_method'] = "Market size assessment with segmentation analysis and competitor benchmarking"
+    
+    # Secondary method
+    if timeline == 'urgent':
+        if budget == 'limited':
+            recommendations['secondary_method'] = "Rapid guerrilla usability testing with 5-8 participants"
+        else:
+            recommendations['secondary_method'] = "Fast-turnaround remote moderated testing with 12-15 participants"
+    else:
+        if budget == 'limited':
+            recommendations['secondary_method'] = "Community forum/social media analysis to understand user conversations"
+        else:
+            recommendations['secondary_method'] = "Multi-phase research plan with diary studies and longitudinal analysis"
+    
+    # Innovative approach
+    if methods == 'interviews':
+        if budget == 'limited':
+            recommendations['innovative_approach'] = "Virtual workshop with collaborative whiteboarding to explore concepts"
+        else:
+            recommendations['innovative_approach'] = "Design sprint with key stakeholders and representative users"
+    else:
+        if budget == 'limited':
+            recommendations['innovative_approach'] = "Mobile ethnography using participant-captured videos/photos"
+        else:
+            recommendations['innovative_approach'] = "AI-powered sentiment analysis across customer touchpoints"
+    
+    return recommendations
+
+# Research Survey and Adventure API Routes
+@app.route('/api/submit-research-survey', methods=['POST'])
+def submit_research_survey():
+    """Handle research survey response submission."""
+    try:
+        data = request.json
+        logger.info(f"Received survey data: {data}")
+        
+        # Process survey responses
+        survey_responses = {
+            'primary_objective': data.get('1'),
+            'research_type': data.get('2'),
+            'timeline': data.get('3'),
+            'budget': data.get('4'),
+            'methods': data.get('5')
+        }
+        
+        # Generate avatar for researcher
+        avatar_path = generate_researcher_avatar(survey_responses)
+        if avatar_path:
+            survey_responses['avatar_path'] = avatar_path
+        else:
+            survey_responses['avatar_path'] = 'static/images/default_researcher.png'
+        
+        # Generate recommendations
+        recommendations = generate_research_recommendations(survey_responses)
+        survey_responses['recommendations'] = recommendations
+        
+        # Store in session
+        session['survey_responses'] = survey_responses
+        
+        # Save to database
+        try:
+            survey = ResearchSurveyResponse(
+                primary_objective=survey_responses['primary_objective'],
+                research_type=survey_responses['research_type'],
+                timeline=survey_responses['timeline'],
+                budget=survey_responses['budget'],
+                methods=survey_responses['methods'],
+                avatar_path=survey_responses['avatar_path'],
+                recommendations=recommendations
+            )
+            db.session.add(survey)
+            db.session.commit()
+            logger.info(f"Survey response saved to database with ID: {survey.id}")
+        except Exception as e:
+            logger.error(f"Database error: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'redirect': '/survey-results'
+        })
+    except Exception as e:
+        logger.error(f"Error processing survey: {str(e)}")
+        return jsonify({
+            'success': False,
+            'message': 'An error occurred while processing your responses.'
+        })
+
+@app.route('/api/survey-results', methods=['GET'])
+def api_survey_results():
+    """Return survey results and recommendations."""
+    if 'survey_responses' not in session:
+        return jsonify({
+            'success': False,
+            'message': 'No survey responses found. Please take the survey first.'
+        })
+    
+    survey_responses = session.get('survey_responses', {})
+    return jsonify({
+        'success': True,
+        'survey_responses': survey_responses
+    })
+
+@app.route('/api/game-state', methods=['GET'])
+def game_state():
+    """Get the current state of the research adventure game."""
+    # Initialize or get game state
+    if 'game_state' not in session:
+        # Create initial game state
+        game_state = {
+            'research_methods': [
+                {
+                    'name': 'User Interviews',
+                    'description': 'In-depth conversations with users to understand their needs, behaviors, and pain points.',
+                    'key_researchers': ['Jakob Nielsen', 'Steve Portigal', 'Erika Hall'],
+                    'common_techniques': ['Semi-structured interviews', 'Contextual inquiry', 'Laddering']
+                },
+                {
+                    'name': 'Usability Testing',
+                    'description': 'Observing users as they complete tasks with your product to identify usability issues.',
+                    'key_researchers': ['Don Norman', 'Jakob Nielsen', 'Jared Spool'],
+                    'common_techniques': ['Think-aloud protocol', 'Task analysis', 'Heuristic evaluation']
+                },
+                {
+                    'name': 'Surveys & Questionnaires',
+                    'description': 'Collecting quantitative and qualitative data from many users efficiently.',
+                    'key_researchers': ['Likert', 'Dillman', 'Krosnick'],
+                    'common_techniques': ['Likert scales', 'Multiple choice', 'Open-ended questions']
+                }
+            ],
+            'discovered_methods': [],
+            'current_location': 'Research Center',
+            'history': [{
+                'type': 'system',
+                'text': """Welcome to the Research Discovery Adventure!
+
+You find yourself in the Research Center, surrounded by different methodologies and approaches to understanding user needs. You have a mission to discover the best research methods for your project.
+
+You can:
+- Look around to explore the Research Center
+- Move to different research method areas
+- Explore specific methods in detail
+- Learn about various techniques
+- Talk to famous researchers for advice
+
+Where would you like to start your research journey?"""
+            }]
+        }
+        session['game_state'] = game_state
+    
+    return jsonify({
+        'success': True,
+        'game_state': session['game_state']
+    })
+
+@app.route('/api/game-action', methods=['POST'])
+def game_action():
+    """Handle game actions and commands."""
+    data = request.json
+    command = data.get('command', '').strip().lower()
+    logger.info(f"Game action received: {command}")
+    
+    # Get or initialize game state
+    if 'game_state' not in session:
+        # This will create and return a new game state
+        result = game_state()
+        game_state_data = result.get_json()
+        current_game_state = game_state_data['game_state']
+    else:
+        current_game_state = session.get('game_state', {})
+    
+    # Handle new game command
+    if command == 'new game':
+        # Reset game state
+        result = game_state()
+        game_state_data = result.get_json()
+        current_game_state = game_state_data['game_state']
+        session['game_state'] = current_game_state
+        
+        return jsonify({
+            'success': True,
+            'message': current_game_state['history'][0]['text'],
+            'game_state': current_game_state
+        })
+    
+    # Researcher conversations and method details
+    researcher_info = {
+        'jakob nielsen': {
+            'expertise': 'Usability and User Experience',
+            'famous_for': 'Heuristic Evaluation, Discount Usability Testing',
+            'quote': "Bad usability is like having a store with a locked front door.",
+            'advice': "Start with a small number of participants. You'll find that after testing 5 users, you've discovered most of the major usability issues."
+        },
+        'don norman': {
+            'expertise': 'Cognitive Science and User-Centered Design',
+            'famous_for': 'The Design of Everyday Things, User-Centered Design',
+            'quote': "Good design is actually a lot harder to notice than poor design.",
+            'advice': "Always remember that your users are people with goals, not just users of your system. Design for their goals, not for the technology."
+        },
+        'erika hall': {
+            'expertise': 'Research Methods and Design',
+            'famous_for': 'Just Enough Research',
+            'quote': "The most expensive research is the research you don't do.",
+            'advice': "Start with the right questions, not with the methods. Methods should serve your research questions, not the other way around."
+        }
+    }
+    
+    method_details = {
+        'user interviews': {
+            'overview': "User interviews are structured conversations designed to gather insights about users' experiences, needs, and pain points.",
+            'when_to_use': "Early in the research process to understand user needs and goals, or later to dive deeper into specific issues.",
+            'advantages': "Flexible, allows for follow-up questions, builds empathy, provides rich qualitative data.",
+            'challenges': "Time-consuming, potential for bias, requires good interviewing skills, small sample sizes.",
+            'key_techniques': [
+                "Ask open-ended questions to encourage detailed responses",
+                "Use the 'five whys' technique to get to underlying motivations",
+                "Avoid leading questions that suggest a desired answer"
+            ]
+        },
+        'usability testing': {
+            'overview': "Usability testing involves observing users as they attempt to complete tasks with a product or prototype.",
+            'when_to_use': "When you have a specific design or prototype to evaluate and want to identify usability issues.",
+            'advantages': "Directly observes user behavior, identifies specific problems, provides clear evidence for stakeholders.",
+            'challenges': "Can be resource-intensive to set up, may require special equipment, participation incentives.",
+            'key_techniques': [
+                "Think-aloud protocol: Ask users to verbalize their thoughts as they interact with the product",
+                "Task-based testing: Have users complete specific, realistic tasks",
+                "Remote testing: Use screen sharing software to test with geographically dispersed users"
+            ]
+        },
+        'surveys': {
+            'overview': "Surveys collect structured data from many users through standardized questions.",
+            'when_to_use': "When you need quantitative data from a large sample, or to validate findings from qualitative research.",
+            'advantages': "Reaches many users quickly, provides quantifiable data, cost-effective for large samples.",
+            'challenges': "Limited depth, can't follow up on answers, response bias, question design is critical.",
+            'key_techniques': [
+                "Use Likert scales (1-5 or 1-7) for measuring attitudes",
+                "Include a mix of closed and open-ended questions",
+                "Keep surveys short to improve completion rates",
+                "Test your survey with a small group before wide distribution"
+            ]
+        }
+    }
+    
+    # Handle researcher conversations
+    if any(name in command for name in researcher_info.keys()):
+        for name, info in researcher_info.items():
+            if name in command:
+                response = f"You approach {name.title()}, known for expertise in {info['expertise']}.\n\n"
+                response += f"'{info['quote']}'\n\n"
+                response += f"Their advice for you: {info['advice']}"
+                break
+        else:
+            response = "I'm not sure which researcher you'd like to talk to. Try asking about Jakob Nielsen, Don Norman, or Erika Hall."
+    
+    # Handle method exploration
+    elif any(method in command for method in method_details.keys()):
+        for method_name, details in method_details.items():
+            if method_name in command:
+                # Add to discovered methods if not already there
+                method_discovered = False
+                for discovered in current_game_state['discovered_methods']:
+                    if discovered.get('name', '').lower() == method_name:
+                        method_discovered = True
+                        break
+                
+                if not method_discovered:
+                    for method in current_game_state['research_methods']:
+                        if method['name'].lower() == method_name or method_name in method['name'].lower():
+                            current_game_state['discovered_methods'].append({
+                                'name': method['name'],
+                                'description': method['description'],
+                                'researchers': method['key_researchers']
+                            })
+                            break
+                
+                response = f"**{method_name.title()} Method Overview**\n\n"
+                response += f"{details['overview']}\n\n"
+                response += f"**When to use:** {details['when_to_use']}\n\n"
+                response += f"**Advantages:** {details['advantages']}\n\n"
+                response += f"**Challenges:** {details['challenges']}\n\n"
+                response += "**Key Techniques:**\n"
+                for technique in details['key_techniques']:
+                    response += f"- {technique}\n"
+                
+                current_game_state['current_location'] = method_name.title()
+                break
+        else:
+            response = "I'm not sure which research method you'd like to explore. Try user interviews, usability testing, or surveys."
+    
+    # Handle look around command
+    elif any(word in command for word in ['look', 'see', 'where', 'around']):
+        current_location = current_game_state['current_location']
+        
+        if current_location == 'Research Center':
+            response = """You're in the Research Center, a hub of activity where researchers plan their studies and analyze their findings.
+
+Around you are different areas representing various research methods:
+- User Interviews section with comfortable chairs and recording equipment
+- Usability Testing lab with one-way mirrors and testing stations
+- Surveys & Questionnaires area with statistical models and data visualizations
+
+Each area contains experts and resources to help you learn more about that research method. Where would you like to go?"""
+        else:
+            # Return information about the current method location
+            for method_name, details in method_details.items():
+                if method_name in current_location.lower():
+                    response = f"You're in the {current_location} area.\n\n"
+                    response += f"{details['overview']}\n\n"
+                    response += "You can see researchers working on projects and various tools related to this method."
+                    break
+            else:
+                response = f"You're in the {current_location} area. Look around to see what's available, or try moving to a specific research method area."
+    
+    # Handle movement
+    elif any(word in command for word in ['go', 'move', 'walk', 'head']):
+        if 'center' in command or 'main' in command:
+            current_game_state['current_location'] = 'Research Center'
+            response = "You return to the Research Center, where you can see all the different research method areas."
+        elif 'interview' in command:
+            current_game_state['current_location'] = 'User Interviews'
+            response = "You move to the User Interviews area, where researchers are conducting in-depth conversations with participants."
+        elif 'usability' in command or 'testing' in command:
+            current_game_state['current_location'] = 'Usability Testing'
+            response = "You enter the Usability Testing lab, with its observation rooms and testing stations."
+        elif 'survey' in command or 'questionnaire' in command:
+            current_game_state['current_location'] = 'Surveys & Questionnaires'
+            response = "You walk over to the Surveys & Questionnaires area, filled with statistical models and data analysis tools."
+        else:
+            response = "I'm not sure where you want to go. Try 'go to interviews', 'move to usability testing', or 'return to research center'."
+    
+    # Handle help command
+    elif 'help' in command:
+        response = """**Research Adventure Help**
+
+You can use these commands:
+- **Look/See**: Explore your current location
+- **Go/Move to [location]**: Move to a different area (Research Center, User Interviews, Usability Testing, Surveys)
+- **Explore [method]**: Learn details about a specific research method
+- **Talk to [researcher]**: Get advice from famous researchers like Jakob Nielsen or Don Norman
+- **Help**: Show this help message
+
+Your goal is to discover different research methods and techniques to build your research plan."""
+    
+    # Default response
+    else:
+        response = "I'm not sure what you want to do. Try 'look around', 'explore user interviews', or 'help' for more options."
+    
+    # Save updated game state
+    session['game_state'] = current_game_state
+    
+    return jsonify({
+        'success': True,
+        'message': response,
+        'game_state': current_game_state
+    })
 
 if __name__ == '__main__':
     socketio.run(app, 
@@ -4168,4 +4670,5 @@ if __name__ == '__main__':
         port=5003,
         debug=True,
         use_reloader=True
-    ) 
+    )
+
