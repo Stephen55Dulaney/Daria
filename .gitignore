@@ -4,6 +4,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
+env/
 build/
 develop-eggs/
 dist/
@@ -22,8 +23,8 @@ wheels/
 
 # Virtual Environment
 venv/
-env/
 ENV/
+env/
 
 # IDE
 .idea/
@@ -31,34 +32,33 @@ ENV/
 *.swp
 *.swo
 
-# Jupyter Notebook
-.ipynb_checkpoints
-*.ipynb
-
-# Environment variables
+# Node/Frontend
+node_modules/
+frontend/.vite/
+frontend/dist/
+frontend/build/
 .env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Data and Models
-data/*
-!data/.gitkeep
-models/*
-!models/.gitkeep
+# Database
+instance/
+*.db
+*.sqlite3
 
-# Logs
-*.log
-logs/
-tensorboard/
-
-# OS
-.DS_Store
-Thumbs.db
-
-# Vector Store
-vector_store/
+# Generated files
+static/images/researcher_avatar_*.png
+vector_store
 vector_store_metadata.json
 
-# Generated Content
-personas/*.json
-interviews/*.json
-journey_maps/*.json 
-node_modules
+# Misc
+.DS_Store
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
