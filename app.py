@@ -70,6 +70,9 @@ app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')  # Add OpenAI API key
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Global directories
+interview_dirs = ['interviews', 'interviews/raw', 'interviews/processed']
+
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
 
@@ -699,8 +702,8 @@ def list_personas(limit=None):
                     persona['last_modified'] = persona.get('date', datetime.now().isoformat())
                 personas.append(persona)
     
-    # Sort by last modified date, most recent first
-    personas.sort(key=lambda x: x.get('last_modified', ''), reverse=True)
+    # Sort personas by creation date, most recent first
+    personas.sort(key=lambda x: x.get('created_at') or '', reverse=True)
     
     if limit:
         personas = personas[:limit]
@@ -2346,7 +2349,7 @@ def list_personas():
                 continue
         
         # Sort personas by creation date, most recent first
-        personas.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        personas.sort(key=lambda x: x.get('created_at') or '', reverse=True)
         return jsonify(personas)
         
     except Exception as e:
@@ -4220,11 +4223,53 @@ def get_project_interviews_alt(project_name):
 def api_generate_persona():
     try:
         data = request.json
-        # Process the request data here
-        return jsonify({"status": "success"})
+        project_id = data.get('project_id')
+        interview_ids = data.get('interview_ids', [])
+        model = data.get('model', 'gpt-4')
+
+        if not project_id or not interview_ids:
+             return jsonify({'error': 'Project ID and at least one interview ID are required.'}), 400
+
+        interview_data = []
+        for interview_id in interview_ids:
+            interview = get_interview(interview_id)
+            if interview:
+                # Ensure transcript exists, default to empty string if not
+                interview['transcript'] = interview.get('transcript', '') 
+                interview_data.append(interview)
+
+        if not interview_data:
+            return jsonify({'error': 'No valid interviews found for the provided IDs.'}), 404
+
+        interview_texts = [i['transcript'] for i in interview_data]
+
+        # Generate persona using the multi-step process
+        from src.persona_gpt import generate_persona_from_interviews
+        # Pass the user's preferred base model (e.g., gpt-4) for synthesis
+        # The function itself will upgrade to gpt-4-turbo for final generation
+        persona_data = generate_persona_from_interviews(
+            interview_texts=interview_texts,
+            project_name=project_id,
+            model=model # Pass user's choice for synthesis stage
+        )
+
+        # Successfully generated
+        return jsonify(persona_data)
+
+    except ValueError as ve:
+        # Catch specific errors raised from persona_gpt (like JSON parsing, validation, context limit)
+        logger.error(f"ValueError during persona generation: {str(ve)}")
+        # Return a specific error message to the frontend
+        return jsonify({"error": f"Persona Generation Error: {str(ve)}"}), 500
+    except NotImplementedError as nie:
+        # Catch if Claude model was selected but logic isn't updated
+        logger.error(f"NotImplementedError: {str(nie)}")
+        return jsonify({"error": str(nie)}), 501 # 501 Not Implemented
     except Exception as e:
-        logger.error(f"Error in API generate persona: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        # Catch any other unexpected errors
+        logger.error(f"Unexpected error in /api/generate_persona: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({"error": "An unexpected internal server error occurred."}), 500
 
 # Helper function to generate researcher avatar
 def generate_researcher_avatar(survey_responses):
