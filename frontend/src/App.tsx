@@ -8,6 +8,8 @@ import Archive from './pages/Archive'
 import Persona from './pages/Persona'
 import CreatePersonas from './pages/CreatePersonas'
 import JourneyMap from './pages/JourneyMap'
+import PersonasGallery from './pages/PersonasGallery'
+import JourneyMapsGallery from './pages/JourneyMapsGallery'
 import AnnotatedTranscript from './pages/AnnotatedTranscript'
 import PersonaGenerator from './pages/PersonaGenerator'
 import AdvancedSearch from './pages/AdvancedSearch'
@@ -16,6 +18,8 @@ import CreateInterview from './pages/CreateInterview'
 import ResearchSurvey from './pages/ResearchSurvey'
 import SurveyResults from './pages/SurveyResults'
 import ResearchAdventure from './pages/ResearchAdventure'
+import ViewPersona from './pages/Persona/ViewPersona'
+import ViewJourneyMap from './pages/JourneyMap/ViewJourneyMap'
 
 const App: React.FC = () => {
   return (
@@ -30,6 +34,8 @@ const App: React.FC = () => {
           <Route path="/persona" element={<Persona />} />
           <Route path="/create-personas" element={<CreatePersonas />} />
           <Route path="/journey-map" element={<JourneyMap />} />
+          <Route path="/personas" element={<PersonasGallery />} />
+          <Route path="/journey-maps" element={<JourneyMapsGallery />} />
           <Route path="/annotated-transcript/:transcriptId" element={<AnnotatedTranscript />} />
           <Route path="/persona-generator" element={<PersonaGenerator />} />
           <Route path="/advanced-search" element={<AdvancedSearch />} />
@@ -38,6 +44,8 @@ const App: React.FC = () => {
           <Route path="/research-survey" element={<ResearchSurvey />} />
           <Route path="/survey-results" element={<SurveyResults />} />
           <Route path="/research-adventure" element={<ResearchAdventure />} />
+          <Route path="/view-persona/:id" element={<ViewPersona />} />
+          <Route path="/view-journey-map/:id" element={<ViewJourneyMap />} />
           {/* Add more routes as we build them */}
         </Routes>
       </Layout>
