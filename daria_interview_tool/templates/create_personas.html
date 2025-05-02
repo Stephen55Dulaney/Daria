@@ -1,0 +1,365 @@
+{% extends "base.html" %}
+
+{% block title %}Create Personas - {{ project_name }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .content-grid {
+        display: grid;
+        grid-template-columns: 50px 1fr;
+        gap: 0;
+    }
+
+    .line-numbers {
+        counter-reset: line;
+        padding: 1rem 0.5rem;
+        background: #f8f9fa;
+        border-right: 1px solid #e5e7eb;
+        text-align: right;
+        user-select: none;
+        color: #6b7280;
+        font-family: monospace;
+    }
+
+    .line-number {
+        display: block;
+        counter-increment: line;
+        height: 1.5rem;
+        line-height: 1.5rem;
+    }
+
+    .line-number::before {
+        content: counter(line);
+    }
+
+    .content-lines > * {
+        min-height: 1.5rem;
+        line-height: 1.5rem;
+        padding: 0 1rem;
+    }
+
+    .slider-container {
+        width: 200px;
+        margin: 10px 0;
+    }
+
+    .slider-label {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 5px;
+    }
+
+    .section-header {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-top: 1.5rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .content-editable {
+        cursor: pointer;
+    }
+
+    .content-editable:hover {
+        background-color: #f3f4f6;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<!-- Project Header -->
+<h1 class="text-3xl font-bold mb-6">Create Personas for {{ project_name }}</h1>
+
+<!-- Uploaded Transcripts Section -->
+<div class="bg-white rounded-lg shadow p-6 mb-6">
+    <h2 class="text-xl font-semibold mb-4">Uploaded Transcripts</h2>
+    <div class="flex gap-4 mb-4">
+        <input type="text" id="searchInput" placeholder="Search interviews..." class="flex-grow p-2 border rounded">
+        <button id="searchButton" class="bg-blue-500 text-white px-4 py-2 rounded">Search</button>
+    </div>
+    
+    <!-- Search Results -->
+    <div id="searchResults" class="mb-4"></div>
+    
+    <!-- Selected Transcripts -->
+    <div id="selectedTranscripts" class="flex flex-wrap gap-4 mb-4"></div>
+
+    <!-- Generate Persona Button -->
+    <button id="generatePersonaBtn" class="bg-green-500 text-white px-6 py-2 rounded hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+        Generate Persona from Selected Interviews
+    </button>
+</div>
+
+<!-- Personas Tabs -->
+<div class="bg-white rounded-lg shadow mb-6">
+    <div class="border-b">
+        <div id="personaTabs" class="flex"></div>
+        <button id="addPersonaTab" class="p-2 text-blue-500">+ Add Persona</button>
+    </div>
+</div>
+
+<!-- Main Content Area -->
+<div class="flex gap-6">
+    <!-- Left Column - Persona Content -->
+    <div class="flex-grow bg-white rounded-lg shadow">
+        <div class="content-grid">
+            <!-- Line Numbers Column -->
+            <div class="line-numbers" id="lineNumbers"></div>
+            
+            <!-- Content Column -->
+            <div class="content-lines" id="personaContent">
+                <!-- Header Section -->
+                <div class="flex items-start gap-6 p-6">
+                    <img id="personaImage" src="/static/images/default-avatar.png" alt="Persona" class="w-32 h-32 object-cover rounded-lg">
+                    <div>
+                        <h2 id="personaName" class="text-2xl font-bold mb-2 content-editable">Name: [Click to Edit]</h2>
+                        <p id="personaQuote" class="text-lg italic content-editable">"[Click to Edit Quote]"</p>
+                    </div>
+                </div>
+
+                <!-- Demographic Profile -->
+                <div class="section-header">Demographic Profile</div>
+                <div id="demographicProfile" class="space-y-2">
+                    <!-- Content will be generated -->
+                </div>
+
+                <!-- Goals and Needs -->
+                <div class="section-header">Goals and Needs</div>
+                <ul id="goalsAndNeeds" class="list-disc ml-6 space-y-2">
+                    <!-- Content will be generated -->
+                </ul>
+
+                <!-- Motivations -->
+                <div class="section-header">Motivations</div>
+                <ul id="motivations" class="list-disc ml-6 space-y-2">
+                    <!-- Content will be generated -->
+                </ul>
+
+                <!-- Frustrations -->
+                <div class="section-header">Frustrations</div>
+                <ul id="frustrations" class="list-disc ml-6 space-y-2">
+                    <!-- Content will be generated -->
+                </ul>
+
+                <!-- Everyday Activities -->
+                <div class="section-header">Everyday Activities</div>
+                <ul id="everydayActivities" class="list-disc ml-6 space-y-2">
+                    <!-- Content will be generated -->
+                </ul>
+
+                <!-- Device Usage -->
+                <div class="section-header">Devices and Internet Usage</div>
+                <div id="deviceUsage" class="space-y-4 p-4">
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Desktop Devices</span>
+                            <span class="value">50%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="w-full">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Mobile Devices</span>
+                            <span class="value">50%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="w-full">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Social Media</span>
+                            <span class="value">50%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="w-full">
+                    </div>
+                    <div class="slider-container">
+                        <div class="slider-label">
+                            <span>Technical Know-how</span>
+                            <span class="value">50%</span>
+                        </div>
+                        <input type="range" min="0" max="100" value="50" class="w-full">
+                    </div>
+                </div>
+
+                <!-- Notable Quotes -->
+                <div class="section-header">Notable Quotes</div>
+                <div id="notableQuotes" class="space-y-4">
+                    <!-- Content will be generated -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Right Column - Chat Interface -->
+    <div class="w-1/3 bg-white rounded-lg shadow p-6">
+        <div class="flex flex-col h-full">
+            <div id="chatMessages" class="flex-grow overflow-y-auto mb-4 space-y-4">
+                <!-- Chat messages will appear here -->
+            </div>
+            <div class="border-t pt-4">
+                <div class="flex gap-2 mb-2">
+                    <button id="uploadImage" class="p-2 text-blue-500 border rounded">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                        </svg>
+                    </button>
+                    <button id="uploadFile" class="p-2 text-blue-500 border rounded">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13" />
+                        </svg>
+                    </button>
+                </div>
+                <div class="flex gap-2">
+                    <input type="text" id="chatInput" placeholder="Type your message..." class="flex-grow p-2 border rounded">
+                    <button id="sendMessage" class="bg-blue-500 text-white px-4 py-2 rounded">
+                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="/static/js/persona.js"></script>
+<script>
+    // Initialize line numbers
+    function updateLineNumbers() {
+        const content = document.getElementById('personaContent');
+        const lineNumbers = document.getElementById('lineNumbers');
+        lineNumbers.innerHTML = '';
+        
+        const elements = content.querySelectorAll('*:not(.slider-container):not(.slider-label):not(input)');
+        elements.forEach(() => {
+            const span = document.createElement('span');
+            span.className = 'line-number';
+            lineNumbers.appendChild(span);
+        });
+    }
+
+    // Initialize sliders
+    document.querySelectorAll('input[type="range"]').forEach(slider => {
+        const valueDisplay = slider.previousElementSibling.querySelector('.value');
+        slider.addEventListener('input', () => {
+            valueDisplay.textContent = `${slider.value}%`;
+        });
+    });
+
+    // Search functionality
+    document.getElementById('searchButton').addEventListener('click', async () => {
+        const query = document.getElementById('searchInput').value;
+        try {
+            const response = await fetch('/search_interviews', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ query }),
+            });
+            const data = await response.json();
+            displaySearchResults(data.results);
+        } catch (error) {
+            console.error('Error searching interviews:', error);
+        }
+    });
+
+    function displaySearchResults(results) {
+        const container = document.getElementById('searchResults');
+        container.innerHTML = results.map(result => `
+            <div class="flex items-center gap-2 p-2 border-b">
+                <input type="checkbox" value="${result.id}" class="interview-checkbox">
+                <span>${result.project_name} - ${result.date}</span>
+            </div>
+        `).join('');
+
+        // Update generate button state
+        updateGenerateButtonState();
+    }
+
+    // Track selected interviews and update button state
+    const selectedInterviews = new Set();
+
+    function updateGenerateButtonState() {
+        const generateBtn = document.getElementById('generatePersonaBtn');
+        generateBtn.disabled = selectedInterviews.size === 0;
+    }
+
+    // Add selected transcripts
+    document.getElementById('searchResults').addEventListener('change', (e) => {
+        if (e.target.classList.contains('interview-checkbox')) {
+            const container = document.getElementById('selectedTranscripts');
+            const interviewId = e.target.value;
+            
+            if (e.target.checked) {
+                selectedInterviews.add(interviewId);
+                container.innerHTML += `
+                    <div class="p-2 bg-gray-100 rounded flex items-center gap-2" data-interview-id="${interviewId}">
+                        <span>Interview ${interviewId}</span>
+                        <button class="text-red-500" onclick="removeSelectedInterview('${interviewId}')">×</button>
+                    </div>
+                `;
+            } else {
+                selectedInterviews.delete(interviewId);
+                container.querySelector(`[data-interview-id="${interviewId}"]`)?.remove();
+            }
+            
+            updateGenerateButtonState();
+        }
+    });
+
+    function removeSelectedInterview(interviewId) {
+        selectedInterviews.delete(interviewId);
+        document.querySelector(`[data-interview-id="${interviewId}"]`).remove();
+        const checkbox = document.querySelector(`input[value="${interviewId}"]`);
+        if (checkbox) checkbox.checked = false;
+        updateGenerateButtonState();
+    }
+
+    // Generate Persona button click handler
+    document.getElementById('generatePersonaBtn').addEventListener('click', async () => {
+        if (selectedInterviews.size === 0) {
+            alert('Please select at least one interview transcript');
+            return;
+        }
+
+        try {
+            const response = await fetch('/generate_persona', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    interview_ids: Array.from(selectedInterviews),
+                    project_name: document.querySelector('h1').textContent.split('Create Personas for ')[1]
+                })
+            });
+
+            const data = await response.json();
+            if (data.error) {
+                throw new Error(data.error);
+            }
+
+            // Create a new persona with the generated content
+            window.personaManager.populateFromAnalysis(data);
+        } catch (error) {
+            console.error('Error generating persona:', error);
+            alert('Error generating persona content. Please try again.');
+        }
+    });
+
+    // Initialize the page
+    document.addEventListener('DOMContentLoaded', () => {
+        updateLineNumbers();
+        
+        // Add mutation observer to update line numbers when content changes
+        const observer = new MutationObserver(updateLineNumbers);
+        observer.observe(document.getElementById('personaContent'), {
+            childList: true,
+            subtree: true,
+            characterData: true
+        });
+    });
+</script>
+{% endblock %} 

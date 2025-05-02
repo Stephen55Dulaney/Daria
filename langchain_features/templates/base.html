@@ -1,0 +1,14 @@
+{% extends "langchain/base.html" %}
+
+{% block content %}
+    <div class="container">
+        <nav aria-label="breadcrumb" class="mt-3 mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="/dashboard">Home</a></li>
+                {% block breadcrumbs %}{% endblock %}
+            </ol>
+        </nav>
+        
+        {% block inner_content %}{% endblock %}
+    </div>
+{% endblock %} 

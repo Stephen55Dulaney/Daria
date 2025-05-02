@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+
+{% block title %}Generate Interview Link{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+          <h3 class="card-title mb-0">Generate Secure Interview Link</h3>
+        </div>
+        <div class="card-body">
+          <form method="POST">
+            <div class="mb-3">
+              <label for="interview_type" class="form-label">Interview Type</label>
+              <select class="form-select" id="interview_type" name="interview_type" required>
+                <option value="general">General Research Interview</option>
+                <option value="ux">UX Research</option>
+                <option value="product">Product Feedback</option>
+                <option value="customer">Customer Experience</option>
+                <option value="custom">Custom Interview</option>
+              </select>
+            </div>
+            
+            <div class="mb-3">
+              <label for="participant_email" class="form-label">Participant Email</label>
+              <input type="email" class="form-control" id="participant_email" name="participant_email" 
+                    placeholder="participant@example.com" required>
+              <div class="form-text text-muted">This is used for identification only. No emails will be sent automatically.</div>
+            </div>
+            
+            <div class="mb-3">
+              <label for="interview_prompt" class="form-label">Interview Prompt/Instructions</label>
+              <textarea class="form-control" id="interview_prompt" name="interview_prompt" rows="4" required>Thank you for participating in this interview. You'll be asked a series of questions about your experience and background. Please answer as thoroughly as possible.</textarea>
+              <div class="form-text text-muted">This will be shown to the participant at the start of the interview.</div>
+            </div>
+            
+            <div class="row mb-3">
+              <div class="col-md-6">
+                <label for="interview_duration" class="form-label">Estimated Duration (minutes)</label>
+                <input type="number" class="form-control" id="interview_duration" name="interview_duration" 
+                      min="5" max="120" value="30" required>
+              </div>
+              
+              <div class="col-md-6">
+                <label for="expiration_days" class="form-label">Link Expires After (days)</label>
+                <input type="number" class="form-control" id="expiration_days" name="expiration_days" 
+                      min="1" max="30" value="7" required>
+              </div>
+            </div>
+            
+            <div class="alert alert-info">
+              <h5><i class="fas fa-lock"></i> Security Information</h5>
+              <p class="mb-0">This will generate a secure, unique link that you can send to the participant. 
+              The link contains a cryptographically secure token that validates the participant's access.
+              For enhanced security in production, consider implementing:</p>
+              <ul class="mb-0 mt-2">
+                <li>Email verification</li>
+                <li>IP address limitations</li>
+                <li>End-to-end encryption of responses</li>
+                <li>Data access controls</li>
+              </ul>
+            </div>
+            
+            <div class="d-grid gap-2">
+              <button type="submit" class="btn btn-primary">Generate Secure Link</button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

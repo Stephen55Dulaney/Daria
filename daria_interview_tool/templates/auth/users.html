@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Users{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Manage Users</h1>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <table class="min-w-full divide-y divide-gray-200">
+      <thead class="bg-gray-50">
+        <tr>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Name</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Email</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Role</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Login</th>
+          <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-gray-200">
+        {% for user in users %}
+        <tr>
+          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{{ user.name }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{{ user.email }}</td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            <select 
+              class="role-select border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+              data-user-id="{{ user.id }}"
+              {% if user.id == current_user.id %}disabled{% endif %}
+            >
+              {% for role in ['admin', 'interviewer', 'manager', 'viewer'] %}
+              <option value="{{ role }}" {% if role == user.role %}selected{% endif %}>
+                {{ role|title }}
+              </option>
+              {% endfor %}
+            </select>
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {{ user.last_login or 'Never' }}
+          </td>
+          <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+            {% if user.id != current_user.id %}
+            <button 
+              class="text-indigo-600 hover:text-indigo-900 reset-api-key"
+              data-user-id="{{ user.id }}"
+            >
+              Reset API Key
+            </button>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  // Handle role changes
+  document.querySelectorAll('.role-select').forEach(select => {
+    select.addEventListener('change', async function() {
+      const userId = this.dataset.userId;
+      const newRole = this.value;
+      
+      try {
+        const response = await fetch(`/auth/users/${userId}`, {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ role: newRole })
+        });
+        
+        if (!response.ok) throw new Error('Failed to update role');
+        
+        // Show success message
+        alert('Role updated successfully');
+      } catch (error) {
+        console.error('Error:', error);
+        alert('Failed to update role');
+        // Reset select to previous value
+        this.value = this.getAttribute('data-original-value');
+      }
+    });
+    
+    // Store original value
+    select.setAttribute('data-original-value', select.value);
+  });
+});
+</script>
+{% endblock %} 

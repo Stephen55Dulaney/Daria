@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block title %}Home - DARIA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Welcome to DARIA</h1>
+    <p>Deloitte Advanced Research & Interview Assistant</p>
+    
+    {% if current_user.is_authenticated %}
+        <div class="mt-4">
+            <h2>Your Dashboard</h2>
+            <p>Welcome back, {{ current_user.name }}!</p>
+            <p>Your role: {{ current_user.role }}</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -1,0 +1,619 @@
+{% extends "base.html" %}
+
+{% block title %}Import Transcript{% endblock %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/upload_transcript.css') }}">
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1>Import Transcript</h1>
+    
+    <form id="uploadTranscriptForm">
+        <!-- Step 1: Researcher Information -->
+        <div class="step-container">
+            <div class="step-header">
+                <span class="step-number">1</span>
+                <h2 class="step-title">Researcher Information</h2>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Researcher Name</label>
+                    <input type="text" id="researcherName" name="researcherName" 
+                           class="form-input"
+                           placeholder="Enter researcher name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Researcher Email</label>
+                    <input type="email" id="researcherEmail" name="researcherEmail" 
+                           class="form-input"
+                           placeholder="Enter researcher email" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Researcher Role</label>
+                    <input type="text" id="researcherRole" name="researcherRole" 
+                           class="form-input"
+                           placeholder="Enter researcher role" required>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 2: Transcript Configuration -->
+        <div class="step-container">
+            <div class="step-header">
+                <span class="step-number">2</span>
+                <h2 class="step-title">Transcript Configuration</h2>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Project Name</label>
+                    <input type="text" id="projectName" name="projectName" 
+                           class="form-input"
+                           placeholder="Enter project name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Interview Type</label>
+                    <div class="radio-group">
+                        <label class="radio-label">
+                            <input type="radio" name="interviewType" value="Persona Interview" class="radio-input" required>
+                            Persona Interview
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="interviewType" value="Journey Map Interview" class="radio-input">
+                            Journey Map Interview
+                        </label>
+                        <label class="radio-label">
+                            <input type="radio" name="interviewType" value="Application Interview" class="radio-input">
+                            Application Interview
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">Project Description</label>
+                    <textarea id="projectDescription" name="projectDescription" 
+                              class="form-textarea"
+                              rows="4" placeholder="Enter project description" required></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Transcript Name</label>
+                    <input type="text" id="transcriptName" name="transcriptName" 
+                           class="form-input"
+                           placeholder="Enter transcript name" required>
+                </div>
+
+                <div class="form-group" style="grid-column: 1 / -1;">
+                    <label class="form-label">Upload Transcript</label>
+                    <div class="dropzone" id="dropZone">
+                        <div class="dropzone-content">
+                            <svg class="upload-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                <path d="M4 16L4 17C4 18.6569 5.34315 20 7 20L17 20C18.6569 20 20 18.6569 20 17L20 16M16 8L12 4M12 4L8 8M12 4L12 16" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                            <div class="dropzone-text">
+                                <span class="primary-text">Drag and drop your file here, or</span>
+                                <label class="browse-label">
+                                    <span class="browse-text">browse</span>
+                                    <input id="transcriptFile" name="transcriptFile" type="file" accept=".txt,.doc,.docx,.pdf">
+                                </label>
+                            </div>
+                            <p class="file-hint">TXT, DOC, DOCX, or PDF up to 10MB</p>
+                        </div>
+                        <div id="selectedFile" class="selected-file hidden">
+                            <div class="file-info">
+                                <svg class="file-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M14 2H6C4.89543 2 4 2.89543 4 4V20C4 21.1046 4.89543 22 6 22H18C19.1046 22 20 21.1046 20 20V8L14 2Z" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                    <path d="M14 2V8H20" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                                <span id="fileName" class="file-name"></span>
+                            </div>
+                            <button type="button" id="removeFile" class="remove-file" aria-label="Remove file">
+                                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                    <path d="M18 6L6 18M6 6L18 18" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 3: Interviewee Information -->
+        <div class="step-container">
+            <div class="step-header">
+                <span class="step-number">3</span>
+                <h2 class="step-title">Interviewee Information</h2>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Interviewee Name</label>
+                    <input type="text" id="intervieweeName" name="intervieweeName" 
+                           class="form-input"
+                           placeholder="Enter interviewee's name" required>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Age Range</label>
+                    <select id="intervieweeAge" name="intervieweeAge" class="form-select">
+                        <option value="">Select age range</option>
+                        <option value="18-24">18-24</option>
+                        <option value="25-34">25-34</option>
+                        <option value="35-44">35-44</option>
+                        <option value="45-54">45-54</option>
+                        <option value="55-64">55-64</option>
+                        <option value="65+">65+</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Gender</label>
+                    <select id="intervieweeGender" name="intervieweeGender" class="form-select">
+                        <option value="">Select gender</option>
+                        <option value="male">Male</option>
+                        <option value="female">Female</option>
+                        <option value="non-binary">Non-binary</option>
+                        <option value="prefer-not-to-say">Prefer not to say</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Location</label>
+                    <input type="text" id="intervieweeLocation" name="intervieweeLocation" 
+                           class="form-input"
+                           placeholder="City, State">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Occupation</label>
+                    <input type="text" id="intervieweeOccupation" name="intervieweeOccupation" 
+                           class="form-input"
+                           placeholder="Enter occupation">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Industry</label>
+                    <input type="text" id="intervieweeIndustry" name="intervieweeIndustry" 
+                           class="form-input"
+                           placeholder="Enter industry">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Years of Experience</label>
+                    <input type="number" id="intervieweeExperience" name="intervieweeExperience" 
+                           class="form-input"
+                           placeholder="Years in current role">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Education Level</label>
+                    <select id="intervieweeEducation" name="intervieweeEducation" class="form-select">
+                        <option value="">Select education level</option>
+                        <option value="high-school">High School</option>
+                        <option value="associates">Associate's Degree</option>
+                        <option value="bachelors">Bachelor's Degree</option>
+                        <option value="masters">Master's Degree</option>
+                        <option value="doctorate">Doctorate</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Step 4: Technology Information -->
+        <div class="step-container">
+            <div class="step-header">
+                <span class="step-number">4</span>
+                <h2 class="step-title">Technology Information</h2>
+            </div>
+            
+            <div class="form-grid">
+                <div class="form-group">
+                    <label class="form-label">Device Type</label>
+                    <select id="deviceType" name="deviceType" class="form-select">
+                        <option value="">Select device type</option>
+                        <option value="desktop">Desktop</option>
+                        <option value="laptop">Laptop</option>
+                        <option value="tablet">Tablet</option>
+                        <option value="mobile">Mobile</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Operating System</label>
+                    <select id="operatingSystem" name="operatingSystem" class="form-select">
+                        <option value="">Select operating system</option>
+                        <option value="windows">Windows</option>
+                        <option value="macos">macOS</option>
+                        <option value="linux">Linux</option>
+                        <option value="ios">iOS</option>
+                        <option value="android">Android</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Browser</label>
+                    <select id="browser" name="browser" class="form-select">
+                        <option value="">Select browser</option>
+                        <option value="chrome">Chrome</option>
+                        <option value="firefox">Firefox</option>
+                        <option value="safari">Safari</option>
+                        <option value="edge">Edge</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Consent Checkbox -->
+        <div class="step-container">
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" id="consent" name="consent" class="checkbox-input" required>
+                    <span class="checkbox-text">I confirm that I have permission to upload this transcript and that it contains no sensitive or confidential information.</span>
+                </label>
+            </div>
+        </div>
+
+        <button type="submit" class="submit-button">
+            <span class="button-text">Upload Transcript</span>
+            <div class="spinner" style="display: none;">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </button>
+    </form>
+</div>
+
+<!-- Error Message -->
+<div id="errorMessage" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-xl">
+        <h3 class="text-lg font-medium text-gray-900 mb-4">Error</h3>
+        <p id="errorText" class="text-gray-600"></p>
+        <div class="mt-4 flex justify-end">
+            <button id="closeError" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600">
+                Close
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Loading Indicator -->
+<div id="loadingIndicator" class="hidden fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex items-center justify-center z-50">
+    <div class="bg-white p-8 rounded-lg shadow-xl flex flex-col items-center space-y-4">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <p class="text-lg text-gray-700">Uploading Transcript...</p>
+    </div>
+</div>
+
+<style>
+/* Add styles for the consent checkbox */
+.checkbox-label {
+    display: flex;
+    align-items: flex-start;
+    gap: 0.5rem;
+    cursor: pointer;
+}
+
+.checkbox-input {
+    margin-top: 0.25rem;
+}
+
+.checkbox-text {
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    line-height: 1.4;
+}
+
+/* Updated dropzone styles */
+.dropzone {
+    border: 2px dashed #cbd5e1;
+    border-radius: 0.5rem;
+    padding: 1rem;
+    transition: all 0.2s ease;
+    background: #f8fafc;
+}
+
+.dropzone.drag-active {
+    border-color: #3b82f6;
+    background: #eff6ff;
+}
+
+.dropzone-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.5rem;
+}
+
+.upload-icon {
+    color: #64748b;
+    margin-bottom: 0.5rem;
+}
+
+.dropzone-text {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #475569;
+}
+
+.primary-text {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.browse-label {
+    cursor: pointer;
+}
+
+.browse-text {
+    color: #3b82f6;
+    text-decoration: underline;
+}
+
+.browse-label input[type="file"] {
+    display: none;
+}
+
+.file-hint {
+    font-size: 0.75rem;
+    color: #64748b;
+}
+
+.selected-file {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 0.375rem;
+    margin-top: 0.5rem;
+}
+
+.file-info {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.file-icon {
+    color: #64748b;
+}
+
+.file-name {
+    font-size: 0.875rem;
+    color: #1e293b;
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.remove-file {
+    color: #ef4444;
+    padding: 0.25rem;
+    border-radius: 0.25rem;
+    transition: all 0.2s ease;
+}
+
+.remove-file:hover {
+    background: #fee2e2;
+}
+
+.hidden {
+    display: none;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('uploadTranscriptForm');
+    const errorMessage = document.getElementById('errorMessage');
+    const errorText = document.getElementById('errorText');
+    const closeError = document.getElementById('closeError');
+    const loadingIndicator = document.getElementById('loadingIndicator');
+    const consentCheckbox = document.getElementById('consent');
+    
+    // Close error message
+    closeError.addEventListener('click', function() {
+        errorMessage.classList.add('hidden');
+    });
+    
+    // Form submission handler
+    form.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
+        
+        // Show loading indicator
+        loadingIndicator.classList.remove('hidden');
+        
+        try {
+            // Create FormData object
+            const formData = new FormData();
+            
+            // Add form fields
+            formData.append('researcher', JSON.stringify({
+                name: document.getElementById('researcherName').value,
+                email: document.getElementById('researcherEmail').value,
+                role: document.getElementById('researcherRole').value
+            }));
+            
+            formData.append('project', JSON.stringify({
+                name: document.getElementById('projectName').value,
+                type: document.querySelector('input[name="interviewType"]:checked').value,
+                description: document.getElementById('projectDescription').value
+            }));
+            
+            formData.append('interviewee', JSON.stringify({
+                name: document.getElementById('intervieweeName').value,
+                age: document.getElementById('intervieweeAge').value,
+                gender: document.getElementById('intervieweeGender').value,
+                location: document.getElementById('intervieweeLocation').value,
+                occupation: document.getElementById('intervieweeOccupation').value,
+                industry: document.getElementById('intervieweeIndustry').value,
+                experience: document.getElementById('intervieweeExperience').value,
+                education: document.getElementById('intervieweeEducation').value
+            }));
+            
+            formData.append('technology', JSON.stringify({
+                deviceType: document.getElementById('deviceType').value,
+                operatingSystem: document.getElementById('operatingSystem').value,
+                browser: document.getElementById('browser').value
+            }));
+            
+            formData.append('consent', consentCheckbox.checked);
+            formData.append('transcriptName', document.getElementById('transcriptName').value);
+            
+            // Add transcript file
+            const transcriptFile = document.getElementById('transcriptFile').files[0];
+            if (transcriptFile) {
+                formData.append('transcriptFile', transcriptFile);
+            }
+            
+            // Send the request
+            const response = await fetch('/upload_transcript', {
+                method: 'POST',
+                body: formData
+            });
+            
+            if (!response.ok) {
+                throw new Error('Failed to upload transcript');
+            }
+            
+            // Redirect to transcript view
+            const data = await response.json();
+            window.location.href = `/transcript/${data.transcript_id}`;
+            
+        } catch (error) {
+            errorText.textContent = error.message;
+            errorMessage.classList.remove('hidden');
+        } finally {
+            loadingIndicator.classList.add('hidden');
+        }
+    });
+    
+    // Validate form
+    function validateForm() {
+        const requiredInputs = form.querySelectorAll('[required]');
+        
+        for (const input of requiredInputs) {
+            if (!input.value && input.type !== 'checkbox') {
+                errorText.textContent = `Please fill in all required fields`;
+                errorMessage.classList.remove('hidden');
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+            if (input.type === 'checkbox' && !input.checked) {
+                errorText.textContent = `Please confirm the consent checkbox`;
+                errorMessage.classList.remove('hidden');
+                input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+        }
+        
+        // Validate email format if email fields are filled
+        const emailInputs = form.querySelectorAll('input[type="email"]');
+        for (const emailInput of emailInputs) {
+            if (emailInput.value && !emailInput.validity.valid) {
+                errorText.textContent = `Please enter a valid email address`;
+                errorMessage.classList.remove('hidden');
+                emailInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return false;
+            }
+        }
+        
+        // Validate file upload
+        const fileInput = document.getElementById('transcriptFile');
+        if (!fileInput.files.length) {
+            errorText.textContent = `Please upload a transcript file`;
+            errorMessage.classList.remove('hidden');
+            fileInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            return false;
+        }
+        
+        return true;
+    }
+
+    // File upload handling
+    const fileInput = document.getElementById('transcriptFile');
+    const dropZone = document.getElementById('dropZone');
+    const selectedFile = document.getElementById('selectedFile');
+    const fileName = document.getElementById('fileName');
+    const removeFile = document.getElementById('removeFile');
+    
+    // Handle file selection
+    fileInput.addEventListener('change', function(e) {
+        handleFileSelection(this.files);
+    });
+    
+    // Handle file removal
+    removeFile.addEventListener('click', function() {
+        fileInput.value = '';
+        selectedFile.classList.add('hidden');
+        dropZone.querySelector('.dropzone-content').classList.remove('hidden');
+    });
+    
+    // Handle drag and drop
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, preventDefaults, false);
+    });
+    
+    function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
+    
+    ['dragenter', 'dragover'].forEach(eventName => {
+        dropZone.addEventListener(eventName, highlight, false);
+    });
+    
+    ['dragleave', 'drop'].forEach(eventName => {
+        dropZone.addEventListener(eventName, unhighlight, false);
+    });
+    
+    function highlight(e) {
+        dropZone.classList.add('drag-active');
+    }
+    
+    function unhighlight(e) {
+        dropZone.classList.remove('drag-active');
+    }
+    
+    dropZone.addEventListener('drop', handleDrop, false);
+    
+    function handleDrop(e) {
+        const dt = e.dataTransfer;
+        const files = dt.files;
+        handleFileSelection(files);
+    }
+    
+    function handleFileSelection(files) {
+        if (files.length > 0) {
+            const file = files[0];
+            if (isValidFileType(file)) {
+                fileName.textContent = file.name;
+                selectedFile.classList.remove('hidden');
+                dropZone.querySelector('.dropzone-content').classList.add('hidden');
+            } else {
+                errorText.textContent = 'Please upload a valid file type (TXT, DOC, DOCX, or PDF)';
+                errorMessage.classList.remove('hidden');
+            }
+        }
+    }
+    
+    function isValidFileType(file) {
+        const validTypes = ['.txt', '.doc', '.docx', '.pdf'];
+        const fileType = '.' + file.name.split('.').pop().toLowerCase();
+        return validTypes.includes(fileType);
+    }
+});
+</script>
+{% endblock %} 

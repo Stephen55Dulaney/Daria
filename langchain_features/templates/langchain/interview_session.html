@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Remote Interview - {{ title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .header {
+            background-color: white;
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .main-container {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+        }
+        .chat-container {
+            flex: 1;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 18px;
+            max-width: 75%;
+            position: relative;
+        }
+        .message.interviewer {
+            background-color: #f1f3f5;
+            color: #212529;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+        .message.participant {
+            background-color: #0d6efd;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+            margin-left: auto;
+        }
+        .message-container {
+            display: flex;
+            flex-direction: column;
+        }
+        .message-sender {
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+        .controls {
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-top: 1px solid #dee2e6;
+        }
+        .mic-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            border: none;
+        }
+        .mic-button.listening {
+            background-color: #dc3545;
+            color: white;
+        }
+        .status-indicator {
+            height: 10px;
+            width: 10px;
+            border-radius: 50%;
+            background-color: #6c757d;
+            margin-right: 5px;
+        }
+        .status-indicator.active {
+            background-color: #28a745;
+        }
+        .btn-toolbar {
+            margin-left: auto;
+        }
+        .recording-animation {
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 15px rgba(220, 53, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            display: none;
+        }
+        .typing-indicator span {
+            height: 8px;
+            width: 8px;
+            background-color: #6c757d;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 3px;
+            animation: typing 1s infinite;
+        }
+        .typing-indicator span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+        .typing-indicator span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+        @keyframes typing {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-5px);
+            }
+        }
+        .transcript-panel {
+            position: fixed;
+            right: -400px;
+            top: 0;
+            width: 400px;
+            height: 100vh;
+            background-color: white;
+            box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: right 0.3s ease;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+        .transcript-panel.open {
+            right: 0;
+        }
+        .transcript-content {
+            flex: 1;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .transcript-toggle {
+            position: fixed;
+            right: 20px;
+            bottom: 20px;
+            z-index: 1001;
+        }
+        .audio-visualizer {
+            height: 30px;
+            display: flex;
+            align-items: center;
+            margin-left: 15px;
+        }
+        .audio-bar {
+            width: 3px;
+            height: 100%;
+            background-color: #0d6efd;
+            margin: 0 2px;
+            border-radius: 3px;
+        }
+        #textInputArea {
+            transition: all 0.3s ease;
+        }
+        #userTextInput {
+            resize: none;
+            border-top-right-radius: 0;
+            border-bottom-right-radius: 0;
+        }
+        #sendTextBtn {
+            border-top-left-radius: 0;
+            border-bottom-left-radius: 0;
+        }
+        /* Auto-listen switch styling */
+        .form-check-input:checked {
+            background-color: #28a745;
+            border-color: #28a745;
+        }
+        .form-switch .form-check-input {
+            width: 2.5em;
+            height: 1.25em;
+        }
+        .form-check-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6c757d;
+        }
+        .form-switch .form-check-input:focus {
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='-4 -4 8 8'%3e%3ccircle r='3' fill='%23fff'/%3e%3c/svg%3e");
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.25);
+        }
+        /* Auto-listen indicator styling */
+        .auto-listen-indicator {
+            display: flex;
+            align-items: center;
+            font-size: 0.7rem;
+            color: #28a745;
+        }
+        .auto-listen-indicator .indicator-dot {
+            height: 6px;
+            width: 6px;
+            border-radius: 50%;
+            background-color: #28a745;
+            margin-right: 5px;
+            animation: pulse-green 1.5s infinite;
+        }
+        @keyframes pulse-green {
+            0% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.3;
+            }
+            100% {
+                opacity: 1;
+            }
+        }
+        .auto-listen-indicator.disabled {
+            color: #6c757d;
+        }
+        .auto-listen-indicator.disabled .indicator-dot {
+            background-color: #6c757d;
+            animation: none;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="container">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h4 mb-0">Remote Interview: {{ title }}</h1>
+                <div class="d-flex align-items-center">
+                    <div class="d-flex align-items-center me-3">
+                        <div class="status-indicator active" id="connectionStatus"></div>
+                        <span class="small" id="connectionText">Connected</span>
+                    </div>
+                    <button class="btn btn-outline-secondary btn-sm" id="endInterviewBtn">
+                        <i class="fas fa-phone-slash"></i> End Interview
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-container container">
+        <div class="chat-container">
+            <div class="chat-messages" id="chatMessages">
+                <!-- Messages will appear here -->
+                <div class="typing-indicator" id="typingIndicator">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+            <div class="controls">
+                <div class="d-flex flex-column w-100">
+                    <!-- Text input area (initially hidden) -->
+                    <div id="textInputArea" class="mb-2" style="display: none;">
+                        <div class="input-group">
+                            <textarea class="form-control" id="userTextInput" rows="2" placeholder="Type your response here..."></textarea>
+                            <button class="btn btn-primary" id="sendTextBtn">
+                                <i class="bi bi-send"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Voice/type controls -->
+                    <div class="d-flex align-items-center">
+                        <button class="mic-button" id="micButton">
+                            <i class="fas fa-microphone fa-lg"></i>
+                        </button>
+                        <div id="audioVisualizer" class="audio-visualizer" style="display: none;">
+                            <!-- Audio bars will be added dynamically -->
+                        </div>
+                        <div class="btn-toolbar ms-auto">
+                            <div class="form-check form-switch me-3">
+                                <input class="form-check-input" type="checkbox" role="switch" id="autoListenSwitch" checked>
+                                <label class="form-check-label" for="autoListenSwitch">Auto Listen</label>
+                                <div id="autoListenIndicator" class="auto-listen-indicator mt-1">
+                                    <div class="indicator-dot"></div>
+                                    <span class="indicator-text">Listening for silence</span>
+                                </div>
+                            </div>
+                            <button class="btn btn-outline-secondary me-2" id="skipQuestionBtn">
+                                <i class="fas fa-forward"></i> Skip
+                            </button>
+                            <button class="btn btn-outline-primary" id="typeResponseBtn">
+                                <i class="fas fa-keyboard"></i> Type
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Transcript Panel -->
+    <div class="transcript-panel" id="transcriptPanel">
+        <h3 class="h5 mb-3">Live Transcript</h3>
+        <div class="transcript-content" id="transcriptContent"></div>
+        <div class="mt-3">
+            <button class="btn btn-sm btn-outline-secondary" id="closeTranscriptBtn">
+                <i class="fas fa-times"></i> Close
+            </button>
+            <button class="btn btn-sm btn-outline-primary" id="copyTranscriptBtn">
+                <i class="fas fa-copy"></i> Copy
+            </button>
+        </div>
+    </div>
+    <button class="btn btn-primary transcript-toggle" id="toggleTranscriptBtn">
+        <i class="fas fa-file-alt"></i> Transcript
+    </button>
+
+    <!-- Type Response Modal -->
+    <div class="modal fade" id="typeModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Type Your Response</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <textarea class="form-control" id="typedResponse" rows="5" placeholder="Type your response here..."></textarea>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="sendTypedResponse">Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- End Interview Modal -->
+    <div class="modal fade" id="endInterviewModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">End Interview</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to end this interview? This will complete the session and generate an analysis.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-danger" id="confirmEndInterview">End Interview</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Analysis Modal -->
+    <div class="modal fade" id="analysisModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Interview Complete</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4" id="analysisLoading">
+                        <div class="spinner-border text-primary mb-3" role="status">
+                            <span class="visually-hidden">Processing...</span>
+                        </div>
+                        <p>Processing your responses...</p>
+                    </div>
+                    <div id="thankYouContent">
+                        <h4 class="mb-3 text-center">Thank You for Your Participation!</h4>
+                        <p>We appreciate you taking the time to share your thoughts and experiences with us.</p>
+                        <p>Your feedback is extremely valuable and will help us improve our products and services.</p>
+                        <p>If you have any additional questions or comments about the interview process, please feel free to email us at <a href="mailto:research@example.com">research@example.com</a>.</p>
+                        <div class="alert alert-info mt-3">
+                            <p>This window will automatically close in <span id="redirectCountdown">10</span> seconds.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer d-flex justify-content-between">
+                    <button type="button" class="btn btn-secondary" id="stayOnPageBtn">Stay on Page</button>
+                    <button type="button" class="btn btn-primary" id="closeNowBtn">Close Now</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Globals
+            const sessionId = '{{ session_id }}';
+            const voiceId = '{{ voice_id }}';
+            let isRecording = false;
+            let isFirstQuestion = true;
+            let audioContext;
+            let recorder;
+            let gumStream;
+            let speechSynthVoices = [];
+            let autoListenEnabled = true;
+            let isSpeaking = false;
+            let silenceDetectionTimer = null;
+            let silenceThreshold = 0.2;
+            let silenceTimeout = 1000; // Reduced from 2000 to 1000ms (1 second) of silence triggers end of recording
+            let autoListenMinimumWait = 500; // ms to wait after Daria speaks before auto-listening
+            let audioAnalyser = null;
+            let audioLevel = 0;
+            
+            // Initialize speech synthesis voices
+            function initVoices() {
+                if (typeof speechSynthesis !== 'undefined') {
+                    speechSynthesis.onvoiceschanged = () => {
+                        speechSynthVoices = speechSynthesis.getVoices();
+                        console.log('Speech synthesis voices loaded:', speechSynthVoices.length);
+                    };
+                    
+                    // Try to load voices immediately (in case they're already available)
+                    speechSynthVoices = speechSynthesis.getVoices();
+                }
+            }
+            
+            // Call voice initialization
+            initVoices();
+            
+            // Elements
+            const chatMessages = document.getElementById('chatMessages');
+            const micButton = document.getElementById('micButton');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const transcriptPanel = document.getElementById('transcriptPanel');
+            const transcriptContent = document.getElementById('transcriptContent');
+            const toggleTranscriptBtn = document.getElementById('toggleTranscriptBtn');
+            const closeTranscriptBtn = document.getElementById('closeTranscriptBtn');
+            const copyTranscriptBtn = document.getElementById('copyTranscriptBtn');
+            const typeResponseBtn = document.getElementById('typeResponseBtn');
+            const textInputArea = document.getElementById('textInputArea');
+            const userTextInput = document.getElementById('userTextInput');
+            const sendTextBtn = document.getElementById('sendTextBtn');
+            const typeModal = new bootstrap.Modal(document.getElementById('typeModal'));
+            const sendTypedResponseBtn = document.getElementById('sendTypedResponse');
+            const typedResponseTextarea = document.getElementById('typedResponse');
+            const endInterviewBtn = document.getElementById('endInterviewBtn');
+            const endInterviewModal = new bootstrap.Modal(document.getElementById('endInterviewModal'));
+            const confirmEndInterviewBtn = document.getElementById('confirmEndInterview');
+            const analysisModal = new bootstrap.Modal(document.getElementById('analysisModal'));
+            const skipQuestionBtn = document.getElementById('skipQuestionBtn');
+            const audioVisualizer = document.getElementById('audioVisualizer');
+            
+            // Create audio bars for visualizer
+            for (let i = 0; i < 20; i++) {
+                const bar = document.createElement('div');
+                bar.className = 'audio-bar';
+                audioVisualizer.appendChild(bar);
+            }
+            const audioBars = document.querySelectorAll('.audio-bar');
+            
+            // Initialize the interview
+            function initInterview() {
+                // Start the interview and get the first question
+                fetch('/langchain/api/interview/start', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.status === 'success') {
+                        // Add the first question to the chat and transcript
+                        addMessage(data.first_question, 'interviewer');
+                        updateTranscript(data.first_question, 'interviewer');
+                        
+                        // Speak the first question (only once)
+                        // The auto-listening will be triggered after speaking completes
+                        // due to the modifications in the speakText function
+                        speakText(data.first_question);
+                    } else {
+                        alert('Error starting interview: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error starting interview: ' + error);
+                });
+            }
+            
+            // Add a message to the chat
+            function addMessage(text, sender) {
+                const messageContainer = document.createElement('div');
+                messageContainer.className = 'message-container';
+                
+                const senderElement = document.createElement('div');
+                senderElement.className = 'message-sender';
+                senderElement.textContent = sender === 'interviewer' ? 'Daria (Interviewer)' : 'You';
+                messageContainer.appendChild(senderElement);
+                
+                const messageElement = document.createElement('div');
+                messageElement.className = `message ${sender}`;
+                messageElement.textContent = text;
+                messageContainer.appendChild(messageElement);
+                
+                chatMessages.insertBefore(messageContainer, typingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Update the transcript
+            function updateTranscript(text, sender) {
+                const prefix = sender === 'interviewer' ? 'Daria: ' : 'You: ';
+                transcriptContent.textContent += prefix + text + '\n\n';
+            }
+            
+            // Text-to-speech function
+            function speakText(text) {
+                return new Promise((resolve, reject) => {
+                    try {
+                        // Use browser's built-in speech synthesis by default
+                        isSpeaking = true;
+                        
+                        // Stop recording while Daria is speaking
+                        if (isRecording) {
+                            stopRecording();
+                        }
+                        
+                        const synth = window.speechSynthesis;
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        
+                        // Set voice properties
+                        utterance.rate = 1.0;
+                        utterance.pitch = 1.0;
+                        utterance.volume = 1.0;
+                        
+                        // Try to use a female voice if available
+                        if (speechSynthVoices.length > 0) {
+                            const femaleVoice = speechSynthVoices.find(voice => 
+                                voice.name.includes('female') || 
+                                voice.name.includes('woman') ||
+                                voice.name.includes('girl') ||
+                                voice.name.includes('Samantha') ||
+                                voice.name.includes('Victoria')
+                            );
+                            
+                            if (femaleVoice) {
+                                utterance.voice = femaleVoice;
+                                console.log('Using voice:', femaleVoice.name);
+                            }
+                        } else {
+                            console.log('No voices available for selection');
+                        }
+                        
+                        utterance.onend = () => {
+                            console.log('Speech synthesis finished');
+                            isSpeaking = false;
+                            
+                            // If auto-listen is enabled, start recording after a short delay
+                            if (autoListenEnabled) {
+                                setTimeout(() => {
+                                    if (autoListenEnabled && !isRecording && !isSpeaking) {
+                                        startRecording();
+                                    }
+                                }, autoListenMinimumWait);
+                            }
+                            
+                            resolve();
+                        };
+                        
+                        utterance.onerror = (err) => {
+                            console.error('Speech synthesis error:', err);
+                            isSpeaking = false;
+                            
+                            // If auto-listen is enabled, start recording after a short delay even if speech fails
+                            if (autoListenEnabled) {
+                                setTimeout(() => {
+                                    if (autoListenEnabled && !isRecording && !isSpeaking) {
+                                        startRecording();
+                                    }
+                                }, autoListenMinimumWait);
+                            }
+                            
+                            resolve(); // Resolve anyway to continue the interview
+                        };
+                        
+                        synth.speak(utterance);
+                    } catch (error) {
+                        console.error('Failed to use speech synthesis:', error);
+                        isSpeaking = false;
+                        
+                        // If auto-listen is enabled, start recording after a short delay even if speech fails
+                        if (autoListenEnabled) {
+                            setTimeout(() => {
+                                if (autoListenEnabled && !isRecording && !isSpeaking) {
+                                    startRecording();
+                                }
+                            }, autoListenMinimumWait);
+                        }
+                        
+                        resolve(); // Resolve anyway to continue the interview
+                    }
+                });
+            }
+            
+            // Start recording with browser's speech recognition API
+            function startRecording() {
+                if (isRecording) return;
+                
+                // Update auto-listen indicator
+                if (autoListenEnabled) {
+                    updateAutoListenIndicator(true);
+                }
+                
+                // First try using the browser's built-in speech recognition
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    useBrowserSpeechRecognition();
+                } else {
+                    // Fall back to MediaRecorder API for recording audio to send to server
+                    useMediaRecorder();
+                }
+            }
+            
+            // Use browser's built-in speech recognition
+            function useBrowserSpeechRecognition() {
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                const recognition = new SpeechRecognition();
+                
+                recognition.lang = 'en-US';
+                // Changed from false to true to allow longer recording sessions
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                
+                // Set a longer timeout for the recording - 10 seconds
+                const recordingTimeout = 10000;
+                let recordingTimer;
+                let finalTranscript = '';
+                
+                isRecording = true;
+                micButton.classList.add('listening', 'recording-animation');
+                
+                // Update indicator text to show active listening
+                if (autoListenEnabled) {
+                    autoListenIndicator.querySelector('.indicator-text').textContent = 'Listening actively';
+                }
+                
+                recognition.onstart = () => {
+                    console.log('Speech recognition started');
+                    
+                    // Set timeout to automatically stop recording after the set time
+                    recordingTimer = setTimeout(() => {
+                        if (isRecording) {
+                            console.log('Recording timeout reached, stopping...');
+                            recognition.stop();
+                        }
+                    }, recordingTimeout);
+                };
+                
+                recognition.onresult = (event) => {
+                    let interimTranscript = '';
+                    
+                    // Process the interim results
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript + ' ';
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                        
+                        // Check for "end interview" phrases in both final and interim
+                        const lowerTranscript = transcript.toLowerCase();
+                        if (
+                            lowerTranscript.includes('end interview') || 
+                            lowerTranscript.includes('end the interview') || 
+                            lowerTranscript.includes('finish interview') || 
+                            lowerTranscript.includes('finish the interview') || 
+                            lowerTranscript.includes('conclude interview') || 
+                            lowerTranscript.includes('conclude the interview') ||
+                            lowerTranscript.includes('can we end') ||
+                            lowerTranscript.includes("let's end") ||
+                            lowerTranscript.includes('lets end')
+                        ) {
+                            console.log('End interview request detected');
+                            // Clear the timeout
+                            clearTimeout(recordingTimer);
+                            // Stop the recording
+                            recognition.stop();
+                            // Show end interview confirmation
+                            endInterviewModal.show();
+                            return;
+                        }
+                    }
+                    
+                    console.log('Interim transcript:', interimTranscript);
+                    console.log('Final transcript so far:', finalTranscript);
+                    
+                    // Reset the timeout each time we get a result
+                    clearTimeout(recordingTimer);
+                    recordingTimer = setTimeout(() => {
+                        if (isRecording) {
+                            console.log('Recording timeout reached, stopping...');
+                            recognition.stop();
+                        }
+                    }, recordingTimeout);
+                };
+                
+                recognition.onerror = (event) => {
+                    console.error('Speech recognition error:', event.error);
+                    clearTimeout(recordingTimer);
+                    
+                    // Fall back to MediaRecorder if speech recognition fails
+                    if (event.error === 'no-speech' || event.error === 'audio-capture' || event.error === 'not-allowed') {
+                        alert('Browser speech recognition failed. Please try speaking more clearly or use the typing option.');
+                        toggleTypingMode(true);
+                    }
+                    stopRecording();
+                };
+                
+                recognition.onend = () => {
+                    clearTimeout(recordingTimer);
+                    stopRecording();
+                    
+                    if (finalTranscript.trim()) {
+                        console.log('Processing final transcript:', finalTranscript);
+                        processUserResponse(finalTranscript.trim());
+                    } else {
+                        console.log('No speech detected');
+                        
+                        // If auto-listen is enabled and not currently speaking, restart listening after a delay
+                        if (autoListenEnabled && !isSpeaking) {
+                            setTimeout(() => {
+                                if (autoListenEnabled && !isRecording && !isSpeaking) {
+                                    startRecording();
+                                }
+                            }, 1000);
+                        }
+                    }
+                };
+                
+                try {
+                    recognition.start();
+                } catch (err) {
+                    console.error('Speech recognition error on start:', err);
+                    clearTimeout(recordingTimer);
+                    useMediaRecorder();
+                }
+            }
+            
+            // Fallback to using MediaRecorder API with silence detection
+            function useMediaRecorder() {
+                isRecording = true;
+                micButton.classList.add('listening', 'recording-animation');
+                audioVisualizer.style.display = 'flex';
+                
+                // Update indicator text to show active listening
+                if (autoListenEnabled) {
+                    autoListenIndicator.querySelector('.indicator-text').textContent = 'Listening actively';
+                }
+                
+                // Set a recording timeout - 10 seconds
+                const recordingTimeout = 10000;
+                let recordingTimer;
+                
+                navigator.mediaDevices.getUserMedia({ audio: true })
+                    .then(stream => {
+                        gumStream = stream;
+                        audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                        const source = audioContext.createMediaStreamSource(stream);
+                        
+                        // Create analyzer for visualizer and silence detection
+                        audioAnalyser = audioContext.createAnalyser();
+                        audioAnalyser.fftSize = 256;
+                        source.connect(audioAnalyser);
+                        
+                        // Create and start recorder
+                        recorder = new MediaRecorder(stream);
+                        const chunks = [];
+                        
+                        recorder.ondataavailable = e => {
+                            chunks.push(e.data);
+                        };
+                        
+                        recorder.onstop = () => {
+                            const blob = new Blob(chunks, { 'type': 'audio/webm' });
+                            sendAudioToServer(blob);
+                        };
+                        
+                        recorder.start();
+                        
+                        // Set timeout to automatically stop recording after the set time
+                        recordingTimer = setTimeout(() => {
+                            if (isRecording) {
+                                console.log('Recording timeout reached, stopping MediaRecorder...');
+                                stopRecording();
+                            }
+                        }, recordingTimeout);
+                        
+                        // Set up silence detection
+                        setupSilenceDetection(audioAnalyser);
+                        
+                        // Update visualizer
+                        const visualizerInterval = setInterval(() => {
+                            if (!isRecording) {
+                                clearInterval(visualizerInterval);
+                                audioVisualizer.style.display = 'none';
+                                return;
+                            }
+                            
+                            const dataArray = new Uint8Array(audioAnalyser.frequencyBinCount);
+                            audioAnalyser.getByteFrequencyData(dataArray);
+                            
+                            // Update audio level for silence detection
+                            let sum = 0;
+                            for (let i = 0; i < dataArray.length; i++) {
+                                sum += dataArray[i];
+                            }
+                            audioLevel = sum / dataArray.length / 255; // Normalize to 0-1
+                            
+                            // Update bars
+                            audioBars.forEach((bar, index) => {
+                                const barIndex = Math.floor(index * dataArray.length / audioBars.length);
+                                const value = dataArray[barIndex] / 255;
+                                bar.style.height = (value * 100) + '%';
+                                bar.style.opacity = 0.5 + value * 0.5;
+                            });
+                        }, 50);
+                    })
+                    .catch(error => {
+                        console.error('Error accessing microphone:', error);
+                        clearTimeout(recordingTimer);
+                        stopRecording();
+                        alert('Error accessing microphone: ' + error.message);
+                        toggleTypingMode(true);
+                    });
+            }
+            
+            // Set up silence detection
+            function setupSilenceDetection(analyzer) {
+                // Clear any existing silence detection timer
+                if (silenceDetectionTimer) {
+                    clearTimeout(silenceDetectionTimer);
+                    silenceDetectionTimer = null;
+                }
+                
+                // Function to check audio level
+                const checkSilence = () => {
+                    if (!isRecording || !autoListenEnabled) return;
+                    
+                    // If we detect silence (audio level below threshold)
+                    if (audioLevel < silenceThreshold) {
+                        if (!silenceDetectionTimer) {
+                            // Start silence timer
+                            silenceDetectionTimer = setTimeout(() => {
+                                console.log('Silence detected, stopping recording...');
+                                stopRecording();
+                                silenceDetectionTimer = null;
+                            }, silenceTimeout);
+                        }
+                    } else {
+                        // If audio level is above threshold, reset silence timer
+                        if (silenceDetectionTimer) {
+                            clearTimeout(silenceDetectionTimer);
+                            silenceDetectionTimer = null;
+                        }
+                    }
+                    
+                    // Continue checking while recording
+                    if (isRecording) {
+                        requestAnimationFrame(checkSilence);
+                    }
+                };
+                
+                // Start checking for silence
+                requestAnimationFrame(checkSilence);
+            }
+            
+            // Stop recording with silence detection cleanup
+            function stopRecording() {
+                if (!isRecording) return;
+                
+                isRecording = false;
+                micButton.classList.remove('listening', 'recording-animation');
+                audioVisualizer.style.display = 'none';
+                
+                // Update auto-listen indicator
+                if (autoListenEnabled) {
+                    autoListenIndicator.querySelector('.indicator-text').textContent = 'Waiting to listen';
+                }
+                
+                // Clear silence detection timer
+                if (silenceDetectionTimer) {
+                    clearTimeout(silenceDetectionTimer);
+                    silenceDetectionTimer = null;
+                }
+                
+                // If using MediaRecorder
+                if (recorder && recorder.state !== 'inactive') {
+                    recorder.stop();
+                }
+                
+                // Clean up microphone access
+                if (gumStream) {
+                    gumStream.getTracks().forEach(track => track.stop());
+                }
+                
+                // Note: Browser's SpeechRecognition API automatically stops
+                // when recognition.stop() is called or when it detects the end of speech
+            }
+            
+            // Send audio to server for transcription
+            function sendAudioToServer(blob) {
+                // Show typing indicator
+                typingIndicator.style.display = 'flex';
+                
+                const formData = new FormData();
+                formData.append('audio', blob, 'recording.webm');
+                formData.append('session_id', sessionId);  // Add session_id to the request
+                
+                fetch('/speech_to_text', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        const transcription = data.text;
+                        
+                        // Check if end interview was detected
+                        if (data.end_interview_detected) {
+                            console.log('End interview request detected from speech-to-text');
+                            // Add user message to chat 
+                            addMessage(transcription, 'participant');
+                            updateTranscript(transcription, 'participant');
+                            
+                            // Show automatic response
+                            const endResponse = "I'll end the interview now. Thank you for your time and valuable insights!";
+                            addMessage(endResponse, 'interviewer');
+                            updateTranscript(endResponse, 'interviewer');
+                            
+                            // Hide typing indicator
+                            typingIndicator.style.display = 'none';
+                            
+                            // Speak the end response
+                            speakText(endResponse).then(() => {
+                                // After speaking, end the interview
+                                setTimeout(() => {
+                                    generateAnalysis();
+                                }, 1000);
+                            });
+                        } else {
+                            // Normal processing
+                            processUserResponse(transcription);
+                        }
+                    } else {
+                        typingIndicator.style.display = 'none';
+                        alert('Error transcribing audio: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    typingIndicator.style.display = 'none';
+                    console.error('Error:', error);
+                    alert('Speech-to-text failed. Please try typing your response instead.');
+                    // Show typing interface when speech fails
+                    toggleTypingMode(true);
+                });
+            }
+            
+            // Toggle typing mode
+            function toggleTypingMode(show) {
+                if (show) {
+                    textInputArea.style.display = 'block';
+                    userTextInput.focus();
+                } else {
+                    textInputArea.style.display = 'none';
+                }
+            }
+            
+            // Process user response and get next question
+            function processUserResponse(text) {
+                // Check for "end interview" phrases before processing
+                const lowerText = text.toLowerCase();
+                if (
+                    lowerText.includes('end interview') || 
+                    lowerText.includes('end the interview') || 
+                    lowerText.includes('finish interview') || 
+                    lowerText.includes('finish the interview') || 
+                    lowerText.includes('conclude interview') || 
+                    lowerText.includes('conclude the interview') ||
+                    lowerText.includes('can we end') ||
+                    lowerText.includes("let's end") ||
+                    lowerText.includes('lets end')
+                ) {
+                    console.log('End interview request detected in text');
+                    // Add user message to chat 
+                    addMessage(text, 'participant');
+                    updateTranscript(text, 'participant');
+                    
+                    // Show automatic response
+                    const endResponse = "I'll end the interview now. Thank you for your time and valuable insights!";
+                    addMessage(endResponse, 'interviewer');
+                    updateTranscript(endResponse, 'interviewer');
+                    
+                    // Speak the end response
+                    speakText(endResponse).then(() => {
+                        // After speaking, end the interview
+                        setTimeout(() => {
+                            generateAnalysis();
+                        }, 1000);
+                    });
+                    
+                    return;
+                }
+                
+                // Normal processing for other responses
+                // Add user message to chat
+                addMessage(text, 'participant');
+                updateTranscript(text, 'participant');
+                
+                // Show typing indicator while waiting for response
+                typingIndicator.style.display = 'flex';
+                
+                // Send to server for processing
+                fetch('/langchain/api/interview/respond', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        user_input: text
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Hide typing indicator
+                    typingIndicator.style.display = 'none';
+                    
+                    if (data.status === 'success') {
+                        // Add interviewer message to chat and transcript
+                        addMessage(data.next_question, 'interviewer');
+                        updateTranscript(data.next_question, 'interviewer');
+                        
+                        // Speak the question (only once)
+                        speakText(data.next_question);
+                    } else {
+                        alert('Error processing response: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    typingIndicator.style.display = 'none';
+                    console.error('Error:', error);
+                    alert('Error processing response: ' + error);
+                });
+            }
+            
+            // Event Listeners
+            micButton.addEventListener('click', () => {
+                if (isRecording) {
+                    stopRecording();
+                } else {
+                    startRecording();
+                }
+            });
+            
+            toggleTranscriptBtn.addEventListener('click', () => {
+                transcriptPanel.classList.toggle('open');
+            });
+            
+            closeTranscriptBtn.addEventListener('click', () => {
+                transcriptPanel.classList.remove('open');
+            });
+            
+            copyTranscriptBtn.addEventListener('click', () => {
+                navigator.clipboard.writeText(transcriptContent.textContent)
+                    .then(() => {
+                        alert('Transcript copied to clipboard!');
+                    })
+                    .catch(err => {
+                        console.error('Could not copy text: ', err);
+                    });
+            });
+            
+            typeResponseBtn.addEventListener('click', () => {
+                // Toggle the typing interface instead of showing modal
+                const isVisible = textInputArea.style.display === 'block';
+                toggleTypingMode(!isVisible);
+            });
+            
+            sendTextBtn.addEventListener('click', () => {
+                const text = userTextInput.value.trim();
+                if (text) {
+                    processUserResponse(text);
+                    userTextInput.value = '';
+                    toggleTypingMode(false);
+                }
+            });
+            
+            // Enter key in textarea sends the message
+            userTextInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendTextBtn.click();
+                }
+            });
+            
+            sendTypedResponseBtn.addEventListener('click', () => {
+                const text = typedResponseTextarea.value.trim();
+                if (text) {
+                    typeModal.hide();
+                    typedResponseTextarea.value = '';
+                    processUserResponse(text);
+                }
+            });
+            
+            endInterviewBtn.addEventListener('click', () => {
+                endInterviewModal.show();
+            });
+            
+            confirmEndInterviewBtn.addEventListener('click', () => {
+                endInterviewModal.hide();
+                generateAnalysis();
+            });
+            
+            skipQuestionBtn.addEventListener('click', () => {
+                // Send a neutral response to skip the current question
+                processUserResponse("I'd prefer to move on to the next question.");
+            });
+            
+            // Auto-listening toggle
+            const autoListenSwitch = document.getElementById('autoListenSwitch');
+            const autoListenIndicator = document.getElementById('autoListenIndicator');
+            
+            // Update indicator based on auto-listen state
+            function updateAutoListenIndicator(enabled) {
+                if (enabled) {
+                    autoListenIndicator.classList.remove('disabled');
+                    autoListenIndicator.querySelector('.indicator-text').textContent = 
+                        isRecording ? 'Listening actively' : 'Waiting to listen';
+                } else {
+                    autoListenIndicator.classList.add('disabled');
+                    autoListenIndicator.querySelector('.indicator-text').textContent = 'Auto-listen disabled';
+                }
+            }
+            
+            // Initial indicator state
+            updateAutoListenIndicator(autoListenEnabled);
+            
+            autoListenSwitch.addEventListener('change', (e) => {
+                autoListenEnabled = e.target.checked;
+                console.log(`Auto-listening ${autoListenEnabled ? 'enabled' : 'disabled'}`);
+                
+                // Update indicator
+                updateAutoListenIndicator(autoListenEnabled);
+                
+                // If enabling and Daria isn't speaking, start listening immediately
+                if (autoListenEnabled && !isSpeaking) {
+                    setTimeout(() => {
+                        if (autoListenEnabled && !isRecording && !isSpeaking) {
+                            startRecording();
+                        }
+                    }, 500);
+                }
+            });
+            
+            // Save interview data and show thank you message
+            function generateAnalysis() {
+                // Show the thank you modal
+                document.getElementById('analysisLoading').style.display = 'block';
+                document.getElementById('thankYouContent').style.display = 'none';
+                analysisModal.show();
+                
+                // End the interview in the backend but don't display analysis to the user
+                fetch('/langchain/api/interview/end', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        session_id: sessionId,
+                        generate_analysis: true
+                    })
+                })
+                .then(response => {
+                    // First check if the response is ok before trying to parse JSON
+                    if (!response.ok) {
+                        throw new Error(`Server responded with status ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    // Hide loading and show thank you content
+                    document.getElementById('analysisLoading').style.display = 'none';
+                    document.getElementById('thankYouContent').style.display = 'block';
+                    
+                    // Set up countdown timer
+                    let redirectTimer;
+                    let secondsLeft = 10;
+                    const countdownElement = document.getElementById('redirectCountdown');
+                    const stayOnPageBtn = document.getElementById('stayOnPageBtn');
+                    const closeNowBtn = document.getElementById('closeNowBtn');
+                    
+                    // Function to handle redirection
+                    const redirectUser = () => {
+                        if (window.opener) {
+                            // If opened in a new window by the researcher, close it
+                            window.close();
+                        } else {
+                            // Otherwise redirect to the main page
+                            window.location.href = '/langchain/';
+                        }
+                    };
+                    
+                    // Update countdown every second
+                    redirectTimer = setInterval(() => {
+                        secondsLeft--;
+                        if (countdownElement) {
+                            countdownElement.textContent = secondsLeft;
+                        }
+                        
+                        if (secondsLeft <= 0) {
+                            clearInterval(redirectTimer);
+                            redirectUser();
+                        }
+                    }, 1000);
+                    
+                    // Close Now button
+                    if (closeNowBtn) {
+                        closeNowBtn.addEventListener('click', () => {
+                            clearInterval(redirectTimer);
+                            redirectUser();
+                        });
+                    }
+                    
+                    // Stay on Page button
+                    if (stayOnPageBtn) {
+                        stayOnPageBtn.addEventListener('click', () => {
+                            // Clear the timer
+                            clearInterval(redirectTimer);
+                            // Hide the countdown message
+                            document.querySelector('.alert-info').style.display = 'none';
+                            // Change button text
+                            stayOnPageBtn.textContent = 'Return to Dashboard';
+                            stayOnPageBtn.addEventListener('click', () => {
+                                window.location.href = '/langchain/';
+                            }, { once: true });
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error ending interview:', error);
+                    // Still show thank you message even if there was an error
+                    document.getElementById('analysisLoading').style.display = 'none';
+                    document.getElementById('thankYouContent').style.display = 'block';
+                    
+                    // Set a simpler timeout if there was an error
+                    const closeNowBtn = document.getElementById('closeNowBtn');
+                    if (closeNowBtn) {
+                        closeNowBtn.addEventListener('click', () => {
+                            if (window.opener) {
+                                window.close();
+                            } else {
+                                window.location.href = '/langchain/';
+                            }
+                        });
+                    }
+                    
+                    const stayOnPageBtn = document.getElementById('stayOnPageBtn');
+                    if (stayOnPageBtn) {
+                        stayOnPageBtn.addEventListener('click', () => {
+                            // Hide the countdown message
+                            document.querySelector('.alert-info').style.display = 'none';
+                            // Change button text
+                            stayOnPageBtn.textContent = 'Return to Dashboard';
+                            stayOnPageBtn.addEventListener('click', () => {
+                                window.location.href = '/langchain/';
+                            }, { once: true });
+                        });
+                    }
+                    
+                    // Still set the countdown
+                    let secondsLeft = 10;
+                    const countdownElement = document.getElementById('redirectCountdown');
+                    const redirectTimer = setInterval(() => {
+                        secondsLeft--;
+                        if (countdownElement) {
+                            countdownElement.textContent = secondsLeft;
+                        }
+                        
+                        if (secondsLeft <= 0) {
+                            clearInterval(redirectTimer);
+                            if (window.opener) {
+                                window.close();
+                            } else {
+                                window.location.href = '/langchain/';
+                            }
+                        }
+                    }, 1000);
+                });
+            }
+            
+            // Initialize the interview
+            initInterview();
+        });
+    </script>
+</body>
+</html> 

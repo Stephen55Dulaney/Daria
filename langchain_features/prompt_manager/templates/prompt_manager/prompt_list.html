@@ -1,0 +1,163 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Prompt Manager{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row py-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3">Prompt Manager</h1>
+                <a href="{{ url_for('langchain_features.prompt_manager.create_prompt') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> New Prompt
+                </a>
+            </div>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Agent Prompt Configurations</h5>
+                </div>
+                <div class="card-body">
+                    {% if agents %}
+                        <div class="list-group">
+                            {% for agent in agents %}
+                                <a href="{{ url_for('langchain_features.prompt_manager.edit_prompt', agent_name=agent) }}" 
+                                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    <div>
+                                        <h5 class="mb-1">{{ agent|capitalize }}</h5>
+                                        <small>Click to edit</small>
+                                    </div>
+                                    <span class="badge bg-primary rounded-pill">Edit</span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            No prompt configurations found. Click the "New Prompt" button to create one.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row py-3">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Available Agents</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Daria</h5>
+                                    <p class="card-text">Deloitte's advanced research and interview assistant.</p>
+                                    {% if 'daria' in agents %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.edit_prompt', agent_name='daria') }}" class="btn btn-sm btn-primary">Edit Prompt</a>
+                                    {% else %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.create_prompt') }}?preset=daria" class="btn btn-sm btn-outline-primary">Create Prompt</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Thesea</h5>
+                                    <p class="card-text">Persona analyzer who gets to the heart of user needs.</p>
+                                    {% if 'thesea' in agents %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.edit_prompt', agent_name='thesea') }}" class="btn btn-sm btn-primary">Edit Prompt</a>
+                                    {% else %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.create_prompt') }}?preset=thesea" class="btn btn-sm btn-outline-primary">Create Prompt</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Odessia</h5>
+                                    <p class="card-text">Journey mapper who visualizes user experiences.</p>
+                                    {% if 'odessia' in agents %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.edit_prompt', agent_name='odessia') }}" class="btn btn-sm btn-primary">Edit Prompt</a>
+                                    {% else %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.create_prompt') }}?preset=odessia" class="btn btn-sm btn-outline-primary">Create Prompt</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Synthia</h5>
+                                    <p class="card-text">Discovery assistant building 8-week plans.</p>
+                                    {% if 'synthia' in agents %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.edit_prompt', agent_name='synthia') }}" class="btn btn-sm btn-primary">Edit Prompt</a>
+                                    {% else %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.create_prompt') }}?preset=synthia" class="btn btn-sm btn-outline-primary">Create Prompt</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Askia</h5>
+                                    <p class="card-text">Interview question assistant crafting perfect scripts.</p>
+                                    {% if 'askia' in agents %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.edit_prompt', agent_name='askia') }}" class="btn btn-sm btn-primary">Edit Prompt</a>
+                                    {% else %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.create_prompt') }}?preset=askia" class="btn btn-sm btn-outline-primary">Create Prompt</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Eurekia</h5>
+                                    <p class="card-text">Opportunity identifier detecting key patterns.</p>
+                                    {% if 'eurekia' in agents %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.edit_prompt', agent_name='eurekia') }}" class="btn btn-sm btn-primary">Edit Prompt</a>
+                                    {% else %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.create_prompt') }}?preset=eurekia" class="btn btn-sm btn-outline-primary">Create Prompt</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h5 class="card-title">Skeptica</h5>
+                                    <p class="card-text">Assumption buster questioning what everyone takes for granted.</p>
+                                    {% if 'skeptica' in agents %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.edit_prompt', agent_name='skeptica') }}" class="btn btn-sm btn-primary">Edit Prompt</a>
+                                    {% else %}
+                                        <a href="{{ url_for('langchain_features.prompt_manager.create_prompt') }}?preset=skeptica" class="btn btn-sm btn-outline-primary">Create Prompt</a>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

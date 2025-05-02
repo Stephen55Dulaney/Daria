@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}Add Feedback for {{ agent }} - DARIA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Add Feedback for {{ agent }}</h1>
+        <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Back to Prompt
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Performance Feedback</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('prompts.prompt_feedback', agent=agent) }}">
+                        <div class="mb-3">
+                            <label for="session_id" class="form-label">Session ID (optional)</label>
+                            <input type="text" class="form-control" id="session_id" name="session_id" placeholder="Leave blank to auto-generate">
+                            <div class="form-text">Reference ID for the interview session where this prompt was used</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Score (1-5)</label>
+                            <div class="rating-input d-flex gap-2">
+                                {% for i in range(1, 6) %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="score" id="score{{ i }}" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                                    <label class="form-check-label" for="score{{ i }}">
+                                        {{ i }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-2 d-flex justify-content-between text-muted">
+                                <small>Needs improvement</small>
+                                <small>Excellent</small>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="notes" class="form-label">Feedback Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="5" required></textarea>
+                            <div class="form-text">Detailed feedback about how the prompt performed and areas for improvement</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

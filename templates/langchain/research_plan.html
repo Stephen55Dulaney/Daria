@@ -1,0 +1,499 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Plan: {{ plan.title }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        body {
+            background-color: #f5f7fa;
+            padding: 20px 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .plan-container {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        .plan-header {
+            margin-bottom: 30px;
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 20px;
+        }
+        .plan-header h1 {
+            font-weight: 300;
+            color: #0d6efd;
+            margin-bottom: 10px;
+        }
+        .plan-header .description {
+            color: #6c757d;
+            font-size: 1.1rem;
+        }
+        .plan-metadata {
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+        .section-heading {
+            font-weight: 500;
+            color: #212529;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+        }
+        .section-heading i {
+            margin-right: 10px;
+            color: #0d6efd;
+        }
+        .objectives-list, .questions-list {
+            list-style-position: inside;
+            padding-left: 0;
+        }
+        .objectives-list li, .questions-list li {
+            margin-bottom: 10px;
+            padding-left: 20px;
+            position: relative;
+        }
+        .objectives-list li:before, .questions-list li:before {
+            content: '•';
+            position: absolute;
+            left: 0;
+            color: #0d6efd;
+        }
+        .methodology {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+        .timeline-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        .timeline-item:last-child {
+            border-bottom: none;
+        }
+        .timeline-milestone {
+            font-weight: 500;
+        }
+        .timeline-timeframe {
+            color: #6c757d;
+        }
+        .question-category {
+            font-weight: 500;
+            margin-bottom: 10px;
+            color: #0d6efd;
+        }
+        .actions-bar {
+            margin-top: 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 1px solid #dee2e6;
+            padding-top: 20px;
+        }
+        .empty-plan {
+            text-align: center;
+            padding: 50px 0;
+            color: #6c757d;
+        }
+        .empty-plan i {
+            font-size: 48px;
+            margin-bottom: 20px;
+            color: #dee2e6;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="plan-container">
+            <div class="plan-header">
+                <h1>{{ plan.title }}</h1>
+                <div class="description">{{ plan.description }}</div>
+                <div class="plan-metadata">
+                    Created: {{ plan.created_at.strftime('%Y-%m-%d %H:%M') }}
+                    {% if plan.created_at != plan.updated_at %}
+                    | Updated: {{ plan.updated_at.strftime('%Y-%m-%d %H:%M') }}
+                    {% endif %}
+                </div>
+            </div>
+            
+            {% if plan.objectives %}
+                <h2 class="section-heading"><i class="fas fa-bullseye"></i> Research Objectives</h2>
+                <ul class="objectives-list">
+                    {% for objective in plan.objectives %}
+                        <li>{{ objective }}</li>
+                    {% endfor %}
+                </ul>
+                
+                <h2 class="section-heading"><i class="fas fa-clipboard-list"></i> Methodology</h2>
+                <div class="methodology">
+                    {{ plan.methodology }}
+                </div>
+                
+                <h2 class="section-heading"><i class="far fa-calendar-alt"></i> Timeline</h2>
+                <div class="card mb-4">
+                    <div class="card-body p-0">
+                        {% for milestone, timeframe in plan.timeline.items() %}
+                            <div class="timeline-item">
+                                <div class="timeline-milestone">{{ milestone }}</div>
+                                <div class="timeline-timeframe">{{ timeframe }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+                
+                <h2 class="section-heading"><i class="fas fa-question-circle"></i> Research Questions</h2>
+                {% for category in plan.questions %}
+                    <div class="mb-4">
+                        <div class="question-category">{{ category.category }}</div>
+                        <ul class="questions-list">
+                            {% for question in category.questions %}
+                                <li>{{ question }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="empty-plan">
+                    <i class="fas fa-file-alt"></i>
+                    <h3>This research plan needs to be generated</h3>
+                    <p>Use the generate button below to create a comprehensive research plan based on your description.</p>
+                </div>
+            {% endif %}
+            
+            <div class="actions-bar">
+                <div>
+                    <a href="/langchain" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+                <div>
+                    {% if not plan.objectives %}
+                        <button class="btn btn-primary" id="generatePlanBtn">
+                            <i class="fas fa-magic"></i> Generate Research Plan
+                        </button>
+                    {% else %}
+                        <button class="btn btn-outline-primary me-2" id="generateScriptBtn">
+                            <i class="fas fa-file-alt"></i> Generate Interview Script
+                        </button>
+                        <button class="btn btn-primary" id="downloadPlanBtn">
+                            <i class="fas fa-download"></i> Download Plan
+                        </button>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Generate Plan Modal -->
+    <div class="modal fade" id="generatePlanModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Research Plan</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="researchBrief" class="form-label">Research Brief</label>
+                        <textarea class="form-control" id="researchBrief" rows="5" placeholder="Provide a detailed brief about what you're trying to research. Include context, goals, target audience, and any specific areas you want to explore."></textarea>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> The more detailed your brief, the more comprehensive your research plan will be.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmGeneratePlan">
+                        <i class="fas fa-cog"></i> Generate Plan
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Loading Modal -->
+    <div class="modal fade" id="loadingModal" tabindex="-1" aria-hidden="true" data-bs-backdrop="static">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <div class="modal-body text-center p-4">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <h5 id="loadingMessage">Generating research plan...</h5>
+                    <p class="text-muted">This may take a minute or two</p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script Modal -->
+    <div class="modal fade" id="scriptModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Generate Interview Script</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Participant Information</label>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="participantRole" placeholder="Role (e.g., Product Manager)">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="participantExperience" placeholder="Experience Level">
+                            </div>
+                            <div class="col-md-4">
+                                <input type="text" class="form-control" id="participantIndustry" placeholder="Industry">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> The script will be personalized based on this information and the research plan.
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="button" class="btn btn-primary" id="confirmGenerateScript">
+                        <i class="fas fa-file-alt"></i> Generate Script
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Script Result Modal -->
+    <div class="modal fade" id="scriptResultModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Interview Script</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <pre id="scriptContent" class="p-3" style="max-height: 400px; overflow-y: auto; white-space: pre-wrap;"></pre>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary" id="downloadScriptBtn">
+                        <i class="fas fa-download"></i> Download Script
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const generatePlanBtn = document.getElementById('generatePlanBtn');
+            const generateScriptBtn = document.getElementById('generateScriptBtn');
+            const downloadPlanBtn = document.getElementById('downloadPlanBtn');
+            const confirmGeneratePlan = document.getElementById('confirmGeneratePlan');
+            const confirmGenerateScript = document.getElementById('confirmGenerateScript');
+            const downloadScriptBtn = document.getElementById('downloadScriptBtn');
+            
+            const generatePlanModal = new bootstrap.Modal(document.getElementById('generatePlanModal'));
+            const loadingModal = new bootstrap.Modal(document.getElementById('loadingModal'));
+            const scriptModal = new bootstrap.Modal(document.getElementById('scriptModal'));
+            const scriptResultModal = new bootstrap.Modal(document.getElementById('scriptResultModal'));
+            
+            const planId = '{{ plan.id }}';
+            
+            // Generate Plan button
+            if (generatePlanBtn) {
+                generatePlanBtn.addEventListener('click', function() {
+                    generatePlanModal.show();
+                });
+            }
+            
+            // Generate Script button
+            if (generateScriptBtn) {
+                generateScriptBtn.addEventListener('click', function() {
+                    scriptModal.show();
+                });
+            }
+            
+            // Download Plan button
+            if (downloadPlanBtn) {
+                downloadPlanBtn.addEventListener('click', function() {
+                    // Create the plan content
+                    const planContent = `# Research Plan: {{ plan.title }}
+                    
+## Description
+{{ plan.description }}
+
+## Research Objectives
+{% for objective in plan.objectives %}
+- {{ objective }}
+{% endfor %}
+
+## Methodology
+{{ plan.methodology }}
+
+## Timeline
+{% for milestone, timeframe in plan.timeline.items() %}
+- {{ milestone }}: {{ timeframe }}
+{% endfor %}
+
+## Research Questions
+{% for category in plan.questions %}
+### {{ category.category }}
+{% for question in category.questions %}
+- {{ question }}
+{% endfor %}
+{% endfor %}
+                    `;
+                    
+                    // Create and download the file
+                    const blob = new Blob([planContent], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `research_plan_${planId}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            }
+            
+            // Confirm Generate Plan button
+            if (confirmGeneratePlan) {
+                confirmGeneratePlan.addEventListener('click', function() {
+                    const brief = document.getElementById('researchBrief').value;
+                    
+                    if (!brief) {
+                        alert('Please enter a research brief');
+                        return;
+                    }
+                    
+                    // Close the modal and show loading
+                    generatePlanModal.hide();
+                    document.getElementById('loadingMessage').textContent = 'Generating research plan...';
+                    loadingModal.show();
+                    
+                    // Generate the research plan
+                    fetch('/langchain/api/research/generate', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            plan_id: planId,
+                            brief: brief
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'success') {
+                            // Save the plan
+                            return fetch('/langchain/api/research/save', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    plan_id: planId
+                                })
+                            });
+                        } else {
+                            throw new Error(data.error || 'Failed to generate plan');
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingModal.hide();
+                        if (data.status === 'success') {
+                            // Reload the page to show the new plan
+                            window.location.reload();
+                        } else {
+                            alert('Error saving plan: ' + (data.error || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        loadingModal.hide();
+                        console.error('Error:', error);
+                        alert('Error generating plan: ' + error.message);
+                    });
+                });
+            }
+            
+            // Confirm Generate Script button
+            if (confirmGenerateScript) {
+                confirmGenerateScript.addEventListener('click', function() {
+                    const role = document.getElementById('participantRole').value || 'Participant';
+                    const experience = document.getElementById('participantExperience').value || 'Not specified';
+                    const industry = document.getElementById('participantIndustry').value || 'General';
+                    
+                    // Close the modal and show loading
+                    scriptModal.hide();
+                    document.getElementById('loadingMessage').textContent = 'Generating interview script...';
+                    loadingModal.show();
+                    
+                    // Generate the interview script
+                    fetch('/langchain/api/research/interview-script', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            plan_id: planId,
+                            participant_info: {
+                                role: role,
+                                experience: experience,
+                                industry: industry
+                            }
+                        })
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        loadingModal.hide();
+                        if (data.status === 'success') {
+                            // Show the script in the result modal
+                            document.getElementById('scriptContent').textContent = data.script;
+                            scriptResultModal.show();
+                        } else {
+                            alert('Error generating script: ' + (data.error || 'Unknown error'));
+                        }
+                    })
+                    .catch(error => {
+                        loadingModal.hide();
+                        console.error('Error:', error);
+                        alert('Error generating script: ' + error.message);
+                    });
+                });
+            }
+            
+            // Download Script button
+            if (downloadScriptBtn) {
+                downloadScriptBtn.addEventListener('click', function() {
+                    const scriptContent = document.getElementById('scriptContent').textContent;
+                    
+                    // Create and download the file
+                    const blob = new Blob([scriptContent], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `interview_script_${planId}.md`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                });
+            }
+        });
+    </script>
+</body>
+</html> 
