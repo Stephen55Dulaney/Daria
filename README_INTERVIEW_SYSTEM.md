@@ -1,13 +1,52 @@
-# DARIA Secure Interview System
+# DARIA Remote Interview System - Release Candidate 1
 
 ## Overview
-The DARIA (Deloitte Advanced Research & Interview Assistant) Secure Interview System allows you to create and share secure links with interview participants. This system includes:
 
-1. **Secure Link Generation**: Create unique, tokenized links for participants
-2. **Live Interview Monitoring**: Watch interviews in real-time with live transcript updates
-3. **Voice Input Processing**: Participants can use voice responses which are transcribed
-4. **Security Features**: Token-based authentication, link expiration, and controlled access
-5. **Transcript Management**: Store and manage interview transcripts
+The DARIA Remote Interview System is a specialized module built on top of the DARIA Interview Tool that allows researchers to conduct remote interviews with participants using AI-powered voice capabilities.
+
+## Release Candidate 1 Features
+
+This release candidate (RC1) includes the following features:
+
+### ElevenLabs Integration
+- Text-to-speech conversion using ElevenLabs API for natural-sounding AI voices
+- Support for multiple voice options (Rachel, Antoni, Elli, Domi, Fin)
+- Speech-to-text functionality for transcribing participant responses
+- Automatic fallback to browser-based speech synthesis when needed
+
+### Interview Management
+- Creation and configuration of interview sessions
+- Character selection for different interviewer personas (Skeptica, Empathica, etc.)
+- Session persistence between pages and application restarts
+- Session tracking with unique IDs
+- Transcript generation and storage
+
+### User Experience
+- Simple and intuitive interview setup interface
+- Real-time voice capture and response
+- Visual feedback during recording
+- Support for both text and voice input methods
+
+## How to Use
+
+1. Start the services with `./start_services.sh`
+2. Navigate to `http://127.0.0.1:5010/dashboard`
+3. Go to the Interview Setup page to configure a new interview
+4. Select a character and voice
+5. Start the interview session
+
+## Known Issues
+
+- When the application is restarted without saving the state, session data may be lost
+- Some browsers may require permission settings for microphone access
+- Occasional connection issues with ElevenLabs API may occur
+
+## Next Steps
+
+The following features are planned for future releases:
+- Enhanced database persistence for interview sessions
+- Vector database for semantic search and analysis of transcripts
+- Improved security measures for handling sensitive interview data
 
 ## Security Features
 
