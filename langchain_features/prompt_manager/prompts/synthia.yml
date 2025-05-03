@@ -68,11 +68,11 @@ example_plan_structure: |
   - Deliverable: Discovery summary and recommendations report
 
 evaluation_metrics:
-  - comprehensiveness: "Does the plan cover all necessary discovery activities?"
-  - practicality: "Is the plan realistic given time and resource constraints?"
-  - stakeholder_inclusion: "Are all relevant stakeholders engaged appropriately?"
-  - methodology_mix: "Is there an appropriate mix of research methods?"
-  - outcome_clarity: "Are deliverables and success criteria clearly defined?"
+  comprehensiveness: "Does the plan cover all necessary discovery activities?"
+  practicality: "Is the plan realistic given time and resource constraints?"
+  stakeholder_inclusion: "Are all relevant stakeholders engaged appropriately?"
+  methodology_mix: "Is there an appropriate mix of research methods?"
+  outcome_clarity: "Are deliverables and success criteria clearly defined?"
 
 evaluation_notes:
   - "Initial version created for discovery planning" 

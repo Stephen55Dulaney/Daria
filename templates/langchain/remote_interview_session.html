@@ -1,0 +1,375 @@
+{% extends "langchain/remote_interview_base.html" %}
+
+{% block title %}Remote Interview - {{ interview.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="welcome-message bg-light p-3 mb-4 rounded">
+            <h2 class="h5">Welcome to this remote interview session</h2>
+            <p>Thank you for agreeing to speak with us today. This interview will help us gather valuable insights.</p>
+            <p>Please respond naturally to the questions asked. You can type your answers or use the microphone button to speak.</p>
+        </div>
+        
+        <div class="bg-white rounded-3 shadow-sm p-3 d-flex flex-column" style="min-height: 70vh;">
+            <!-- Hidden input to store session ID -->
+            <input type="hidden" id="sessionId" value="{{ session_id }}">
+            <input type="hidden" id="voiceId" value="{{ voice_id|default('EXAVITQu4vr4xnSDxMaL') }}">
+            
+            <!-- Main chat interface -->
+            <div id="chat-container" class="flex-grow-1 d-flex flex-column mb-3">
+                <div id="chat-messages" class="flex-grow-1 overflow-auto p-3"></div>
+                <div class="typing-indicator d-none" id="typingIndicator">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            
+            <!-- User input area -->
+            <div id="user-input-container" class="mt-auto">
+                <div class="input-group">
+                    <textarea id="userText" class="form-control" placeholder="Type your response..." rows="2"></textarea>
+                    <button id="sendBtn" class="btn btn-primary" onclick="sendMessage()">
+                        <i class="bi bi-send"></i>
+                    </button>
+                    <button id="micBtn" class="btn btn-outline-primary" onclick="toggleRecording()">
+                        <i class="bi bi-mic"></i>
+                    </button>
+                </div>
+                <div class="text-muted small mt-1" id="status-text">Ready</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thank You Modal -->
+<div class="modal fade" id="thankYouModal" tabindex="-1" aria-labelledby="thankYouModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="thankYouModalLabel">Interview Complete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="py-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                    <h3 class="mt-4">Thank You!</h3>
+                    <p class="text-muted">Your interview has been successfully completed and recorded.</p>
+                    <p>We appreciate your participation and valuable insights.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeWindow()">Close Window</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get session ID from the hidden input
+        const sessionId = document.getElementById('sessionId').value;
+        const voiceId = document.getElementById('voiceId').value;
+        console.log('Session ID:', sessionId);
+        
+        // DOM elements
+        const chatMessages = document.getElementById('chat-messages');
+        const micBtn = document.getElementById('micBtn');
+        const sendBtn = document.getElementById('sendBtn');
+        const statusText = document.getElementById('status-text');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const userText = document.getElementById('userText');
+        
+        // State variables
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let audioContext = null;
+        let isWaitingForResponse = false;
+        
+        // Initialize
+        startInterview();
+        
+        // Handle enter key in textarea
+        userText.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Function to start the interview
+        function startInterview() {
+            // Show loading state
+            showTypingIndicator();
+            
+            // Call the API to start the interview
+            fetch('/api/interview/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ 
+                    session_id: sessionId,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                if (data.success) {
+                    // Add the AI's greeting
+                    addMessage(data.message, 'ai');
+                    
+                    // Use text-to-speech for the greeting
+                    speakText(data.message);
+                } else {
+                    console.error('Error starting interview:', data.error);
+                    addMessage('Error starting interview. Please refresh the page or contact support.', 'ai');
+                }
+            })
+            .catch(error => {
+                console.error('Error starting interview:', error);
+                hideTypingIndicator();
+                addMessage('Error starting interview. Please refresh the page or contact support.', 'ai');
+            });
+        }
+        
+        // Function to send a message
+        window.sendMessage = function() {
+            const text = userText.value.trim();
+            if (!text || isWaitingForResponse) return;
+            
+            // Add the user's message to the chat
+            addMessage(text, 'user');
+            
+            // Clear the input
+            userText.value = '';
+            
+            // Show typing indicator
+            showTypingIndicator();
+            isWaitingForResponse = true;
+            
+            // Call the API to process the user's message
+            fetch('/api/interview/respond', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    message: text,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                hideTypingIndicator();
+                isWaitingForResponse = false;
+                
+                if (data.success) {
+                    // Add the AI's response
+                    addMessage(data.message, 'ai');
+                    
+                    // Use text-to-speech for the response
+                    speakText(data.message);
+                } else {
+                    console.error('Error getting response:', data.error);
+                    addMessage('Sorry, I encountered an error. Please try again.', 'ai');
+                }
+            })
+            .catch(error => {
+                console.error('Error getting response:', error);
+                hideTypingIndicator();
+                isWaitingForResponse = false;
+                addMessage('Sorry, I encountered an error. Please try again.', 'ai');
+            });
+        };
+        
+        // Function to toggle recording
+        window.toggleRecording = function() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        };
+        
+        // Function to start recording audio
+        function startRecording() {
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    isRecording = true;
+                    micBtn.classList.add('btn-danger');
+                    micBtn.classList.remove('btn-outline-primary');
+                    micBtn.innerHTML = '<i class="bi bi-stop-fill"></i>';
+                    statusText.innerText = 'Recording...';
+                    
+                    mediaRecorder = new MediaRecorder(stream);
+                    audioChunks = [];
+                    
+                    mediaRecorder.ondataavailable = (e) => {
+                        audioChunks.push(e.data);
+                    };
+                    
+                    mediaRecorder.onstop = processRecording;
+                    
+                    mediaRecorder.start();
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    statusText.innerText = 'Error: Could not access microphone';
+                });
+        }
+        
+        // Function to stop recording
+        function stopRecording() {
+            if (!mediaRecorder) return;
+            
+            isRecording = false;
+            micBtn.classList.remove('btn-danger');
+            micBtn.classList.add('btn-outline-primary');
+            micBtn.innerHTML = '<i class="bi bi-mic"></i>';
+            statusText.innerText = 'Processing audio...';
+            
+            mediaRecorder.stop();
+        }
+        
+        // Process recording and send to speech-to-text
+        function processRecording() {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            
+            const formData = new FormData();
+            formData.append('audio', audioBlob);
+            
+            fetch('/api/speech_to_text', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    userText.value = data.text;
+                    statusText.innerText = 'Speech processed successfully!';
+                    
+                    // Auto-send the message
+                    setTimeout(() => sendMessage(), 500);
+                } else {
+                    statusText.innerText = 'Error processing speech. Please try again.';
+                    console.error('Speech-to-text error:', data.error);
+                }
+            })
+            .catch(error => {
+                statusText.innerText = 'Error processing speech. Please try again.';
+                console.error('Speech-to-text error:', error);
+            });
+        }
+        
+        // Function to speak text using TTS
+        function speakText(text) {
+            fetch('/api/text_to_speech_elevenlabs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice_id: voiceId,
+                    session_id: sessionId
+                })
+            })
+            .then(response => {
+                if (response.ok) {
+                    return response.blob();
+                }
+                throw new Error('TTS request failed');
+            })
+            .then(audioBlob => {
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audio = new Audio(audioUrl);
+                audio.play();
+            })
+            .catch(error => {
+                console.error('Text-to-speech error:', error);
+                // Use browser's TTS as fallback
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    speechSynthesis.speak(utterance);
+                }
+            });
+        }
+        
+        // Function to add a message to the chat
+        function addMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.textContent = text;
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Function to show typing indicator
+        function showTypingIndicator() {
+            typingIndicator.classList.remove('d-none');
+        }
+        
+        // Function to hide typing indicator
+        function hideTypingIndicator() {
+            typingIndicator.classList.add('d-none');
+        }
+        
+        // Function to end the interview
+        window.endInterview = function() {
+            fetch('/api/interview/end', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show thank you modal
+                    const thankYouModal = new bootstrap.Modal(document.getElementById('thankYouModal'));
+                    thankYouModal.show();
+                    
+                    // Update status
+                    document.getElementById('interviewStatus').innerText = 'Completed';
+                    document.getElementById('interviewStatus').classList.add('bg-success');
+                } else {
+                    console.error('Error ending interview:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error ending interview:', error);
+            });
+        };
+        
+        // Function to close the window
+        window.closeWindow = function() {
+            window.close();
+            
+            // If window.close() doesn't work (which is common in many browsers)
+            // Show a message asking the user to close the tab
+            setTimeout(() => {
+                document.body.innerHTML = `
+                    <div class="container text-center py-5">
+                        <h1>Thank you for your participation!</h1>
+                        <p>You may now close this browser tab.</p>
+                    </div>
+                `;
+            }, 300);
+        };
+    });
+</script>
+{% endblock %} 

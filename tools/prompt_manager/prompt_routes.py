@@ -52,12 +52,16 @@ def view_prompt(agent):
         feedback = prompt_manager.get_feedback(agent)
         performance = prompt_manager.get_prompt_performance(agent)
         
+        # Get improvement recommendations
+        recommendations = prompt_manager.get_improvement_recommendations(agent)
+        
         return render_template('prompts/view_prompt.html',
                               agent=agent,
                               config=config,
                               history=history,
                               feedback=feedback,
-                              performance=performance)
+                              performance=performance,
+                              recommendations=recommendations)
     except FileNotFoundError:
         flash(f"Prompt for {agent} not found", "error")
         return redirect(url_for('prompts.prompt_list'))
@@ -109,7 +113,14 @@ def edit_prompt(agent):
     # GET request or error in POST
     try:
         config = prompt_manager.load_prompt(agent)
-        return render_template('prompts/edit_prompt.html', agent=agent, config=config)
+        
+        # Format lists for textarea
+        core_objectives = "\n".join(config.get('core_objectives', []))
+        
+        return render_template('prompts/edit_prompt.html',
+                              agent=agent,
+                              config=config,
+                              core_objectives=core_objectives)
     except FileNotFoundError:
         flash(f"Prompt for {agent} not found", "error")
         return redirect(url_for('prompts.prompt_list'))
@@ -129,8 +140,21 @@ def prompt_feedback(agent):
             score = int(form_data.get('score', 3))
             notes = form_data.get('notes', '')
             
-            # Add feedback
-            prompt_manager.add_feedback(agent, session_id, score, notes)
+            # Extract detailed evaluation metrics
+            evaluation_metrics = {}
+            for key in form_data:
+                if key.startswith('metric_'):
+                    metric_name = key.replace('metric_', '')
+                    evaluation_metrics[metric_name] = int(form_data.get(key, 3))
+            
+            # Add feedback with evaluation metrics
+            prompt_manager.add_feedback(
+                agent, 
+                session_id, 
+                score, 
+                notes, 
+                evaluation_metrics=evaluation_metrics
+            )
             
             flash(f"Feedback for {agent} added successfully", "success")
             return redirect(url_for('prompts.view_prompt', agent=agent))
@@ -139,11 +163,13 @@ def prompt_feedback(agent):
             logger.error(f"Error adding feedback for {agent}: {str(e)}")
     
     # GET request or error in POST
-    return render_template('prompts/add_feedback.html', agent=agent)
+    # Get evaluation rubric categories for the form
+    evaluation_rubric = prompt_manager.get_evaluation_rubric()
+    return render_template('prompts/add_feedback.html', agent=agent, rubric=evaluation_rubric)
 
 @prompt_bp.route('/<agent>/history/<filename>')
 def view_history(agent, filename):
-    """View a specific version from history"""
+    """View a historical version of a prompt"""
     try:
         history_file = Path(prompt_manager.history_dir) / filename
         
@@ -163,9 +189,9 @@ def view_history(agent, filename):
         logger.error(f"Error loading history for {agent}: {str(e)}")
         return redirect(url_for('prompts.view_prompt', agent=agent))
 
-@prompt_bp.route('/<agent>/restore/<filename>')
+@prompt_bp.route('/<agent>/history/<filename>/restore')
 def restore_history(agent, filename):
-    """Restore a prompt from history"""
+    """Restore a historical version of a prompt"""
     try:
         history_file = Path(prompt_manager.history_dir) / filename
         
@@ -176,108 +202,25 @@ def restore_history(agent, filename):
         with open(history_file, 'r') as f:
             config = yaml.safe_load(f)
         
-        # Update version to indicate restoration
-        if 'version' in config:
-            version_parts = config['version'].split('.')
-            if len(version_parts) >= 2:
-                try:
-                    major = version_parts[0]
-                    minor = int(version_parts[1]) + 1
-                    config['version'] = f"{major}.{minor}"
-                except:
-                    config['version'] = f"{config['version']}.restored"
-        
-        # Add restoration note
-        if 'evaluation_notes' not in config:
-            config['evaluation_notes'] = []
-        config['evaluation_notes'].append(f"{datetime.now().strftime('%Y-%m-%d')}: Restored from {filename}")
-        
-        # Save the restored config
+        # Save as current version
         prompt_manager.save_prompt(agent, config)
         
-        flash(f"Prompt for {agent} restored successfully", "success")
+        flash(f"Successfully restored {agent} prompt to version from {filename}", "success")
         return redirect(url_for('prompts.view_prompt', agent=agent))
     except Exception as e:
-        flash(f"Error restoring prompt: {str(e)}", "error")
-        logger.error(f"Error restoring prompt for {agent}: {str(e)}")
+        flash(f"Error restoring history: {str(e)}", "error")
+        logger.error(f"Error restoring history for {agent}: {str(e)}")
         return redirect(url_for('prompts.view_prompt', agent=agent))
 
-@prompt_bp.route('/new', methods=['GET', 'POST'])
-def new_prompt():
-    """Create a new prompt"""
-    if request.method == 'POST':
-        try:
-            # Get form data
-            form_data = request.form
-            agent_name = form_data.get('agent_name', '').lower().strip()
-            
-            if not agent_name:
-                flash("Agent name is required", "error")
-                return render_template('prompts/new_prompt.html')
-            
-            # Check if prompt already exists
-            try:
-                existing_config = prompt_manager.load_prompt(agent_name)
-                flash(f"Prompt for {agent_name} already exists", "error")
-                return redirect(url_for('prompts.edit_prompt', agent=agent_name))
-            except FileNotFoundError:
-                pass
-            
-            # Create new prompt template
-            config = prompt_manager.create_prompt_template(
-                agent_name=agent_name,
-                role=form_data.get('role', ''),
-                description=form_data.get('description', ''),
-                tone=form_data.get('tone', ''),
-                core_objectives=[obj.strip() for obj in form_data.get('core_objectives', '').split('\n') if obj.strip()],
-                contextual_instructions=form_data.get('contextual_instructions', ''),
-                dynamic_prompt_prefix=form_data.get('dynamic_prompt_prefix', ''),
-                analysis_prompt=form_data.get('analysis_prompt', '')
-            )
-            
-            # Save the new prompt
-            prompt_manager.save_prompt(agent_name, config, create_version=False)
-            
-            flash(f"Prompt for {agent_name} created successfully", "success")
-            return redirect(url_for('prompts.view_prompt', agent=agent_name))
-        except Exception as e:
-            flash(f"Error creating prompt: {str(e)}", "error")
-            logger.error(f"Error creating prompt: {str(e)}")
-    
-    # GET request or error in POST
-    return render_template('prompts/new_prompt.html')
-
-@prompt_bp.route('/api/<agent>')
-def api_get_prompt(agent):
-    """API endpoint to get a prompt configuration"""
+@prompt_bp.route('/<agent>/api/performance')
+def api_performance(agent):
+    """API endpoint to get performance data for a prompt"""
     try:
-        config = prompt_manager.load_prompt(agent)
-        return jsonify({"success": True, "prompt": config})
-    except FileNotFoundError:
-        return jsonify({"success": False, "error": "Prompt not found"}), 404
+        performance = prompt_manager.get_prompt_performance(agent)
+        return jsonify(performance)
     except Exception as e:
-        logger.error(f"Error in API get_prompt for {agent}: {str(e)}")
-        return jsonify({"success": False, "error": str(e)}), 500
-
-@prompt_bp.route('/api/<agent>/feedback', methods=['POST'])
-def api_add_feedback(agent):
-    """API endpoint to add feedback for a prompt"""
-    try:
-        data = request.json
-        if not data:
-            return jsonify({"success": False, "error": "No JSON data provided"}), 400
-        
-        session_id = data.get('session_id', str(datetime.now().timestamp()))
-        score = int(data.get('score', 3))
-        notes = data.get('notes', '')
-        
-        # Add feedback
-        feedback = prompt_manager.add_feedback(agent, session_id, score, notes)
-        
-        return jsonify({"success": True, "feedback": feedback})
-    except Exception as e:
-        logger.error(f"Error in API add_feedback for {agent}: {str(e)}")
-        return jsonify({"success": False, "error": str(e)}), 500
+        logger.error(f"Error getting performance data for {agent}: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 def register_prompt_routes(app):
     """Set up prompt routes for the Flask app"""

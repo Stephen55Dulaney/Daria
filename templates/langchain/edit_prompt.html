@@ -1,0 +1,245 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Edit Prompt: {{ agent }} - DARIA{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h2 mb-0">Edit Prompt: {{ agent }}</h1>
+                    <p class="text-muted">Modify your prompt template</p>
+                </div>
+                <div>
+                    <a href="/prompts/" class="btn btn-outline-secondary me-2">
+                        <i class="bi bi-arrow-left"></i> Back to Prompts
+                    </a>
+                    <button class="btn btn-primary" id="savePromptBtn">
+                        <i class="bi bi-save"></i> Save Changes
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            <form id="editPromptForm">
+                <!-- Basic Information Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Basic Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="agentName" class="form-label">Agent Name</label>
+                                <input type="text" class="form-control" id="agentName" value="{{ config.agent_name }}" required>
+                                <div class="form-text">The name of this agent (e.g., "Thesea")</div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="version" class="form-label">Version</label>
+                                <input type="text" class="form-control" id="version" value="{{ config.version }}" required>
+                                <div class="form-text">Version number (e.g., "v1.0")</div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <input type="text" class="form-control" id="role" value="{{ config.role }}" required>
+                            <div class="form-text">The functional role of this agent in the research process</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" rows="3" required>{{ config.description }}</textarea>
+                            <div class="form-text">A detailed description of what this agent does</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tone" class="form-label">Tone</label>
+                            <input type="text" class="form-control" id="tone" value="{{ config.tone }}">
+                            <div class="form-text">Communication style (e.g., "Professional, empathetic, curious")</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Core Objectives Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Core Objectives</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="coreObjectives" class="form-label">Core Objectives</label>
+                            <textarea class="form-control" id="coreObjectives" rows="6">{{ config.core_objectives }}</textarea>
+                            <div class="form-text">Enter each objective on a new line</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Instructions & Prompting Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Instructions & Prompting</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="contextualInstructions" class="form-label">Contextual Instructions</label>
+                            <textarea class="form-control" id="contextualInstructions" rows="8">{{ config.contextual_instructions }}</textarea>
+                            <div class="form-text">Detailed instructions about how the agent should operate</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="dynamicPromptPrefix" class="form-label">Dynamic Prompt Prefix</label>
+                            <textarea class="form-control" id="dynamicPromptPrefix" rows="10" required>{{ config.dynamic_prompt_prefix }}</textarea>
+                            <div class="form-text">The LangChain prompt prefix used to guide agent behavior</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="analysisPrompt" class="form-label">Analysis Prompt</label>
+                            <textarea class="form-control" id="analysisPrompt" rows="10">{{ config.analysis_prompt }}</textarea>
+                            <div class="form-text">The prompt used for analyzing interview transcripts</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Examples Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Examples</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="exampleQuestions" class="form-label">Example Questions</label>
+                            <textarea class="form-control" id="exampleQuestions" rows="4">{{ config.example_questions }}</textarea>
+                            <div class="form-text">Enter each question on a new line</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="exampleOutputs" class="form-label">Example Outputs</label>
+                            <textarea class="form-control" id="exampleOutputs" rows="4">{{ config.example_outputs }}</textarea>
+                            <div class="form-text">Enter each example output on a new line</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="exampleAssumptionChallenges" class="form-label">Example Assumption Challenges</label>
+                            <textarea class="form-control" id="exampleAssumptionChallenges" rows="6">{{ config.example_assumption_challenges }}</textarea>
+                            <div class="form-text">Enter each assumption challenge on a new line</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="commonResearchBiases" class="form-label">Common Research Biases</label>
+                            <textarea class="form-control" id="commonResearchBiases" rows="6">{{ config.common_research_biases }}</textarea>
+                            <div class="form-text">List common research biases to be aware of</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Version & Notes Card -->
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Versioning & Notes</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="evaluationNote" class="form-label">Evaluation Note</label>
+                            <textarea class="form-control" id="evaluationNote" rows="3"></textarea>
+                            <div class="form-text">A note explaining the changes made in this version</div>
+                        </div>
+                        
+                        <div class="form-check mb-3">
+                            <input class="form-check-input" type="checkbox" id="createVersion" checked>
+                            <label class="form-check-label" for="createVersion">Create new version</label>
+                            <div class="form-text">Save the previous version in history</div>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            
+            <div class="d-flex justify-content-between mb-4">
+                <a href="/prompts/" class="btn btn-outline-secondary">Cancel</a>
+                <button type="button" class="btn btn-primary" id="saveButton">Save Changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const promptId = '{{ prompt_id }}';
+        const saveBtn = document.getElementById('savePromptBtn');
+        const saveButton = document.getElementById('saveButton');
+        
+        const saveFunction = function() {
+            const agentName = document.getElementById('agentName').value.trim();
+            const version = document.getElementById('version').value.trim();
+            const description = document.getElementById('description').value.trim();
+            const role = document.getElementById('role').value.trim();
+            const tone = document.getElementById('tone').value.trim();
+            const coreObjectives = document.getElementById('coreObjectives').value.trim();
+            const contextualInstructions = document.getElementById('contextualInstructions').value.trim();
+            const dynamicPromptPrefix = document.getElementById('dynamicPromptPrefix').value.trim();
+            const analysisPrompt = document.getElementById('analysisPrompt').value.trim();
+            const exampleQuestions = document.getElementById('exampleQuestions').value.trim();
+            const exampleOutputs = document.getElementById('exampleOutputs').value.trim();
+            const exampleAssumptionChallenges = document.getElementById('exampleAssumptionChallenges').value.trim();
+            const commonResearchBiases = document.getElementById('commonResearchBiases').value.trim();
+            const evaluationNote = document.getElementById('evaluationNote').value.trim();
+            const createVersion = document.getElementById('createVersion').checked;
+            
+            if (!agentName || !description || !role) {
+                alert('Agent name, description, and role are required!');
+                return;
+            }
+            
+            // Call API to update prompt
+            fetch(`/api/prompts/edit/${promptId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    agent_name: agentName,
+                    version: version,
+                    description: description,
+                    role: role,
+                    tone: tone,
+                    core_objectives: coreObjectives,
+                    contextual_instructions: contextualInstructions,
+                    dynamic_prompt_prefix: dynamicPromptPrefix,
+                    analysis_prompt: analysisPrompt,
+                    example_questions: exampleQuestions,
+                    example_outputs: exampleOutputs,
+                    example_assumption_challenges: exampleAssumptionChallenges,
+                    common_research_biases: commonResearchBiases,
+                    evaluation_note: evaluationNote,
+                    create_version: createVersion
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    alert('Prompt saved successfully!');
+                    
+                    // Redirect back to prompts page
+                    window.location.href = '/prompts/';
+                } else {
+                    alert('Error saving prompt: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error saving prompt. Please try again.');
+            });
+        };
+        
+        saveBtn.addEventListener('click', saveFunction);
+        saveButton.addEventListener('click', saveFunction);
+    });
+</script>
+{% endblock %} 

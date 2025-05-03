@@ -60,13 +60,13 @@
                 <h3 class="h5 mb-3">Interview Link</h3>
                 <p class="small text-muted mb-2">Share this link with candidates to start interviews:</p>
                 <div class="input-group mb-2">
-                    <input type="text" class="form-control" value="{{ request.host_url }}langchain/interview/session/{{ session_id }}" readonly id="interview-link">
+                    <input type="text" class="form-control" value="{{ request.host_url }}interview/session/{{ session_id }}?voice_id={{ interview.voice_id|default('EXAVITQu4vr4xnSDxMaL') }}&remote=true" readonly id="interview-link">
                     <button class="btn btn-outline-primary" type="button" onclick="copyLink()">
                         <i class="bi bi-clipboard me-1"></i> Copy
                     </button>
                 </div>
                 <div class="d-flex gap-2">
-                    <a href="{{ request.host_url }}langchain/interview/session/{{ session_id }}" target="_blank" class="btn btn-sm btn-outline-secondary">
+                    <a href="{{ request.host_url }}interview/session/{{ session_id }}?voice_id={{ interview.voice_id|default('EXAVITQu4vr4xnSDxMaL') }}&remote=true" target="_blank" class="btn btn-sm btn-outline-secondary">
                         <i class="bi bi-box-arrow-up-right me-1"></i> Open in new tab
                     </a>
                     <button type="button" class="btn btn-sm btn-outline-secondary" onclick="sendEmailWithLink()">

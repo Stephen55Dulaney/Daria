@@ -1,4 +1,4 @@
-{% extends "base.html" %}
+{% extends "langchain/base.html" %}
 
 {% block title %}Create New Prompt - DARIA{% endblock %}
 
@@ -71,6 +71,12 @@
                     <label for="dynamic_prompt_prefix" class="form-label">Dynamic Prompt Prefix</label>
                     <textarea class="form-control" id="dynamic_prompt_prefix" name="dynamic_prompt_prefix" rows="10" required></textarea>
                     <div class="form-text">The LangChain prompt prefix used to guide agent behavior</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="analysis_prompt" class="form-label">Analysis Prompt</label>
+                    <textarea class="form-control" id="analysis_prompt" name="analysis_prompt" rows="10"></textarea>
+                    <div class="form-text">The prompt used for analyzing interview transcripts</div>
                 </div>
             </div>
         </div>

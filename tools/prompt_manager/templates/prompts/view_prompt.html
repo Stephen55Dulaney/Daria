@@ -1,6 +1,6 @@
-{% extends "base.html" %}
+{% extends "langchain/base.html" %}
 
-{% block title %}{{ agent }} Prompt - DARIA{% endblock %}
+{% block title %}View Prompt: {{ agent }} - DARIA{% endblock %}
 
 {% block content %}
 <div class="container">
@@ -24,46 +24,44 @@
             <!-- Prompt Details -->
             <div class="card mb-4">
                 <div class="card-header">
-                    <h5>Prompt Configuration</h5>
+                    <h5>Prompt Details</h5>
                 </div>
                 <div class="card-body">
                     <h6>Description</h6>
                     <p>{{ config.description }}</p>
-
+                    
+                    {% if config.core_objectives %}
+                        <h6 class="mt-4">Core Objectives</h6>
+                        <ul>
+                            {% for objective in config.core_objectives %}
+                                <li>{{ objective }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% endif %}
+                    
                     <h6 class="mt-4">Tone</h6>
                     <p>{{ config.tone }}</p>
-
-                    <h6 class="mt-4">Core Objectives</h6>
-                    <ul>
-                        {% for objective in config.core_objectives %}
-                            <li>{{ objective }}</li>
-                        {% endfor %}
-                    </ul>
-
+                    
                     <h6 class="mt-4">Contextual Instructions</h6>
-                    <pre class="p-3 bg-light rounded">{{ config.contextual_instructions }}</pre>
-
+                    <pre class="text-pre-wrap">{{ config.contextual_instructions }}</pre>
+                    
                     <h6 class="mt-4">Dynamic Prompt Prefix</h6>
-                    <pre class="p-3 bg-light rounded">{{ config.dynamic_prompt_prefix }}</pre>
-
-                    {% if config.example_questions %}
-                        <h6 class="mt-4">Example Questions</h6>
+                    <pre class="text-pre-wrap">{{ config.dynamic_prompt_prefix }}</pre>
+                    
+                    {% if config.analysis_prompt %}
+                        <h6 class="mt-4">Analysis Prompt</h6>
+                        <pre class="text-pre-wrap">{{ config.analysis_prompt }}</pre>
+                    {% endif %}
+                    
+                    {% if config.evaluation_notes %}
+                        <h6 class="mt-4">Evaluation Notes</h6>
                         <ul>
-                            {% for question in config.example_questions %}
-                                <li>{{ question }}</li>
+                            {% for note in config.evaluation_notes %}
+                                <li>{{ note }}</li>
                             {% endfor %}
                         </ul>
                     {% endif %}
-
-                    {% if config.example_outputs %}
-                        <h6 class="mt-4">Example Outputs</h6>
-                        <ul>
-                            {% for output in config.example_outputs %}
-                                <li>{{ output }}</li>
-                            {% endfor %}
-                        </ul>
-                    {% endif %}
-
+                    
                     {% if config.evaluation_metrics %}
                         <h6 class="mt-4">Evaluation Metrics</h6>
                         <ul>
@@ -97,105 +95,221 @@
                                     <span class="me-2">{{ score }} ★</span>
                                     <div class="progress flex-grow-1">
                                         <div class="progress-bar" role="progressbar" 
-                                             style="width: {{ (performance.score_distribution.get(score, 0) / performance.total_sessions * 100) if performance.total_sessions > 0 else 0 }}%">
+                                             style="width: {% if performance.total_sessions > 0 %}{{ (performance.score_distribution.get(score, 0) / performance.total_sessions * 100) }}{% else %}0{% endif %}%">
                                             {{ performance.score_distribution.get(score, 0) }}
                                         </div>
                                     </div>
                                 </div>
                             {% endfor %}
                         </div>
-                    {% else %}
-                        <div class="alert alert-secondary">
-                            No performance data available yet
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Version History -->
-            <div class="card mb-4">
-                <div class="card-header">
-                    <h5>Version History</h5>
-                </div>
-                <div class="card-body">
-                    {% if history %}
-                        <ul class="list-group list-group-flush">
-                            {% for version in history %}
-                                <li class="list-group-item d-flex justify-content-between align-items-center">
-                                    <div>
-                                        <small class="text-muted">{{ version.date }}</small>
-                                        <div>Version {{ version.version }}</div>
-                                    </div>
-                                    <div>
-                                        <a href="{{ url_for('prompts.view_history', agent=agent, filename=version.filename) }}" class="btn btn-sm btn-outline-secondary">View</a>
-                                        <a href="{{ url_for('prompts.restore_history', agent=agent, filename=version.filename) }}" class="btn btn-sm btn-outline-primary">Restore</a>
-                                    </div>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                    {% else %}
-                        <div class="alert alert-secondary">
-                            No version history available
-                        </div>
-                    {% endif %}
-                </div>
-            </div>
-
-            <!-- Recent Feedback -->
-            <div class="card">
-                <div class="card-header">
-                    <h5>Recent Feedback</h5>
-                </div>
-                <div class="card-body">
-                    {% if feedback %}
-                        <ul class="list-group list-group-flush">
-                            {% for item in feedback[:5] %}
-                                <li class="list-group-item">
-                                    <div class="d-flex justify-content-between">
-                                        <small class="text-muted">{{ item.date }}</small>
-                                        <div>
-                                            {% for i in range(1, 6) %}
-                                                <i class="fas fa-star {% if i <= item.score %}text-warning{% else %}text-muted{% endif %}"></i>
-                                            {% endfor %}
-                                        </div>
-                                    </div>
-                                    <p class="mt-2 mb-0">{{ item.notes }}</p>
-                                </li>
-                            {% endfor %}
-                        </ul>
-                        {% if feedback|length > 5 %}
-                            <div class="text-center mt-3">
-                                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#moreFeedback">
-                                    View More
-                                </button>
-                            </div>
-                            <div class="collapse mt-3" id="moreFeedback">
-                                <ul class="list-group list-group-flush">
-                                    {% for item in feedback[5:] %}
-                                        <li class="list-group-item">
-                                            <div class="d-flex justify-content-between">
-                                                <small class="text-muted">{{ item.date }}</small>
-                                                <div>
-                                                    {% for i in range(1, 6) %}
-                                                        <i class="fas fa-star {% if i <= item.score %}text-warning{% else %}text-muted{% endif %}"></i>
-                                                    {% endfor %}
-                                                </div>
-                                            </div>
-                                            <p class="mt-2 mb-0">{{ item.notes }}</p>
-                                        </li>
-                                    {% endfor %}
-                                </ul>
+                        
+                        {% if performance.evaluation_metrics %}
+                            <h6 class="mt-4">Evaluation Metrics</h6>
+                            <div class="table-responsive">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Metric</th>
+                                            <th>Score</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for metric, score in performance.evaluation_metrics.items() %}
+                                            <tr>
+                                                <td>{{ metric|title }}</td>
+                                                <td>
+                                                    <div class="d-flex align-items-center">
+                                                        <span class="me-2">{{ "%.1f"|format(score) }}</span>
+                                                        <div class="progress flex-grow-1" style="height: 6px;">
+                                                            <div class="progress-bar" role="progressbar" 
+                                                                 style="width: {{ (score / 5 * 100) }}%"></div>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
                             </div>
                         {% endif %}
                     {% else %}
-                        <div class="alert alert-secondary">
-                            No feedback available yet
+                        <div class="text-center py-4">
+                            <p class="text-muted">No feedback data available</p>
+                            <a href="{{ url_for('prompts.prompt_feedback', agent=agent) }}" class="btn btn-sm btn-primary mt-2">
+                                Add First Feedback
+                            </a>
                         </div>
                     {% endif %}
                 </div>
             </div>
+            
+            <!-- Improvement Recommendations -->
+            {% if recommendations and recommendations|length > 0 %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Improvement Recommendations</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="mb-0">
+                            {% for rec in recommendations %}
+                                <li class="mb-2">{{ rec }}</li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+            {% endif %}
+            
+            <!-- Version History -->
+            {% if history and history|length > 0 %}
+                <div class="card mb-4">
+                    <div class="card-header">
+                        <h5>Version History</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Version</th>
+                                        <th>Date</th>
+                                        <th>Performance</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for version_info in history %}
+                                        <tr>
+                                            <td>{{ version_info.version }}</td>
+                                            <td>{{ version_info.timestamp.split('T')[0] }}</td>
+                                            <td>
+                                                {% if performance.by_version and version_info.version in performance.by_version %}
+                                                    {% set version_perf = performance.by_version[version_info.version] %}
+                                                    {% if version_perf.average_score %}
+                                                        {{ "%.1f"|format(version_perf.average_score) }}
+                                                        <span class="text-muted">({{ version_perf.sessions }})</span>
+                                                    {% else %}
+                                                        -
+                                                    {% endif %}
+                                                {% else %}
+                                                    -
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
         </div>
     </div>
+    
+    <!-- Recent Feedback -->
+    {% if feedback and feedback|length > 0 %}
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Recent Feedback</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Version</th>
+                                <th>Score</th>
+                                <th>Notes</th>
+                                <th>Metrics</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for entry in feedback[:5] %}
+                                <tr>
+                                    <td>{{ entry.timestamp.split('T')[0] }}</td>
+                                    <td>{{ entry.version }}</td>
+                                    <td>{{ entry.score }}/5</td>
+                                    <td>{{ entry.notes }}</td>
+                                    <td>
+                                        {% if entry.evaluation_metrics %}
+                                            <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                                    data-bs-toggle="collapse" data-bs-target="#metrics{{ loop.index }}">
+                                                View
+                                            </button>
+                                            <div class="collapse mt-2" id="metrics{{ loop.index }}">
+                                                <div class="card card-body py-2 px-3">
+                                                    <ul class="mb-0 ps-3 small">
+                                                        {% for metric, score in entry.evaluation_metrics.items() %}
+                                                            <li>{{ metric|title }}: {{ score }}/5</li>
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
+                                            </div>
+                                        {% else %}
+                                            <span class="text-muted">-</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                
+                {% if feedback|length > 5 %}
+                    <div class="text-center mt-3">
+                        <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                data-bs-toggle="collapse" data-bs-target="#moreFeedback">
+                            Show More ({{ feedback|length - 5 }} additional entries)
+                        </button>
+                        
+                        <div class="collapse mt-3" id="moreFeedback">
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Date</th>
+                                            <th>Version</th>
+                                            <th>Score</th>
+                                            <th>Notes</th>
+                                            <th>Metrics</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for entry in feedback[5:] %}
+                                            <tr>
+                                                <td>{{ entry.timestamp.split('T')[0] }}</td>
+                                                <td>{{ entry.version }}</td>
+                                                <td>{{ entry.score }}/5</td>
+                                                <td>{{ entry.notes }}</td>
+                                                <td>
+                                                    {% if entry.evaluation_metrics %}
+                                                        <button class="btn btn-sm btn-outline-secondary" type="button" 
+                                                                data-bs-toggle="collapse" data-bs-target="#metricsMore{{ loop.index }}">
+                                                            View
+                                                        </button>
+                                                        <div class="collapse mt-2" id="metricsMore{{ loop.index }}">
+                                                            <div class="card card-body py-2 px-3">
+                                                                <ul class="mb-0 ps-3 small">
+                                                                    {% for metric, score in entry.evaluation_metrics.items() %}
+                                                                        <li>{{ metric|title }}: {{ score }}/5</li>
+                                                                    {% endfor %}
+                                                                </ul>
+                                                            </div>
+                                                        </div>
+                                                    {% else %}
+                                                        <span class="text-muted">-</span>
+                                                    {% endif %}
+                                                </td>
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    {% endif %}
 </div>
 {% endblock %}
 

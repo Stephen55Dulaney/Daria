@@ -394,16 +394,29 @@
                     <div id="thankYouContent">
                         <h4 class="mb-3 text-center">Thank You for Your Participation!</h4>
                         <p>We appreciate you taking the time to share your thoughts and experiences with us.</p>
+                        
+                        <div class="card border-primary mb-3">
+                            <div class="card-header bg-primary text-white">
+                                <i class="fas fa-gift me-2"></i> Claim Your Reward
+                            </div>
+                            <div class="card-body">
+                                <p><strong>Reward Code:</strong> <span id="rewardCode" class="fw-bold text-primary">DARIA-{{ session_id|truncate(8, true, '') }}</span></p>
+                                <p>Please email this code to <a href="mailto:research@example.com">research@example.com</a> to claim your participation reward.</p>
+                                <p class="mb-0"><small>Rewards will be processed within 5-7 business days.</small></p>
+                            </div>
+                        </div>
+                        
                         <p>Your feedback is extremely valuable and will help us improve our products and services.</p>
-                        <p>If you have any additional questions or comments about the interview process, please feel free to email us at <a href="mailto:research@example.com">research@example.com</a>.</p>
+                        <p>If you have any additional thoughts or follow-up comments about the interview topics, please include them in your email.</p>
+                        
                         <div class="alert alert-info mt-3">
-                            <p>This window will automatically close in <span id="redirectCountdown">10</span> seconds.</p>
+                            <p class="mb-0">This window will automatically close in <span id="redirectCountdown" class="fw-bold">10</span> seconds after clicking "Close".</p>
                         </div>
                     </div>
                 </div>
                 <div class="modal-footer d-flex justify-content-between">
                     <button type="button" class="btn btn-secondary" id="stayOnPageBtn">Stay on Page</button>
-                    <button type="button" class="btn btn-primary" id="closeNowBtn">Close Now</button>
+                    <button type="button" class="btn btn-primary" id="closeNowBtn">Close</button>
                 </div>
             </div>
         </div>
@@ -429,6 +442,8 @@
             let autoListenMinimumWait = 500; // ms to wait after Daria speaks before auto-listening
             let audioAnalyser = null;
             let audioLevel = 0;
+            let countdownActive = false;
+            let countdownInterval = null;
             
             // Initialize speech synthesis voices
             function initVoices() {
@@ -624,147 +639,100 @@
                 });
             }
             
-            // Start recording with browser's speech recognition API
+            // Start recording
             function startRecording() {
-                if (isRecording) return;
+                if (isRecording || isSpeaking) return;
                 
-                // Update auto-listen indicator
-                if (autoListenEnabled) {
-                    updateAutoListenIndicator(true);
-                }
+                // Try to use the browser's built-in SpeechRecognition API first
+                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 
-                // First try using the browser's built-in speech recognition
-                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                if (SpeechRecognition) {
                     useBrowserSpeechRecognition();
                 } else {
-                    // Fall back to MediaRecorder API for recording audio to send to server
+                    console.log('Browser SpeechRecognition not available, using MediaRecorder...');
                     useMediaRecorder();
                 }
             }
             
-            // Use browser's built-in speech recognition
+            // Use the browser's built-in SpeechRecognition API
             function useBrowserSpeechRecognition() {
-                const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-                const recognition = new SpeechRecognition();
-                
-                recognition.lang = 'en-US';
-                // Changed from false to true to allow longer recording sessions
-                recognition.continuous = true;
-                recognition.interimResults = true;
-                
-                // Set a longer timeout for the recording - 10 seconds
-                const recordingTimeout = 10000;
-                let recordingTimer;
-                let finalTranscript = '';
-                
-                isRecording = true;
-                micButton.classList.add('listening', 'recording-animation');
-                
-                // Update indicator text to show active listening
-                if (autoListenEnabled) {
-                    autoListenIndicator.querySelector('.indicator-text').textContent = 'Listening actively';
-                }
-                
-                recognition.onstart = () => {
-                    console.log('Speech recognition started');
-                    
-                    // Set timeout to automatically stop recording after the set time
-                    recordingTimer = setTimeout(() => {
-                        if (isRecording) {
-                            console.log('Recording timeout reached, stopping...');
-                            recognition.stop();
-                        }
-                    }, recordingTimeout);
-                };
-                
-                recognition.onresult = (event) => {
-                    let interimTranscript = '';
-                    
-                    // Process the interim results
-                    for (let i = event.resultIndex; i < event.results.length; i++) {
-                        const transcript = event.results[i][0].transcript;
-                        
-                        if (event.results[i].isFinal) {
-                            finalTranscript += transcript + ' ';
-                        } else {
-                            interimTranscript += transcript;
-                        }
-                        
-                        // Check for "end interview" phrases in both final and interim
-                        const lowerTranscript = transcript.toLowerCase();
-                        if (
-                            lowerTranscript.includes('end interview') || 
-                            lowerTranscript.includes('end the interview') || 
-                            lowerTranscript.includes('finish interview') || 
-                            lowerTranscript.includes('finish the interview') || 
-                            lowerTranscript.includes('conclude interview') || 
-                            lowerTranscript.includes('conclude the interview') ||
-                            lowerTranscript.includes('can we end') ||
-                            lowerTranscript.includes("let's end") ||
-                            lowerTranscript.includes('lets end')
-                        ) {
-                            console.log('End interview request detected');
-                            // Clear the timeout
-                            clearTimeout(recordingTimer);
-                            // Stop the recording
-                            recognition.stop();
-                            // Show end interview confirmation
-                            endInterviewModal.show();
-                            return;
-                        }
-                    }
-                    
-                    console.log('Interim transcript:', interimTranscript);
-                    console.log('Final transcript so far:', finalTranscript);
-                    
-                    // Reset the timeout each time we get a result
-                    clearTimeout(recordingTimer);
-                    recordingTimer = setTimeout(() => {
-                        if (isRecording) {
-                            console.log('Recording timeout reached, stopping...');
-                            recognition.stop();
-                        }
-                    }, recordingTimeout);
-                };
-                
-                recognition.onerror = (event) => {
-                    console.error('Speech recognition error:', event.error);
-                    clearTimeout(recordingTimer);
-                    
-                    // Fall back to MediaRecorder if speech recognition fails
-                    if (event.error === 'no-speech' || event.error === 'audio-capture' || event.error === 'not-allowed') {
-                        alert('Browser speech recognition failed. Please try speaking more clearly or use the typing option.');
-                        toggleTypingMode(true);
-                    }
-                    stopRecording();
-                };
-                
-                recognition.onend = () => {
-                    clearTimeout(recordingTimer);
-                    stopRecording();
-                    
-                    if (finalTranscript.trim()) {
-                        console.log('Processing final transcript:', finalTranscript);
-                        processUserResponse(finalTranscript.trim());
-                    } else {
-                        console.log('No speech detected');
-                        
-                        // If auto-listen is enabled and not currently speaking, restart listening after a delay
-                        if (autoListenEnabled && !isSpeaking) {
-                            setTimeout(() => {
-                                if (autoListenEnabled && !isRecording && !isSpeaking) {
-                                    startRecording();
-                                }
-                            }, 1000);
-                        }
-                    }
-                };
-                
                 try {
-                    recognition.start();
+                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                    const recognition = new SpeechRecognition();
+                    
+                    isRecording = true;
+                    micButton.classList.add('listening', 'recording-animation');
+                    audioVisualizer.style.display = 'flex';
+                    
+                    // Update indicator text to show active listening
+                    if (autoListenEnabled) {
+                        autoListenIndicator.querySelector('.indicator-text').textContent = 'Listening actively';
+                    }
+                    
+                    // Set a recording timeout - 20 seconds
+                    const recordingTimeout = 20000;
+                    const recordingTimer = setTimeout(() => {
+                        if (isRecording) {
+                            console.log('Recording timeout reached, stopping SpeechRecognition...');
+                            recognition.stop();
+                        }
+                    }, recordingTimeout);
+                    
+                    // Configure recognition
+                    recognition.continuous = false;
+                    recognition.interimResults = false;
+                    recognition.lang = 'en-US';
+                    
+                    let finalTranscript = '';
+                    
+                    recognition.onresult = (event) => {
+                        clearTimeout(recordingTimer);
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            if (event.results[i].isFinal) {
+                                finalTranscript += event.results[i][0].transcript;
+                            }
+                        }
+                    };
+                    
+                    recognition.onerror = (event) => {
+                        console.error('SpeechRecognition error:', event.error);
+                        clearTimeout(recordingTimer);
+                        
+                        if (event.error === 'no-speech' || event.error === 'audio-capture' || event.error === 'not-allowed') {
+                            console.log('Browser speech recognition failed, falling back to MediaRecorder');
+                            // Try fallback method
+                            useMediaRecorder();
+                        } else {
+                            alert('Speech recognition error. Please try typing your response instead.');
+                            toggleTypingMode(true);
+                            stopRecording();
+                        }
+                    };
+                    
+                    recognition.onend = () => {
+                        clearTimeout(recordingTimer);
+                        stopRecording();
+                        
+                        if (finalTranscript.trim()) {
+                            console.log('Processing final transcript:', finalTranscript);
+                            processUserResponse(finalTranscript.trim());
+                        } else {
+                            console.log('No speech detected, trying MediaRecorder fallback');
+                            // Try fallback method
+                            useMediaRecorder();
+                        }
+                    };
+                    
+                    try {
+                        recognition.start();
+                    } catch (err) {
+                        console.error('Speech recognition error on start:', err);
+                        clearTimeout(recordingTimer);
+                        console.log('Falling back to MediaRecorder...');
+                        useMediaRecorder();
+                    }
                 } catch (err) {
-                    console.error('Speech recognition error on start:', err);
-                    clearTimeout(recordingTimer);
+                    console.error('Error setting up SpeechRecognition:', err);
                     useMediaRecorder();
                 }
             }
@@ -950,44 +918,51 @@
                     return response.json();
                 })
                 .then(data => {
-                    if (data.success) {
-                        const transcription = data.text;
+                    // Hide typing indicator regardless of success
+                    typingIndicator.style.display = 'none';
+                    
+                    // Check if we have valid text content
+                    if (data.text && typeof data.text === 'string') {
+                        const transcription = data.text.trim();
                         
-                        // Check if end interview was detected
-                        if (data.end_interview_detected) {
-                            console.log('End interview request detected from speech-to-text');
-                            // Add user message to chat 
-                            addMessage(transcription, 'participant');
-                            updateTranscript(transcription, 'participant');
-                            
-                            // Show automatic response
-                            const endResponse = "I'll end the interview now. Thank you for your time and valuable insights!";
-                            addMessage(endResponse, 'interviewer');
-                            updateTranscript(endResponse, 'interviewer');
-                            
-                            // Hide typing indicator
-                            typingIndicator.style.display = 'none';
-                            
-                            // Speak the end response
-                            speakText(endResponse).then(() => {
-                                // After speaking, end the interview
-                                setTimeout(() => {
-                                    generateAnalysis();
-                                }, 1000);
-                            });
+                        if (transcription) {
+                            // Check if end interview was detected
+                            if (data.end_interview_detected) {
+                                console.log('End interview request detected from speech-to-text');
+                                // Add user message to chat 
+                                addMessage(transcription, 'participant');
+                                updateTranscript(transcription, 'participant');
+                                
+                                // Show automatic response
+                                const endResponse = "I'll end the interview now. Thank you for your time and valuable insights!";
+                                addMessage(endResponse, 'interviewer');
+                                updateTranscript(endResponse, 'interviewer');
+                                
+                                // Speak the end response
+                                speakText(endResponse).then(() => {
+                                    // After speaking, end the interview
+                                    setTimeout(() => {
+                                        generateAnalysis();
+                                    }, 1000);
+                                });
+                            } else {
+                                // Normal processing
+                                processUserResponse(transcription);
+                            }
                         } else {
-                            // Normal processing
-                            processUserResponse(transcription);
+                            console.error('Empty transcription received');
+                            toggleTypingMode(true);
                         }
                     } else {
-                        typingIndicator.style.display = 'none';
-                        alert('Error transcribing audio: ' + (data.error || 'Unknown error'));
+                        console.error('Speech-to-text error: Invalid response format', data);
+                        alert('Speech-to-text failed. Please try typing your response instead.');
+                        toggleTypingMode(true);
                     }
                 })
                 .catch(error => {
                     typingIndicator.style.display = 'none';
-                    console.error('Error:', error);
-                    alert('Speech-to-text failed. Please try typing your response instead.');
+                    console.error('Speech-to-text error:', error);
+                    alert('Speech-to-text service is currently unavailable. Please try typing your response instead.');
                     // Show typing interface when speech fails
                     toggleTypingMode(true);
                 });
@@ -1016,7 +991,13 @@
                     lowerText.includes('conclude the interview') ||
                     lowerText.includes('can we end') ||
                     lowerText.includes("let's end") ||
-                    lowerText.includes('lets end')
+                    lowerText.includes('lets end') ||
+                    lowerText.includes('please end the interview') ||
+                    lowerText.includes('please end interview') ||
+                    lowerText.includes('please finish the interview') ||
+                    lowerText.includes('please finish interview') ||
+                    lowerText.includes('could we please end') ||
+                    lowerText.includes('i would like to end the interview')
                 ) {
                     console.log('End interview request detected in text');
                     // Add user message to chat 
@@ -1048,14 +1029,14 @@
                 typingIndicator.style.display = 'flex';
                 
                 // Send to server for processing
-                fetch('/langchain/api/interview/respond', {
+                fetch('/api/interview/respond', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
                         session_id: sessionId,
-                        user_input: text
+                        message: text
                     })
                 })
                 .then(response => response.json())
@@ -1063,13 +1044,24 @@
                     // Hide typing indicator
                     typingIndicator.style.display = 'none';
                     
-                    if (data.status === 'success') {
+                    if (data.success) {
                         // Add interviewer message to chat and transcript
-                        addMessage(data.next_question, 'interviewer');
-                        updateTranscript(data.next_question, 'interviewer');
+                        addMessage(data.message, 'interviewer');
+                        updateTranscript(data.message, 'interviewer');
                         
-                        // Speak the question (only once)
-                        speakText(data.next_question);
+                        // Check if we should end the interview
+                        if (data.end_interview) {
+                            // Speak the farewell message and then end the interview
+                            speakText(data.message).then(() => {
+                                // After speaking, end the interview
+                                setTimeout(() => {
+                                    generateAnalysis();
+                                }, 1000);
+                            });
+                        } else {
+                            // Speak the response (only if not ending the interview)
+                            speakText(data.message);
+                        }
                     } else {
                         alert('Error processing response: ' + (data.error || 'Unknown error'));
                     }
@@ -1198,7 +1190,7 @@
                 analysisModal.show();
                 
                 // End the interview in the backend but don't display analysis to the user
-                fetch('/langchain/api/interview/end', {
+                fetch('/api/interview/end', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -1220,9 +1212,15 @@
                     document.getElementById('analysisLoading').style.display = 'none';
                     document.getElementById('thankYouContent').style.display = 'block';
                     
-                    // Set up countdown timer
-                    let redirectTimer;
-                    let secondsLeft = 10;
+                    // Set reward code if available
+                    if (data.reward_code) {
+                        const rewardCodeElement = document.getElementById('rewardCode');
+                        if (rewardCodeElement) {
+                            rewardCodeElement.textContent = data.reward_code;
+                        }
+                    }
+                    
+                    // Set up countdown variables but don't start yet
                     const countdownElement = document.getElementById('redirectCountdown');
                     const stayOnPageBtn = document.getElementById('stayOnPageBtn');
                     const closeNowBtn = document.getElementById('closeNowBtn');
@@ -1234,42 +1232,63 @@
                             window.close();
                         } else {
                             // Otherwise redirect to the main page
-                            window.location.href = '/langchain/';
+                            window.location.href = '/dashboard';
                         }
                     };
                     
-                    // Update countdown every second
-                    redirectTimer = setInterval(() => {
-                        secondsLeft--;
-                        if (countdownElement) {
-                            countdownElement.textContent = secondsLeft;
-                        }
+                    // Function to start the countdown
+                    const startCountdown = () => {
+                        if (countdownActive) return; // Prevent multiple countdowns
                         
-                        if (secondsLeft <= 0) {
-                            clearInterval(redirectTimer);
-                            redirectUser();
-                        }
-                    }, 1000);
+                        countdownActive = true;
+                        let secondsLeft = 3; // Shorter countdown of 3 seconds after pressing close
+                        countdownElement.textContent = secondsLeft;
+                        
+                        // Show big countdown overlay
+                        const countdownOverlay = document.createElement('div');
+                        countdownOverlay.style.position = 'fixed';
+                        countdownOverlay.style.top = '0';
+                        countdownOverlay.style.left = '0';
+                        countdownOverlay.style.width = '100%';
+                        countdownOverlay.style.height = '100%';
+                        countdownOverlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                        countdownOverlay.style.display = 'flex';
+                        countdownOverlay.style.justifyContent = 'center';
+                        countdownOverlay.style.alignItems = 'center';
+                        countdownOverlay.style.zIndex = '9999';
+                        countdownOverlay.style.fontSize = '10rem';
+                        countdownOverlay.style.color = 'white';
+                        countdownOverlay.textContent = secondsLeft;
+                        document.body.appendChild(countdownOverlay);
+                        
+                        // Update countdown every second
+                        countdownInterval = setInterval(() => {
+                            secondsLeft--;
+                            countdownElement.textContent = secondsLeft;
+                            countdownOverlay.textContent = secondsLeft;
+                            
+                            if (secondsLeft <= 0) {
+                                clearInterval(countdownInterval);
+                                redirectUser();
+                            }
+                        }, 1000);
+                    };
                     
-                    // Close Now button
+                    // Close Now button - starts the countdown
                     if (closeNowBtn) {
                         closeNowBtn.addEventListener('click', () => {
-                            clearInterval(redirectTimer);
-                            redirectUser();
+                            analysisModal.hide();
+                            startCountdown();
                         });
                     }
                     
                     // Stay on Page button
                     if (stayOnPageBtn) {
                         stayOnPageBtn.addEventListener('click', () => {
-                            // Clear the timer
-                            clearInterval(redirectTimer);
-                            // Hide the countdown message
-                            document.querySelector('.alert-info').style.display = 'none';
                             // Change button text
                             stayOnPageBtn.textContent = 'Return to Dashboard';
                             stayOnPageBtn.addEventListener('click', () => {
-                                window.location.href = '/langchain/';
+                                window.location.href = '/dashboard';
                             }, { once: true });
                         });
                     }
@@ -1280,49 +1299,77 @@
                     document.getElementById('analysisLoading').style.display = 'none';
                     document.getElementById('thankYouContent').style.display = 'block';
                     
-                    // Set a simpler timeout if there was an error
+                    // Generate a fallback reward code if the API fails
+                    const fallbackRewardCode = `DARIA-${sessionId.substring(0, 8)}`;
+                    const rewardCodeElement = document.getElementById('rewardCode');
+                    if (rewardCodeElement) {
+                        rewardCodeElement.textContent = fallbackRewardCode;
+                    }
+                    
+                    // Setup the same countdown behavior even on error
                     const closeNowBtn = document.getElementById('closeNowBtn');
+                    const stayOnPageBtn = document.getElementById('stayOnPageBtn');
+                    
+                    const redirectUser = () => {
+                        if (window.opener) {
+                            window.close();
+                        } else {
+                            window.location.href = '/dashboard';
+                        }
+                    };
+                    
+                    // Function to start the countdown
+                    const startCountdown = () => {
+                        if (countdownActive) return; // Prevent multiple countdowns
+                        
+                        countdownActive = true;
+                        let secondsLeft = 3; // Shorter countdown of 3 seconds
+                        
+                        // Show big countdown overlay
+                        const countdownOverlay = document.createElement('div');
+                        countdownOverlay.style.position = 'fixed';
+                        countdownOverlay.style.top = '0';
+                        countdownOverlay.style.left = '0';
+                        countdownOverlay.style.width = '100%';
+                        countdownOverlay.style.height = '100%';
+                        countdownOverlay.style.backgroundColor = 'rgba(0,0,0,0.8)';
+                        countdownOverlay.style.display = 'flex';
+                        countdownOverlay.style.justifyContent = 'center';
+                        countdownOverlay.style.alignItems = 'center';
+                        countdownOverlay.style.zIndex = '9999';
+                        countdownOverlay.style.fontSize = '10rem';
+                        countdownOverlay.style.color = 'white';
+                        countdownOverlay.textContent = secondsLeft;
+                        document.body.appendChild(countdownOverlay);
+                        
+                        // Update countdown every second
+                        countdownInterval = setInterval(() => {
+                            secondsLeft--;
+                            countdownOverlay.textContent = secondsLeft;
+                            
+                            if (secondsLeft <= 0) {
+                                clearInterval(countdownInterval);
+                                redirectUser();
+                            }
+                        }, 1000);
+                    };
+                    
                     if (closeNowBtn) {
                         closeNowBtn.addEventListener('click', () => {
-                            if (window.opener) {
-                                window.close();
-                            } else {
-                                window.location.href = '/langchain/';
-                            }
+                            analysisModal.hide();
+                            startCountdown();
                         });
                     }
                     
-                    const stayOnPageBtn = document.getElementById('stayOnPageBtn');
                     if (stayOnPageBtn) {
                         stayOnPageBtn.addEventListener('click', () => {
-                            // Hide the countdown message
-                            document.querySelector('.alert-info').style.display = 'none';
                             // Change button text
                             stayOnPageBtn.textContent = 'Return to Dashboard';
                             stayOnPageBtn.addEventListener('click', () => {
-                                window.location.href = '/langchain/';
+                                window.location.href = '/dashboard';
                             }, { once: true });
                         });
                     }
-                    
-                    // Still set the countdown
-                    let secondsLeft = 10;
-                    const countdownElement = document.getElementById('redirectCountdown');
-                    const redirectTimer = setInterval(() => {
-                        secondsLeft--;
-                        if (countdownElement) {
-                            countdownElement.textContent = secondsLeft;
-                        }
-                        
-                        if (secondsLeft <= 0) {
-                            clearInterval(redirectTimer);
-                            if (window.opener) {
-                                window.close();
-                            } else {
-                                window.location.href = '/langchain/';
-                            }
-                        }
-                    }, 1000);
                 });
             }
             

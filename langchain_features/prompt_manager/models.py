@@ -16,6 +16,7 @@ class PromptConfig:
                  core_objectives: List[str] = None,
                  contextual_instructions: str = "",
                  dynamic_prompt_prefix: str = "",
+                 analysis_prompt: str = "",
                  example_questions: List[str] = None,
                  evaluation_notes: List[str] = None):
         """Initialize a prompt configuration."""
@@ -27,6 +28,7 @@ class PromptConfig:
         self.core_objectives = core_objectives or []
         self.contextual_instructions = contextual_instructions
         self.dynamic_prompt_prefix = dynamic_prompt_prefix
+        self.analysis_prompt = analysis_prompt
         self.example_questions = example_questions or []
         self.evaluation_notes = evaluation_notes or []
     
@@ -42,6 +44,7 @@ class PromptConfig:
             core_objectives=data.get('core_objectives', []),
             contextual_instructions=data.get('contextual_instructions', ''),
             dynamic_prompt_prefix=data.get('dynamic_prompt_prefix', ''),
+            analysis_prompt=data.get('analysis_prompt', ''),
             example_questions=data.get('example_questions', []),
             evaluation_notes=data.get('evaluation_notes', [])
         )
@@ -57,6 +60,7 @@ class PromptConfig:
             'core_objectives': self.core_objectives,
             'contextual_instructions': self.contextual_instructions,
             'dynamic_prompt_prefix': self.dynamic_prompt_prefix,
+            'analysis_prompt': self.analysis_prompt,
             'example_questions': self.example_questions,
             'evaluation_notes': self.evaluation_notes
         }
@@ -94,6 +98,9 @@ class PromptManager:
         try:
             with open(file_path, 'r') as f:
                 data = yaml.safe_load(f)
+                print(f"DEBUG: Loaded YAML for {agent_name}, keys: {list(data.keys())}")
+                if 'analysis_prompt' in data:
+                    print(f"DEBUG: Found analysis_prompt in YAML: {data['analysis_prompt'][:50]}...")
                 data['agent_name'] = agent_name  # Ensure agent_name is set
                 return PromptConfig.from_dict(data)
         except Exception as e:
@@ -133,6 +140,7 @@ class PromptManager:
             core_objectives=["Assist users effectively"],
             contextual_instructions="Provide helpful responses to user queries.",
             dynamic_prompt_prefix=f"You are {agent_name}, a helpful AI assistant.",
+            analysis_prompt="Analyze the conversation to identify key insights, user needs, pain points, and opportunities for improvement.",
             example_questions=["How can I help you today?"],
             evaluation_notes=["Initial version"]
         )

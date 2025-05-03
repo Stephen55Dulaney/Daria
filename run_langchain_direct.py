@@ -735,6 +735,56 @@ def end_interview():
                     f.write(transcript)
                     
                 logger.info(f"Transcript saved to {transcript_path}")
+                
+                # Generate analysis if requested and an analysis prompt is available
+                if interview_data.get('analysis', True):
+                    try:
+                        # Get the analysis prompt based on the character or use a default
+                        analysis_prompt = ""
+                        character_name = interview_data.get('character_select', '')
+                        
+                        if character_name:
+                            # Try to load the character's analysis prompt
+                            try:
+                                config = prompt_manager.load_prompt(character_name)
+                                analysis_prompt = config.get('analysis_prompt', '')
+                                logger.info(f"Using analysis prompt from character: {character_name}")
+                            except Exception as e:
+                                logger.warning(f"Could not load character prompt: {str(e)}")
+                        
+                        # If no character-specific analysis prompt, use the one from the interview data
+                        if not analysis_prompt:
+                            analysis_prompt = interview_data.get('analysis_prompt', '')
+                            logger.info("Using analysis prompt from interview data")
+                        
+                        # If we have an analysis prompt, generate the analysis
+                        if analysis_prompt:
+                            # Initialize OpenAI client for analysis
+                            from langchain.llms import OpenAI
+                            analysis_llm = OpenAI(temperature=0.2)
+                            
+                            # Prepare the prompt with the transcript
+                            full_prompt = f"{analysis_prompt}\n\nInterview Transcript:\n{transcript}"
+                            
+                            # Generate the analysis
+                            logger.info("Generating interview analysis...")
+                            analysis = analysis_llm.predict(full_prompt)
+                            
+                            # Save the analysis in the interview data
+                            interview_data['analysis_result'] = analysis
+                            
+                            # Save the analysis to a file
+                            analysis_dir = Path("analyses")
+                            analysis_dir.mkdir(exist_ok=True)
+                            
+                            analysis_path = analysis_dir / f"{session_id}.txt"
+                            with open(analysis_path, 'w') as f:
+                                f.write(analysis)
+                                
+                            logger.info(f"Analysis saved to {analysis_path}")
+                    except Exception as e:
+                        logger.error(f"Error generating analysis: {str(e)}")
+                        # Continue with saving the interview data even if analysis fails
             
             # Save updated interview data to disk
             save_interviews(app.interviews)
@@ -1088,6 +1138,144 @@ def check_services():
             "status": "error",
             "error": str(e),
             "timestamp": datetime.datetime.now().isoformat()
+        }), 500
+
+# Add API endpoint to generate analysis on demand
+@app.route('/api/interview/generate_analysis', methods=['POST'])
+@app.route('/langchain/api/interview/generate_analysis', methods=['POST'])
+def generate_analysis():
+    """Generate analysis for an interview transcript."""
+    try:
+        data = request.json
+        session_id = data.get('session_id', '')
+        
+        logger.info(f"Generating analysis for interview session: {session_id}")
+        
+        # Get the interview data
+        if hasattr(app, 'interviews') and session_id in app.interviews:
+            interview_data = app.interviews[session_id]
+            
+            # Check if we have a transcript to analyze
+            if 'transcript' not in interview_data or not interview_data['transcript']:
+                logger.warning(f"No transcript found for session: {session_id}")
+                return jsonify({
+                    "success": False,
+                    "error": "No transcript found for this interview"
+                }), 400
+            
+            transcript = interview_data['transcript']
+            
+            # Get the analysis prompt based on the character or use a default
+            analysis_prompt = ""
+            character_name = interview_data.get('character_select', '')
+            
+            if character_name:
+                # Try to load the character's analysis prompt
+                try:
+                    config = prompt_manager.load_prompt(character_name)
+                    analysis_prompt = config.get('analysis_prompt', '')
+                    logger.info(f"Using analysis prompt from character: {character_name}")
+                except Exception as e:
+                    logger.warning(f"Could not load character prompt: {str(e)}")
+            
+            # If no character-specific analysis prompt, use the one from the interview data
+            if not analysis_prompt:
+                analysis_prompt = interview_data.get('analysis_prompt', '')
+                logger.info("Using analysis prompt from interview data")
+            
+            # If we still don't have an analysis prompt, use a default
+            if not analysis_prompt:
+                analysis_prompt = """Analyze this interview transcript and provide insights about:
+                
+1. Key points and themes discussed
+2. User needs, goals, and pain points identified
+3. Notable quotes or insights
+4. Recommendations based on the discussion"""
+                logger.info("Using default analysis prompt")
+            
+            # Initialize OpenAI client for analysis
+            from langchain.llms import OpenAI
+            analysis_llm = OpenAI(temperature=0.2)
+            
+            # Prepare the prompt with the transcript
+            full_prompt = f"{analysis_prompt}\n\nInterview Transcript:\n{transcript}"
+            
+            # Generate the analysis
+            logger.info("Generating interview analysis...")
+            analysis = analysis_llm.predict(full_prompt)
+            
+            # Save the analysis in the interview data
+            interview_data['analysis_result'] = analysis
+            
+            # Save the analysis to a file
+            analysis_dir = Path("analyses")
+            analysis_dir.mkdir(exist_ok=True)
+            
+            analysis_path = analysis_dir / f"{session_id}.txt"
+            with open(analysis_path, 'w') as f:
+                f.write(analysis)
+                
+            logger.info(f"Analysis saved to {analysis_path}")
+            
+            # Save updated interview data to disk
+            save_interviews(app.interviews)
+            
+            return jsonify({
+                "success": True,
+                "message": "Analysis generated successfully"
+            })
+        else:
+            logger.warning(f"No interview data found for session: {session_id}")
+            return jsonify({
+                "success": False,
+                "error": "Interview session not found"
+            }), 404
+            
+    except Exception as e:
+        logger.error(f"Error generating analysis: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+# Add API endpoint to save notes
+@app.route('/api/interview/save_notes', methods=['POST'])
+@app.route('/langchain/api/interview/save_notes', methods=['POST'])
+def save_notes():
+    """Save notes for an interview."""
+    try:
+        data = request.json
+        session_id = data.get('session_id', '')
+        notes = data.get('notes', '')
+        
+        logger.info(f"Saving notes for interview session: {session_id}")
+        
+        # Get the interview data
+        if hasattr(app, 'interviews') and session_id in app.interviews:
+            interview_data = app.interviews[session_id]
+            
+            # Save the notes
+            interview_data['notes'] = notes
+            
+            # Save updated interview data to disk
+            save_interviews(app.interviews)
+            
+            return jsonify({
+                "success": True,
+                "message": "Notes saved successfully"
+            })
+        else:
+            logger.warning(f"No interview data found for session: {session_id}")
+            return jsonify({
+                "success": False,
+                "error": "Interview session not found"
+            }), 404
+            
+    except Exception as e:
+        logger.error(f"Error saving notes: {str(e)}")
+        return jsonify({
+            "success": False,
+            "error": str(e)
         }), 500
 
 if __name__ == '__main__':

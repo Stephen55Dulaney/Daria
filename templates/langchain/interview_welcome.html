@@ -84,7 +84,7 @@
         <div class="welcome-content">
             <p>Please provide your information below to start the interview.</p>
             
-            <form method="GET" action="/langchain/interview/session/{{ session_id }}" class="mt-4">
+            <form method="GET" action="/interview/session/{{ session_id }}" class="mt-4">
                 <div class="mb-3">
                     <label for="name" class="form-label">Your Name</label>
                     <input type="text" class="form-control" id="name" name="name" required>
@@ -102,6 +102,9 @@
                 
                 <input type="hidden" name="voice_id" value="{{ voice_id }}">
                 <input type="hidden" name="accepted" value="true">
+                {% if is_remote %}
+                <input type="hidden" name="remote" value="true">
+                {% endif %}
                 
                 <button type="submit" class="btn btn-primary w-100">Start Interview</button>
             </form>

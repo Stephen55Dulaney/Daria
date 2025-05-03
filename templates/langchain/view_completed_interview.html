@@ -172,18 +172,24 @@
                 
                 <!-- Analysis Tab -->
                 <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
-                    {% if interview.analysis %}
+                    {% if interview.analysis_result %}
                     <div class="analysis-content">
                         <div class="analysis-section">
-                            <h4>Key Insights</h4>
-                            <div>{{ interview.analysis.content|safe }}</div>
+                            <h4>Analysis</h4>
+                            <div class="analysis-text" style="white-space: pre-wrap;">{{ interview.analysis_result|safe }}</div>
                         </div>
                     </div>
                     {% else %}
                     <div class="text-center py-5">
                         <i class="bi bi-graph-up fs-1 text-muted mb-3"></i>
                         <h4>No Analysis Available</h4>
-                        <p class="text-muted">Analysis was not generated for this interview.</p>
+                        <p class="text-muted">
+                            {% if interview.character_select %}
+                            Analysis using {{ interview.character_select }}'s prompt was not generated for this interview.
+                            {% else %}
+                            Analysis was not generated for this interview.
+                            {% endif %}
+                        </p>
                         <button class="btn btn-primary mt-2" id="generateAnalysisBtn">Generate Analysis</button>
                     </div>
                     {% endif %}

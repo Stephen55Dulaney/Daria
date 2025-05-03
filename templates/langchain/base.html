@@ -134,18 +134,23 @@
             <hr>
             <ul class="nav nav-pills flex-column mb-auto">
                 <li class="nav-item">
-                    <a href="/dashboard" class="nav-link {% if request.endpoint == 'dashboard' %}active{% else %}link-dark{% endif %}">
+                    <a href="/dashboard" class="nav-link {% if request.path == '/dashboard' %}active{% else %}link-dark{% endif %}">
                         <i class="bi bi-speedometer2 me-2"></i> Dashboard
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/interview_setup" class="nav-link {% if request.endpoint == 'interview_setup' %}active{% else %}link-dark{% endif %}">
+                    <a href="/interview_setup" class="nav-link {% if request.path == '/interview_setup' %}active{% else %}link-dark{% endif %}">
                         <i class="bi bi-plus-circle me-2"></i> New Interview
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a href="/interview_archive" class="nav-link {% if request.endpoint == 'interview_archive' %}active{% else %}link-dark{% endif %}">
+                    <a href="/interview_archive" class="nav-link {% if request.path == '/interview_archive' %}active{% else %}link-dark{% endif %}">
                         <i class="bi bi-archive me-2"></i> Interview Archive
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/monitor_interview" class="nav-link {% if request.path == '/monitor_interview' %}active{% else %}link-dark{% endif %}">
+                        <i class="bi bi-display me-2"></i> Monitor Interviews
                     </a>
                 </li>
                 <li>
@@ -158,9 +163,15 @@
                             {% if interviews %}
                                 {% for interview in interviews %}
                                 <li>
-                                    <a href="/interview_details/{{ interview.id }}" class="nav-link link-dark py-1">
+                                    <a href="/interview_details/{{ interview.session_id }}" class="nav-link link-dark py-1">
                                         <i class="bi bi-chat-text me-2"></i>
-                                        {{ interview.title }}
+                                        {% if interview is string %}
+                                            {{ interview }}
+                                        {% elif interview is mapping %}
+                                            {{ interview.get('title', 'Untitled Interview') }}
+                                        {% else %}
+                                            Unnamed Interview
+                                        {% endif %}
                                     </a>
                                 </li>
                                 {% endfor %}
@@ -179,7 +190,7 @@
                     </a>
                 </li>
                 <li>
-                    <a href="/prompt_manager/list_prompts" class="nav-link {% if 'prompt_manager' in request.endpoint %}active{% else %}link-dark{% endif %}">
+                    <a href="/prompts/" class="nav-link {% if '/prompts/' in request.path %}active{% else %}link-dark{% endif %}">
                         <i class="bi bi-chat-quote me-2"></i>
                         Prompt Manager
                     </a>
@@ -192,7 +203,7 @@
                     <strong>admin</strong>
                 </a>
                 <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
-                    <li><a class="dropdown-item" href="#">New interview...</a></li>
+                    <li><a class="dropdown-item" href="/interview_setup">New interview...</a></li>
                     <li><a class="dropdown-item" href="#">Settings</a></li>
                     <li><a class="dropdown-item" href="#">Profile</a></li>
                     <li><hr class="dropdown-divider"></li>

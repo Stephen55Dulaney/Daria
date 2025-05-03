@@ -1,0 +1,21 @@
+{
+  "session_id": "fc902db9-bc17-4cd4-b9c2-88d6c16d7a02",
+  "character": "interviewer",
+  "voice_id": "",
+  "title": "Untitled Interview",
+  "description": "",
+  "status": "active",
+  "created_at": "2025-05-02T23:14:12.263735",
+  "last_updated": "2025-05-02T23:14:12.263735",
+  "expiration_date": "2025-05-09T23:14:12.263735",
+  "conversation_history": [
+    {
+      "role": "system",
+      "content": "You are a helpful interview assistant."
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I'm interviewer. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?"
+    }
+  ]
+}

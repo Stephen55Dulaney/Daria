@@ -1,0 +1,21 @@
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+INFO:__main__:Starting text-to-speech server on port 5007
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+ * Serving Flask app 'simple_tts_test'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5007
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+INFO:__main__:Starting text-to-speech server on port 5007
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 436-438-731
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:10:22] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:12:02] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:49] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:11] "GET / HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:22] "GET / HTTP/1.1" 200 -

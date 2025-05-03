@@ -428,7 +428,7 @@ document.addEventListener('DOMContentLoaded', function() {
         submitButton.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Creating Interview...';
         
         // Call the API to create the interview
-        fetch('/langchain/interview/create', {
+        fetch('/interview/create', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

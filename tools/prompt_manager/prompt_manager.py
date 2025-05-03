@@ -11,6 +11,15 @@ from typing import Dict, List, Optional, Any, Union
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Define evaluation rubric categories and descriptions
+EVALUATION_RUBRIC = {
+    "clarity": "How clear and understandable is the agent's response? (1-5)",
+    "relevance": "How relevant is the response to the user's query? (1-5)",
+    "accuracy": "How accurate and factually correct is the information provided? (1-5)",
+    "helpfulness": "How helpful is the response in addressing the user's needs? (1-5)",
+    "completeness": "How complete is the response in addressing all aspects of the query? (1-5)"
+}
+
 class PromptManager:
     """
     Manager for LangChain prompts that provides functionality for:
@@ -224,7 +233,7 @@ class PromptManager:
         return template
     
     def add_feedback(self, agent_name: str, session_id: str, score: int, 
-                    notes: str, version: str = None) -> Dict[str, Any]:
+                    notes: str, version: str = None, evaluation_metrics: Dict[str, int] = None) -> Dict[str, Any]:
         """
         Add feedback for a prompt version
         
@@ -234,6 +243,7 @@ class PromptManager:
             score: Score (1-5) for the prompt performance
             notes: Notes or comments about the prompt performance
             version: Version of the prompt (if None, current version will be used)
+            evaluation_metrics: Detailed evaluation metrics using rubric categories (1-5 for each category)
             
         Returns:
             The feedback entry that was added
@@ -245,17 +255,27 @@ class PromptManager:
             except FileNotFoundError:
                 version = 'unknown'
         
+        # Create a timestamp for the feedback
+        timestamp = datetime.now().isoformat()
+        
+        # Default metrics if not provided
+        if evaluation_metrics is None:
+            evaluation_metrics = {}
+        
         feedback_entry = {
             'agent': agent_name,
             'version': version,
             'session_id': session_id,
             'score': score,
             'notes': notes,
-            'timestamp': datetime.now().isoformat()
+            'timestamp': timestamp,
+            'evaluation_metrics': evaluation_metrics
         }
         
         self.feedback.append(feedback_entry)
         self._save_feedback()
+        
+        logger.info(f"Added feedback for {agent_name} (v{version}): score={score}")
         
         return feedback_entry
     
@@ -300,12 +320,21 @@ class PromptManager:
                 'agent': agent_name,
                 'total_sessions': 0,
                 'average_score': None,
-                'by_version': {}
+                'by_version': {},
+                'score_distribution': {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+                'evaluation_metrics': {}
             }
         
         # Calculate overall metrics
         total_sessions = len(feedback)
         average_score = sum(f['score'] for f in feedback) / total_sessions
+        
+        # Calculate score distribution
+        score_distribution = {1: 0, 2: 0, 3: 0, 4: 0, 5: 0}
+        for entry in feedback:
+            score = entry['score']
+            if score in score_distribution:
+                score_distribution[score] += 1
         
         # Calculate metrics by version
         versions = {}
@@ -315,22 +344,114 @@ class PromptManager:
                 versions[version] = {
                     'sessions': 0,
                     'scores': [],
-                    'average_score': 0
+                    'average_score': 0,
+                    'score_distribution': {1: 0, 2: 0, 3: 0, 4: 0, 5: 0},
+                    'evaluation_metrics': {}
                 }
             
             versions[version]['sessions'] += 1
             versions[version]['scores'].append(entry['score'])
+            
+            # Update score distribution for this version
+            score = entry['score']
+            if score in versions[version]['score_distribution']:
+                versions[version]['score_distribution'][score] += 1
+            
+            # Collect evaluation metrics
+            if 'evaluation_metrics' in entry and entry['evaluation_metrics']:
+                for metric, value in entry['evaluation_metrics'].items():
+                    if metric not in versions[version]['evaluation_metrics']:
+                        versions[version]['evaluation_metrics'][metric] = []
+                    versions[version]['evaluation_metrics'][metric].append(value)
+        
+        # Calculate aggregate evaluation metrics across all versions
+        all_metrics = {}
+        for entry in feedback:
+            if 'evaluation_metrics' in entry and entry['evaluation_metrics']:
+                for metric, value in entry['evaluation_metrics'].items():
+                    if metric not in all_metrics:
+                        all_metrics[metric] = []
+                    all_metrics[metric].append(value)
         
         # Calculate average scores by version
         for version in versions:
             versions[version]['average_score'] = sum(versions[version]['scores']) / len(versions[version]['scores'])
+            
+            # Calculate average for each evaluation metric
+            for metric, values in versions[version]['evaluation_metrics'].items():
+                if values:
+                    versions[version]['evaluation_metrics'][metric] = sum(values) / len(values)
+        
+        # Calculate overall averages for evaluation metrics
+        evaluation_metrics = {}
+        for metric, values in all_metrics.items():
+            if values:
+                evaluation_metrics[metric] = sum(values) / len(values)
         
         return {
             'agent': agent_name,
             'total_sessions': total_sessions,
             'average_score': average_score,
-            'by_version': versions
+            'by_version': versions,
+            'score_distribution': score_distribution,
+            'evaluation_metrics': evaluation_metrics
         }
+    
+    def get_evaluation_rubric(self) -> Dict[str, str]:
+        """
+        Get the evaluation rubric used for prompt evaluation
+        
+        Returns:
+            Dictionary containing evaluation categories and their descriptions
+        """
+        return EVALUATION_RUBRIC
+    
+    def get_improvement_recommendations(self, agent_name: str) -> List[str]:
+        """
+        Generate improvement recommendations based on feedback
+        
+        Args:
+            agent_name: Name of the agent
+            
+        Returns:
+            List of improvement recommendations
+        """
+        feedback = self.get_feedback(agent_name)
+        performance = self.get_prompt_performance(agent_name)
+        
+        if not feedback or performance['total_sessions'] < 3:
+            return ["Not enough feedback to generate improvement recommendations."]
+        
+        recommendations = []
+        
+        # Check overall score
+        if performance['average_score'] < 3.5:
+            recommendations.append("The prompt's overall performance is below average. Consider a major revision.")
+        
+        # Check evaluation metrics
+        eval_metrics = performance['evaluation_metrics']
+        for metric, score in eval_metrics.items():
+            if score < 3.0:
+                metric_description = EVALUATION_RUBRIC.get(metric, metric)
+                recommendations.append(f"Low score in '{metric}' ({score:.1f}/5). Consider improving: {metric_description}")
+        
+        # Check for consistency
+        if len(performance['by_version']) > 1:
+            versions = list(performance['by_version'].keys())
+            latest_version = versions[-1]  # Assume versions are added in chronological order
+            latest_score = performance['by_version'][latest_version]['average_score']
+            
+            prev_version = versions[-2]
+            prev_score = performance['by_version'][prev_version]['average_score']
+            
+            if latest_score < prev_score:
+                recommendations.append(f"The latest version ({latest_version}) performs worse than the previous version ({prev_version}). Consider reverting or reviewing recent changes.")
+        
+        # Add generic recommendation if none found
+        if not recommendations:
+            recommendations.append("The prompt is performing well. No specific improvements needed.")
+        
+        return recommendations
     
     def get_langchain_prompt(self, agent_name: str):
         """

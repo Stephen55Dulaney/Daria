@@ -1,0 +1,106 @@
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+INFO:__main__:Starting LangChain Interview Prototype on port 5010...
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+Access the application at: http://127.0.0.1:5010
+Dashboard: http://127.0.0.1:5010/dashboard
+Interview Test: http://127.0.0.1:5010/interview_test
+Interview Setup: http://127.0.0.1:5010/interview_setup
+Prompt Manager: http://127.0.0.1:5010/prompts/
+ * Serving Flask app 'run_langchain_direct_fixed'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5010
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+INFO:__main__:Starting LangChain Interview Prototype on port 5010...
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 436-438-731
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:10:22] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:12:02] "GET /dashboard HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:12:02] "GET /api/interviews HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:12:02] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Using prompt_dir: langchain_features/prompt_manager/prompts
+INFO:__main__:Prompt directory exists: True
+INFO:__main__:Prompt directory contents: ['synthia.yml', 'eurekia.yml', 'skeptica.yml', 'empathica.yml', 'askia.yml', '.history', 'odessia.yml', 'thesea.yml', 'daria.yml']
+ERROR:__main__:Error loading characters: 'function' object has no attribute 'list_agents'
+INFO:__main__:Loaded 0 characters for interview setup
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:12:04] "GET /interview_setup HTTP/1.1" 200 -
+INFO:__main__:Using prompt_dir: langchain_features/prompt_manager/prompts
+INFO:__main__:Prompt directory exists: True
+INFO:__main__:Prompt directory contents: ['synthia.yml', 'eurekia.yml', 'skeptica.yml', 'empathica.yml', 'askia.yml', '.history', 'odessia.yml', 'thesea.yml', 'daria.yml']
+ERROR:__main__:Error loading characters: 'function' object has no attribute 'list_agents'
+INFO:__main__:Loaded 0 characters for interview setup
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:38] "GET /interview_setup HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:48] "GET /dashboard HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:49] "GET /api/interviews HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:49] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:53] "GET /interview_details/dcaf2077-9a15-434b-843e-2ff0bd810960 HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:56] "GET /monitor_interview/dcaf2077-9a15-434b-843e-2ff0bd810960 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:56] "[33mGET /langchain/api/interview/transcript?session_id=dcaf2077-9a15-434b-843e-2ff0bd810960 HTTP/1.1[0m" 404 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:58] "GET /interview_archive HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:13:59] "GET /monitor_interview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:02] "[33mGET /interview_details/ HTTP/1.1[0m" 404 -
+ERROR:__main__:Error loading prompt askia.yml: while parsing a block collection
+  in "langchain_features/prompt_manager/prompts/askia.yml", line 36, column 3
+expected <block end>, but found '<scalar>'
+  in "langchain_features/prompt_manager/prompts/askia.yml", line 36, column 72
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:06] "GET /prompts/ HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:11] "GET /dashboard HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:11] "GET /api/interviews HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:11] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/Users/sdulaney/DariaInterviewTool/run_langchain_direct_fixed.py', reloading
+Access the application at: http://127.0.0.1:5010
+Dashboard: http://127.0.0.1:5010/dashboard
+Interview Test: http://127.0.0.1:5010/interview_test
+Interview Setup: http://127.0.0.1:5010/interview_setup
+Prompt Manager: http://127.0.0.1:5010/prompts/
+INFO:werkzeug: * Restarting with stat
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+INFO:__main__:Starting LangChain Interview Prototype on port 5010...
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 436-438-731
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:15] "GET /interview_archive HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:22] "GET /dashboard HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: dcaf2077-9a15-434b-843e-2ff0bd810960
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Loaded 2 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:22] "GET /api/interviews HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [03/May/2025 00:14:22] "GET /api/check_services HTTP/1.1" 200 -

@@ -106,19 +106,19 @@ def speech_to_text():
         # Check if audio file is provided
         if 'audio' not in request.files:
             logger.error("No audio file provided for speech-to-text")
-            return jsonify({'error': 'No audio file provided'}), 400
+            return jsonify({'success': False, 'error': 'No audio file provided'}), 400
         
         audio_file = request.files['audio']
         
         if not audio_file:
             logger.error("Empty audio file provided for speech-to-text")
-            return jsonify({'error': 'Empty audio file provided'}), 400
+            return jsonify({'success': False, 'error': 'Empty audio file provided'}), 400
         
         logger.info("Speech-to-text request received")
         
         if not ELEVENLABS_API_KEY:
             logger.error("ELEVENLABS_API_KEY not found in environment")
-            return jsonify({'error': 'ElevenLabs API key is not configured'}), 500
+            return jsonify({'success': False, 'error': 'ElevenLabs API key is not configured'}), 500
         
         # Save the audio file temporarily
         temp_dir = os.path.join(tempfile.gettempdir(), 'audio_temp')
@@ -155,7 +155,7 @@ def speech_to_text():
             if response.status_code != 200:
                 error_message = f"ElevenLabs API error: {response.status_code} - {response.text}"
                 logger.error(error_message)
-                return jsonify({'error': error_message}), 500
+                return jsonify({'success': False, 'error': error_message}), 500
             
             result = response.json()
             logger.info(f"Response from ElevenLabs: {result}")
@@ -164,19 +164,20 @@ def speech_to_text():
             
             logger.info(f"Speech-to-text conversion successful: {transcription[:30]}...")
             
-            return jsonify({'text': transcription})
+            return jsonify({'success': True, 'text': transcription})
             
         except Exception as elevenlabs_error:
             logger.error(f"ElevenLabs API error: {str(elevenlabs_error)}")
             
             # Provide a fallback response for testing
             return jsonify({
+                'success': False,
                 'text': "Sorry, I couldn't transcribe that. The error was: " + str(elevenlabs_error)
             }), 200  # Still return 200 to not break the UI
         
     except Exception as e:
         logger.error(f"Error in speech_to_text: {str(e)}")
-        return jsonify({'error': str(e)}), 500
+        return jsonify({'success': False, 'error': str(e)}), 500
     finally:
         # Make sure temp files are always cleaned up
         try:

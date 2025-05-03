@@ -1,0 +1,60 @@
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+INFO:__main__:Starting LangChain Interview Prototype on port 5010...
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+Access the application at: http://127.0.0.1:5010
+Dashboard: http://127.0.0.1:5010/dashboard
+Interview Test: http://127.0.0.1:5010/interview_test
+Interview Setup: http://127.0.0.1:5010/interview_setup
+Prompt Manager: http://127.0.0.1:5010/prompts/
+ * Serving Flask app 'run_langchain_direct_fixed'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on http://127.0.0.1:5010
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+INFO:__main__:Starting LangChain Interview Prototype on port 5010...
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+'FLASK_ENV' is deprecated and will not be used in Flask 2.3. Use 'FLASK_DEBUG' instead.
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 436-438-731
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:37:50] "[32mGET / HTTP/1.1[0m" 302 -
+INFO:__main__:Loaded 0 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:37:50] "GET /dashboard HTTP/1.1" 200 -
+INFO:__main__:Loaded 0 interviews from /Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:37:50] "GET /api/interviews HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:37:50] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Using prompt_dir: langchain_features/prompt_manager/prompts
+INFO:__main__:Prompt directory exists: True
+INFO:__main__:Prompt directory contents: ['synthia.yml', 'eurekia.yml', 'skeptica.yml', 'empathica.yml', 'askia.yml', '.history', 'odessia.yml', 'thesea.yml', 'daria.yml']
+ERROR:__main__:Error loading characters: 'function' object has no attribute 'list_agents'
+INFO:__main__:Loaded 0 characters for interview setup
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:38:07] "GET /interview_setup HTTP/1.1" 200 -
+INFO:__main__:Saved interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Saved new interview with ID: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:38:57] "POST /interview/create HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:38:58] "GET /interview_details/543c8fad-bbf8-48c3-ba46-f09c8817e750 HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:04] "GET /interview/session/543c8fad-bbf8-48c3-ba46-f09c8817e750?voice_id=EXAVITQu4vr4xnSDxMaL&remote=true HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Saved interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:09] "GET /interview/session/543c8fad-bbf8-48c3-ba46-f09c8817e750?name=Stephen+Dulaney&email=sdulaney%40deloitte.com&voice_id=EXAVITQu4vr4xnSDxMaL&accepted=true&remote=true HTTP/1.1" 200 -
+INFO:__main__:Saved interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+ERROR:__main__:Error loading character prompt: 'function' object has no attribute 'load_prompt'
+INFO:__main__:Saved interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:09] "POST /api/interview/start HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:11] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:11] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:20] "POST /api/speech_to_text HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Generating response for character: interviewer based on input: Yes, I'm Stephen. How come you have the same promp...
+INFO:__main__:Saved interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:21] "POST /api/interview/respond HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:22] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:31] "POST /api/speech_to_text HTTP/1.1" 200 -
+INFO:__main__:Loaded interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:__main__:Saved interview data for session: 543c8fad-bbf8-48c3-ba46-f09c8817e750
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:31] "POST /api/interview/respond HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [02/May/2025 23:39:32] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
