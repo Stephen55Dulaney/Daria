@@ -140,9 +140,19 @@
                     <div class="mb-3">
                         <label for="voice_id" class="form-label">Interviewer Voice</label>
                         <select id="voice_id" name="voice_id" class="form-select">
-                            {% for voice in voices %}
-                            <option value="{{ voice.id }}">{{ voice.name }}</option>
-                            {% endfor %}
+                            {% if voices %}
+                                <!-- Debug: {{ voices|length }} voices available -->
+                                {% for voice in voices %}
+                                <option value="{{ voice.id }}">{{ voice.name }}</option>
+                                {% endfor %}
+                            {% else %}
+                                <!-- Fallback voices (if no voices provided from server) -->
+                                <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
+                                <option value="ErXwobaYiN019PkySvjV">Antoni (Male)</option>
+                                <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
+                                <option value="AZnzlk1XvdvUeBnXmlld">Domi (Female)</option>
+                                <option value="JBFqnCBsd6RMkjVDRZzb">Fin (Male)</option>
+                            {% endif %}
                         </select>
                     </div>
                     
