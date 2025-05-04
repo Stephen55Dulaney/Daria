@@ -14,7 +14,7 @@ import datetime
 import argparse
 import requests
 from pathlib import Path
-from flask import Flask, redirect, render_template, Blueprint, send_from_directory, request, jsonify, send_file, Response
+from flask import Flask, redirect, render_template, Blueprint, send_from_directory, request, jsonify, send_file, Response, make_response
 from werkzeug.utils import secure_filename
 import shutil
 import tempfile
@@ -568,47 +568,83 @@ def text_to_speech_elevenlabs():
             audio_service_url += 'text_to_speech'
             
             logger.info(f"Sending TTS request to: {audio_service_url}")
-            response = requests.post(
-                audio_service_url,
-                json={
-                    'text': text,
-                    'voice_id': voice_id
-                },
-                timeout=10  # 10 second timeout
-            )
+            files = {}
+            payload = {
+                'text': text,
+                'voice_id': voice_id,
+                'session_id': session_id
+            }
             
+            # Send the request to the audio service with a timeout
+            response = requests.post(audio_service_url, json=payload, timeout=10)
+            
+            # Check for successful response
             if response.status_code == 200:
-                # Return the audio directly
-                return Response(
-                    response.content,
-                    mimetype='audio/mpeg'
-                )
-            else:
-                logger.error(f"Error from audio service: {response.text}")
-                return jsonify({'success': False, 'error': 'Error from audio service'}), 500
+                # Get audio file from response
+                audio_content = response.content
                 
-        except requests.RequestException as e:
+                # Stream the audio back to the client
+                audio_response = make_response(audio_content)
+                audio_response.headers.set('Content-Type', 'audio/mpeg')
+                audio_response.headers.set('Content-Disposition', 'attachment', filename='speech.mp3')
+                
+                return audio_response
+            else:
+                logger.error(f"Error from audio service: {response.status_code} - {response.text}")
+                return jsonify({'success': False, 'error': f'Audio service error: {response.text}'}), response.status_code
+                
+        except requests.exceptions.RequestException as e:
             logger.error(f"Error connecting to audio service: {str(e)}")
-            
-            # Fallback to standard text-to-speech
-            return jsonify({
-                'success': False,
-                'error': 'Could not connect to ElevenLabs service',
-                'fallback': True
-            }), 503
+            return jsonify({'success': False, 'error': f'Error connecting to audio service: {str(e)}'}), 500
             
     except Exception as e:
-        logger.error(f"Error in ElevenLabs text-to-speech: {str(e)}")
+        logger.error(f"Error in text_to_speech_elevenlabs: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/speech_to_text', methods=['POST'])
-def direct_speech_to_text():
+@api_bp.route('/observer/analyze', methods=['POST'])
+def analyze_transcript():
     """
-    Direct endpoint for speech-to-text conversion (no /api prefix)
+    Process a transcript chunk through the AI Observer.
+    This endpoint receives a transcript segment and returns AI analysis.
     """
-    return speech_to_text()
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'success': False, 'error': 'Missing data'}), 400
+            
+        # Extract transcript chunk
+        transcript_chunk = data.get('transcript_chunk', {})
+        if not transcript_chunk:
+            return jsonify({'success': False, 'error': 'Missing transcript_chunk'}), 400
+            
+        # Extract other parameters
+        session_id = data.get('session_id', '')
+        previous_mood = data.get('previous_mood', None)
+        previous_tags = data.get('previous_tags', None)
+        
+        # Log request
+        logger.info(f"Analyzing transcript chunk for session {session_id}")
+        
+        # Process through AI Observer
+        analysis_result = analyze_transcript_chunk(
+            transcript_chunk, 
+            session_id=session_id,
+            previous_mood=previous_mood,
+            previous_tags=previous_tags
+        )
+        
+        # Return analysis
+        return jsonify({
+            'success': True,
+            'result': analysis_result
+        })
+        
+    except Exception as e:
+        logger.error(f"Error in analyze_transcript: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-# Original endpoint stays for backward compatibility
 @api_bp.route('/speech_to_text', methods=['POST'])
 def speech_to_text():
     """
@@ -1354,6 +1390,155 @@ def generate_follow_up_question(user_input, character_name="", session_id=None):
         return {
             "text": fallback_response,
             "debug": debug_info
+        }
+
+def analyze_transcript_chunk(transcript_chunk, session_id=None, previous_mood=None, previous_tags=None):
+    """
+    AI Observer function that analyzes a transcript chunk and provides:
+    1. Semantic note-taking
+    2. Tag generation 
+    3. Mood/emotion tracking
+    
+    Args:
+        transcript_chunk (dict): A chunk of transcript containing text and speaker
+        session_id (str): The interview session ID
+        previous_mood (dict): Previous mood state to maintain continuity
+        previous_tags (list): List of previously identified tags
+        
+    Returns:
+        dict: Analysis results containing notes, tags, and mood tracking
+    """
+    try:
+        # Initialize default values
+        if previous_mood is None:
+            previous_mood = {"value": 0, "label": "Neutral"}  # -1 to 1 scale: negative to positive
+        
+        if previous_tags is None:
+            previous_tags = []
+            
+        # Get text and speaker from the transcript chunk
+        text = transcript_chunk.get('content', '')
+        role = transcript_chunk.get('role', 'user')  # 'user' or 'assistant'
+        
+        # Skip system messages as they're not part of the actual conversation
+        if role == 'system':
+            return {
+                "observer_notes": "",
+                "semantic_tags": [],
+                "observer_mood": previous_mood,
+                "observer_tag_list": previous_tags
+            }
+            
+        # Create a speaker label
+        speaker = "Interviewer" if role == "assistant" else "Interviewee"
+        
+        # Build the analysis prompt
+        analysis_prompt = f"""
+        You are an AI Observer analyzing an interview transcript in real-time. 
+        Analyze the following segment from a user research interview:
+        
+        Speaker: {speaker}
+        Text: "{text}"
+        
+        Provide the following analysis:
+        1. A brief, insightful note about this segment (1-2 sentences max)
+        2. Up to 3 semantic tags that describe themes, emotions, or topics in this segment
+        3. The apparent mood/sentiment of the speaker on a scale from -1 (negative) to 1 (positive)
+        
+        Format your response as JSON with the following structure:
+        {{
+            "note": "Your brief insight note here",
+            "tags": ["tag1", "tag2", "tag3"],
+            "mood_value": 0.5,
+            "mood_label": "Mostly Positive"
+        }}
+        """
+        
+        # Initialize LLM
+        from langchain_openai import ChatOpenAI
+        from langchain.prompts import ChatPromptTemplate
+        
+        # Configure the LLM for structured output
+        llm = ChatOpenAI(model="gpt-3.5-turbo-0125", temperature=0.3)
+        
+        # Create and run chain for analysis
+        prompt = ChatPromptTemplate.from_template(analysis_prompt)
+        chain_output = llm.invoke(prompt.format())
+        
+        # Parse the JSON response
+        import json
+        try:
+            # Extract the content from the message
+            content = chain_output.content
+            
+            # Find JSON content (it might be wrapped in markdown code blocks)
+            json_start = content.find('{')
+            json_end = content.rfind('}') + 1
+            
+            if json_start >= 0 and json_end > json_start:
+                json_str = content[json_start:json_end]
+                analysis = json.loads(json_str)
+            else:
+                # Fallback if JSON parsing fails
+                analysis = {
+                    "note": "Unable to analyze this segment properly.",
+                    "tags": [],
+                    "mood_value": previous_mood["value"], 
+                    "mood_label": previous_mood["label"]
+                }
+        except json.JSONDecodeError:
+            # Fallback for JSON parsing errors
+            analysis = {
+                "note": "Error parsing analysis results.",
+                "tags": [],
+                "mood_value": previous_mood["value"],
+                "mood_label": previous_mood["label"]
+            }
+            
+        # Process the tags: normalize and merge with previous_tags
+        new_tags = analysis.get("tags", [])
+        normalized_tags = []
+        
+        for tag in new_tags:
+            # Convert to lowercase and trim
+            clean_tag = tag.lower().strip()
+            if clean_tag and clean_tag not in normalized_tags:
+                normalized_tags.append(clean_tag)
+        
+        # Merge with previous tags, avoid duplicates
+        updated_tags = previous_tags.copy()
+        for tag in normalized_tags:
+            if tag not in updated_tags:
+                updated_tags.append(tag)
+        
+        # Create mood object
+        mood = {
+            "value": analysis.get("mood_value", previous_mood["value"]),
+            "label": analysis.get("mood_label", previous_mood["label"]),
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+        
+        # Prepare the response
+        result = {
+            "observer_notes": analysis.get("note", ""),
+            "semantic_tags": normalized_tags,
+            "observer_mood": mood,
+            "observer_tag_list": updated_tags
+        }
+        
+        return result
+        
+    except Exception as e:
+        logger.error(f"Error in AI Observer analysis: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        
+        # Return fallback values in case of error
+        return {
+            "observer_notes": "Analysis not available at this time.",
+            "semantic_tags": [],
+            "observer_mood": previous_mood,
+            "observer_tag_list": previous_tags
         }
 
 # ========================
@@ -2531,4 +2716,380 @@ def api_speech_to_text():
     except Exception as e:
         logger.error(f"Error in speech_to_text: {str(e)}")
         return jsonify({"success": False, "error": str(e)}), 500
+
+@api_bp.route('/interview/transcript', methods=['GET'])
+def get_interview_transcript():
+    """
+    Get the transcript for an interview.
+    """
+    try:
+        session_id = request.args.get('session_id')
+        if not session_id:
+            return jsonify({'status': 'error', 'message': 'Missing session_id parameter'}), 400
+            
+        # Check if interview exists
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'status': 'error', 'message': f'No interview found with session ID {session_id}'}), 404
+            
+        # Get the transcript file path
+        transcript_path = os.path.join(INTERVIEWS_DIR, f"{session_id}_transcript.json")
+        
+        # Check if transcript exists
+        if not os.path.exists(transcript_path):
+            return jsonify({
+                'status': 'success',
+                'content': 'No transcript available yet.',
+                'transcript_chunks': []
+            })
+            
+        # Read the transcript
+        try:
+            with open(transcript_path, 'r') as f:
+                transcript_data = json.load(f)
+                
+            # Process the JSON structure to get a readable HTML transcript
+            formatted_transcript = ""
+            
+            # Prepare chunks for AI observer
+            transcript_chunks = []
+            
+            for item in transcript_data:
+                # Skip system messages for display but include them in chunks
+                if item.get('role') == 'system':
+                    transcript_chunks.append({
+                        'id': item.get('id', str(uuid.uuid4())), 
+                        'role': 'system',
+                        'content': item.get('content', ''),
+                        'timestamp': item.get('timestamp', '')
+                    })
+                    continue
+                    
+                # Create unique ID for this message if not present
+                if 'id' not in item:
+                    item['id'] = str(uuid.uuid4())
+                    
+                # Get the speaker role and content
+                role = item.get('role', '')
+                content = item.get('content', '')
+                message_id = item.get('id', '')
+                timestamp = item.get('timestamp', '')
+                
+                # Format for display
+                if role == 'assistant':
+                    formatted_transcript += f'<div class="interviewer-message" data-message-id="{message_id}">'
+                    formatted_transcript += f'<strong>Interviewer:</strong> {content}</div>\n'
+                elif role == 'user':
+                    formatted_transcript += f'<div class="participant-message" data-message-id="{message_id}">'
+                    formatted_transcript += f'<strong>Participant:</strong> {content}</div>\n'
+                
+                # Add to chunks for AI observer
+                transcript_chunks.append({
+                    'id': message_id,
+                    'role': role,
+                    'content': content,
+                    'timestamp': timestamp
+                })
+            
+            # Prepare stats
+            stats = {
+                'duration': calculate_interview_duration(transcript_data),
+                'questions_count': count_questions(transcript_data),
+                'avg_response_time': calculate_avg_response_time(transcript_data),
+                'interviewer_percentage': calculate_interviewer_percentage(transcript_data),
+                'participant_percentage': calculate_participant_percentage(transcript_data)
+            }
+            
+            # Extract topics (simple keyword extraction for now)
+            topics = extract_topics_from_transcript(transcript_data)
+            
+            return jsonify({
+                'status': 'success',
+                'content': formatted_transcript,
+                'transcript_chunks': transcript_chunks,
+                'stats': stats,
+                'topics': topics
+            })
+            
+        except Exception as e:
+            logger.error(f"Error reading transcript: {str(e)}")
+            return jsonify({'status': 'error', 'message': f'Error reading transcript: {str(e)}'}), 500
+            
+    except Exception as e:
+        logger.error(f"Error getting interview transcript: {str(e)}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
+
+# Helper functions for transcript analysis
+def calculate_interview_duration(transcript_data):
+    """Calculate the duration of the interview based on timestamps."""
+    try:
+        if not transcript_data or len(transcript_data) < 2:
+            return "00:00:00"
+            
+        # Get first and last message timestamps
+        first_message = transcript_data[0]
+        last_message = transcript_data[-1]
+        
+        first_time = datetime.datetime.fromisoformat(first_message.get('timestamp', '').replace('Z', '+00:00'))
+        last_time = datetime.datetime.fromisoformat(last_message.get('timestamp', '').replace('Z', '+00:00'))
+        
+        # Calculate duration
+        duration = last_time - first_time
+        hours, remainder = divmod(duration.seconds, 3600)
+        minutes, seconds = divmod(remainder, 60)
+        
+        return f"{hours:02d}:{minutes:02d}:{seconds:02d}"
+    except Exception as e:
+        logger.error(f"Error calculating interview duration: {str(e)}")
+        return "00:00:00"
+
+def count_questions(transcript_data):
+    """Count the number of questions asked by the interviewer."""
+    try:
+        question_count = 0
+        for item in transcript_data:
+            if item.get('role') == 'assistant':
+                content = item.get('content', '')
+                if '?' in content:
+                    # Count the number of question marks
+                    question_count += content.count('?')
+        return question_count
+    except Exception as e:
+        logger.error(f"Error counting questions: {str(e)}")
+        return 0
+
+def calculate_avg_response_time(transcript_data):
+    """Calculate the average time it takes for the participant to respond."""
+    try:
+        if not transcript_data or len(transcript_data) < 3:
+            return "0.0 sec"
+            
+        response_times = []
+        
+        # Iterate through messages to find question-answer pairs
+        for i in range(len(transcript_data) - 1):
+            current = transcript_data[i]
+            next_msg = transcript_data[i + 1]
+            
+            if (current.get('role') == 'assistant' and next_msg.get('role') == 'user' and 
+                'timestamp' in current and 'timestamp' in next_msg):
+                
+                # Convert timestamps to datetime
+                question_time = datetime.datetime.fromisoformat(current.get('timestamp', '').replace('Z', '+00:00'))
+                answer_time = datetime.datetime.fromisoformat(next_msg.get('timestamp', '').replace('Z', '+00:00'))
+                
+                # Calculate response time in seconds
+                response_time = (answer_time - question_time).total_seconds()
+                
+                # Only count reasonable response times (less than 2 minutes)
+                if 0 < response_time < 120:
+                    response_times.append(response_time)
+        
+        # Calculate average
+        if response_times:
+            avg_time = sum(response_times) / len(response_times)
+            return f"{avg_time:.1f} sec"
+        return "0.0 sec"
+    except Exception as e:
+        logger.error(f"Error calculating average response time: {str(e)}")
+        return "0.0 sec"
+
+def calculate_interviewer_percentage(transcript_data):
+    """Calculate the percentage of the conversation taken by the interviewer."""
+    try:
+        interviewer_chars = 0
+        total_chars = 0
+        
+        for item in transcript_data:
+            if item.get('role') in ['assistant', 'user']:
+                content_length = len(item.get('content', ''))
+                total_chars += content_length
+                
+                if item.get('role') == 'assistant':
+                    interviewer_chars += content_length
+        
+        if total_chars > 0:
+            percentage = (interviewer_chars / total_chars) * 100
+            return f"{int(percentage)}%"
+        return "0%"
+    except Exception as e:
+        logger.error(f"Error calculating interviewer percentage: {str(e)}")
+        return "0%"
+
+def calculate_participant_percentage(transcript_data):
+    """Calculate the percentage of the conversation taken by the participant."""
+    try:
+        participant_chars = 0
+        total_chars = 0
+        
+        for item in transcript_data:
+            if item.get('role') in ['assistant', 'user']:
+                content_length = len(item.get('content', ''))
+                total_chars += content_length
+                
+                if item.get('role') == 'user':
+                    participant_chars += content_length
+        
+        if total_chars > 0:
+            percentage = (participant_chars / total_chars) * 100
+            return f"{int(percentage)}%"
+        return "0%"
+    except Exception as e:
+        logger.error(f"Error calculating participant percentage: {str(e)}")
+        return "0%"
+
+def extract_topics_from_transcript(transcript_data):
+    """Extract main topics from the transcript content."""
+    try:
+        # Simple keyword extraction approach
+        # For a more sophisticated approach, you could use NLP techniques
+        
+        # Combine all text from the participant
+        all_text = " ".join([
+            item.get('content', '') 
+            for item in transcript_data 
+            if item.get('role') == 'user'
+        ])
+        
+        # Remove common stop words (simple approach)
+        stop_words = [
+            'i', 'me', 'my', 'myself', 'we', 'our', 'ours', 'ourselves', 'you', 
+            'your', 'yours', 'yourself', 'yourselves', 'he', 'him', 'his', 'himself', 
+            'she', 'her', 'hers', 'herself', 'it', 'its', 'itself', 'they', 'them', 
+            'their', 'theirs', 'themselves', 'what', 'which', 'who', 'whom', 'this', 
+            'that', 'these', 'those', 'am', 'is', 'are', 'was', 'were', 'be', 'been', 
+            'being', 'have', 'has', 'had', 'having', 'do', 'does', 'did', 'doing', 
+            'a', 'an', 'the', 'and', 'but', 'if', 'or', 'because', 'as', 'until', 
+            'while', 'of', 'at', 'by', 'for', 'with', 'about', 'against', 'between', 
+            'into', 'through', 'during', 'before', 'after', 'above', 'below', 'to', 
+            'from', 'up', 'down', 'in', 'out', 'on', 'off', 'over', 'under', 'again', 
+            'further', 'then', 'once', 'here', 'there', 'when', 'where', 'why', 'how', 
+            'all', 'any', 'both', 'each', 'few', 'more', 'most', 'other', 'some', 'such', 
+            'no', 'nor', 'not', 'only', 'own', 'same', 'so', 'than', 'too', 'very', 
+            's', 't', 'can', 'will', 'just', 'don', 'should', 'now'
+        ]
+        
+        # Tokenize and filter
+        words = all_text.lower().split()
+        filtered_words = [word for word in words if word.isalpha() and word not in stop_words]
+        
+        # Count word frequency
+        from collections import Counter
+        word_counts = Counter(filtered_words)
+        
+        # Get the top keywords
+        top_keywords = word_counts.most_common(10)
+        
+        # Generate topics from top keywords
+        topics = []
+        for word, count in top_keywords:
+            if count > 1 and len(word) > 3:  # Only include words that appear multiple times and are longer than 3 chars
+                topics.append(word.capitalize())
+        
+        return topics[:5]  # Return the top 5 topics
+    except Exception as e:
+        logger.error(f"Error extracting topics: {str(e)}")
+        return []
+
+@api_bp.route('/interview/status', methods=['GET'])
+def get_interview_status():
+    """
+    Get the status of an interview.
+    """
+    try:
+        session_id = request.args.get('session_id')
+        if not session_id:
+            return jsonify({'status': 'error', 'message': 'Missing session_id parameter'}), 400
+            
+        # Check if interview exists
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'status': 'error', 'message': f'No interview found with session ID {session_id}'}), 404
+            
+        # Get the transcript file path
+        transcript_path = os.path.join(INTERVIEWS_DIR, f"{session_id}_transcript.json")
+        
+        # Check if transcript exists
+        if not os.path.exists(transcript_path):
+            return jsonify({
+                'status': 'success',
+                'content': 'No transcript available yet.',
+                'transcript_chunks': []
+            })
+            
+        # Read the transcript
+        try:
+            with open(transcript_path, 'r') as f:
+                transcript_data = json.load(f)
+                
+            # Process the JSON structure to get a readable HTML transcript
+            formatted_transcript = ""
+            
+            # Prepare chunks for AI observer
+            transcript_chunks = []
+            
+            for item in transcript_data:
+                # Skip system messages for display but include them in chunks
+                if item.get('role') == 'system':
+                    transcript_chunks.append({
+                        'id': item.get('id', str(uuid.uuid4())), 
+                        'role': 'system',
+                        'content': item.get('content', ''),
+                        'timestamp': item.get('timestamp', '')
+                    })
+                    continue
+                    
+                # Create unique ID for this message if not present
+                if 'id' not in item:
+                    item['id'] = str(uuid.uuid4())
+                    
+                # Get the speaker role and content
+                role = item.get('role', '')
+                content = item.get('content', '')
+                message_id = item.get('id', '')
+                timestamp = item.get('timestamp', '')
+                
+                # Format for display
+                if role == 'assistant':
+                    formatted_transcript += f'<div class="interviewer-message" data-message-id="{message_id}">'
+                    formatted_transcript += f'<strong>Interviewer:</strong> {content}</div>\n'
+                elif role == 'user':
+                    formatted_transcript += f'<div class="participant-message" data-message-id="{message_id}">'
+                    formatted_transcript += f'<strong>Participant:</strong> {content}</div>\n'
+                
+                # Add to chunks for AI observer
+                transcript_chunks.append({
+                    'id': message_id,
+                    'role': role,
+                    'content': content,
+                    'timestamp': timestamp
+                })
+            
+            # Prepare stats
+            stats = {
+                'duration': calculate_interview_duration(transcript_data),
+                'questions_count': count_questions(transcript_data),
+                'avg_response_time': calculate_avg_response_time(transcript_data),
+                'interviewer_percentage': calculate_interviewer_percentage(transcript_data),
+                'participant_percentage': calculate_participant_percentage(transcript_data)
+            }
+            
+            # Extract topics (simple keyword extraction for now)
+            topics = extract_topics_from_transcript(transcript_data)
+            
+            return jsonify({
+                'status': 'success',
+                'content': formatted_transcript,
+                'transcript_chunks': transcript_chunks,
+                'stats': stats,
+                'topics': topics
+            })
+            
+        except Exception as e:
+            logger.error(f"Error reading transcript: {str(e)}")
+            return jsonify({'status': 'error', 'message': f'Error reading transcript: {str(e)}'}), 500
+            
+    except Exception as e:
+        logger.error(f"Error getting interview transcript: {str(e)}")
+        return jsonify({'status': 'error', 'message': str(e)}), 500
 

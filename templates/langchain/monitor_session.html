@@ -155,6 +155,89 @@
         display: flex;
         gap: 20px;
     }
+    
+    /* AI Observer Styles */
+    .ai-note {
+        background-color: rgba(79, 70, 229, 0.05);
+        border-left: 3px solid rgba(79, 70, 229, 0.5);
+        padding: 8px 12px;
+        margin-top: 5px;
+        font-size: 0.9rem;
+        color: #495057;
+        font-style: italic;
+    }
+    .ai-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px;
+        margin-top: 5px;
+    }
+    .ai-tag {
+        background-color: rgba(79, 70, 229, 0.1);
+        color: #4f46e5;
+        padding: 2px 8px;
+        border-radius: 12px;
+        font-size: 0.75rem;
+    }
+    .mood-timeline {
+        height: 100px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+        margin-bottom: 15px;
+        position: relative;
+    }
+    .mood-point {
+        position: absolute;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background-color: #4f46e5;
+        transform: translate(-50%, -50%);
+    }
+    .observer-message {
+        background-color: rgba(79, 70, 229, 0.03);
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    .observer-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 8px 12px;
+        border-bottom: 1px solid rgba(0,0,0,0.05);
+    }
+    .observer-icon {
+        color: #4f46e5;
+        margin-right: 5px;
+    }
+    .observer-title {
+        font-size: 0.8rem;
+        font-weight: 500;
+        color: #4f46e5;
+    }
+    .observer-status {
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    .observer-content {
+        padding: 10px 12px;
+    }
+    .tab-controls {
+        margin-bottom: 15px;
+    }
+    .toggle-observer {
+        display: inline-flex;
+        align-items: center;
+        font-size: 0.8rem;
+        color: #495057;
+        cursor: pointer;
+        user-select: none;
+        margin-bottom: 10px;
+    }
+    .toggle-observer input {
+        margin-right: 5px;
+    }
 </style>
 {% endblock %}
 
@@ -186,64 +269,124 @@
         <div class="transcript-container">
             <div class="d-flex justify-content-between align-items-center mb-3">
                 <h2 class="h5 mb-0">Live Transcript</h2>
-                <button class="btn btn-sm btn-outline-secondary" id="copyTranscriptBtn">
-                    <i class="bi bi-clipboard"></i> Copy Transcript
-                </button>
+                <div>
+                    <label class="toggle-observer me-3">
+                        <input type="checkbox" id="toggleAIObserver" checked> 
+                        <span>AI Observer</span>
+                    </label>
+                    <button class="btn btn-sm btn-outline-secondary" id="copyTranscriptBtn">
+                        <i class="bi bi-clipboard"></i> Copy Transcript
+                    </button>
+                </div>
             </div>
             <div class="transcript-content" id="transcriptContent">
                 {{ transcript }}
             </div>
         </div>
         <div class="controls-container">
-            <h3 class="h5 mb-3">Interview Analytics</h3>
-            
-            <div class="control-label">Sentiment Tracking</div>
-            <div class="sentiment-indicator mb-1">
-                <div class="sentiment-level"></div>
-                <div class="sentiment-marker" style="left: 50%;"></div>
-            </div>
-            <div class="d-flex justify-content-between mb-3 small text-muted">
-                <span>Negative</span>
-                <span>Neutral</span>
-                <span>Positive</span>
+            <div class="tab-controls">
+                <ul class="nav nav-tabs" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="researcher-tab" data-bs-toggle="tab" data-bs-target="#researcher-pane" type="button" role="tab">Researcher</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="observer-tab" data-bs-toggle="tab" data-bs-target="#observer-pane" type="button" role="tab">AI Observer</button>
+                    </li>
+                </ul>
             </div>
             
-            <div class="control-label">Key Topics Mentioned</div>
-            <div class="topic-list" id="topicList">
-                <span class="topic-tag">Product Features</span>
-                <span class="topic-tag">User Experience</span>
-                <span class="topic-tag">Interface Design</span>
-                <span class="topic-tag">Customer Support</span>
-                <span class="topic-tag">Documentation</span>
-            </div>
-            
-            <div class="control-label">Interview Stats</div>
-            <ul class="interview-stats">
-                <li>
-                    <span class="label">Duration</span>
-                    <span class="value" id="durationValue">00:05:32</span>
-                </li>
-                <li>
-                    <span class="label">Questions Asked</span>
-                    <span class="value" id="questionsValue">6</span>
-                </li>
-                <li>
-                    <span class="label">Avg. Response Time</span>
-                    <span class="value" id="responseTimeValue">12.4 sec</span>
-                </li>
-                <li>
-                    <span class="label">Interviewer Talk Time</span>
-                    <span class="value" id="interviewerTimeValue">35%</span>
-                </li>
-                <li>
-                    <span class="label">Participant Talk Time</span>
-                    <span class="value" id="participantTimeValue">65%</span>
-                </li>
-            </ul>
-            
-            <div class="control-label">AI Suggestions</div>
-            <div class="suggestion-box" id="suggestionBox">
-                Consider asking about their specific pain points with the current process. The participant has mentioned challenges but hasn't specified details.
+            <div class="tab-content">
+                <div class="tab-pane fade show active" id="researcher-pane" role="tabpanel">
+                    <h3 class="h5 mb-3">Interview Analytics</h3>
+                    
+                    <div class="control-label">Sentiment Tracking</div>
+                    <div class="sentiment-indicator mb-1">
+                        <div class="sentiment-level"></div>
+                        <div class="sentiment-marker" style="left: 50%;"></div>
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 small text-muted">
+                        <span>Negative</span>
+                        <span>Neutral</span>
+                        <span>Positive</span>
+                    </div>
+                    
+                    <div class="control-label">Key Topics Mentioned</div>
+                    <div class="topic-list" id="topicList">
+                        <span class="topic-tag">Product Features</span>
+                        <span class="topic-tag">User Experience</span>
+                        <span class="topic-tag">Interface Design</span>
+                        <span class="topic-tag">Customer Support</span>
+                        <span class="topic-tag">Documentation</span>
+                    </div>
+                    
+                    <div class="control-label">Interview Stats</div>
+                    <ul class="interview-stats">
+                        <li>
+                            <span class="label">Duration</span>
+                            <span class="value" id="durationValue">00:05:32</span>
+                        </li>
+                        <li>
+                            <span class="label">Questions Asked</span>
+                            <span class="value" id="questionsValue">6</span>
+                        </li>
+                        <li>
+                            <span class="label">Avg. Response Time</span>
+                            <span class="value" id="responseTimeValue">12.4 sec</span>
+                        </li>
+                        <li>
+                            <span class="label">Interviewer Talk Time</span>
+                            <span class="value" id="interviewerTimeValue">35%</span>
+                        </li>
+                        <li>
+                            <span class="label">Participant Talk Time</span>
+                            <span class="value" id="participantTimeValue">65%</span>
+                        </li>
+                    </ul>
+                    
+                    <div class="control-label">Researcher Notes</div>
+                    <div class="suggestion-box" id="suggestionBox">
+                        Consider asking about their specific pain points with the current process. The participant has mentioned challenges but hasn't specified details.
+                    </div>
+                </div>
+                
+                <div class="tab-pane fade" id="observer-pane" role="tabpanel">
+                    <h3 class="h5 mb-3">AI Observer Analysis</h3>
+                    
+                    <div class="control-label">Sentiment Timeline</div>
+                    <div class="mood-timeline" id="moodTimeline">
+                        <!-- Mood points will be added dynamically -->
+                    </div>
+                    <div class="d-flex justify-content-between mb-3 small text-muted">
+                        <span>Negative</span>
+                        <span>Neutral</span>
+                        <span>Positive</span>
+                    </div>
+                    
+                    <div class="control-label">Current Mood</div>
+                    <div class="sentiment-indicator mb-3">
+                        <div class="sentiment-level"></div>
+                        <div class="sentiment-marker" id="aiMoodMarker" style="left: 50%;"></div>
+                    </div>
+                    
+                    <div class="control-label">Semantic Tags</div>
+                    <div class="topic-list" id="aiTopicList">
+                        <!-- AI-generated tags will appear here -->
+                    </div>
+                    
+                    <div class="control-label">Latest Observation</div>
+                    <div class="observer-message">
+                        <div class="observer-header">
+                            <div>
+                                <i class="bi bi-robot observer-icon"></i>
+                                <span class="observer-title">AI Observer</span>
+                            </div>
+                            <span class="observer-status">Analyzing...</span>
+                        </div>
+                        <div class="observer-content" id="latestObservation">
+                            <!-- Latest AI observation will appear here -->
+                        </div>
+                    </div>
+                </div>
             </div>
             
             <div class="btn-toolbar">
@@ -352,132 +495,118 @@
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Main elements
+        // Constants
         const sessionId = '{{ session_id }}';
+        
+        // Elements
         const transcriptContent = document.getElementById('transcriptContent');
-        const copyTranscriptBtn = document.getElementById('copyTranscriptBtn');
+        const topicList = document.getElementById('topicList');
+        const durationValue = document.getElementById('durationValue');
+        const questionsValue = document.getElementById('questionsValue');
+        const responseTimeValue = document.getElementById('responseTimeValue');
+        const interviewerTimeValue = document.getElementById('interviewerTimeValue');
+        const participantTimeValue = document.getElementById('participantTimeValue');
         const suggestQuestionBtn = document.getElementById('suggestQuestionBtn');
         const endSessionBtn = document.getElementById('endSessionBtn');
         const refreshBtn = document.getElementById('refreshBtn');
+        const copyTranscriptBtn = document.getElementById('copyTranscriptBtn');
         const downloadReportBtn = document.getElementById('downloadReportBtn');
+        const downloadAnalysisBtn = document.getElementById('downloadAnalysisBtn');
+        const sendQuestionBtn = document.getElementById('sendQuestionBtn');
+        const confirmEndSessionBtn = document.getElementById('confirmEndSessionBtn');
+        const customQuestionCheck = document.getElementById('customQuestionCheck');
+        const analysisLoading = document.getElementById('analysisLoading');
+        const analysisContent = document.getElementById('analysisContent');
+        const analysisText = document.getElementById('analysisText');
+        
+        // AI Observer elements
+        const toggleAIObserver = document.getElementById('toggleAIObserver');
+        const aiTopicList = document.getElementById('aiTopicList');
+        const moodTimeline = document.getElementById('moodTimeline');
+        const aiMoodMarker = document.getElementById('aiMoodMarker');
+        const latestObservation = document.getElementById('latestObservation');
         
         // Modals
         const suggestQuestionModal = new bootstrap.Modal(document.getElementById('suggestQuestionModal'));
         const endSessionModal = new bootstrap.Modal(document.getElementById('endSessionModal'));
         const analysisModal = new bootstrap.Modal(document.getElementById('analysisModal'));
         
-        // Form elements
-        const customQuestionCheck = document.getElementById('customQuestionCheck');
-        const customQuestionContainer = document.getElementById('customQuestionContainer');
-        const sendQuestionBtn = document.getElementById('sendQuestionBtn');
-        const confirmEndSessionBtn = document.getElementById('confirmEndSession');
-        
-        // Analysis elements
-        const analysisLoading = document.getElementById('analysisLoading');
-        const analysisContent = document.getElementById('analysisContent');
-        const analysisText = document.getElementById('analysisText');
-        const downloadAnalysisBtn = document.getElementById('downloadAnalysisBtn');
-        
-        // Status tracking variables
+        // State
+        let lastTranscriptLength = 0;
         let isInterviewEnded = false;
-        let checkStatusInterval = null;
-        let pollInterval = null;
+        let pollInterval;
+        let checkStatusInterval;
         
-        // Function to check interview status
-        const checkInterviewStatus = () => {
-            fetch(`/langchain/api/interview/transcript?session_id=${sessionId}`)
-                .then(response => response.json())
-                .then(data => {
-                    // Check if the interview is completed
-                    if (data.transcript && 
-                        (data.transcript.includes("The interview has been completed") || 
-                         data.transcript.includes("I'll end the interview now") ||
-                         data.transcript.includes("Thank you for your time and valuable insights"))) {
-                        
-                        if (!isInterviewEnded) {
-                            isInterviewEnded = true;
-                            handleInterviewEnded();
-                        }
-                    }
-                })
-                .catch(error => console.error('Error checking status:', error));
-        };
+        // AI Observer state
+        let isAIObserverEnabled = true;
+        let observerMoodData = [];
+        let observerTagList = [];
+        let lastProcessedMessageId = null;
+        let currentMood = { value: 0, label: "Neutral" };
         
-        // Handle when interview is ended
-        const handleInterviewEnded = () => {
-            console.log('Interview has ended');
+        // Functions
+        function handleInterviewEnded() {
+            // Update UI for ended interview
+            document.querySelector('.live-indicator').classList.remove('live-indicator');
+            document.querySelector('.dot').classList.remove('dot');
             
             // Clear intervals
-            if (checkStatusInterval) {
-                clearInterval(checkStatusInterval);
-            }
-            if (pollInterval) {
-                clearInterval(pollInterval);
-            }
+            clearInterval(pollInterval);
+            clearInterval(checkStatusInterval);
             
-            // Show notification to researcher
-            const notification = document.createElement('div');
-            notification.className = 'alert alert-info alert-dismissible fade show';
-            notification.innerHTML = `
-                <strong>Interview Completed!</strong> The interview has been ended and the interviewee has been thanked.
-                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-            `;
-            document.querySelector('.container-fluid').prepend(notification);
-            
-            // Disable controls
-            if (endSessionBtn) endSessionBtn.disabled = true;
-            if (suggestQuestionBtn) suggestQuestionBtn.disabled = true;
-            
-            // Add completed label to the title
-            const statusBadge = document.createElement('span');
-            statusBadge.className = 'badge bg-success ms-2';
-            statusBadge.textContent = 'Completed';
-            document.querySelector('h1').appendChild(statusBadge);
-            
-            // Change live indicator
-            document.querySelector('.live-indicator').innerHTML = '<span class="text-success">COMPLETED</span>';
-            
-            // Add view analysis button
-            const actionButtonsContainer = document.querySelector('.d-flex.align-items-center');
-            if (actionButtonsContainer) {
-                const analysisBtn = document.createElement('button');
-                analysisBtn.className = 'btn btn-primary btn-sm ms-2';
-                analysisBtn.innerHTML = '<i class="bi bi-graph-up"></i> View Analysis';
-                analysisBtn.addEventListener('click', () => {
-                    window.location.href = `/langchain/interview/view/${sessionId}`;
-                });
-                actionButtonsContainer.appendChild(analysisBtn);
-            }
-        };
-        
-        // Update sentiment marker position (simulation)
-        function updateSentiment(value) {
-            // value should be between -1 (negative) and 1 (positive)
-            // Convert to percentage for positioning (0% to 100%)
-            const percentage = ((value + 1) / 2) * 100;
-            document.querySelector('.sentiment-marker').style.left = `${percentage}%`;
+            // Disable buttons
+            suggestQuestionBtn.disabled = true;
+            endSessionBtn.disabled = true;
         }
         
-        // Simulate random sentiment between -0.3 and 0.7 (slightly positive bias)
-        updateSentiment(Math.random() * 1.0 - 0.3);
-        
-        // Poll for transcript updates
         function pollTranscript() {
-            fetch(`/langchain/api/interview/transcript?session_id=${sessionId}`, {
-                method: 'GET'
+            if (isInterviewEnded) return;
+            
+            fetch(`/langchain/api/interview/transcript?session_id=${sessionId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+                return response.json();
             })
-            .then(response => response.json())
             .then(data => {
                 if (data.status === 'success') {
-                    // Update the transcript
-                    transcriptContent.textContent = data.transcript;
-                    transcriptContent.scrollTop = transcriptContent.scrollHeight;
+                    if (data.content) {
+                        // Update transcript
+                        transcriptContent.innerHTML = data.content;
+                        
+                        // Process new transcript chunks with AI Observer if enabled
+                        if (isAIObserverEnabled && data.transcript_chunks) {
+                            processNewTranscriptChunks(data.transcript_chunks);
+                        }
+                        
+                        // Check if content has changed
+                        if (data.content.length !== lastTranscriptLength) {
+                            lastTranscriptLength = data.content.length;
+                            // Scroll to bottom of transcript
+                            transcriptContent.scrollTop = transcriptContent.scrollHeight;
+                        }
+                    }
                     
-                    // Update stats (simulation)
-                    updateMonitoringStats();
+                    // Update stats if available
+                    if (data.stats) {
+                        if (data.stats.duration) durationValue.textContent = data.stats.duration;
+                        if (data.stats.questions_count) questionsValue.textContent = data.stats.questions_count;
+                        if (data.stats.avg_response_time) responseTimeValue.textContent = data.stats.avg_response_time;
+                        if (data.stats.interviewer_percentage) interviewerTimeValue.textContent = data.stats.interviewer_percentage;
+                        if (data.stats.participant_percentage) participantTimeValue.textContent = data.stats.participant_percentage;
+                    }
                     
-                    // Check interview status
-                    checkInterviewStatus();
+                    // Update topics if available
+                    if (data.topics && data.topics.length > 0) {
+                        topicList.innerHTML = '';
+                        data.topics.forEach(topic => {
+                            const topicTag = document.createElement('span');
+                            topicTag.className = 'topic-tag';
+                            topicTag.textContent = topic;
+                            topicList.appendChild(topicTag);
+                        });
+                    }
                 }
             })
             .catch(error => {
@@ -485,47 +614,264 @@
             });
         }
         
-        // Simulate updating monitoring stats
-        function updateMonitoringStats() {
-            // Update duration
-            const startTime = new Date(Date.now() - Math.floor(Math.random() * 3600000));
-            const duration = new Date(Date.now() - startTime);
-            const minutes = String(duration.getMinutes()).padStart(2, '0');
-            const seconds = String(duration.getSeconds()).padStart(2, '0');
-            document.getElementById('durationValue').textContent = `00:${minutes}:${seconds}`;
+        function checkInterviewStatus() {
+            if (isInterviewEnded) return;
             
-            // Update other stats
-            const questionCount = Math.floor(Math.random() * 10) + 5;
-            document.getElementById('questionsValue').textContent = questionCount;
+            fetch(`/langchain/api/interview/status?session_id=${sessionId}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    if (data.interview_status === 'completed' || data.interview_status === 'ended') {
+                        isInterviewEnded = true;
+                        handleInterviewEnded();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error checking interview status:', error);
+            });
+        }
+        
+        // AI Observer functions
+        function processNewTranscriptChunks(chunks) {
+            if (!isAIObserverEnabled || !chunks || chunks.length === 0) return;
             
-            const avgResponseTime = (Math.random() * 15 + 5).toFixed(1);
-            document.getElementById('responseTimeValue').textContent = `${avgResponseTime} sec`;
+            // Find the last message that hasn't been processed
+            let lastUnprocessedIndex = -1;
+            for (let i = chunks.length - 1; i >= 0; i--) {
+                if (chunks[i].id !== lastProcessedMessageId) {
+                    lastUnprocessedIndex = i;
+                    break;
+                }
+            }
             
-            const interviewerTime = Math.floor(Math.random() * 20) + 25;
-            document.getElementById('interviewerTimeValue').textContent = `${interviewerTime}%`;
+            if (lastUnprocessedIndex === -1) return; // No new messages
             
-            const participantTime = 100 - interviewerTime;
-            document.getElementById('participantTimeValue').textContent = `${participantTime}%`;
+            // Get the chunk to process
+            const chunkToProcess = chunks[lastUnprocessedIndex];
+            lastProcessedMessageId = chunkToProcess.id;
             
-            // Update sentiment randomly
-            if (Math.random() > 0.7) {
-                updateSentiment(Math.random() * 1.0 - 0.3);
+            // Add AI observer note to UI
+            processTranscriptChunk(chunkToProcess);
+        }
+        
+        function processTranscriptChunk(chunk) {
+            // Call the API to analyze the transcript chunk
+            fetch('/api/observer/analyze', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    transcript_chunk: chunk,
+                    session_id: sessionId,
+                    previous_mood: currentMood,
+                    previous_tags: observerTagList
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success && data.result) {
+                    const result = data.result;
+                    
+                    // Update latest observation
+                    if (result.observer_notes) {
+                        latestObservation.textContent = result.observer_notes;
+                    }
+                    
+                    // Update semantic tags
+                    if (result.semantic_tags && result.semantic_tags.length > 0) {
+                        // Add tags to message in transcript
+                        const messageElement = findMessageElementById(chunk.id);
+                        if (messageElement) {
+                            addAINotesToMessage(messageElement, result);
+                        }
+                    }
+                    
+                    // Update mood
+                    if (result.observer_mood) {
+                        updateMood(result.observer_mood);
+                    }
+                    
+                    // Update tag list
+                    if (result.observer_tag_list) {
+                        updateTagList(result.observer_tag_list);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error analyzing transcript chunk:', error);
+            });
+        }
+        
+        function findMessageElementById(messageId) {
+            // This is a placeholder - you'll need to implement a way to find message elements
+            // One way is to add data-id attributes to messages when they're added to the UI
+            return document.querySelector(`[data-message-id="${messageId}"]`);
+        }
+        
+        function addAINotesToMessage(messageElement, analysis) {
+            if (!messageElement) return;
+            
+            // Check if AI notes already exist
+            if (messageElement.querySelector('.ai-note')) return;
+            
+            // Add AI notes
+            if (analysis.observer_notes) {
+                const noteElement = document.createElement('div');
+                noteElement.className = 'ai-note';
+                noteElement.innerHTML = `<i class="bi bi-robot me-1"></i> ${analysis.observer_notes}`;
+                messageElement.appendChild(noteElement);
+            }
+            
+            // Add tags
+            if (analysis.semantic_tags && analysis.semantic_tags.length > 0) {
+                const tagsElement = document.createElement('div');
+                tagsElement.className = 'ai-tags';
+                
+                analysis.semantic_tags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'ai-tag';
+                    tagElement.textContent = tag;
+                    tagsElement.appendChild(tagElement);
+                });
+                
+                messageElement.appendChild(tagsElement);
             }
         }
         
-        // Event listeners
-        copyTranscriptBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(transcriptContent.textContent)
-                .then(() => {
-                    alert('Transcript copied to clipboard!');
-                })
-                .catch(err => {
-                    console.error('Could not copy text: ', err);
-                });
+        function updateMood(mood) {
+            if (!mood) return;
+            
+            // Update current mood
+            currentMood = mood;
+            
+            // Add to mood data array with timestamp
+            observerMoodData.push({
+                value: mood.value,
+                timestamp: mood.timestamp || new Date().toISOString()
+            });
+            
+            // Update mood marker position (convert from -1:1 to 0:100)
+            const position = ((mood.value + 1) / 2) * 100;
+            aiMoodMarker.style.left = `${position}%`;
+            
+            // Update mood timeline visualization
+            updateMoodTimeline();
+        }
+        
+        function updateMoodTimeline() {
+            // Clear existing points
+            moodTimeline.innerHTML = '';
+            
+            // Skip if no data
+            if (observerMoodData.length === 0) return;
+            
+            // Calculate time range
+            const firstTime = new Date(observerMoodData[0].timestamp).getTime();
+            const lastTime = new Date(observerMoodData[observerMoodData.length - 1].timestamp).getTime();
+            const timeRange = lastTime - firstTime;
+            
+            // Add points
+            observerMoodData.forEach((point, index) => {
+                const pointElement = document.createElement('div');
+                pointElement.className = 'mood-point';
+                
+                // Calculate position (x: time, y: mood value)
+                const time = new Date(point.timestamp).getTime();
+                const xPercent = timeRange === 0 ? 50 : ((time - firstTime) / timeRange) * 100;
+                const yPercent = ((1 - point.value) / 2) * 100; // Convert -1:1 to 0:100 inverted (0 at bottom)
+                
+                pointElement.style.left = `${xPercent}%`;
+                pointElement.style.top = `${yPercent}%`;
+                
+                // Size based on recency
+                const size = index === observerMoodData.length - 1 ? 10 : 6;
+                pointElement.style.width = `${size}px`;
+                pointElement.style.height = `${size}px`;
+                
+                // Color based on value
+                let color;
+                if (point.value < -0.3) color = '#dc3545'; // negative
+                else if (point.value > 0.3) color = '#28a745'; // positive
+                else color = '#ffc107'; // neutral
+                
+                pointElement.style.backgroundColor = color;
+                
+                moodTimeline.appendChild(pointElement);
+            });
+        }
+        
+        function updateTagList(tags) {
+            if (!tags || tags.length === 0) return;
+            
+            // Update local state
+            observerTagList = tags;
+            
+            // Update UI
+            aiTopicList.innerHTML = '';
+            
+            tags.forEach(tag => {
+                const tagElement = document.createElement('span');
+                tagElement.className = 'topic-tag';
+                tagElement.textContent = tag;
+                aiTopicList.appendChild(tagElement);
+            });
+        }
+        
+        // Event Handlers
+        toggleAIObserver.addEventListener('change', (e) => {
+            isAIObserverEnabled = e.target.checked;
+            
+            // Toggle AI notes in transcript
+            document.querySelectorAll('.ai-note, .ai-tags').forEach(el => {
+                el.style.display = isAIObserverEnabled ? 'block' : 'none';
+            });
         });
         
+        copyTranscriptBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(transcriptContent.textContent)
+            .then(() => {
+                // Create a temporary message to show that copy was successful
+                const copyMessage = document.createElement('div');
+                copyMessage.textContent = 'Copied to clipboard!';
+                copyMessage.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3';
+                copyMessage.style.zIndex = '9999';
+                document.body.appendChild(copyMessage);
+                
+                // Remove the message after 2 seconds
+                setTimeout(() => {
+                    document.body.removeChild(copyMessage);
+                }, 2000);
+            })
+            .catch(err => {
+                console.error('Could not copy text: ', err);
+                alert('Failed to copy text to clipboard');
+            });
+        });
+        
+        // Custom question checkbox toggle
         customQuestionCheck.addEventListener('change', () => {
-            customQuestionContainer.style.display = customQuestionCheck.checked ? 'block' : 'none';
+            const customQuestionInput = document.getElementById('customQuestion');
+            const suggestedQuestionSelect = document.getElementById('suggestedQuestion');
+            
+            if (customQuestionCheck.checked) {
+                customQuestionInput.disabled = false;
+                suggestedQuestionSelect.disabled = true;
+            } else {
+                customQuestionInput.disabled = true;
+                suggestedQuestionSelect.disabled = false;
+            }
         });
         
         suggestQuestionBtn.addEventListener('click', () => {
@@ -645,7 +991,17 @@
         });
         
         downloadReportBtn.addEventListener('click', () => {
-            // Create report content
+            // Create report content with AI Observer data if available
+            let aiObserverSection = '';
+            if (isAIObserverEnabled && observerTagList.length > 0) {
+                aiObserverSection = `
+## AI Observer Analysis
+- Current Mood: ${currentMood.label} (${currentMood.value})
+- Semantic Tags: ${observerTagList.map(tag => tag).join(', ')}
+- Latest Observation: ${latestObservation.textContent || 'No observations yet'}
+`;
+            }
+            
             const reportContent = `# Interview Monitoring Report
 Session ID: ${sessionId}
 Date: ${new Date().toLocaleString()}
@@ -663,8 +1019,9 @@ ${transcriptContent.textContent}
 ## Key Topics
 ${Array.from(document.querySelectorAll('.topic-tag')).map(tag => '- ' + tag.textContent).join('\n')}
 
-## AI Suggestions
+## Researcher Notes
 ${document.getElementById('suggestionBox').textContent}
+${aiObserverSection}
 `;
 
             // Create and download the file
@@ -702,8 +1059,8 @@ ${transcriptContent.textContent}
 ## Key Topics
 ${Array.from(document.querySelectorAll('.topic-tag')).map(tag => '- ' + tag.textContent).join('\n')}
 
-## AI Suggestions
-${document.getElementById('suggestionBox').textContent}
+## AI Observer Tags
+${observerTagList.map(tag => '- ' + tag).join('\n')}
 `;
 
             // Create and download the file
