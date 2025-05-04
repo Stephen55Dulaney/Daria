@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ElevenLabs Audio Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .controls {
+            display: flex;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        input, select, button, textarea {
+            padding: 10px;
+            margin-right: 10px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .debug {
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 12px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        audio {
+            width: 100%;
+            margin: 10px 0;
+        }
+        .loading {
+            display: none;
+            color: #666;
+            font-style: italic;
+        }
+        .note {
+            background-color: #fffde7;
+            border-left: 4px solid #ffd600;
+            padding: 10px;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>ElevenLabs Audio Test</h1>
+    
+    <div class="container">
+        <h2>Text-to-Speech (Port 5015)</h2>
+        <div>
+            <textarea id="ttsText" placeholder="Enter text to convert to speech...">Hello, this is a test of the ElevenLabs text to speech system.</textarea>
+        </div>
+        <div class="controls">
+            <select id="voiceSelect">
+                <option value="EXAVITQu4vr4xnSDxMaL">Female Voice (Rachel)</option>
+                <option value="pNInz6obpgDQGcFmaJgB">Male Voice (Adam)</option>
+            </select>
+            <button onclick="testTTS()">Generate Speech</button>
+            <span id="ttsLoading" class="loading">Generating audio...</span>
+        </div>
+        <div>
+            <audio id="ttsAudio" controls></audio>
+        </div>
+        <div id="ttsDebug" class="debug"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Speech-to-Text (Port 5016)</h2>
+        <div class="note">
+            <strong>Note:</strong> For testing purposes, this service will display a predefined transcript to simulate real functionality. 
+            For actual speech recognition, an ElevenLabs API key needs to be configured in the server.
+        </div>
+        <div class="controls">
+            <button onclick="startRecording()" id="recordButton">Start Recording</button>
+            <button onclick="stopRecording()" id="stopButton" disabled>Stop Recording</button>
+            <span id="sttLoading" class="loading">Transcribing audio...</span>
+        </div>
+        <div>
+            <p><strong>Transcription:</strong></p>
+            <div id="transcription" class="debug"></div>
+        </div>
+        <div id="sttDebug" class="debug"></div>
+    </div>
+    
+    <div class="container">
+        <h2>Service Status</h2>
+        <div class="controls">
+            <button onclick="checkServices()">Check Services</button>
+        </div>
+        <div id="serviceStatus" class="debug"></div>
+    </div>
+    
+    <script>
+        // Audio recording variables
+        let mediaRecorder;
+        let audioChunks = [];
+        
+        // Configuration constants
+        const serverUrl = 'http://127.0.0.1:5010'; // Main app server URL 
+        const voices = [
+            {id: 'EXAVITQu4vr4xnSDxMaL', name: 'Rachel (Female)'},
+            {id: 'ErXwobaYiN019PkySvjV', name: 'Antoni (Male)'},
+            {id: 'MF3mGyEYCl7XYWbV9V6O', name: 'Elli (Female)'},
+            {id: 'AZnzlk1XvdvUeBnXmlld', name: 'Domi (Female)'},
+            {id: 'JBFqnCBsd6RMkjVDRZzb', name: 'Fin (Male)'}
+        ];
+        
+        // Log debug information
+        function logTTSDebug(message) {
+            console.log(message);
+            const debugElement = document.getElementById('ttsDebug');
+            debugElement.textContent += (typeof message === 'object') 
+                ? JSON.stringify(message, null, 2) + '\n' 
+                : message + '\n';
+            debugElement.scrollTop = debugElement.scrollHeight;
+        }
+        
+        function logSTTDebug(message) {
+            console.log(message);
+            const debugElement = document.getElementById('sttDebug');
+            debugElement.textContent += (typeof message === 'object') 
+                ? JSON.stringify(message, null, 2) + '\n' 
+                : message + '\n';
+            debugElement.scrollTop = debugElement.scrollHeight;
+        }
+        
+        function logServiceDebug(message) {
+            console.log(message);
+            const debugElement = document.getElementById('serviceStatus');
+            debugElement.textContent += (typeof message === 'object') 
+                ? JSON.stringify(message, null, 2) + '\n' 
+                : message + '\n';
+            debugElement.scrollTop = debugElement.scrollHeight;
+        }
+        
+        // Test Text-to-Speech
+        function testTTS() {
+            const text = document.getElementById('ttsText').value.trim();
+            const voiceId = document.getElementById('voiceSelect').value;
+            
+            if (!text) {
+                alert('Please enter some text');
+                return;
+            }
+            
+            // Show loading
+            document.getElementById('ttsLoading').style.display = 'inline';
+            
+            // Clear audio
+            const audioElement = document.getElementById('ttsAudio');
+            audioElement.src = '';
+            
+            logTTSDebug(`Testing TTS with text: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}" and voice: ${voiceId}`);
+            
+            // Make request to TTS service
+            fetch('http://127.0.0.1:5015/text_to_speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! Status: ${response.status}, Body: ${text}`);
+                    });
+                }
+                return response.blob();
+            })
+            .then(audioBlob => {
+                const audioUrl = URL.createObjectURL(audioBlob);
+                audioElement.src = audioUrl;
+                logTTSDebug('Successfully generated audio!');
+            })
+            .catch(error => {
+                logTTSDebug(`Error generating audio: ${error.message}`);
+                alert(`Error generating audio: ${error.message}`);
+            })
+            .finally(() => {
+                document.getElementById('ttsLoading').style.display = 'none';
+            });
+        }
+        
+        // Speech-to-Text recording functions
+        async function startRecording() {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                mediaRecorder = new MediaRecorder(stream);
+                audioChunks = [];
+                
+                mediaRecorder.addEventListener('dataavailable', event => {
+                    audioChunks.push(event.data);
+                });
+                
+                mediaRecorder.addEventListener('stop', () => {
+                    const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                    sendAudioForTranscription(audioBlob);
+                });
+                
+                mediaRecorder.start();
+                document.getElementById('recordButton').disabled = true;
+                document.getElementById('stopButton').disabled = false;
+                
+                logSTTDebug('Recording started...');
+            } catch (error) {
+                logSTTDebug(`Error starting recording: ${error.message}`);
+                alert(`Error starting recording: ${error.message}`);
+            }
+        }
+        
+        function stopRecording() {
+            if (!mediaRecorder) return;
+            
+            mediaRecorder.stop();
+            document.getElementById('recordButton').disabled = false;
+            document.getElementById('stopButton').disabled = true;
+            
+            logSTTDebug('Recording stopped. Processing...');
+            document.getElementById('sttLoading').style.display = 'inline';
+        }
+        
+        function sendAudioForTranscription(audioBlob) {
+            document.getElementById('sttLoading').style.display = 'inline';
+            document.getElementById('transcription').textContent = "Processing your audio...";
+            
+            // Display information about the audio being sent
+            const audioSize = audioBlob.size;
+            logSTTDebug(`Sending audio for transcription: ${audioSize} bytes`);
+            
+            const formData = new FormData();
+            formData.append('audio', audioBlob, 'recording.webm');
+            
+            fetch('http://127.0.0.1:5016/speech_to_text', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! Status: ${response.status}, Body: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                logSTTDebug('Transcription received successfully!');
+                logSTTDebug(`Provider: ${data.provider || 'unknown'}`);
+                logSTTDebug(`Success: ${data.success}`);
+                
+                // Clear the debug area so we can see the full transcription
+                document.getElementById('sttDebug').textContent = '';
+                logSTTDebug('Transcription response:');
+                logSTTDebug(data);
+                
+                // Display the transcription more prominently
+                const transcriptionEl = document.getElementById('transcription');
+                transcriptionEl.textContent = data.text || 'No transcription returned';
+                
+                // Highlight different provider responses
+                if (data.provider === 'simulated') {
+                    transcriptionEl.style.color = '#aa5500';
+                    logSTTDebug('⚠️ NOTE: This is a simulated response, not actual speech recognition.');
+                } else if (data.provider === 'elevenlabs') {
+                    transcriptionEl.style.color = '#008800';
+                    logSTTDebug('✅ Real ElevenLabs transcription received!');
+                } else if (data.provider === 'real_transcription') {
+                    transcriptionEl.style.color = '#008800';
+                    logSTTDebug('✅ Real transcription received!');
+                } else {
+                    transcriptionEl.style.color = '#0066cc';
+                    logSTTDebug('⚠️ Response received from unknown provider.');
+                }
+            })
+            .catch(error => {
+                logSTTDebug(`Error transcribing audio: ${error.message}`);
+                document.getElementById('transcription').textContent = `Error: ${error.message}`;
+                document.getElementById('transcription').style.color = '#cc0000';
+            })
+            .finally(() => {
+                document.getElementById('sttLoading').style.display = 'none';
+            });
+        }
+        
+        // Check if services are running
+        function checkServices() {
+            document.getElementById('serviceStatus').textContent = ''; // Clear previous status
+            
+            // Check TTS Service
+            fetch('http://127.0.0.1:5015/', { method: 'HEAD' })
+                .then(response => {
+                    logServiceDebug(`TTS Service (Port 5015): ${response.status === 404 ? 'Running (404 is normal)' : 'Status ' + response.status}`);
+                })
+                .catch(error => {
+                    logServiceDebug(`TTS Service (Port 5015): Not running - ${error.message}`);
+                });
+            
+            // Check STT Service
+            fetch('http://127.0.0.1:5016/', { method: 'HEAD' })
+                .then(response => {
+                    logServiceDebug(`STT Service (Port 5016): ${response.status === 404 ? 'Running (404 is normal)' : 'Status ' + response.status}`);
+                })
+                .catch(error => {
+                    logServiceDebug(`STT Service (Port 5016): Not running - ${error.message}`);
+                });
+                
+            // Check Skeptica Service
+            fetch('http://127.0.0.1:5010/', { method: 'HEAD' })
+                .then(response => {
+                    logServiceDebug(`Skeptica Service (Port 5010): ${response.ok ? 'Running' : 'Status ' + response.status}`);
+                })
+                .catch(error => {
+                    logServiceDebug(`Skeptica Service (Port 5010): Not running - ${error.message}`);
+                });
+        }
+        
+        // Check services on page load
+        window.onload = function() {
+            checkServices();
+        };
+    </script>
+</body>
+</html> 

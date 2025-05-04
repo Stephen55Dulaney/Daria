@@ -22,6 +22,7 @@ from io import BytesIO
 import yaml
 from werkzeug.middleware.proxy_fix import ProxyFix
 from langchain_features.prompt_manager.models import PromptManager
+from flask_cors import CORS
 
 # Set up logging
 logging.basicConfig(level=logging.INFO)
@@ -58,6 +59,11 @@ logger.info(f"Initialized PromptManager with prompt_dir={PROMPT_DIR}")
 app = Flask(__name__, 
            template_folder='templates',
            static_folder='static')
+
+# Enable CORS for all routes
+CORS(app, resources={r"/*": {"origins": "*"}})
+logger.info("CORS enabled for all origins")
+
 app.secret_key = str(uuid.uuid4())
 app.wsgi_app = ProxyFix(app.wsgi_app, x_for=1, x_proto=1, x_host=1, x_port=1)
 app.config['TEMPLATES_AUTO_RELOAD'] = True
@@ -151,6 +157,11 @@ def start_interview():
     try:
         data = request.json
         character_name = data.get('character', 'interviewer')
+        # Make sure character_name is in lowercase for consistent comparison
+        if character_name:
+            character_name = character_name.lower()
+            logger.info(f"Starting interview with character: {character_name}")
+        
         voice_id = data.get('voice', '')
         session_id = data.get('session_id', str(uuid.uuid4()))
         
@@ -177,13 +188,59 @@ def start_interview():
         # Load the character's prompt
         try:
             character_config = prompt_mgr.load_prompt_config(character_name)
-            system_prompt = character_config.get('dynamic_prompt_prefix', '')
+            if character_config:
+                if hasattr(character_config, 'dynamic_prompt_prefix'):
+                    # Handle PromptConfig object
+                    system_prompt = character_config.dynamic_prompt_prefix
+                elif isinstance(character_config, dict):
+                    # Handle dictionary format
+                    system_prompt = character_config.get('dynamic_prompt_prefix', '')
+                else:
+                    logger.error(f"Unknown character config type: {type(character_config)}")
+                    system_prompt = "You are a helpful interview assistant."
+            else:
+                # Try direct YAML loading as a fallback
+                try:
+                    yaml_file = os.path.join(PROMPT_DIR, f"{character_name}.yml")
+                    if os.path.exists(yaml_file):
+                        with open(yaml_file, 'r') as f:
+                            config_data = yaml.safe_load(f)
+                        system_prompt = config_data.get('dynamic_prompt_prefix', '')
+                    else:
+                        system_prompt = "You are a helpful interview assistant."
+                except Exception as yaml_e:
+                    logger.error(f"Error loading character YAML: {str(yaml_e)}")
+                    system_prompt = "You are a helpful interview assistant."
         except Exception as e:
             logger.error(f"Error loading character prompt: {str(e)}")
             system_prompt = "You are a helpful interview assistant."
         
-        # Generate greeting message
-        greeting = f"Hello! I'm {character_name}. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?"
+        # Generate greeting message based on character
+        # Note we've already converted character_name to lowercase above
+        logger.info(f"Generating greeting for character: {character_name}")
+        
+        if character_name == "skeptica":
+            greeting = "Hello! I'm Skeptica, Deloitte's Assumption Buster. I'll be conducting this interview today to help challenge assumptions and ensure research integrity. Let's get started. Could you please introduce yourself?"
+        elif character_name == "eurekia":
+            greeting = "Hello! I'm Eurekia, your insight synthesizer. I'll be conducting this interview today to help identify patterns and insights in your research. Let's get started. Could you please introduce yourself?"
+        elif character_name == "thesea":
+            greeting = "Hello! I'm Thesea, your journey mapping guide. I'll be conducting this interview today to help map out user journeys and experiences. Let's get started. Could you please introduce yourself?"
+        elif character_name == "daria":
+            greeting = "Hello! I'm Daria, Deloitte's Advanced Research & Interview Assistant. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?"
+        elif character_name == "odessia":
+            greeting = "Hello! I'm Odessia, Deloitte's Journey Mapper. I'll be conducting this interview today to help analyze user experiences and create comprehensive journey maps. Let's get started. Could you please introduce yourself?"
+        elif character_name == "askia":
+            greeting = "Hello! I'm Askia, your question expert. I'll be conducting this interview today using strategic questioning techniques to uncover insights. Let's get started. Could you please introduce yourself?"
+        elif character_name == "empathica":
+            greeting = "Hello! I'm Empathica, your empathy explorer. I'll be conducting this interview today with a focus on understanding emotional experiences and needs. Let's get started. Could you please introduce yourself?"
+        elif character_name == "synthia":
+            greeting = "Hello! I'm Synthia, your synthesis specialist. I'll be conducting this interview today to help draw conclusions and synthesize findings. Let's get started. Could you please introduce yourself?"
+        else:
+            # For other characters, capitalize the first letter for a nicer display
+            display_name = character_name.capitalize() if character_name else "Interviewer"
+            greeting = f"Hello! I'm {display_name}. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?"
+            
+        logger.info(f"Generated greeting: {greeting[:50]}...")
         
         # Add greeting to conversation history
         interview_data['conversation_history'] = [
@@ -203,96 +260,80 @@ def start_interview():
         logger.error(f"Error starting interview: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+# Web UI compatibility routes
+@app.route('/langchain/api/interview/start', methods=['POST'])
+def langchain_api_interview_start():
+    """Legacy route to support the web UI's existing API calls."""
+    logger.info("Called legacy /langchain/api/interview/start endpoint")
+    return start_interview()
+
+@app.route('/api/interview/start', methods=['POST'])
+def api_interview_start():
+    """API compatibility route for interview start"""
+    logger.info("Called /api/interview/start endpoint")
+    return start_interview()
+
 @api_bp.route('/interview/respond', methods=['POST'])
 def respond_to_interview():
     """
-    Respond to the user's input in an interview session.
+    Generate a response to user input in an interview.
     """
     try:
         data = request.json
         session_id = data.get('session_id')
         user_input = data.get('message', '')
+        character_name = data.get('character', '')
         
-        if not session_id or not user_input:
-            return jsonify({'success': False, 'error': 'Missing session_id or message'}), 400
+        if not session_id:
+            return jsonify({'success': False, 'error': 'Missing session_id'}), 400
         
-        # Check if user wants to end the interview
-        lower_input = user_input.lower()
-        if ('end interview' in lower_input or 
-            'end the interview' in lower_input or 
-            'please end the interview' in lower_input or 
-            'please end interview' in lower_input or
-            'please finish the interview' in lower_input or
-            'please finish interview' in lower_input or
-            'finish interview' in lower_input or 
-            'finish the interview' in lower_input or 
-            'conclude interview' in lower_input or 
-            'conclude the interview' in lower_input or
-            'could we please end' in lower_input or
-            'i would like to end the interview' in lower_input):
-            
-            # Load interview data
-            interview_data = load_interview(session_id)
-            if not interview_data:
-                return jsonify({'success': False, 'error': f'No interview found for session: {session_id}'}), 404
-            
-            # Add user message to conversation history
-            if 'conversation_history' not in interview_data:
-                interview_data['conversation_history'] = []
-            
-            interview_data['conversation_history'].append({
-                "role": "user",
-                "content": user_input
-            })
-            
-            # Add farewell message to conversation history
-            farewell_message = "I'll end the interview now. Thank you for your time and valuable insights!"
-            interview_data['conversation_history'].append({
-                "role": "assistant",
-                "content": farewell_message
-            })
-            
-            # Update status to completed
-            interview_data['status'] = 'completed'
-            interview_data['last_updated'] = datetime.datetime.now()
-            
-            # Save updated interview data
-            save_interview(session_id, interview_data)
-            
-            # Return a special response indicating the interview should end
-            return jsonify({
-                'success': True,
-                'message': farewell_message,
-                'session_id': session_id,
-                'end_interview': True
-            })
+        if not user_input:
+            return jsonify({'success': False, 'error': 'Missing user message'}), 400
         
         # Load interview data
         interview_data = load_interview(session_id)
         if not interview_data:
             return jsonify({'success': False, 'error': f'No interview found for session: {session_id}'}), 404
         
-        # Add user message to conversation history
+        # Update interview data with user message
         if 'conversation_history' not in interview_data:
             interview_data['conversation_history'] = []
         
+        # Add user message to history
         interview_data['conversation_history'].append({
             "role": "user",
             "content": user_input
         })
         
-        # Generate AI response based on character
-        character_name = interview_data.get('character_select', 'interviewer')
-        try:
-            ai_response = generate_follow_up_question(user_input, character_name)
-        except Exception as e:
-            logger.error(f"Error generating response: {str(e)}")
-            ai_response = "I'm sorry, I encountered an issue processing your response. Could you provide more details or try rephrasing?"
+        # Check if this is a remote interview and store interviewee name
+        is_remote = data.get('is_remote', False)
+        if is_remote and 'interviewee' not in interview_data:
+            interviewee_name = data.get('interviewee_name', 'Anonymous')
+            interview_data['interviewee'] = {
+                'name': interviewee_name
+            }
+            logger.info(f"Recorded remote interviewee: {interviewee_name}")
         
-        # Add AI response to conversation history
+        # Generate follow-up question using character if specified
+        logger.info(f"Generating follow-up question for character: {character_name} and session: {session_id}")
+        follow_up = generate_follow_up_question(
+            user_input, 
+            character_name=character_name,
+            session_id=session_id
+        )
+        
+        # Handle case where follow_up is a dict with text and debug info
+        if isinstance(follow_up, dict) and 'text' in follow_up:
+            response_text = follow_up['text']
+            debug_info = follow_up.get('debug', {})
+        else:
+            response_text = follow_up
+            debug_info = {}
+        
+        # Add assistant message to history
         interview_data['conversation_history'].append({
             "role": "assistant",
-            "content": ai_response
+            "content": response_text
         })
         
         # Update last_updated timestamp
@@ -301,14 +342,77 @@ def respond_to_interview():
         # Save updated interview data
         save_interview(session_id, interview_data)
         
+        # Create comprehensive debug information
+        debug_data = {
+            'session_id': session_id,
+            'character_name': character_name,
+            'user_input': user_input,
+            'response': response_text
+        }
+        
+        # If there is interview_prompt in the session data, include it
+        if 'interview_prompt' in interview_data:
+            debug_data['interview_prompt'] = interview_data['interview_prompt']
+        
+        # If there is analysis_prompt in the session data, include it
+        if 'analysis_prompt' in interview_data:
+            debug_data['analysis_prompt'] = interview_data['analysis_prompt']
+        
+        # Include any extra debug information from generate_follow_up_question
+        if debug_info:
+            debug_data.update(debug_info)
+        
+        # Extract character prompt if available
+        if character_name and character_name != "interviewer":
+            try:
+                character_data = get_character(character_name)
+                if isinstance(character_data, Response):
+                    # Extract data from Response object
+                    import json
+                    character_json = json.loads(character_data.get_data(as_text=True))
+                    if character_json.get('success'):
+                        debug_data['character_prompt'] = character_json.get('prompt', '')
+                        debug_data['character_role'] = character_json.get('role', '')
+                elif isinstance(character_data, dict):
+                    debug_data['character_prompt'] = character_data.get('prompt', '')
+                    debug_data['character_role'] = character_data.get('role', '')
+            except Exception as e:
+                logger.error(f"Error extracting character data for debug: {str(e)}")
+                debug_data['character_error'] = str(e)
+        
+        # Include complete prompt construction if possible
+        if 'interview_prompt' in interview_data:
+            debug_data['full_prompt'] = f"{interview_data.get('interview_prompt')}\n\nUser's response: {user_input}\n\nGenerate a follow-up question based on this response:"
+        
+        # Return the response with debug information
         return jsonify({
             'success': True,
-            'message': ai_response,
-            'session_id': session_id
+            'message': response_text,
+            'session_id': session_id,
+            'debug': debug_data  # Include comprehensive debugging info
         })
     except Exception as e:
         logger.error(f"Error responding to interview: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({
+            'success': False, 
+            'error': str(e),
+            'debug': {'exception': str(e), 'traceback': traceback.format_exc()}
+        }), 500
+
+# Web UI compatibility routes for respond
+@app.route('/langchain/api/interview/respond', methods=['POST'])
+def langchain_api_interview_respond():
+    """Legacy route to support the web UI's respond API call"""
+    logger.info("Called legacy /langchain/api/interview/respond endpoint")
+    return respond_to_interview()
+
+@app.route('/api/interview/respond', methods=['POST'])
+def api_interview_respond():
+    """API compatibility route for interview respond"""
+    logger.info("Called /api/interview/respond endpoint")
+    return respond_to_interview()
 
 @api_bp.route('/interview/end', methods=['POST'])
 def end_interview():
@@ -335,35 +439,84 @@ def end_interview():
         reward_code = f"DARIA-{session_id[:8]}"
         interview_data['reward_code'] = reward_code
         
-        # Save updated interview data
-        save_interview(session_id, interview_data)
-        
-        # Create transcript
+        # Create transcript from conversation history
         if 'conversation_history' in interview_data:
+            # Extract the transcript text for analysis
             transcript = []
             for message in interview_data['conversation_history']:
                 if message['role'] != 'system':
-                    speaker = 'Interviewer' if message['role'] == 'assistant' else 'Participant'
-                    transcript.append({
-                        'speaker': speaker,
-                        'content': message['content'],
-                        'timestamp': interview_data['last_updated'].isoformat()
-                    })
+                    role_prefix = "Interviewer: " if message['role'] == "assistant" else "Interviewee: "
+                    transcript.append(f"{role_prefix}{message['content']}")
             
-            # Save transcript
-            transcript_path = os.path.join(INTERVIEWS_DIR, f"{session_id}_transcript.json")
-            with open(transcript_path, 'w') as f:
-                json.dump(transcript, f, indent=2)
+            transcript_text = "\n\n".join(transcript)
+            
+            # Generate analysis if the analysis_prompt is available
+            if interview_data.get('analysis_prompt'):
+                try:
+                    # Initialize a basic LLM connection
+                    from langchain_openai import ChatOpenAI
+                    from langchain.chains import LLMChain
+                    from langchain.prompts import ChatPromptTemplate
+                    
+                    # Get the analysis prompt
+                    analysis_prompt = interview_data['analysis_prompt']
+                    logger.info(f"Generating analysis using prompt: {analysis_prompt[:100]}...")
+                    
+                    # Create a prompt that includes the analysis_prompt and the transcript
+                    prompt_template = ChatPromptTemplate.from_template(
+                        f"{analysis_prompt}\n\nInterview Transcript:\n{transcript_text}\n\nAnalysis:"
+                    )
+                    
+                    # Create LLM chain
+                    llm = ChatOpenAI(model="gpt-4o", temperature=0.7)
+                    llm_chain = LLMChain(llm=llm, prompt=prompt_template)
+                    
+                    # Generate the analysis
+                    analysis = llm_chain.run({})
+                    
+                    # Add the analysis to the interview data
+                    interview_data['analysis'] = analysis
+                    logger.info(f"Analysis generated successfully: {analysis[:100]}...")
+                    
+                    # Add analysis to conversation history
+                    interview_data['conversation_history'].append({
+                        "role": "system",
+                        "content": "Generated analysis"
+                    })
+                    interview_data['conversation_history'].append({
+                        "role": "assistant",
+                        "content": analysis
+                    })
+                except Exception as e:
+                    logger.error(f"Error generating analysis: {str(e)}")
+            else:
+                logger.info("No analysis_prompt provided, skipping analysis generation")
+        
+        # Save updated interview data
+        save_interview(session_id, interview_data)
         
         return jsonify({
             'success': True,
-            'message': 'Interview completed successfully',
             'session_id': session_id,
-            'reward_code': reward_code
+            'reward_code': reward_code,
+            'message': "Interview completed successfully. Thank you for your participation!"
         })
     except Exception as e:
         logger.error(f"Error ending interview: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# Web UI compatibility routes for end interview
+@app.route('/langchain/api/interview/end', methods=['POST'])
+def langchain_api_interview_end():
+    """Legacy route to support the web UI's end interview API call"""
+    logger.info("Called legacy /langchain/api/interview/end endpoint")
+    return end_interview()
+
+@app.route('/api/interview/end', methods=['POST'])
+def api_interview_end():
+    """API compatibility route for interview end"""
+    logger.info("Called /api/interview/end endpoint") 
+    return end_interview()
 
 @api_bp.route('/text_to_speech', methods=['POST'])
 def text_to_speech():
@@ -408,14 +561,20 @@ def text_to_speech_elevenlabs():
         
         # Forward request to ElevenLabs audio service
         try:
-            audio_service_url = "http://127.0.0.1:5007/text_to_speech"
+            # Use the environment variable for service URL if it exists, or use port 5007
+            audio_service_url = os.environ.get('AUDIO_SERVICE_URL', 'http://127.0.0.1:5007')
+            if not audio_service_url.endswith('/'):
+                audio_service_url += '/'
+            audio_service_url += 'text_to_speech'
+            
+            logger.info(f"Sending TTS request to: {audio_service_url}")
             response = requests.post(
                 audio_service_url,
                 json={
                     'text': text,
                     'voice_id': voice_id
                 },
-                timeout=30
+                timeout=10  # 10 second timeout
             )
             
             if response.status_code == 200:
@@ -463,8 +622,13 @@ def speech_to_text():
         
         # Forward to audio service
         try:
-            audio_service_url = "http://127.0.0.1:5007/speech_to_text"
+            # Use the environment variable for service URL if it exists
+            audio_service_url = os.environ.get('AUDIO_SERVICE_URL', 'http://127.0.0.1:5007')
+            if not audio_service_url.endswith('/'):
+                audio_service_url += '/'
+            audio_service_url += 'speech_to_text'
             
+            logger.info(f"Sending STT request to: {audio_service_url}")
             files = {
                 'audio': (audio_file.filename, audio_file.read(), audio_file.content_type)
             }
@@ -472,7 +636,7 @@ def speech_to_text():
             response = requests.post(
                 audio_service_url,
                 files=files,
-                timeout=30
+                timeout=10  # 10 second timeout
             )
             
             if response.status_code == 200:
@@ -548,14 +712,15 @@ def check_services():
         },
         'audio_service': {
             'status': 'unknown',
-            'endpoint': 'http://127.0.0.1:5007/'
+            'endpoint': os.environ.get('AUDIO_SERVICE_URL', 'http://127.0.0.1:5007/')
         }
     }
     
     # Check audio service
     try:
         response = requests.get(services['audio_service']['endpoint'], timeout=2)
-        if response.status_code == 200:
+        # 404 is normal for these services when accessing root endpoint
+        if response.status_code == 200 or response.status_code == 404:
             services['audio_service']['status'] = 'running'
         else:
             services['audio_service']['status'] = 'error'
@@ -571,44 +736,138 @@ def check_services():
 def get_character(character_name):
     """Get a character's prompt data."""
     try:
-        print(f"DEBUG: Character API called for: {character_name}")
-        print(f"DEBUG: prompt_mgr type: {type(prompt_mgr)}")
-        print(f"DEBUG: prompt_mgr.__class__.__name__: {prompt_mgr.__class__.__name__}")
-        print(f"DEBUG: Has list_agents method: {'list_agents' in dir(prompt_mgr)}")
-        print(f"DEBUG: Has load_prompt_config method: {'load_prompt_config' in dir(prompt_mgr)}")
-        print(f"DEBUG: prompt_dir path: {prompt_mgr.prompt_dir}")
-        print(f"DEBUG: prompt_dir exists: {os.path.exists(prompt_mgr.prompt_dir)}")
-        print(f"DEBUG: prompt_dir contents: {os.listdir(prompt_mgr.prompt_dir) if os.path.exists(prompt_mgr.prompt_dir) else 'Not found'}")
+        # Extensive debug logging
+        logger.info(f"Character API called for: {character_name}")
+        logger.info(f"prompt_mgr type: {type(prompt_mgr)}")
+        logger.info(f"prompt_mgr.__class__.__name__: {prompt_mgr.__class__.__name__}")
+        logger.info(f"Has list_agents method: {'list_agents' in dir(prompt_mgr)}")
+        logger.info(f"Has load_prompt_config method: {'load_prompt_config' in dir(prompt_mgr)}")
+        logger.info(f"prompt_dir path: {prompt_mgr.prompt_dir}")
+        logger.info(f"prompt_dir exists: {os.path.exists(prompt_mgr.prompt_dir)}")
         
-        config = prompt_mgr.load_prompt_config(character_name)
-        if config:
-            # Debug the analysis_prompt value
-            analysis_prompt = getattr(config, 'analysis_prompt', '')
-            print(f"DEBUG: Analysis prompt for {character_name}: {analysis_prompt[:100]}...")
+        # List files in the prompt directory to verify they exist
+        prompt_files = os.listdir(prompt_mgr.prompt_dir) if os.path.exists(prompt_mgr.prompt_dir) else 'Directory not found'
+        logger.info(f"prompt_dir contents: {prompt_files}")
+        
+        # Try to load the config carefully with error checking
+        logger.info(f"Attempting to load character config for: {character_name}")
+        try:
+            config = prompt_mgr.load_prompt_config(character_name)
+            logger.info(f"Config load result type: {type(config)}")
             
-            logger.info(f"Retrieved character data for {character_name}: {config.role}")
+            # Check if config exists and is properly structured
+            if config is None:
+                logger.error(f"Config for character '{character_name}' is None")
+                return jsonify({
+                    'success': False,
+                    'error': f"Character '{character_name}' config is None",
+                    'debug_info': {
+                        'character_name': character_name,
+                        'prompt_dir': prompt_mgr.prompt_dir,
+                        'prompt_files': prompt_files
+                    }
+                }), 404
+                
+            # Verify config structure and access methods
+            if not hasattr(config, 'agent_name'):
+                logger.error(f"Config missing agent_name attribute: {dir(config)}")
+            
+            # Safely extract properties, with fallbacks
+            agent_name = getattr(config, 'agent_name', character_name)
+            role = getattr(config, 'role', 'Interviewer')
+            description = getattr(config, 'description', 'No description available')
+            dynamic_prompt_prefix = getattr(config, 'dynamic_prompt_prefix', '')
+            
+            # Safely handle analysis_prompt which may be missing
+            try:
+                analysis_prompt = getattr(config, 'analysis_prompt', '')
+                logger.info(f"Analysis prompt type: {type(analysis_prompt)}, length: {len(analysis_prompt) if analysis_prompt else 0}")
+            except Exception as e:
+                logger.error(f"Error accessing analysis_prompt: {str(e)}")
+                analysis_prompt = ''
+            
+            logger.info(f"Successfully loaded character data for {character_name}: {role}")
+            
             return jsonify({
                 'success': True,
-                'name': config.agent_name,
-                'role': config.role,
-                'description': config.description,
-                'dynamic_prompt_prefix': config.dynamic_prompt_prefix,
+                'name': agent_name,
+                'role': role,
+                'description': description,
+                'prompt': dynamic_prompt_prefix,
+                'system_prompt': dynamic_prompt_prefix,
+                'dynamic_prompt_prefix': dynamic_prompt_prefix,
                 'analysis_prompt': analysis_prompt
             })
-        else:
-            logger.error(f"Character not found: {character_name}")
+            
+        except Exception as inner_e:
+            logger.error(f"Inner error loading character '{character_name}': {str(inner_e)}")
+            import traceback
+            logger.error(traceback.format_exc())
+            
+            # Try alternate loading method - direct YAML file loading
+            try:
+                logger.info(f"Attempting direct YAML loading for character: {character_name}")
+                # Try with multiple possible extensions
+                possible_files = [
+                    os.path.join(prompt_mgr.prompt_dir, f"{character_name}.yml"),
+                    os.path.join(prompt_mgr.prompt_dir, f"{character_name}.yaml")
+                ]
+                
+                for file_path in possible_files:
+                    if os.path.exists(file_path):
+                        logger.info(f"Found character file at {file_path}")
+                        with open(file_path, 'r') as f:
+                            yaml_data = yaml.safe_load(f)
+                            
+                        if yaml_data:
+                            return jsonify({
+                                'success': True,
+                                'name': yaml_data.get('agent_name', character_name),
+                                'role': yaml_data.get('role', 'Interviewer'),
+                                'description': yaml_data.get('description', 'No description available'),
+                                'prompt': yaml_data.get('dynamic_prompt_prefix', ''),
+                                'system_prompt': yaml_data.get('dynamic_prompt_prefix', ''),
+                                'analysis_prompt': yaml_data.get('analysis_prompt', '')
+                            })
+                
+                logger.error(f"No YAML file found for character '{character_name}'")
+                return jsonify({
+                    'success': False,
+                    'error': f"Character '{character_name}' YAML file not found",
+                    'debug_info': {
+                        'character_name': character_name,
+                        'prompt_dir': prompt_mgr.prompt_dir,
+                        'checked_files': possible_files,
+                        'prompt_files': prompt_files
+                    }
+                }), 404
+                
+            except Exception as yaml_e:
+                logger.error(f"Error in direct YAML loading for '{character_name}': {str(yaml_e)}")
+                logger.error(traceback.format_exc())
+            
             return jsonify({
                 'success': False,
-                'error': f"Character '{character_name}' not found"
-            }), 404
+                'error': f"Error loading character '{character_name}': {str(inner_e)}",
+                'debug_info': {
+                    'character_name': character_name,
+                    'prompt_dir': prompt_mgr.prompt_dir,
+                    'prompt_files': prompt_files
+                }
+            }), 500
+            
     except Exception as e:
         logger.error(f"Error loading prompt for {character_name}: {str(e)}")
         import traceback
-        traceback.print_exc()
+        logger.error(traceback.format_exc())
         return jsonify({
             'success': False,
-            'error': str(e)
-        }), 404
+            'error': str(e),
+            'debug_info': {
+                'character_name': character_name,
+                'exception_type': str(type(e))
+            }
+        }), 500
 
 @api_bp.route('/interview/create', methods=['POST'])
 def create_interview():
@@ -914,59 +1173,188 @@ def view_prompt_page(prompt_id):
 # Helper Functions
 # ========================
 
-def generate_follow_up_question(user_input, character_name=""):
+def generate_follow_up_question(user_input, character_name="", session_id=None):
     """
     Generate a follow-up question based on the user's input and character.
+    If session_id is provided, use the interview_prompt from that session.
     """
+    start_time = datetime.datetime.now()
     logger.info(f"Generating response for character: {character_name} based on input: {user_input[:50]}...")
     
+    # First, try to load the interview data if session_id is provided
+    interview_data = None
+    interview_prompt = None
+    
+    if session_id:
+        try:
+            interview_data = load_interview(session_id)
+            logger.info(f"Loaded interview data for session {session_id}: {interview_data is not None}")
+            if interview_data and 'interview_prompt' in interview_data:
+                interview_prompt = interview_data['interview_prompt']
+                logger.info(f"Found interview prompt in session data: {interview_prompt[:50]}...")
+            else:
+                logger.warning(f"No interview_prompt found in session data for {session_id}")
+                if interview_data:
+                    logger.debug(f"Interview data keys: {interview_data.keys()}")
+        except Exception as e:
+            logger.error(f"Error loading interview data for session {session_id}: {str(e)}")
+    
+    # Get the character prompt
+    character_prompt = None
+    character_system_prompt = None
+    
     try:
-        # If a character is specified, try to use its prompt template
-        if character_name and character_name != "interviewer":
-            try:
-                # Load the character's prompt configuration
-                config = prompt_mgr.load_prompt_config(character_name)
-                logger.info(f"Loaded prompt for {character_name}")
+        if character_name:
+            character_data = get_character(character_name)
+            if character_data is None:
+                logger.error(f"Character data is None for character: {character_name}")
+            else:
+                # Handle different types of responses from get_character
+                # If it's a Flask Response object, extract the JSON
+                if isinstance(character_data, Response):
+                    import json
+                    character_json = json.loads(character_data.get_data(as_text=True))
+                    if character_json.get('success', False):
+                        character_data = character_json
+                    else:
+                        logger.error(f"Character API returned error: {character_json.get('error', 'Unknown error')}")
+                        character_data = None
                 
-                if config and config.dynamic_prompt_prefix:
-                    prompt_template = config.dynamic_prompt_prefix
-                    logger.info(f"Using custom prompt template for {character_name}")
+                # Handle dictionary format (from direct API response)
+                if isinstance(character_data, dict):
+                    logger.debug(f"Character data keys: {character_data.keys()}")
+                    # Get prompt from various possible keys
+                    character_prompt = character_data.get("prompt") or character_data.get("dynamic_prompt_prefix")
+                    if character_prompt is None:
+                        logger.error(f"Character prompt is None for character: {character_name}")
                     
-                    # In a real app, this would call an LLM with the custom prompt
-                    # For now, we'll simulate a more character-specific response
-                    custom_responses = [
-                        f"As {config.role or character_name}, I'd like to know more about that. How does this relate to your experience?",
-                        f"That's an interesting perspective. From my viewpoint as {config.role or character_name}, I wonder how you arrive at that conclusion?",
-                        f"In my role as {config.role or character_name}, I've seen similar patterns. Could you elaborate on your specific challenges?",
-                        f"Based on {config.description or 'my expertise'}, I'd suggest exploring this further. What obstacles have you encountered?",
-                        f"Given what you've shared, and considering my background in {config.role or 'this field'}, how would you approach improving this process?"
-                    ]
-                    
-                    import random
-                    return random.choice(custom_responses)
-            except Exception as e:
-                logger.error(f"Error using character prompt for {character_name}: {str(e)}")
-                # Fall back to default responses if there's an error
+                    character_system_prompt = character_data.get("system_prompt") or character_data.get("dynamic_prompt_prefix")
+                    if character_system_prompt is None:
+                        logger.error(f"Character system_prompt is None for character: {character_name}")
+                
+                # Handle PromptConfig object format
+                elif hasattr(character_data, 'dynamic_prompt_prefix'):
+                    logger.debug(f"Character data is a PromptConfig object")
+                    character_prompt = getattr(character_data, 'dynamic_prompt_prefix', '')
+                    character_system_prompt = character_prompt
+                else:
+                    logger.error(f"Character data has unexpected type: {type(character_data)}")
+    except Exception as e:
+        logger.error(f"Error loading character data for {character_name}: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+    
+    # Use interview_prompt from the session if available, otherwise use a default prompt
+    DEFAULT_INTERVIEW_PROMPT = "You are a helpful interviewer. Ask thoughtful follow-up questions based on the interviewee's responses."
+    prompt_template = interview_prompt or DEFAULT_INTERVIEW_PROMPT
+    
+    # Combine character prompt with interview prompt if both exist
+    combined_prompt = prompt_template
+    if character_prompt:
+        combined_prompt = f"{character_prompt}\n\n{prompt_template}"
+    
+    # Create a prompt that includes the interview_prompt and the user's input
+    full_prompt = f"{combined_prompt}\n\nUser's response: {user_input}\n\nGenerate a follow-up question based on this response:"
+    
+    # Create debug information to return with the response
+    debug_info = {
+        "character_name": character_name,
+        "session_id": session_id,
+        "interview_prompt": interview_prompt,
+        "character_prompt": character_prompt,
+        "character_system_prompt": character_system_prompt,
+        "using_default_prompt": interview_prompt is None,
+        "full_prompt": full_prompt,
+        "timestamp": start_time.isoformat(),
+        "prompt_construction": {
+            "base_prompt": prompt_template,
+            "character_prompt_used": character_prompt is not None,
+            "combined_prompt": combined_prompt,
+            "user_input": user_input
+        }
+    }
+    
+    # Log the debug information
+    logger.info(f"Debug info: {debug_info}")
+    
+    # Log the complete prompt in a very visible way
+    logger.info("=" * 40)
+    logger.info("FULL LLM PROMPT:")
+    logger.info("-" * 40)
+    logger.info(full_prompt)
+    logger.info("=" * 40)
+    
+    # Generate the follow-up question based on the prompt
+    try:
+        # Initialize a basic LLM connection
+        from langchain_openai import ChatOpenAI
+        from langchain.chains import LLMChain
+        from langchain.prompts import ChatPromptTemplate
+        
+        # Log the full prompt sent to the LLM
+        logger.info(f"Sending prompt to LLM: {full_prompt[:100]}...")
+        llm_start_time = datetime.datetime.now()
+        
+        # Create prompt template object
+        prompt_template_obj = ChatPromptTemplate.from_template(full_prompt)
+        
+        # Create LLM chain
+        llm = ChatOpenAI(model="gpt-3.5-turbo", temperature=0.7)
+        llm_chain = LLMChain(llm=llm, prompt=prompt_template_obj)
+        
+        # Generate the follow-up question
+        follow_up = llm_chain.run({})
+        
+        # Track timing
+        llm_end_time = datetime.datetime.now()
+        llm_duration = (llm_end_time - llm_start_time).total_seconds()
+        debug_info["llm_timing"] = {
+            "start_time": llm_start_time.isoformat(),
+            "end_time": llm_end_time.isoformat(),
+            "duration_seconds": llm_duration
+        }
+        
+        logger.info(f"Generated follow-up question in {llm_duration:.2f}s: {follow_up[:50]}...")
+        
+        # Return both the generated text and debug info
+        return {
+            "text": follow_up,
+            "debug": debug_info
+        }
     
     except Exception as e:
-        logger.error(f"Error in character response generation: {str(e)}")
-    
-    # Default responses if no character is specified or if there was an error
-    follow_ups = [
-        "That's interesting. Could you tell me more about that?",
-        "How did that make you feel?",
-        "Can you provide a specific example of that?",
-        "What do you think could be improved about that?",
-        "How do you see that evolving in the future?",
-        "What challenges did you face with that?",
-        "Could you elaborate on why you think that is?",
-        "What alternatives have you considered?",
-        "How does that compare to your previous experiences?",
-        "What impact did that have on your work or process?"
-    ]
-    
-    import random
-    return random.choice(follow_ups)
+        logger.error(f"Error generating follow-up question: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        
+        # Fall back to default responses if there's an error
+        follow_ups = [
+            "That's interesting. Could you tell me more about that?",
+            "How did that make you feel?",
+            "Can you provide a specific example of that?",
+            "What do you think could be improved about that?",
+            "How do you see that evolving in the future?",
+            "What challenges did you face with that?",
+            "Could you elaborate on why you think that is?",
+            "What alternatives have you considered?",
+            "How does that compare to your previous experiences?",
+            "What impact did that have on your work or process?"
+        ]
+        
+        import random
+        fallback_response = random.choice(follow_ups)
+        
+        # Add error to debug info
+        end_time = datetime.datetime.now()
+        debug_info["error"] = str(e)
+        debug_info["traceback"] = traceback.format_exc()
+        debug_info["fallback_used"] = True
+        debug_info["total_duration_seconds"] = (end_time - start_time).total_seconds()
+        
+        return {
+            "text": fallback_response,
+            "debug": debug_info
+        }
 
 # ========================
 # UI Routes
@@ -1069,6 +1457,10 @@ def interview_session_with_id(session_id):
     # Determine if this is a remote interviewee (based on presence of remote=true param)
     is_remote = request.args.get('remote', 'false').lower() == 'true'
     
+    # Get character from URL if provided
+    character_name = request.args.get('character', '').lower()
+    logger.info(f"Character from URL: {character_name}")
+    
     # Load interview data
     interview_data = load_interview(session_id)
     if not interview_data:
@@ -1082,7 +1474,8 @@ def interview_session_with_id(session_id):
             session_id=session_id,
             title=interview_data.get('title', 'Research Interview'),
             voice_id=voice_id,
-            is_remote=is_remote
+            is_remote=is_remote,
+            character=character_name
         )
     
     # If the user provided name/email in the form, update the interview data
@@ -1095,6 +1488,12 @@ def interview_session_with_id(session_id):
         interview_data['interviewee']['name'] = name
         if email:
             interview_data['interviewee']['email'] = email
+        
+        # Update character in interview data if provided in URL
+        if character_name:
+            interview_data['character'] = character_name
+            logger.info(f"Updated interview character to: {character_name}")
+        
         save_interview(session_id, interview_data)
     
     # Use the remote template for remote interviewees, otherwise use the standard template
@@ -1104,7 +1503,8 @@ def interview_session_with_id(session_id):
         template,
         session_id=session_id,
         interview=interview_data,
-        voice_id=voice_id
+        voice_id=voice_id,
+        character=character_name
     )
 
 @interview_bp.route('/interview_archive')
@@ -1469,13 +1869,666 @@ def get_elevenlabs_voices():
         {"id": "JBFqnCBsd6RMkjVDRZzb", "name": "Fin (Male)"}
     ]
 
+@app.route('/debug/prompts/<session_id>')
+def debug_prompts(session_id):
+    """
+    Debug endpoint to view prompt data for a specific interview session.
+    """
+    try:
+        # Load interview data
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'error': f'No interview found for session: {session_id}'}), 404
+        
+        # Extract prompt information
+        debug_info = {
+            'session_id': session_id,
+            'title': interview_data.get('title', 'Untitled Interview'),
+            'interview_prompt': interview_data.get('interview_prompt', 'Not set'),
+            'analysis_prompt': interview_data.get('analysis_prompt', 'Not set'),
+            'character': interview_data.get('character_select', 'Not set')
+        }
+        
+        # Extract character prompt if available
+        character_name = interview_data.get('character_select')
+        if character_name and character_name != "interviewer":
+            try:
+                config = prompt_mgr.load_prompt_config(character_name)
+                if config and config.dynamic_prompt_prefix:
+                    debug_info['character_prompt'] = config.dynamic_prompt_prefix
+                else:
+                    debug_info['character_prompt'] = 'No prompt available for this character'
+            except Exception as e:
+                debug_info['character_prompt'] = f'Error loading character prompt: {str(e)}'
+        
+        # Format full combined prompt
+        if 'interview_prompt' in interview_data and character_name and character_name != "interviewer":
+            try:
+                config = prompt_mgr.load_prompt_config(character_name)
+                if config and config.dynamic_prompt_prefix:
+                    debug_info['full_combined_prompt'] = f"{config.dynamic_prompt_prefix}\n\n{interview_data['interview_prompt']}"
+            except:
+                pass
+        
+        # Return as JSON or formatted HTML
+        format_type = request.args.get('format', 'html')
+        if format_type == 'json':
+            return jsonify(debug_info)
+        else:
+            # Format as HTML for easier viewing
+            html = "<html><head><title>Prompt Debug Info</title>"
+            html += "<style>body{font-family:sans-serif;max-width:800px;margin:0 auto;padding:20px;line-height:1.6}"
+            html += "h1,h2{color:#333}pre{background:#f5f5f5;padding:10px;overflow:auto;white-space:pre-wrap;border-radius:4px}</style>"
+            html += "</head><body>"
+            html += f"<h1>Prompt Debug Info for Session: {session_id}</h1>"
+            html += f"<p><strong>Title:</strong> {debug_info['title']}</p>"
+            html += f"<p><strong>Character:</strong> {debug_info['character']}</p>"
+            
+            html += "<h2>Interview Prompt</h2>"
+            html += f"<pre>{debug_info['interview_prompt']}</pre>"
+            
+            html += "<h2>Analysis Prompt</h2>"
+            html += f"<pre>{debug_info['analysis_prompt']}</pre>"
+            
+            if 'character_prompt' in debug_info:
+                html += "<h2>Character Prompt</h2>"
+                html += f"<pre>{debug_info['character_prompt']}</pre>"
+            
+            if 'full_combined_prompt' in debug_info:
+                html += "<h2>Full Combined Prompt</h2>"
+                html += f"<pre>{debug_info['full_combined_prompt']}</pre>"
+            
+            html += "</body></html>"
+            return html
+    
+    except Exception as e:
+        logger.error(f"Error in debug_prompts: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/debug/interview/test', methods=['GET', 'POST'])
+def debug_interview_test():
+    """
+    Debug endpoint to test interview flow with specific prompts.
+    """
+    if request.method == 'GET':
+        # Return a simple HTML form for testing
+        html = """
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <title>LangChain Interview Debug</title>
+            <style>
+                body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }
+                h1 { color: #333; }
+                label { display: block; margin-top: 10px; font-weight: bold; }
+                textarea { width: 100%; height: 120px; margin-bottom: 15px; padding: 8px; }
+                input[type="text"] { width: 100%; padding: 8px; margin-bottom: 15px; }
+                button { background: #4CAF50; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+                .result { margin-top: 20px; padding: 15px; background: #f8f8f8; border-left: 4px solid #4CAF50; }
+                pre { white-space: pre-wrap; overflow-x: auto; }
+            </style>
+        </head>
+        <body>
+            <h1>LangChain Interview Debug Tool</h1>
+            <form method="POST" action="/debug/interview/test">
+                <label for="interview_prompt">Interview Prompt:</label>
+                <textarea name="interview_prompt" id="interview_prompt">You are an expert UX researcher conducting a user interview. Ask open-ended questions to understand the user's needs, goals, and pain points. Be conversational, empathetic, and curious.</textarea>
+                
+                <label for="character_name">Character Name:</label>
+                <input type="text" name="character_name" id="character_name" value="interviewer">
+                
+                <label for="user_input">User Input to Test:</label>
+                <textarea name="user_input" id="user_input">I've been working on designing a new mobile app for financial services, and I'm finding it challenging to balance all the features that stakeholders want with keeping the interface simple and user-friendly.</textarea>
+                
+                <button type="submit">Test Interview Flow</button>
+            </form>
+        </body>
+        </html>
+        """
+        return html
+    else:  # POST
+        try:
+            # Get form data
+            interview_prompt = request.form.get('interview_prompt', '')
+            character_name = request.form.get('character_name', 'interviewer')
+            user_input = request.form.get('user_input', '')
+            
+            # Log the test parameters
+            logger.info(f"Testing interview flow with character: {character_name}")
+            logger.info(f"Interview prompt: {interview_prompt[:100]}...")
+            logger.info(f"User input: {user_input[:100]}...")
+            
+            # Create a test session ID
+            session_id = f"debug-test-{uuid.uuid4()}"
+            
+            # Create and save a test interview with the provided prompt
+            now = datetime.datetime.now()
+            interview_data = {
+                'session_id': session_id,
+                'title': 'Debug Test Interview',
+                'interview_prompt': interview_prompt,
+                'analysis_prompt': 'This is a test analysis prompt.',
+                'character_select': character_name,
+                'created_at': now,
+                'last_updated': now,
+                'conversation_history': []
+            }
+            
+            save_interview(session_id, interview_data)
+            logger.info(f"Created test interview session: {session_id}")
+            
+            # Generate a follow-up question using the character
+            try:
+                logger.info("Calling generate_follow_up_question...")
+                response = generate_follow_up_question(
+                    user_input=user_input,
+                    character_name=character_name,
+                    session_id=session_id
+                )
+                logger.info(f"Response from generate_follow_up_question: {response}")
+                
+                # Build HTML result display
+                html_result = f"""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>LangChain Interview Debug Result</title>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }}
+                        h1, h2 {{ color: #333; }}
+                        .section {{ margin-bottom: 20px; padding: 15px; background: #f8f8f8; border-left: 4px solid #4CAF50; }}
+                        pre {{ white-space: pre-wrap; overflow-x: auto; background: #f5f5f5; padding: 10px; }}
+                        .back-link {{ margin-top: 20px; }}
+                    </style>
+                </head>
+                <body>
+                    <h1>Interview Debug Result</h1>
+                    
+                    <div class="section">
+                        <h2>Test Parameters</h2>
+                        <p><strong>Character:</strong> {character_name}</p>
+                        <p><strong>Session ID:</strong> {session_id}</p>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Interview Prompt</h2>
+                        <pre>{interview_prompt}</pre>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>User Input</h2>
+                        <pre>{user_input}</pre>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Response</h2>
+                        <pre>{response}</pre>
+                    </div>
+                    
+                    <div class="section">
+                        <h2>Character Data</h2>
+                        <pre>
+"""
+                
+                # Add character data if available
+                try:
+                    character_data = get_character(character_name)
+                    if isinstance(character_data, Response):
+                        # If it's a Flask Response, extract the JSON
+                        import json
+                        character_json = json.loads(character_data.get_data(as_text=True))
+                        html_result += json.dumps(character_json, indent=2)
+                    else:
+                        html_result += str(character_data)
+                except Exception as e:
+                    html_result += f"Error getting character data: {str(e)}"
+                
+                html_result += """
+                        </pre>
+                    </div>
+                    
+                    <a href="/debug/interview/test" class="back-link">← Back to debug form</a>
+                </body>
+                </html>
+                """
+                
+                return html_result
+                
+            except Exception as e:
+                import traceback
+                logger.error(f"Error in debug interview test: {str(e)}")
+                logger.error(traceback.format_exc())
+                
+                return f"""
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>LangChain Interview Debug Error</title>
+                    <style>
+                        body {{ font-family: Arial, sans-serif; margin: 20px; line-height: 1.6; }}
+                        h1 {{ color: #d9534f; }}
+                        .error {{ margin-top: 20px; padding: 15px; background: #f8d7da; border-left: 4px solid #d9534f; }}
+                        pre {{ white-space: pre-wrap; overflow-x: auto; background: #f5f5f5; padding: 10px; }}
+                        .back-link {{ margin-top: 20px; }}
+                    </style>
+                </head>
+                <body>
+                    <h1>Error in Interview Debug</h1>
+                    
+                    <div class="error">
+                        <h2>Error Details</h2>
+                        <p>{str(e)}</p>
+                        <pre>{traceback.format_exc()}</pre>
+                    </div>
+                    
+                    <a href="/debug/interview/test" class="back-link">← Back to debug form</a>
+                </body>
+                </html>
+                """
+                
+        except Exception as e:
+            logger.error(f"Error in debug interview test: {str(e)}")
+            return f"Error: {str(e)}"
+
+# Update interview status endpoint
+@api_bp.route('/interview/update-status', methods=['POST'])
+def update_interview_status():
+    """Update the status of an interview."""
+    try:
+        data = request.json
+        session_id = data.get('session_id')
+        is_active = data.get('is_active', True)
+        
+        # Load interview data
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'status': 'error', 'error': f'No interview found for session: {session_id}'}), 404
+        
+        # Update status
+        interview_data['status'] = 'active' if is_active else 'inactive'
+        interview_data['last_updated'] = datetime.datetime.now()
+        
+        # Save updated interview data
+        save_interview(session_id, interview_data)
+        logger.info(f"Updated interview status for {session_id}: is_active={is_active}")
+        
+        return jsonify({
+            "status": "success",
+            "message": "Interview status updated successfully"
+        })
+    except Exception as e:
+        logger.error(f"Error updating interview status: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500
+
+# Update interview expiration endpoint
+@api_bp.route('/interview/update-expiration', methods=['POST'])
+def update_interview_expiration():
+    """Update the expiration date of an interview."""
+    try:
+        data = request.json
+        session_id = data.get('session_id')
+        expiration_date_str = data.get('expiration_date')
+        
+        # Load interview data
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'status': 'error', 'error': f'No interview found for session: {session_id}'}), 404
+        
+        # Parse expiration date
+        try:
+            expiration_date = datetime.datetime.strptime(expiration_date_str, "%Y-%m-%d")
+            interview_data['expiration_date'] = expiration_date
+            interview_data['last_updated'] = datetime.datetime.now()
+        except ValueError:
+            return jsonify({'status': 'error', 'error': 'Invalid expiration date format. Use YYYY-MM-DD'}), 400
+        
+        # Save updated interview data
+        save_interview(session_id, interview_data)
+        logger.info(f"Updated interview expiration for {session_id}: expiration_date={expiration_date_str}")
+        
+        return jsonify({
+            "status": "success",
+            "message": "Expiration date updated successfully"
+        })
+    except Exception as e:
+        logger.error(f"Error updating interview expiration: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500
+
+# Add legacy routes for updating interview status and expiration
+@legacy_bp.route('/interview/update-status', methods=['POST'])
+def legacy_update_interview_status():
+    """Update the status of an interview (legacy route)."""
+    try:
+        data = request.json
+        session_id = data.get('session_id')
+        is_active = data.get('is_active', True)
+        
+        # Load interview data
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'status': 'error', 'error': f'No interview found for session: {session_id}'}), 404
+        
+        # Update status
+        interview_data['status'] = 'active' if is_active else 'inactive'
+        interview_data['last_updated'] = datetime.datetime.now()
+        
+        # Save updated interview data
+        save_interview(session_id, interview_data)
+        logger.info(f"Updated interview status for {session_id}: is_active={is_active}")
+        
+        return jsonify({
+            "status": "success",
+            "message": "Interview status updated successfully"
+        })
+    except Exception as e:
+        logger.error(f"Error updating interview status: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500
+
+@legacy_bp.route('/interview/update-expiration', methods=['POST'])
+def legacy_update_interview_expiration():
+    """Update the expiration date of an interview (legacy route)."""
+    try:
+        data = request.json
+        session_id = data.get('session_id')
+        expiration_date_str = data.get('expiration_date')
+        
+        # Load interview data
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'status': 'error', 'error': f'No interview found for session: {session_id}'}), 404
+        
+        # Parse expiration date
+        try:
+            expiration_date = datetime.datetime.strptime(expiration_date_str, "%Y-%m-%d")
+            interview_data['expiration_date'] = expiration_date
+            interview_data['last_updated'] = datetime.datetime.now()
+        except ValueError:
+            return jsonify({'status': 'error', 'error': 'Invalid expiration date format. Use YYYY-MM-DD'}), 400
+        
+        # Save updated interview data
+        save_interview(session_id, interview_data)
+        logger.info(f"Updated interview expiration for {session_id}: expiration_date={expiration_date_str}")
+        
+        return jsonify({
+            "status": "success",
+            "message": "Expiration date updated successfully"
+        })
+    except Exception as e:
+        logger.error(f"Error updating interview expiration: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500
+
+# Direct route mappings for crucial functionality
+@app.route('/langchain/interview/update-status', methods=['POST'])
+def app_update_interview_status():
+    """Direct route for updating interview status."""
+    try:
+        data = request.json
+        session_id = data.get('session_id')
+        is_active = data.get('is_active', True)
+        
+        # Load interview data
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'status': 'error', 'error': f'No interview found for session: {session_id}'}), 404
+        
+        # Update status
+        interview_data['status'] = 'active' if is_active else 'inactive'
+        interview_data['last_updated'] = datetime.datetime.now()
+        
+        # Save updated interview data
+        save_interview(session_id, interview_data)
+        logger.info(f"Updated interview status for {session_id}: is_active={is_active}")
+        
+        return jsonify({
+            "status": "success",
+            "message": "Interview status updated successfully"
+        })
+    except Exception as e:
+        logger.error(f"Error updating interview status: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500
+
+@app.route('/langchain/interview/update-expiration', methods=['POST'])
+def app_update_interview_expiration():
+    """Direct route for updating interview expiration."""
+    try:
+        data = request.json
+        session_id = data.get('session_id')
+        expiration_date_str = data.get('expiration_date')
+        
+        # Load interview data
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'status': 'error', 'error': f'No interview found for session: {session_id}'}), 404
+        
+        # Parse expiration date
+        try:
+            expiration_date = datetime.datetime.strptime(expiration_date_str, "%Y-%m-%d")
+            interview_data['expiration_date'] = expiration_date
+            interview_data['last_updated'] = datetime.datetime.now()
+        except ValueError:
+            return jsonify({'status': 'error', 'error': 'Invalid expiration date format. Use YYYY-MM-DD'}), 400
+        
+        # Save updated interview data
+        save_interview(session_id, interview_data)
+        logger.info(f"Updated interview expiration for {session_id}: expiration_date={expiration_date_str}")
+        
+        return jsonify({
+            "status": "success",
+            "message": "Expiration date updated successfully"
+        })
+    except Exception as e:
+        logger.error(f"Error updating interview expiration: {str(e)}")
+        return jsonify({
+            "status": "error",
+            "error": str(e)
+        }), 500
+
+@app.route('/debug/prompts/history/<session_id>')
+def debug_prompts_history(session_id):
+    """
+    Debug endpoint to view prompt history for a specific interview session.
+    Shows all prompts sent to the LLM during the interview, with timing information.
+    """
+    try:
+        # Load interview data
+        interview_data = load_interview(session_id)
+        if not interview_data:
+            return jsonify({'error': f'No interview found for session: {session_id}'}), 404
+        
+        # Get basic interview info
+        basic_info = {
+            'session_id': session_id,
+            'title': interview_data.get('title', 'Untitled Interview'),
+            'created_at': interview_data.get('creation_date', 'Unknown date'),
+            'status': interview_data.get('status', 'unknown'),
+            'character': interview_data.get('character_select', 'Not set')
+        }
+        
+        # Get prompts and conversation history
+        prompt_info = {
+            'interview_prompt': interview_data.get('interview_prompt', 'Not set'),
+            'analysis_prompt': interview_data.get('analysis_prompt', 'Not set')
+        }
+        
+        # Extract conversation history and reconstruct prompts
+        prompt_history = []
+        conversation_history = interview_data.get('conversation_history', [])
+        
+        # Find character prompt if any
+        character_name = interview_data.get('character_select')
+        character_prompt = None
+        if character_name:
+            try:
+                character_data = get_character(character_name)
+                if isinstance(character_data, dict):
+                    character_prompt = character_data.get('prompt', '')
+            except Exception as e:
+                logger.error(f"Error getting character prompt for {character_name}: {str(e)}")
+        
+        # Process the conversation to reconstruct each LLM prompt
+        user_inputs = [msg['content'] for msg in conversation_history if msg['role'] == 'user']
+        ai_responses = [msg['content'] for msg in conversation_history if msg['role'] == 'assistant']
+        
+        # If we have interview_prompt and user inputs, build the prompt history
+        if prompt_info['interview_prompt'] and user_inputs:
+            for i, user_input in enumerate(user_inputs):
+                # Build a prompt based on the interview prompt and user input
+                combined_prompt = prompt_info['interview_prompt']
+                if character_prompt:
+                    combined_prompt = f"{character_prompt}\n\n{prompt_info['interview_prompt']}"
+                
+                full_prompt = f"{combined_prompt}\n\nUser's response: {user_input}\n\nGenerate a follow-up question based on this response:"
+                
+                prompt_entry = {
+                    'index': i+1,
+                    'timestamp': interview_data.get('last_updated', datetime.datetime.now()).isoformat(),
+                    'user_input': user_input,
+                    'full_prompt': full_prompt,
+                    'ai_response': ai_responses[i] if i < len(ai_responses) else "No response recorded"
+                }
+                prompt_history.append(prompt_entry)
+        
+        # Format the output either as JSON or HTML
+        format_type = request.args.get('format', 'html')
+        
+        if format_type == 'json':
+            return jsonify({
+                'basic_info': basic_info,
+                'prompt_info': prompt_info,
+                'prompt_history': prompt_history
+            })
+        else:
+            # Render HTML view
+            return render_template('langchain/prompt_history.html',
+                           basic_info=basic_info,
+                           prompt_info=prompt_info,
+                           prompt_history=prompt_history,
+                           character_prompt=character_prompt,
+                           session_id=session_id)
+    except Exception as e:
+        logger.error(f"Error in debug_prompts_history: {str(e)}")
+        import traceback
+        logger.error(traceback.format_exc())
+        return jsonify({'error': f'Error retrieving prompt history: {str(e)}'}), 500
+
+# Main function for programmatic use
+def main(port=5000, debug=True):
+    """Run the interview application."""
+    # Set up TTS and STT service URLs from environment variables
+    if 'TTS_SERVICE_URL' in os.environ:
+        logger.info(f"Using TTS service URL from environment: {os.environ.get('TTS_SERVICE_URL')}")
+    
+    if 'STT_SERVICE_URL' in os.environ:
+        logger.info(f"Using STT service URL from environment: {os.environ.get('STT_SERVICE_URL')}")
+    
+    print("Starting LangChain Interview Prototype on port", port, "...")
+    print("Access the application at: http://127.0.0.1:" + str(port))
+    print("Dashboard: http://127.0.0.1:" + str(port) + "/dashboard")
+    print("Interview Test: http://127.0.0.1:" + str(port) + "/interview_test")
+    print("Interview Setup: http://127.0.0.1:" + str(port) + "/interview_setup")
+    print("Prompt Manager: http://127.0.0.1:" + str(port) + "/prompts/")
+    
+    # Set environment variables for development
+    os.environ['FLASK_APP'] = 'run_langchain_direct_fixed'
+    if debug:
+        os.environ['FLASK_ENV'] = 'development'
+    
+    # Run the app
+    app.run(host='0.0.0.0', port=port, debug=debug, use_reloader=False)
+
 # Run the Flask app
 if __name__ == "__main__":
-    logger.info(f"Starting LangChain Interview Prototype on port {args.port}...")
-    print(f"Access the application at: http://127.0.0.1:{args.port}")
-    print(f"Dashboard: http://127.0.0.1:{args.port}/dashboard")
-    print(f"Interview Test: http://127.0.0.1:{args.port}/interview_test")
-    print(f"Interview Setup: http://127.0.0.1:{args.port}/interview_setup")
-    print(f"Prompt Manager: http://127.0.0.1:{args.port}/prompts/")
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(description='LangChain Interview Prototype')
+    parser.add_argument('--port', type=int, default=5000, help='Port to run the server on')
+    parser.add_argument('--debug', action='store_true', help='Run in debug mode')
+    args = parser.parse_args()
     
-    app.run(debug=True, port=args.port) 
+    # Run the main function with parsed arguments
+    main(port=args.port, debug=args.debug)
+
+@app.route('/api/text_to_speech_elevenlabs', methods=['POST'])
+def api_text_to_speech_elevenlabs():
+    """API for text-to-speech with ElevenLabs"""
+    try:
+        data = request.json
+        text = data.get('text', '')
+        voice_id = data.get('voice_id', 'EXAVITQu4vr4xnSDxMaL')
+        session_id = data.get('session_id', '')
+        
+        # Use the environment variable for TTS service URL if it exists, otherwise default to port 5015
+        tts_service_url = os.environ.get('TTS_SERVICE_URL', 'http://127.0.0.1:5015')
+        
+        try:
+            # Try to connect to the TTS service
+            tts_url = f"{tts_service_url}/text_to_speech"
+            response = requests.post(
+                tts_url,
+                json={"text": text, "voice_id": voice_id},
+                timeout=30
+            )
+            
+            if response.status_code == 200:
+                return Response(response.content, mimetype='audio/mpeg')
+            else:
+                logger.error(f"Error from TTS service: {response.text}")
+                return Response("Sorry, I couldn't generate speech for that text.", status=500)
+                
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error connecting to audio service: {str(e)}")
+            return Response("Speech service is unavailable.", status=503)
+            
+    except Exception as e:
+        logger.error(f"Error in text_to_speech: {str(e)}")
+        return Response("An error occurred with text-to-speech.", status=500)
+
+@app.route('/api/speech_to_text', methods=['POST'])
+def api_speech_to_text():
+    """API for speech-to-text"""
+    try:
+        # Check if file was included
+        if 'audio' not in request.files:
+            return jsonify({"success": False, "error": "No audio file provided"}), 400
+        
+        # Use the environment variable for STT service URL if it exists, otherwise default to port 5016
+        stt_service_url = os.environ.get('STT_SERVICE_URL', 'http://127.0.0.1:5016')
+        
+        try:
+            # Try to connect to the STT service
+            stt_url = f"{stt_service_url}/speech_to_text"
+            
+            # Create a new multipart form to send to the STT service
+            audio_file = request.files['audio']
+            files = {'audio': (audio_file.filename, audio_file.read(), audio_file.content_type)}
+            
+            response = requests.post(stt_url, files=files, timeout=30)
+            
+            if response.status_code == 200:
+                return jsonify(response.json()), 200
+            else:
+                logger.error(f"Error from STT service: {response.text}")
+                return jsonify({"success": False, "error": "Could not process speech"}), 500
+                
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Error connecting to speech-to-text service: {str(e)}")
+            return jsonify({"success": False, "error": "Could not connect to speech-to-text service"}), 503
+            
+    except Exception as e:
+        logger.error(f"Error in speech_to_text: {str(e)}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
