@@ -2013,6 +2013,22 @@ def archive_discussion_guide(guide_id):
         logger.error(f"Error archiving guide {guide_id}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/discussion_guide/<guide_id>/delete', methods=['POST'])
+def delete_discussion_guide(guide_id):
+    """Permanently delete a discussion guide."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        success = discussion_service.delete_guide(guide_id)
+        if not success:
+            return jsonify({'success': False, 'error': 'Guide not found or could not be deleted'}), 404
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error deleting guide {guide_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/api/discussion_guide/<guide_id>/duplicate', methods=['POST'])
 def duplicate_discussion_guide(guide_id):
     """Duplicate a discussion guide."""
