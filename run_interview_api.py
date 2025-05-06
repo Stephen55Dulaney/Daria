@@ -2091,13 +2091,13 @@ def discussion_guide_details(guide_id):
         
         guide = discussion_service.get_guide(guide_id)
         if not guide:
-            return render_template('error.html', error="Discussion guide not found"), 404
+            return render_template('langchain/error.html', error="Discussion guide not found"), 404
         
         sessions = discussion_service.list_guide_sessions(guide_id)
         return render_template('langchain/discussion_guide.html', guide=guide, sessions=sessions, guide_id=guide_id)
     except Exception as e:
         logger.error(f"Error loading discussion guide page: {str(e)}")
-        return render_template('error.html', error=str(e))
+        return render_template('langchain/error.html', error=str(e))
 
 @app.route('/session/<session_id>', methods=['GET'])
 def session_details(session_id):
@@ -2108,7 +2108,7 @@ def session_details(session_id):
         
         session = discussion_service.get_session(session_id)
         if not session:
-            return render_template('error.html', error="Session not found"), 404
+            return render_template('langchain/error.html', error="Session not found"), 404
         
         guide_id = session.get('guide_id')
         guide = discussion_service.get_guide(guide_id) if guide_id else None
@@ -2116,7 +2116,7 @@ def session_details(session_id):
         return render_template('langchain/session.html', session=session, guide=guide, session_id=session_id)
     except Exception as e:
         logger.error(f"Error loading session page: {str(e)}")
-        return render_template('error.html', error=str(e))
+        return render_template('langchain/error.html', error=str(e))
 
 @app.route('/api/session/<session_id>/messages', methods=['GET'])
 def get_session_messages(session_id):
