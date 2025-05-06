@@ -245,247 +245,243 @@
 <div class="container-fluid">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <div>
-            <h1 class="h3">Monitoring: {{ interview.title|default('Untitled Interview') }}</h1>
+            <h1 class="h3">Monitoring: {{ session.title if session and session.title else "Session" }}</h1>
             <div class="text-muted small">Session ID: {{ session_id }}</div>
         </div>
         <div class="d-flex align-items-center">
             <div class="live-indicator me-3">
-                <div class="dot"></div>
-                <span>LIVE</span>
+                <span class="dot"></span> LIVE
             </div>
-            <button class="btn btn-outline-primary btn-sm me-2" id="suggestQuestionBtn">
-                <i class="bi bi-lightbulb"></i> Suggest Question
-            </button>
-            <a href="/interview_details/{{ session_id }}" class="btn btn-outline-secondary btn-sm me-2">
-                <i class="bi bi-info-circle"></i> Interview Details
+            <a href="/session/{{ session_id }}" class="btn btn-sm btn-outline-secondary me-2">
+                <i class="bi bi-info-circle me-1"></i> Session Details
             </a>
-            <button class="btn btn-outline-danger btn-sm" id="endSessionBtn">
-                <i class="bi bi-stop-circle"></i> End Session
+            <button id="end-session-btn" class="btn btn-sm btn-danger">
+                <i class="bi bi-stop-circle me-1"></i> End Session
             </button>
         </div>
     </div>
-
-    <div class="monitor-container">
-        <div class="transcript-container">
-            <div class="d-flex justify-content-between align-items-center mb-3">
-                <h2 class="h5 mb-0">Live Transcript</h2>
-                <div>
-                    <label class="toggle-observer me-3">
-                        <input type="checkbox" id="toggleAIObserver" checked> 
-                        <span>AI Observer</span>
-                    </label>
-                    <button class="btn btn-sm btn-outline-secondary" id="copyTranscriptBtn">
-                        <i class="bi bi-clipboard"></i> Copy Transcript
+    
+    <div class="row">
+        <!-- Transcript Column (Left) -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Live Transcript</h5>
+                    <div>
+                        <button id="refresh-btn" class="btn btn-sm btn-outline-secondary">
+                            <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                        </button>
+                        <button id="copy-transcript-btn" class="btn btn-sm btn-outline-primary ms-2">
+                            <i class="bi bi-clipboard me-1"></i> Copy
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="transcript-content" class="transcript-content">
+                        <!-- Transcript messages will appear here -->
+                        {% if session and session.messages %}
+                            {% for message in session.messages %}
+                                <div class="{% if message.role == 'assistant' %}interviewer-message{% else %}participant-message{% endif %}" data-message-id="{{ message.id }}">
+                                    <strong>{% if message.role == 'assistant' %}AI Interviewer{% else %}Participant{% endif %}:</strong> {{ message.content }}
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center text-muted py-5">
+                                <i class="bi bi-chat-dots fs-1 mb-3 d-block"></i>
+                                <p>No messages yet. Waiting for the interview to begin...</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Researcher Controls -->
+            <div class="card mt-3">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <span>Interview Controls</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="suggestion-input" class="form-label">Suggest a question or follow-up:</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="suggestion-input" placeholder="Type a suggested question for the interviewer...">
+                            <button class="btn btn-primary" id="send-suggestion-btn">
+                                <i class="bi bi-send"></i> Send
+                            </button>
+                        </div>
+                        <div class="form-text">This will be sent as a suggestion to the interviewer.</div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <button class="btn btn-outline-primary" id="add-note-btn">
+                            <i class="bi bi-journal-plus"></i> Add Research Note
+                        </button>
+                        <button class="btn btn-danger" id="end-interview-btn">
+                            <i class="bi bi-x-circle"></i> End Interview
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Analytics Column (Right) -->
+        <div class="col-lg-4">
+            <!-- AI Observer Panel -->
+            <div class="card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="d-flex align-items-center">
+                        <h5 class="mb-0">AI Observer</h5>
+                        <div class="ms-2">
+                            <span class="badge bg-primary">
+                                <i class="bi bi-robot"></i>
+                            </span>
+                        </div>
+                    </div>
+                    <div class="d-flex align-items-center">
+                        <div class="me-2">
+                            <span class="status-indicator"></span>
+                            <span id="observer-status" class="text-muted small">Initializing</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="tab-controls">
+                        <label class="toggle-observer">
+                            <input type="checkbox" id="observer-toggle" checked>
+                            <span>Show AI observations</span>
+                        </label>
+                    </div>
+                    
+                    <h6 class="mb-2">Mood Timeline</h6>
+                    <div id="mood-timeline" class="mood-timeline">
+                        <!-- Mood points will be added here -->
+                    </div>
+                    
+                    <h6 class="mb-2">Detected Topics</h6>
+                    <div id="topics-list" class="topic-list mb-3">
+                        <!-- Topics will be added here -->
+                    </div>
+                    
+                    <button id="generate-summary-btn" class="btn btn-primary w-100">
+                        <i class="bi bi-lightbulb me-1"></i> Generate Insights
                     </button>
                 </div>
             </div>
-            <div class="transcript-content" id="transcriptContent">
-                {{ transcript }}
-            </div>
-        </div>
-        <div class="controls-container">
-            <div class="tab-controls">
-                <ul class="nav nav-tabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="researcher-tab" data-bs-toggle="tab" data-bs-target="#researcher-pane" type="button" role="tab">Researcher</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="observer-tab" data-bs-toggle="tab" data-bs-target="#observer-pane" type="button" role="tab">AI Observer</button>
-                    </li>
-                </ul>
-            </div>
             
-            <div class="tab-content">
-                <div class="tab-pane fade show active" id="researcher-pane" role="tabpanel">
-                    <h3 class="h5 mb-3">Interview Analytics</h3>
-                    
-                    <div class="control-label">Sentiment Tracking</div>
-                    <div class="sentiment-indicator mb-1">
-                        <div class="sentiment-level"></div>
-                        <div class="sentiment-marker" style="left: 50%;"></div>
-                    </div>
-                    <div class="d-flex justify-content-between mb-3 small text-muted">
-                        <span>Negative</span>
-                        <span>Neutral</span>
-                        <span>Positive</span>
-                    </div>
-                    
-                    <div class="control-label">Key Topics Mentioned</div>
-                    <div class="topic-list" id="topicList">
-                        <span class="topic-tag">Product Features</span>
-                        <span class="topic-tag">User Experience</span>
-                        <span class="topic-tag">Interface Design</span>
-                        <span class="topic-tag">Customer Support</span>
-                        <span class="topic-tag">Documentation</span>
-                    </div>
-                    
-                    <div class="control-label">Interview Stats</div>
+            <!-- Interview Stats -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Session Stats</h5>
+                </div>
+                <div class="card-body">
                     <ul class="interview-stats">
                         <li>
                             <span class="label">Duration</span>
-                            <span class="value" id="durationValue">00:05:32</span>
+                            <span class="value" id="session-duration">00:00:00</span>
                         </li>
                         <li>
-                            <span class="label">Questions Asked</span>
-                            <span class="value" id="questionsValue">6</span>
+                            <span class="label">Messages</span>
+                            <span class="value" id="message-count">
+                                {{ session.messages|length if session and session.messages else 0 }}
+                            </span>
                         </li>
                         <li>
                             <span class="label">Avg. Response Time</span>
-                            <span class="value" id="responseTimeValue">12.4 sec</span>
+                            <span class="value" id="avg-response-time">--</span>
                         </li>
                         <li>
-                            <span class="label">Interviewer Talk Time</span>
-                            <span class="value" id="interviewerTimeValue">35%</span>
-                        </li>
-                        <li>
-                            <span class="label">Participant Talk Time</span>
-                            <span class="value" id="participantTimeValue">65%</span>
+                            <span class="label">Interviewer Talk %</span>
+                            <span class="value" id="interviewer-talk-percent">--</span>
                         </li>
                     </ul>
-                    
-                    <div class="control-label">Researcher Notes</div>
-                    <div class="suggestion-box" id="suggestionBox">
-                        Consider asking about their specific pain points with the current process. The participant has mentioned challenges but hasn't specified details.
-                    </div>
                 </div>
-                
-                <div class="tab-pane fade" id="observer-pane" role="tabpanel">
-                    <h3 class="h5 mb-3">AI Observer Analysis</h3>
-                    
-                    <div class="control-label">Sentiment Timeline</div>
-                    <div class="mood-timeline" id="moodTimeline">
-                        <!-- Mood points will be added dynamically -->
-                    </div>
-                    <div class="d-flex justify-content-between mb-3 small text-muted">
-                        <span>Negative</span>
-                        <span>Neutral</span>
-                        <span>Positive</span>
-                    </div>
-                    
-                    <div class="control-label">Current Mood</div>
-                    <div class="sentiment-indicator mb-3">
-                        <div class="sentiment-level"></div>
-                        <div class="sentiment-marker" id="aiMoodMarker" style="left: 50%;"></div>
-                    </div>
-                    
-                    <div class="control-label">Semantic Tags</div>
-                    <div class="topic-list" id="aiTopicList">
-                        <!-- AI-generated tags will appear here -->
-                    </div>
-                    
-                    <div class="control-label">Latest Observation</div>
-                    <div class="observer-message">
-                        <div class="observer-header">
-                            <div>
-                                <i class="bi bi-robot observer-icon"></i>
-                                <span class="observer-title">AI Observer</span>
-                            </div>
-                            <span class="observer-status">Analyzing...</span>
-                        </div>
-                        <div class="observer-content" id="latestObservation">
-                            <!-- Latest AI observation will appear here -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="btn-toolbar">
-                <button class="btn btn-outline-secondary me-2" id="refreshBtn">
-                    <i class="bi bi-arrow-clockwise"></i> Refresh Data
-                </button>
-                <button class="btn btn-primary" id="downloadReportBtn">
-                    <i class="bi bi-download"></i> Download Report
-                </button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- Suggest Question Modal -->
-<div class="modal fade" id="suggestQuestionModal" tabindex="-1" aria-hidden="true">
+<!-- Observer Summary Modal -->
+<div class="modal fade" id="observerSummaryModal" tabindex="-1" aria-labelledby="observerSummaryModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="observerSummaryModalLabel">AI Observer Summary</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Summary content will be loaded here -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" id="copy-summary-btn">
+                    <i class="bi bi-clipboard me-1"></i> Copy Summary
+                </button>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Note Modal -->
+<div class="modal fade" id="addNoteModal" tabindex="-1" aria-labelledby="addNoteModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">Suggest Follow-up Question</h5>
+                <h5 class="modal-title" id="addNoteModalLabel">Add Research Note</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
                 <div class="mb-3">
-                    <label for="suggestedQuestion" class="form-label">Question Suggestion</label>
-                    <select class="form-select mb-3" id="suggestedQuestion">
-                        <option value="1">Could you elaborate on the challenges you mentioned with the user interface?</option>
-                        <option value="2">How does this compare to other similar products you've used before?</option>
-                        <option value="3">What would be your ideal solution to the issues you've described?</option>
-                        <option value="4">Could you walk me through a specific example where you encountered this problem?</option>
-                    </select>
+                    <label for="note-text" class="form-label">Note:</label>
+                    <textarea class="form-control" id="note-text" rows="4" placeholder="Add your research observation or note here..."></textarea>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Note Type:</label>
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="customQuestionCheck">
-                        <label class="form-check-label" for="customQuestionCheck">
-                            Write a custom question
+                        <input class="form-check-input" type="radio" name="noteType" id="note-type-observation" value="observation" checked>
+                        <label class="form-check-label" for="note-type-observation">
+                            Observation
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="noteType" id="note-type-insight" value="insight">
+                        <label class="form-check-label" for="note-type-insight">
+                            Insight
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="radio" name="noteType" id="note-type-question" value="question">
+                        <label class="form-check-label" for="note-type-question">
+                            Follow-up Question
                         </label>
                     </div>
                 </div>
-                <div class="mb-3" id="customQuestionContainer" style="display: none;">
-                    <label for="customQuestion" class="form-label">Custom Question</label>
-                    <textarea class="form-control" id="customQuestion" rows="3" placeholder="Type your question here..."></textarea>
-                </div>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-primary" id="sendQuestionBtn">Send to Interviewer</button>
+                <button type="button" class="btn btn-primary" id="save-note-btn">Save Note</button>
             </div>
         </div>
     </div>
 </div>
 
-<!-- End Session Modal -->
-<div class="modal fade" id="endSessionModal" tabindex="-1" aria-hidden="true">
+<!-- End Interview Confirmation Modal -->
+<div class="modal fade" id="endInterviewModal" tabindex="-1" aria-labelledby="endInterviewModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title">End Interview Session</h5>
+                <h5 class="modal-title" id="endInterviewModalLabel">End Interview</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <p>Are you sure you want to end this interview session? This will signal to Daria to wrap up the interview.</p>
-                <div class="form-check">
-                    <input class="form-check-input" type="checkbox" id="generateAnalysisCheck" checked>
-                    <label class="form-check-label" for="generateAnalysisCheck">
-                        Generate comprehensive analysis report
-                    </label>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle"></i> 
+                    Are you sure you want to end this interview?
                 </div>
+                <p>This will terminate the session and redirect the participant to the thank you page. The system will automatically generate an analysis based on the interview transcript.</p>
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmEndSession">End Session</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Analysis Modal -->
-<div class="modal fade" id="analysisModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">Interview Analysis</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-            </div>
-            <div class="modal-body">
-                <div class="text-center mb-4" id="analysisLoading">
-                    <div class="spinner-border text-primary mb-3" role="status">
-                        <span class="visually-hidden">Loading...</span>
-                    </div>
-                    <p>Generating analysis...</p>
-                </div>
-                <div id="analysisContent" style="display: none;">
-                    <h4 class="mb-3">Key Insights</h4>
-                    <div id="analysisText" class="mb-4"></div>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <button type="button" class="btn btn-primary" id="downloadAnalysisBtn">Download</button>
+                <button type="button" class="btn btn-danger" id="confirm-end-interview-btn">End Interview</button>
             </div>
         </div>
     </div>
@@ -493,594 +489,349 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="https://cdn.socket.io/4.6.1/socket.io.min.js"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
-        // Constants
         const sessionId = '{{ session_id }}';
+        const transcriptContainer = document.getElementById('transcript-container');
+        const messageInput = document.getElementById('suggestion-input');
+        const sendBtn = document.getElementById('send-suggestion-btn');
+        const addNoteBtn = document.getElementById('add-note-btn');
+        const saveNoteBtn = document.getElementById('save-note-btn');
+        const endInterviewBtn = document.getElementById('end-interview-btn');
+        const confirmEndInterviewBtn = document.getElementById('confirm-end-interview-btn');
         
-        // Elements
-        const transcriptContent = document.getElementById('transcriptContent');
-        const topicList = document.getElementById('topicList');
-        const durationValue = document.getElementById('durationValue');
-        const questionsValue = document.getElementById('questionsValue');
-        const responseTimeValue = document.getElementById('responseTimeValue');
-        const interviewerTimeValue = document.getElementById('interviewerTimeValue');
-        const participantTimeValue = document.getElementById('participantTimeValue');
-        const suggestQuestionBtn = document.getElementById('suggestQuestionBtn');
-        const endSessionBtn = document.getElementById('endSessionBtn');
-        const refreshBtn = document.getElementById('refreshBtn');
-        const copyTranscriptBtn = document.getElementById('copyTranscriptBtn');
-        const downloadReportBtn = document.getElementById('downloadReportBtn');
-        const downloadAnalysisBtn = document.getElementById('downloadAnalysisBtn');
-        const sendQuestionBtn = document.getElementById('sendQuestionBtn');
-        const confirmEndSessionBtn = document.getElementById('confirmEndSessionBtn');
-        const customQuestionCheck = document.getElementById('customQuestionCheck');
-        const analysisLoading = document.getElementById('analysisLoading');
-        const analysisContent = document.getElementById('analysisContent');
-        const analysisText = document.getElementById('analysisText');
+        // Initialize modals
+        const addNoteModal = new bootstrap.Modal(document.getElementById('addNoteModal'));
+        const endInterviewModal = new bootstrap.Modal(document.getElementById('endInterviewModal'));
         
-        // AI Observer elements
-        const toggleAIObserver = document.getElementById('toggleAIObserver');
-        const aiTopicList = document.getElementById('aiTopicList');
-        const moodTimeline = document.getElementById('moodTimeline');
-        const aiMoodMarker = document.getElementById('aiMoodMarker');
-        const latestObservation = document.getElementById('latestObservation');
+        // Socket connection for real-time updates
+        const socket = io();
         
-        // Modals
-        const suggestQuestionModal = new bootstrap.Modal(document.getElementById('suggestQuestionModal'));
-        const endSessionModal = new bootstrap.Modal(document.getElementById('endSessionModal'));
-        const analysisModal = new bootstrap.Modal(document.getElementById('analysisModal'));
+        // Join monitoring room for this session
+        socket.on('connect', function() {
+            socket.emit('join_monitor_room', { session_id: sessionId });
+            console.log('Connected to monitoring room for session:', sessionId);
+        });
         
-        // State
-        let lastTranscriptLength = 0;
-        let isInterviewEnded = false;
-        let pollInterval;
-        let checkStatusInterval;
-        
-        // AI Observer state
-        let isAIObserverEnabled = true;
-        let observerMoodData = [];
-        let observerTagList = [];
-        let lastProcessedMessageId = null;
-        let currentMood = { value: 0, label: "Neutral" };
-        
-        // Functions
-        function handleInterviewEnded() {
-            // Update UI for ended interview
-            document.querySelector('.live-indicator').classList.remove('live-indicator');
-            document.querySelector('.dot').classList.remove('dot');
-            
-            // Clear intervals
-            clearInterval(pollInterval);
-            clearInterval(checkStatusInterval);
-            
-            // Disable buttons
-            suggestQuestionBtn.disabled = true;
-            endSessionBtn.disabled = true;
-        }
-        
-        function pollTranscript() {
-            if (isInterviewEnded) return;
-            
-            fetch(`/langchain/api/interview/transcript?session_id=${sessionId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Server responded with status ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === 'success') {
-                    if (data.content) {
-                        // Update transcript
-                        transcriptContent.innerHTML = data.content;
-                        
-                        // Process new transcript chunks with AI Observer if enabled
-                        if (isAIObserverEnabled && data.transcript_chunks) {
-                            processNewTranscriptChunks(data.transcript_chunks);
-                        }
-                        
-                        // Check if content has changed
-                        if (data.content.length !== lastTranscriptLength) {
-                            lastTranscriptLength = data.content.length;
-                            // Scroll to bottom of transcript
-                            transcriptContent.scrollTop = transcriptContent.scrollHeight;
-                        }
-                    }
-                    
-                    // Update stats if available
-                    if (data.stats) {
-                        if (data.stats.duration) durationValue.textContent = data.stats.duration;
-                        if (data.stats.questions_count) questionsValue.textContent = data.stats.questions_count;
-                        if (data.stats.avg_response_time) responseTimeValue.textContent = data.stats.avg_response_time;
-                        if (data.stats.interviewer_percentage) interviewerTimeValue.textContent = data.stats.interviewer_percentage;
-                        if (data.stats.participant_percentage) participantTimeValue.textContent = data.stats.participant_percentage;
-                    }
-                    
-                    // Update topics if available
-                    if (data.topics && data.topics.length > 0) {
-                        topicList.innerHTML = '';
-                        data.topics.forEach(topic => {
-                            const topicTag = document.createElement('span');
-                            topicTag.className = 'topic-tag';
-                            topicTag.textContent = topic;
-                            topicList.appendChild(topicTag);
-                        });
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error polling transcript:', error);
-            });
-        }
-        
-        function checkInterviewStatus() {
-            if (isInterviewEnded) return;
-            
-            fetch(`/langchain/api/interview/status?session_id=${sessionId}`)
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Server responded with status ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === 'success') {
-                    if (data.interview_status === 'completed' || data.interview_status === 'ended') {
-                        isInterviewEnded = true;
-                        handleInterviewEnded();
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error checking interview status:', error);
-            });
-        }
-        
-        // AI Observer functions
-        function processNewTranscriptChunks(chunks) {
-            if (!isAIObserverEnabled || !chunks || chunks.length === 0) return;
-            
-            // Find the last message that hasn't been processed
-            let lastUnprocessedIndex = -1;
-            for (let i = chunks.length - 1; i >= 0; i--) {
-                if (chunks[i].id !== lastProcessedMessageId) {
-                    lastUnprocessedIndex = i;
-                    break;
-                }
-            }
-            
-            if (lastUnprocessedIndex === -1) return; // No new messages
-            
-            // Get the chunk to process
-            const chunkToProcess = chunks[lastUnprocessedIndex];
-            lastProcessedMessageId = chunkToProcess.id;
-            
-            // Add AI observer note to UI
-            processTranscriptChunk(chunkToProcess);
-        }
-        
-        function processTranscriptChunk(chunk) {
-            // Call the API to analyze the transcript chunk
-            fetch('/api/observer/analyze', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    transcript_chunk: chunk,
-                    session_id: sessionId,
-                    previous_mood: currentMood,
-                    previous_tags: observerTagList
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    throw new Error(`Server responded with status ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.success && data.result) {
-                    const result = data.result;
-                    
-                    // Update latest observation
-                    if (result.observer_notes) {
-                        latestObservation.textContent = result.observer_notes;
-                    }
-                    
-                    // Update semantic tags
-                    if (result.semantic_tags && result.semantic_tags.length > 0) {
-                        // Add tags to message in transcript
-                        const messageElement = findMessageElementById(chunk.id);
-                        if (messageElement) {
-                            addAINotesToMessage(messageElement, result);
-                        }
-                    }
-                    
-                    // Update mood
-                    if (result.observer_mood) {
-                        updateMood(result.observer_mood);
-                    }
-                    
-                    // Update tag list
-                    if (result.observer_tag_list) {
-                        updateTagList(result.observer_tag_list);
-                    }
-                }
-            })
-            .catch(error => {
-                console.error('Error analyzing transcript chunk:', error);
-            });
-        }
-        
-        function findMessageElementById(messageId) {
-            // This is a placeholder - you'll need to implement a way to find message elements
-            // One way is to add data-id attributes to messages when they're added to the UI
-            return document.querySelector(`[data-message-id="${messageId}"]`);
-        }
-        
-        function addAINotesToMessage(messageElement, analysis) {
-            if (!messageElement) return;
-            
-            // Check if AI notes already exist
-            if (messageElement.querySelector('.ai-note')) return;
-            
-            // Add AI notes
-            if (analysis.observer_notes) {
-                const noteElement = document.createElement('div');
-                noteElement.className = 'ai-note';
-                noteElement.innerHTML = `<i class="bi bi-robot me-1"></i> ${analysis.observer_notes}`;
-                messageElement.appendChild(noteElement);
-            }
-            
-            // Add tags
-            if (analysis.semantic_tags && analysis.semantic_tags.length > 0) {
-                const tagsElement = document.createElement('div');
-                tagsElement.className = 'ai-tags';
+        // Listen for new messages
+        socket.on('new_message', function(data) {
+            if (data.session_id === sessionId && data.message) {
+                // Add message to the transcript
+                appendMessage(data.message);
                 
-                analysis.semantic_tags.forEach(tag => {
-                    const tagElement = document.createElement('span');
-                    tagElement.className = 'ai-tag';
-                    tagElement.textContent = tag;
-                    tagsElement.appendChild(tagElement);
+                // Scroll to bottom 
+                transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+            }
+        });
+        
+        // Listen for new observations
+        socket.on('new_observation', function(data) {
+            if (data.session_id === sessionId && data.observation) {
+                // Update AI observer panel
+                updateObservations(data.observation);
+            }
+        });
+        
+        // Listen for session completed event
+        socket.on('session_completed', function(data) {
+            if (data.session_id === sessionId) {
+                console.log('Session completed:', data);
+                // Show notification
+                showNotification('Interview Completed', 'The interview has ended. Analysis is being generated.', 'info');
+                
+                // Disable controls
+                messageInput.disabled = true;
+                sendBtn.disabled = true;
+                endInterviewBtn.disabled = true;
+                
+                // Add completion indicator to transcript
+                const completionDiv = document.createElement('div');
+                completionDiv.className = 'alert alert-info my-3 text-center';
+                completionDiv.innerHTML = `
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    <strong>Interview Completed</strong>
+                    <p class="mb-0 mt-2">The interview has ended and analysis is being generated.</p>
+                    <div class="mt-2">
+                        <div class="spinner-border spinner-border-sm text-primary" role="status">
+                            <span class="visually-hidden">Loading...</span>
+                        </div>
+                        <span class="ms-2">Generating analysis...</span>
+                    </div>
+                `;
+                transcriptContainer.appendChild(completionDiv);
+                transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+            }
+        });
+        
+        // Listen for analysis complete event
+        socket.on('analysis_complete', function(data) {
+            if (data.session_id === sessionId) {
+                console.log('Analysis completed:', data);
+                // Show notification
+                showNotification('Analysis Ready', 'The interview analysis is now available.', 'success');
+                
+                // Update UI to show analysis is ready
+                const completionDivs = transcriptContainer.querySelectorAll('.alert.alert-info');
+                if (completionDivs.length > 0) {
+                    const lastCompletionDiv = completionDivs[completionDivs.length - 1];
+                    lastCompletionDiv.className = 'alert alert-success my-3 text-center';
+                    lastCompletionDiv.innerHTML = `
+                        <i class="bi bi-check-circle-fill me-2"></i>
+                        <strong>Analysis Complete</strong>
+                        <p class="mb-0 mt-2">The interview analysis is now ready.</p>
+                        <a href="/interview_details/${sessionId}" class="btn btn-primary mt-2">
+                            <i class="bi bi-file-text me-1"></i> View Analysis
+                        </a>
+                    `;
+                }
+            }
+        });
+        
+        // Send a suggestion to the interviewer
+        sendBtn.addEventListener('click', function() {
+            const message = messageInput.value.trim();
+            if (message) {
+                // Send the suggestion via socket
+                socket.emit('researcher_message', {
+                    session_id: sessionId,
+                    message: {
+                        role: 'system',
+                        content: message,
+                        type: 'suggestion'
+                    }
                 });
                 
-                messageElement.appendChild(tagsElement);
-            }
-        }
-        
-        function updateMood(mood) {
-            if (!mood) return;
-            
-            // Update current mood
-            currentMood = mood;
-            
-            // Add to mood data array with timestamp
-            observerMoodData.push({
-                value: mood.value,
-                timestamp: mood.timestamp || new Date().toISOString()
-            });
-            
-            // Update mood marker position (convert from -1:1 to 0:100)
-            const position = ((mood.value + 1) / 2) * 100;
-            aiMoodMarker.style.left = `${position}%`;
-            
-            // Update mood timeline visualization
-            updateMoodTimeline();
-        }
-        
-        function updateMoodTimeline() {
-            // Clear existing points
-            moodTimeline.innerHTML = '';
-            
-            // Skip if no data
-            if (observerMoodData.length === 0) return;
-            
-            // Calculate time range
-            const firstTime = new Date(observerMoodData[0].timestamp).getTime();
-            const lastTime = new Date(observerMoodData[observerMoodData.length - 1].timestamp).getTime();
-            const timeRange = lastTime - firstTime;
-            
-            // Add points
-            observerMoodData.forEach((point, index) => {
-                const pointElement = document.createElement('div');
-                pointElement.className = 'mood-point';
+                // Clear input field
+                messageInput.value = '';
                 
-                // Calculate position (x: time, y: mood value)
-                const time = new Date(point.timestamp).getTime();
-                const xPercent = timeRange === 0 ? 50 : ((time - firstTime) / timeRange) * 100;
-                const yPercent = ((1 - point.value) / 2) * 100; // Convert -1:1 to 0:100 inverted (0 at bottom)
-                
-                pointElement.style.left = `${xPercent}%`;
-                pointElement.style.top = `${yPercent}%`;
-                
-                // Size based on recency
-                const size = index === observerMoodData.length - 1 ? 10 : 6;
-                pointElement.style.width = `${size}px`;
-                pointElement.style.height = `${size}px`;
-                
-                // Color based on value
-                let color;
-                if (point.value < -0.3) color = '#dc3545'; // negative
-                else if (point.value > 0.3) color = '#28a745'; // positive
-                else color = '#ffc107'; // neutral
-                
-                pointElement.style.backgroundColor = color;
-                
-                moodTimeline.appendChild(pointElement);
-            });
-        }
-        
-        function updateTagList(tags) {
-            if (!tags || tags.length === 0) return;
-            
-            // Update local state
-            observerTagList = tags;
-            
-            // Update UI
-            aiTopicList.innerHTML = '';
-            
-            tags.forEach(tag => {
-                const tagElement = document.createElement('span');
-                tagElement.className = 'topic-tag';
-                tagElement.textContent = tag;
-                aiTopicList.appendChild(tagElement);
-            });
-        }
-        
-        // Event Handlers
-        toggleAIObserver.addEventListener('change', (e) => {
-            isAIObserverEnabled = e.target.checked;
-            
-            // Toggle AI notes in transcript
-            document.querySelectorAll('.ai-note, .ai-tags').forEach(el => {
-                el.style.display = isAIObserverEnabled ? 'block' : 'none';
-            });
-        });
-        
-        copyTranscriptBtn.addEventListener('click', () => {
-            navigator.clipboard.writeText(transcriptContent.textContent)
-            .then(() => {
-                // Create a temporary message to show that copy was successful
-                const copyMessage = document.createElement('div');
-                copyMessage.textContent = 'Copied to clipboard!';
-                copyMessage.className = 'alert alert-success position-fixed top-0 start-50 translate-middle-x mt-3';
-                copyMessage.style.zIndex = '9999';
-                document.body.appendChild(copyMessage);
-                
-                // Remove the message after 2 seconds
-                setTimeout(() => {
-                    document.body.removeChild(copyMessage);
-                }, 2000);
-            })
-            .catch(err => {
-                console.error('Could not copy text: ', err);
-                alert('Failed to copy text to clipboard');
-            });
-        });
-        
-        // Custom question checkbox toggle
-        customQuestionCheck.addEventListener('change', () => {
-            const customQuestionInput = document.getElementById('customQuestion');
-            const suggestedQuestionSelect = document.getElementById('suggestedQuestion');
-            
-            if (customQuestionCheck.checked) {
-                customQuestionInput.disabled = false;
-                suggestedQuestionSelect.disabled = true;
-            } else {
-                customQuestionInput.disabled = true;
-                suggestedQuestionSelect.disabled = false;
+                // Show confirmation
+                showNotification('Suggestion Sent', 'Your suggestion has been sent to the interviewer.', 'success');
             }
         });
         
-        suggestQuestionBtn.addEventListener('click', () => {
-            suggestQuestionModal.show();
-        });
-        
-        endSessionBtn.addEventListener('click', () => {
-            endSessionModal.show();
-        });
-        
-        sendQuestionBtn.addEventListener('click', () => {
-            let question;
-            
-            if (customQuestionCheck.checked) {
-                question = document.getElementById('customQuestion').value.trim();
-                if (!question) {
-                    alert('Please enter a custom question');
-                    return;
-                }
-            } else {
-                const select = document.getElementById('suggestedQuestion');
-                question = select.options[select.selectedIndex].text;
+        // Allow pressing Enter to send
+        messageInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendBtn.click();
             }
-            
-            // Send the suggested question to the interviewer
-            fetch('/langchain/api/interview/suggest-question', {
+        });
+        
+        // End Interview button click
+        endInterviewBtn.addEventListener('click', function() {
+            endInterviewModal.show();
+        });
+        
+        // Confirm End Interview button click
+        confirmEndInterviewBtn.addEventListener('click', function() {
+            // Call the API to end the interview
+            fetch(`/api/session/${sessionId}/complete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    session_id: sessionId,
-                    question: question
+                    should_analyze: true,
+                    end_reason: "Researcher terminated interview from monitor interface",
+                    researcher_notes: "Interview ended by researcher from monitoring interface"
                 })
             })
-            .then(response => {
-                // First check if the response is ok before trying to parse JSON
-                if (!response.ok) {
-                    throw new Error(`Server responded with status ${response.status}`);
-                }
-                return response.json();
-            })
+            .then(response => response.json())
             .then(data => {
-                if (data.status === 'success') {
-                    alert('Question suggestion sent to the interviewer');
+                if (data.success) {
+                    // Hide the modal
+                    endInterviewModal.hide();
+                    
+                    // Show notification
+                    showNotification('Interview Ended', 'You have successfully ended the interview.', 'success');
+                    
+                    // Disable controls
+                    messageInput.disabled = true;
+                    sendBtn.disabled = true;
+                    endInterviewBtn.disabled = true;
+                    
+                    // Socket will handle the UI update through session_completed event
                 } else {
-                    alert('Error sending suggestion: ' + (data.error || 'Unknown error'));
+                    // Show error
+                    showNotification('Error', data.error || 'Failed to end interview.', 'danger');
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Error sending suggestion: ' + error);
+                console.error('Error ending interview:', error);
+                showNotification('Error', 'Network error occurred while ending interview.', 'danger');
             });
-            
-            suggestQuestionModal.hide();
         });
         
-        confirmEndSessionBtn.addEventListener('click', () => {
-            const generateAnalysis = document.getElementById('generateAnalysisCheck').checked;
+        // Add Note button click
+        addNoteBtn.addEventListener('click', function() {
+            addNoteModal.show();
+        });
+        
+        // Save Note button click
+        saveNoteBtn.addEventListener('click', function() {
+            const noteText = document.getElementById('note-text').value.trim();
+            const noteType = document.querySelector('input[name="noteType"]:checked').value;
             
-            // Show the loading indicator if generating analysis
-            if (generateAnalysis) {
-                analysisLoading.style.display = 'block';
-                analysisContent.style.display = 'none';
-            }
-            
-            // Send the end session request
-            fetch('/langchain/api/interview/end', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
+            if (noteText) {
+                // Send note through socket
+                socket.emit('researcher_message', {
                     session_id: sessionId,
-                    generate_analysis: generateAnalysis
-                })
-            })
-            .then(response => {
-                // First check if the response is ok before trying to parse JSON
-                if (!response.ok) {
-                    throw new Error(`Server responded with status ${response.status}`);
-                }
-                return response.json();
-            })
-            .then(data => {
-                if (data.status === 'success') {
-                    // Close the end session modal
-                    endSessionModal.hide();
-                    
-                    // Mark interview as ended
-                    isInterviewEnded = true;
-                    handleInterviewEnded();
-                    
-                    // If analysis was generated, show it
-                    if (generateAnalysis && data.analysis) {
-                        analysisLoading.style.display = 'none';
-                        analysisContent.style.display = 'block';
-                        analysisText.innerHTML = data.analysis.replace(/\n/g, '<br>');
-                        analysisModal.show();
-                    } else {
-                        alert('Interview session ended successfully');
+                    message: {
+                        role: 'system',
+                        content: noteText,
+                        type: 'researcher_note',
+                        note_type: noteType
                     }
-                } else {
-                    alert('Error ending session: ' + (data.error || 'Unknown error'));
-                    endSessionModal.hide();
+                });
+                
+                // Hide modal and clear input
+                document.getElementById('note-text').value = '';
+                addNoteModal.hide();
+                
+                // Show confirmation
+                showNotification('Note Added', 'Your research note has been saved.', 'success');
+            }
+        });
+        
+        // Helper function to append message to transcript
+        function appendMessage(message) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message message-${message.role}`;
+            
+            if (message.role === 'system') {
+                // System messages (suggestions, notes)
+                messageDiv.className += ' message-system';
+                let icon = 'info-circle';
+                let title = 'System';
+                
+                if (message.type === 'suggestion') {
+                    icon = 'lightbulb';
+                    title = 'Suggestion';
+                } else if (message.type === 'researcher_note') {
+                    icon = 'journal-text';
+                    title = 'Research Note';
+                    
+                    if (message.note_type === 'insight') {
+                        icon = 'lightbulb';
+                        title = 'Insight';
+                    } else if (message.note_type === 'question') {
+                        icon = 'question-circle';
+                        title = 'Follow-up Question';
+                    }
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error ending session: ' + error);
-                endSessionModal.hide();
-            });
-        });
-        
-        refreshBtn.addEventListener('click', () => {
-            pollTranscript();
-        });
-        
-        downloadReportBtn.addEventListener('click', () => {
-            // Create report content with AI Observer data if available
-            let aiObserverSection = '';
-            if (isAIObserverEnabled && observerTagList.length > 0) {
-                aiObserverSection = `
-## AI Observer Analysis
-- Current Mood: ${currentMood.label} (${currentMood.value})
-- Semantic Tags: ${observerTagList.map(tag => tag).join(', ')}
-- Latest Observation: ${latestObservation.textContent || 'No observations yet'}
-`;
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <i class="bi bi-${icon}"></i>
+                        <strong>${title}</strong>
+                        <span class="text-muted ms-2 small">${formatTimestamp(message.timestamp)}</span>
+                    </div>
+                    <div class="message-content">${message.content}</div>
+                `;
+            } else {
+                // Regular messages (user/assistant)
+                const role = message.role === 'assistant' ? 'AI' : 'Participant';
+                
+                messageDiv.innerHTML = `
+                    <div class="message-header">
+                        <strong>${role}</strong>
+                        <span class="text-muted ms-2 small">${formatTimestamp(message.timestamp)}</span>
+                    </div>
+                    <div class="message-content">${message.content}</div>
+                `;
             }
             
-            const reportContent = `# Interview Monitoring Report
-Session ID: ${sessionId}
-Date: ${new Date().toLocaleString()}
-
-## Transcript
-${transcriptContent.textContent}
-
-## Statistics
-- Duration: ${document.getElementById('durationValue').textContent}
-- Questions Asked: ${document.getElementById('questionsValue').textContent}
-- Avg. Response Time: ${document.getElementById('responseTimeValue').textContent}
-- Interviewer Talk Time: ${document.getElementById('interviewerTimeValue').textContent}
-- Participant Talk Time: ${document.getElementById('participantTimeValue').textContent}
-
-## Key Topics
-${Array.from(document.querySelectorAll('.topic-tag')).map(tag => '- ' + tag.textContent).join('\n')}
-
-## Researcher Notes
-${document.getElementById('suggestionBox').textContent}
-${aiObserverSection}
-`;
-
-            // Create and download the file
-            const blob = new Blob([reportContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `interview_report_${sessionId}.md`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
+            transcriptContainer.appendChild(messageDiv);
+        }
         
-        downloadAnalysisBtn.addEventListener('click', () => {
-            // Create report content with analysis
-            const analysisContent = analysisText.innerText || '';
-            const reportContent = `# Interview Analysis Report
-Session ID: ${sessionId}
-Date: ${new Date().toLocaleString()}
-
-## Analysis
-${analysisContent}
-
-## Transcript
-${transcriptContent.textContent}
-
-## Statistics
-- Duration: ${document.getElementById('durationValue').textContent}
-- Questions Asked: ${document.getElementById('questionsValue').textContent}
-- Avg. Response Time: ${document.getElementById('responseTimeValue').textContent}
-- Interviewer Talk Time: ${document.getElementById('interviewerTimeValue').textContent}
-- Participant Talk Time: ${document.getElementById('participantTimeValue').textContent}
-
-## Key Topics
-${Array.from(document.querySelectorAll('.topic-tag')).map(tag => '- ' + tag.textContent).join('\n')}
-
-## AI Observer Tags
-${observerTagList.map(tag => '- ' + tag).join('\n')}
-`;
-
-            // Create and download the file
-            const blob = new Blob([reportContent], { type: 'text/plain' });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `interview_analysis_${sessionId}.md`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
+        // Helper function to update AI observations
+        function updateObservations(observation) {
+            // Implementation depends on your UI structure
+            // This is just a placeholder that should be adapted to your actual UI
+            
+            // Update mood chart if available
+            if (observation.sentiment && typeof updateMoodChart === 'function') {
+                updateMoodChart(observation.sentiment);
+            }
+            
+            // Update topics/tags if available
+            if (observation.topics && observation.topics.length > 0) {
+                const topicsContainer = document.getElementById('detected-topics');
+                if (topicsContainer) {
+                    observation.topics.forEach(topic => {
+                        if (!document.querySelector(`.topic-tag[data-topic="${topic}"]`)) {
+                            const topicTag = document.createElement('span');
+                            topicTag.className = 'badge bg-info me-1 mb-1 topic-tag';
+                            topicTag.setAttribute('data-topic', topic);
+                            topicTag.textContent = topic;
+                            topicsContainer.appendChild(topicTag);
+                        }
+                    });
+                }
+            }
+            
+            // Add observation to notes list if available
+            if (observation.notes && observation.notes.length > 0) {
+                const notesContainer = document.getElementById('ai-observations');
+                if (notesContainer) {
+                    observation.notes.forEach(note => {
+                        const noteDiv = document.createElement('div');
+                        noteDiv.className = 'observation-note mb-2 p-2 border-start border-3 border-info';
+                        noteDiv.innerHTML = `<p class="mb-0 small">${note}</p>`;
+                        notesContainer.appendChild(noteDiv);
+                    });
+                }
+            }
+        }
         
-        // Start polling and status checking
-        pollInterval = setInterval(pollTranscript, 5000);
-        checkStatusInterval = setInterval(checkInterviewStatus, 5000);
+        // Helper function to format timestamp
+        function formatTimestamp(timestamp) {
+            if (!timestamp) return '';
+            
+            try {
+                const date = new Date(timestamp);
+                return date.toLocaleTimeString();
+            } catch (e) {
+                return timestamp;
+            }
+        }
         
-        // Initialize the page
-        pollTranscript();
+        // Helper function to show notifications
+        function showNotification(title, message, type) {
+            // Create notification container if it doesn't exist
+            if (!document.getElementById('notification-container')) {
+                const container = document.createElement('div');
+                container.id = 'notification-container';
+                container.className = 'position-fixed top-0 end-0 p-3';
+                container.style.zIndex = 1050;
+                document.body.appendChild(container);
+            }
+            
+            const notificationId = 'notification-' + new Date().getTime();
+            const notification = document.createElement('div');
+            notification.className = `toast show bg-${type} text-white`;
+            notification.id = notificationId;
+            notification.setAttribute('role', 'alert');
+            notification.setAttribute('aria-live', 'assertive');
+            notification.setAttribute('aria-atomic', 'true');
+            
+            notification.innerHTML = `
+                <div class="toast-header bg-${type} text-white">
+                    <strong class="me-auto">${title}</strong>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+                </div>
+                <div class="toast-body">
+                    ${message}
+                </div>
+            `;
+            
+            document.getElementById('notification-container').appendChild(notification);
+            
+            // Auto-hide after 5 seconds
+            setTimeout(() => {
+                notification.remove();
+            }, 5000);
+        }
     });
 </script>
 {% endblock %} 

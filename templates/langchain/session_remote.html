@@ -335,8 +335,8 @@
             const sendButton = document.getElementById('send-button');
             const confirmExitButton = document.getElementById('confirm-exit');
             const sessionTimer = document.getElementById('session-timer');
-            const visualizerInactive = document.getElementById('visualizer-inactive');
-            const visualizerActive = document.getElementById('visualizer-active');
+            const visualizerInactive = document.getElementById('visualizer-inactive') || { classList: { add: () => {}, remove: () => {} } };
+            const visualizerActive = document.getElementById('visualizer-active') || { classList: { add: () => {}, remove: () => {} } };
             
             // Speech recognition control elements
             const silenceThresholdSlider = document.getElementById('silenceThreshold');
@@ -1131,6 +1131,34 @@
                     return;
                 }
                 
+                // Check if the user wants to end the interview
+                const lowerText = speechText.toLowerCase().trim();
+                if (lowerText.includes("please end the interview") || 
+                    lowerText.includes("end the interview") || 
+                    lowerText.includes("end interview") ||
+                    lowerText.includes("finish the interview") ||
+                    lowerText.includes("complete the interview") ||
+                    lowerText.includes("stop the interview") ||
+                    lowerText.includes("conclude the interview") ||
+                    lowerText.includes("i would like to end") ||
+                    lowerText.includes("can we end") ||
+                    lowerText.includes("wrap up") ||
+                    lowerText.includes("let's finish") ||
+                    lowerText.includes("we're done") ||
+                    lowerText.includes("we are done") ||
+                    lowerText.includes("that's all") ||
+                    lowerText.includes("that is all") ||
+                    lowerText === "end" || 
+                    lowerText === "please end" ||
+                    lowerText === "finish" ||
+                    lowerText === "done") {
+                    
+                    console.log("End interview detected with phrase: " + lowerText);
+                    // Handle end interview request
+                    endInterview(speechText);
+                    return;
+                }
+                
                 // Set flag to indicate an AI response should be coming
                 aiResponsePending = true;
                 
@@ -1140,6 +1168,91 @@
                 // Reset current transcript
                 currentTranscript = '';
             }
+        }
+        
+        // Handle end interview request
+        function endInterview(endMessage) {
+            // First send the end message like normal
+            sendMessage(endMessage);
+            
+            // Show a thank you message and a spinner
+            addMessageToChat('moderator', "Thank you for participating in this interview. I've learned a lot from our conversation. The session is now ending, and your responses will be analyzed. Have a great day!");
+            
+            // Play the thank you message as TTS
+            if (voiceId) {
+                playTTS("Thank you for participating in this interview. I've learned a lot from our conversation. The session is now ending, and your responses will be analyzed. Have a great day!");
+            }
+            
+            // Show ending message in the UI
+            const endingDiv = document.createElement('div');
+            endingDiv.className = 'alert alert-info text-center mt-4';
+            endingDiv.innerHTML = `
+                <strong>Interview Completed</strong>
+                <p class="mb-2">Thank you for participating!</p>
+                <div class="spinner-border text-primary" role="status">
+                    <span class="visually-hidden">Processing...</span>
+                </div>
+                <p class="mt-2 small">Generating analysis, please wait...</p>
+            `;
+            chatMessages.parentNode.appendChild(endingDiv);
+            
+            // Scroll to see the ending message
+            window.scrollTo(0, document.body.scrollHeight);
+            
+            // Mark the session as complete and request analysis
+            fetch(`/api/session/${sessionId}/complete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    should_analyze: true,
+                    end_reason: "User requested to end the interview",
+                    final_message: endMessage
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // End the session
+                    sessionEnded = true;
+                    
+                    // Try to stop speech recognition
+                    if (recognition) {
+                        try {
+                            recognition.stop();
+                        } catch (e) { /* Ignore if already stopped */ }
+                    }
+                    
+                    // Show finished modal
+                    const finishedModal = new bootstrap.Modal(document.getElementById('finishedModal'));
+                    finishedModal.show();
+                    
+                    // Redirect to the interview details page after a delay
+                    setTimeout(() => {
+                        window.location.href = `/interview_details/${sessionId}`;
+                    }, 5000);
+                } else {
+                    // Show error
+                    console.error("Error completing interview:", data.error);
+                    endingDiv.className = 'alert alert-danger text-center mt-4';
+                    endingDiv.innerHTML = `
+                        <strong>Error Completing Interview</strong>
+                        <p>${data.error || "Unknown error occurred"}</p>
+                        <p>You can close this window now.</p>
+                    `;
+                }
+            })
+            .catch(error => {
+                // Show error
+                console.error("Error completing interview:", error);
+                endingDiv.className = 'alert alert-danger text-center mt-4';
+                endingDiv.innerHTML = `
+                    <strong>Error Completing Interview</strong>
+                    <p>A network error occurred while trying to complete the interview.</p>
+                    <p>You can close this window now.</p>
+                `;
+            });
         }
         
         // Handle silence detection

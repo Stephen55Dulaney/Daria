@@ -365,13 +365,14 @@ class InterviewService:
             logger.error(f"Error generating summary: {str(e)}")
             return f"Error generating summary: {str(e)}"
             
-    def generate_response(self, messages: List[Dict[str, str]], prompt: str = "") -> str:
+    def generate_response(self, messages: List[Dict[str, str]], prompt: str = "", character: str = None) -> str:
         """
         Generate a new AI response based on conversation history
         
         Args:
             messages: List of message dictionaries with 'role' and 'content'
             prompt: Optional system prompt to control the interview style
+            character: Optional character name to customize the prompt
             
         Returns:
             str: The generated response
@@ -388,13 +389,32 @@ class InterviewService:
             
             # Default prompt if none provided
             if not prompt:
-                prompt = """
-                You are a professional research interviewer conducting a user research session.
-                Your job is to ask thoughtful follow-up questions based on the participant's responses.
-                Be curious, empathetic, and probe for deeper insights.
-                Focus on understanding the participant's experiences, challenges, and needs.
-                Ask one question at a time, and avoid leading questions.
-                """
+                if character:
+                    # If a character is provided but no prompt, use character-specific prompt
+                    character_prompts = {
+                        "daria": "You are Daria, Deloitte's Advanced Research & Interview Assistant. Ask thoughtful follow-up questions.",
+                        "skeptica": "You are Skeptica, Deloitte's Assumption Buster. Challenge assumptions and ask for evidence.",
+                        "eurekia": "You are Eurekia, Deloitte's Insight Generator. Find patterns and opportunities in the conversation.",
+                        "thesea": "You are Thesea, Deloitte's Journey Mapper. Focus on understanding experiences and journeys.",
+                        "askia": "You are Askia, Deloitte's Strategic Questioner. Ask incisive questions to uncover deeper insights.",
+                        "odessia": "You are Odessia, Deloitte's Journey Expert. Map and analyze user experiences."
+                    }
+                    prompt = character_prompts.get(character.lower(), 
+                    """
+                    You are a professional research interviewer conducting a user research session.
+                    Your job is to ask thoughtful follow-up questions based on the participant's responses.
+                    Be curious, empathetic, and probe for deeper insights.
+                    Focus on understanding the participant's experiences, challenges, and needs.
+                    Ask one question at a time, and avoid leading questions.
+                    """)
+                else:
+                    prompt = """
+                    You are a professional research interviewer conducting a user research session.
+                    Your job is to ask thoughtful follow-up questions based on the participant's responses.
+                    Be curious, empathetic, and probe for deeper insights.
+                    Focus on understanding the participant's experiences, challenges, and needs.
+                    Ask one question at a time, and avoid leading questions.
+                    """
             
             # Get the user's last message
             last_user_message = ""

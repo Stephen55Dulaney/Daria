@@ -69,27 +69,85 @@
         overflow-y: auto;
         padding-right: 10px;
     }
+    
+    /* Live status indicator */
+    .live-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        margin-right: 8px;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(0.8);
+            opacity: 0.7;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(0.8);
+            opacity: 0.7;
+        }
+    }
+    
+    .live-badge {
+        background-color: #dc3545;
+        animation: fade 1.5s infinite;
+    }
+    
+    @keyframes fade {
+        0% { opacity: 0.7; }
+        50% { opacity: 1; }
+        100% { opacity: 0.7; }
+    }
+    
+    .monitor-card {
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        background-color: rgba(220, 53, 69, 0.05);
+    }
 </style>
 
 <div class="container-fluid">
     <div class="d-flex justify-content-between mb-4">
         <h1 class="h3">Interview Details</h1>
         <div class="d-flex gap-2">
-            <a href="/monitor_interview/{{ session_id }}" class="btn btn-primary">
-                <i class="bi bi-eye me-1"></i> Monitor Interview
-            </a>
             <a href="/dashboard" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
             </a>
         </div>
     </div>
     
+    {% set is_active = interview.status|default('active')|lower == 'active' and (interview.transcript is defined and interview.transcript or interview.conversation_history is defined and interview.conversation_history) %}
+    
+    {% if is_active %}
+    <!-- Monitor Card for Active Interviews -->
+    <div class="card mb-4 monitor-card">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h4><span class="live-indicator"></span> Interview In Progress</h4>
+                <p class="mb-0">This interview has active participants. Monitor it live to observe responses and provide feedback.</p>
+            </div>
+            <a href="/monitor_interview/{{ session_id }}" class="btn btn-danger btn-lg">
+                <i class="bi bi-broadcast me-1"></i> Monitor Live Interview
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
     <div class="card mb-4">
         <div class="card-body">
             <div class="mb-4">
                 <h2 class="h4">{{ interview.title }}</h2>
                 <div class="d-flex align-items-center mt-2">
-                    <span class="badge bg-success me-2">Active</span>
+                    <span class="badge {% if is_active %}bg-danger live-badge{% else %}bg-success{% endif %} me-2">
+                        {% if is_active %}Live{% else %}{{ interview.status|default('Active')|capitalize }}{% endif %}
+                    </span>
                     <span class="text-muted small">Created: 
                     {% if interview.created_at is defined %}
                         {% if interview.created_at is string %}
@@ -128,18 +186,15 @@
                 <h3 class="h5 mb-3">Interview Link</h3>
                 <p class="small text-muted mb-2">Share this link with candidates to start interviews:</p>
                 <div class="input-group mb-2">
-                    <input type="text" class="form-control" value="{{ request.host_url }}interview/session/{{ session_id }}?voice_id={{ interview.voice_id|default('EXAVITQu4vr4xnSDxMaL') }}&remote=true" readonly id="interview-link">
-                    <button class="btn btn-outline-primary" type="button" onclick="copyLink()">
-                        <i class="bi bi-clipboard me-1"></i> Copy
+                    <input type="text" class="form-control" value="{{ request.host_url }}interview/{{ session_id }}?voice_id={{ interview.voice_id|default('EXAVITQu4vr4xnSDxMaL') }}&remote=true" readonly id="interview-link">
+                    <button class="btn btn-outline-secondary" type="button" id="copy-link-btn">
+                        <i class="bi bi-clipboard"></i>
                     </button>
                 </div>
-                <div class="d-flex gap-2">
-                    <a href="{{ request.host_url }}interview/session/{{ session_id }}?voice_id={{ interview.voice_id|default('EXAVITQu4vr4xnSDxMaL') }}&remote=true" target="_blank" class="btn btn-sm btn-outline-secondary">
-                        <i class="bi bi-box-arrow-up-right me-1"></i> Open in new tab
+                <div class="mb-3">
+                    <a href="{{ request.host_url }}interview/{{ session_id }}?voice_id={{ interview.voice_id|default('EXAVITQu4vr4xnSDxMaL') }}&remote=true" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Open Link
                     </a>
-                    <button type="button" class="btn btn-sm btn-outline-secondary" onclick="sendEmailWithLink()">
-                        <i class="bi bi-envelope me-1"></i> Send via email
-                    </button>
                 </div>
                 <div id="copy-status" class="small text-success mt-2" style="display: none;">Link copied to clipboard!</div>
             </div>
@@ -185,12 +240,14 @@
                                 </td>
                                 <td>{% if interview.interviewee is defined and interview.interviewee is mapping %}{{ interview.interviewee.get('name', 'Anonymous') }}{% else %}Anonymous{% endif %}</td>
                                 <td>
-                                    <span class="badge {% if interview.status == 'completed' %}bg-primary{% else %}bg-warning{% endif %}">
-                                        {{ interview.status|capitalize }}
+                                    <span class="badge {% if is_active %}bg-danger live-badge{% else %}{% if interview.status == 'completed' %}bg-primary{% else %}bg-warning{% endif %}{% endif %}">
+                                        {% if is_active %}<span class="live-indicator"></span> Live{% else %}{{ interview.status|capitalize }}{% endif %}
                                     </span>
                                 </td>
                                 <td>
-                                    <a href="/monitor_interview/{{ session_id }}" class="btn btn-sm btn-outline-primary">View</a>
+                                    <a href="/monitor_interview/{{ session_id }}" class="btn btn-sm {% if is_active %}btn-danger{% else %}btn-outline-primary{% endif %}">
+                                        <i class="bi bi-{% if is_active %}broadcast{% else %}eye{% endif %} me-1"></i> {% if is_active %}Monitor Now{% else %}View{% endif %}
+                                    </a>
                                 </td>
                             </tr>
                         </tbody>
@@ -450,6 +507,20 @@ function copyLink() {
     }, 3000);
 }
 
+function copyMonitorLink() {
+    // Create a temporary input to copy from
+    const tempInput = document.createElement('input');
+    const monitorUrl = window.location.origin + '/monitor_interview/{{ session_id }}';
+    tempInput.value = monitorUrl;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    
+    // Show toast or alert
+    alert('Monitor link copied to clipboard: ' + monitorUrl);
+}
+
 function sendEmailWithLink() {
     const link = document.getElementById('interview-link').value;
     const subject = encodeURIComponent("Remote Interview Invitation - {{ interview.title }}");
@@ -564,6 +635,31 @@ document.addEventListener('DOMContentLoaded', function() {
             updateExpirationDate(expirationDate);
         });
     }
+    
+    // Add event listener for copy link button
+    const copyLinkBtn = document.getElementById('copy-link-btn');
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', copyLink);
+    }
+    
+    // Add monitor link to the monitor button if the interview is active
+    {% if is_active %}
+    const monitorBtns = document.querySelectorAll('a[href="/monitor_interview/{{ session_id }}"]');
+    monitorBtns.forEach(function(btn) {
+        // Add a copy link button next to each monitor button
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'btn btn-sm btn-outline-secondary ms-2';
+        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+        copyBtn.title = 'Copy monitor link';
+        copyBtn.onclick = function(e) {
+            e.preventDefault();
+            copyMonitorLink();
+        };
+        
+        // Insert after each monitor button
+        btn.parentNode.insertBefore(copyBtn, btn.nextSibling);
+    });
+    {% endif %}
 });
 
 function generateAnalysis() {
