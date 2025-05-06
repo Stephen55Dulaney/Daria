@@ -4,7 +4,7 @@ Interview Service for managing LangChain interview agents
 
 import os
 import logging
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, List
 import json
 import datetime
 import uuid
@@ -364,6 +364,87 @@ class InterviewService:
         except Exception as e:
             logger.error(f"Error generating summary: {str(e)}")
             return f"Error generating summary: {str(e)}"
+            
+    def generate_response(self, messages: List[Dict[str, str]], prompt: str = "") -> str:
+        """
+        Generate a new AI response based on conversation history
+        
+        Args:
+            messages: List of message dictionaries with 'role' and 'content'
+            prompt: Optional system prompt to control the interview style
+            
+        Returns:
+            str: The generated response
+        """
+        try:
+            # Import the necessary LangChain components
+            try:
+                from langchain_community.chat_models import ChatOpenAI
+            except ImportError:
+                from langchain.chat_models import ChatOpenAI
+                
+            from langchain.chains import LLMChain
+            from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+            
+            # Default prompt if none provided
+            if not prompt:
+                prompt = """
+                You are a professional research interviewer conducting a user research session.
+                Your job is to ask thoughtful follow-up questions based on the participant's responses.
+                Be curious, empathetic, and probe for deeper insights.
+                Focus on understanding the participant's experiences, challenges, and needs.
+                Ask one question at a time, and avoid leading questions.
+                """
+            
+            # Get the user's last message
+            last_user_message = ""
+            for msg in reversed(messages):
+                if msg.get('role') == 'user':
+                    last_user_message = msg.get('content', '')
+                    break
+            
+            # Build prompt template with conversation history
+            system_message_prompt = SystemMessagePromptTemplate.from_template(prompt)
+            human_template = """
+            Previous conversation:
+            {conversation_history}
+            
+            Participant's latest response: {last_response}
+            
+            Continue the interview with a thoughtful follow-up question or introduce a new relevant topic.
+            """
+            human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+            
+            chat_prompt = ChatPromptTemplate.from_messages([
+                system_message_prompt,
+                human_message_prompt
+            ])
+            
+            # Format conversation history
+            conversation_history = ""
+            for msg in messages:
+                role = "Interviewer" if msg.get('role') == 'assistant' else "Participant"
+                conversation_history += f"{role}: {msg.get('content', '')}\n\n"
+            
+            # Create the LLM chain
+            llm = ChatOpenAI(
+                temperature=0.7,
+                model_name="gpt-3.5-turbo"
+            )
+            chain = LLMChain(llm=llm, prompt=chat_prompt)
+            
+            # Generate the response
+            response = chain.run(
+                conversation_history=conversation_history,
+                last_response=last_user_message
+            )
+            
+            logger.info(f"Generated response of {len(response)} characters")
+            return response
+            
+        except Exception as e:
+            logger.error(f"Error generating response: {str(e)}")
+            return "I apologize, but I'm having trouble formulating a response. Could you please share more about your experience or perspective on this topic?"
             
     def _format_transcript(self, interview_data: Dict[str, Any]) -> str:
         """Format interview data into a readable transcript for analysis"""

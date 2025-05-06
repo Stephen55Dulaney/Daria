@@ -1,0 +1,1163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Session</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #0ea5e9;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --light-bg: #f9fafb;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        .session-container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+        
+        .chat-container {
+            height: calc(100vh - 250px);
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .chat-messages {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            max-width: 80%;
+        }
+        
+        .message-moderator {
+            margin-right: auto;
+        }
+        
+        .message-participant {
+            margin-left: auto;
+        }
+        
+        .message-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 1rem;
+            display: inline-block;
+        }
+        
+        .message-moderator .message-bubble {
+            background-color: #f2f7ff;
+            border: 1px solid #d1e0ff;
+            border-bottom-left-radius: 0.25rem;
+        }
+        
+        .message-participant .message-bubble {
+            background-color: #f0f9ff;
+            border: 1px solid #bae6fd;
+            border-bottom-right-radius: 0.25rem;
+            text-align: right;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 0.5rem;
+        }
+        
+        .audio-visualizer {
+            height: 60px;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 1rem;
+        }
+        
+        .status-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.5rem 1rem;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        
+        .card {
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .speech-animation {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+        
+        .speech-bar {
+            width: 4px;
+            height: 20px;
+            background-color: var(--primary-color);
+            border-radius: 2px;
+            animation: speech-animation 0.8s infinite ease-in-out;
+        }
+        
+        .speech-bar:nth-child(1) { animation-delay: 0s; }
+        .speech-bar:nth-child(2) { animation-delay: 0.1s; }
+        .speech-bar:nth-child(3) { animation-delay: 0.2s; }
+        .speech-bar:nth-child(4) { animation-delay: 0.3s; }
+        
+        @keyframes speech-animation {
+            0% { height: 5px; }
+            50% { height: 20px; }
+            100% { height: 5px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="session-container">
+        <div class="row mb-4">
+            <div class="col-md-8">
+                <h1 class="h3">Research Session: {{ guide.title if guide else "Research Study" }}</h1>
+                <p class="text-muted">Thank you for participating in this research session. Please speak naturally when responding to questions.</p>
+            </div>
+            <div class="col-md-4 text-end">
+                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exitModal">
+                    <i class="bi bi-door-open me-2"></i>Exit Session
+                </button>
+            </div>
+        </div>
+        
+        <!-- Status Bar -->
+        <div class="status-bar mb-3">
+            <div>
+                <span class="badge bg-success">Connected</span>
+                <span class="ms-2" id="session-timer">00:00</span>
+            </div>
+            <div>
+                <span class="d-flex align-items-center">
+                    <i class="bi bi-mic-fill text-success me-2"></i>
+                    <span id="mic-status">Microphone active</span>
+                </span>
+            </div>
+            <div>
+                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#speechControls">
+                    <i class="bi bi-sliders me-1"></i> Speech Controls
+                </button>
+            </div>
+        </div>
+        
+        <!-- Speech Recognition Controls -->
+        <div class="collapse mb-3" id="speechControls">
+            <div class="card card-body">
+                <h6 class="mb-3">Speech Recognition Settings</h6>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label for="silenceThreshold" class="form-label small">Silence Detection (seconds)</label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" class="form-range me-2" id="silenceThreshold" min="0.5" max="5" step="0.5" value="2">
+                            <span id="silenceThresholdValue" class="small">2s</span>
+                        </div>
+                        <div class="form-text small">Time of silence before sending message</div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="noiseThreshold" class="form-label small">Noise Threshold</label>
+                        <div class="d-flex align-items-center">
+                            <input type="range" class="form-range me-2" id="noiseThreshold" min="0" max="100" value="15">
+                            <span id="noiseThresholdValue" class="small">15%</span>
+                        </div>
+                        <div class="form-text small">Minimum volume to detect speech</div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="form-check form-switch mt-2">
+                            <input class="form-check-input" type="checkbox" id="audioVisualizerEnabled" checked>
+                            <label class="form-check-label small" for="audioVisualizerEnabled">Show Audio Visualization</label>
+                        </div>
+                        <div class="form-check form-switch">
+                            <input class="form-check-input" type="checkbox" id="noiseFilterEnabled" checked>
+                            <label class="form-check-label small" for="noiseFilterEnabled">Noise Filtering</label>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="d-flex justify-content-between">
+                            <div id="audioLevel" class="mt-2 small">Audio Level: <span id="currentLevel">0</span>%</div>
+                            <div id="silenceTimer" class="mt-2 small d-none">Silence: <span id="currentSilence">0</span>s</div>
+                        </div>
+                        <div class="progress mt-1" style="height: 10px;">
+                            <div id="audioLevelBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chat Container -->
+        <div class="chat-container">
+            <div class="chat-messages" id="chat-messages">
+                <!-- Messages will be added here -->
+                <div class="message message-moderator">
+                    <div class="message-bubble">
+                        <p class="mb-0">Hello and welcome to this research session. I'll be asking you some questions about your experiences. Feel free to respond naturally.</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Audio Visualizer -->
+            <div class="audio-visualizer">
+                <div id="visualizer-inactive">
+                    <i class="bi bi-mic-fill text-muted me-2"></i>
+                    <span class="text-muted">Listening...</span>
+                </div>
+                <div id="visualizer-active" class="d-none">
+                    <div class="speech-animation">
+                        <div class="speech-bar"></div>
+                        <div class="speech-bar"></div>
+                        <div class="speech-bar"></div>
+                        <div class="speech-bar"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Input Area (Text Fallback) -->
+            <div class="chat-input">
+                <input type="text" class="form-control" id="text-input" placeholder="Type your response if microphone is not working...">
+                <button class="btn btn-primary" id="send-button">
+                    <i class="bi bi-send"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Exit Confirmation Modal -->
+    <div class="modal fade" id="exitModal" tabindex="-1" aria-labelledby="exitModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exitModalLabel">Exit Session</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to exit this research session? Your progress will be saved, but you won't be able to continue answering questions.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Session</button>
+                    <button type="button" class="btn btn-danger" id="confirm-exit">Exit Session</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Finished Session Modal -->
+    <div class="modal fade" id="finishedModal" tabindex="-1" aria-labelledby="finishedModalLabel" aria-hidden="true" data-bs-backdrop="static" data-bs-keyboard="false">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="finishedModalLabel">Session Complete</h5>
+                </div>
+                <div class="modal-body">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-check-circle text-success fs-1"></i>
+                    </div>
+                    <h4 class="text-center mb-3">Thank You!</h4>
+                    <p>Thank you for participating in this research session. Your feedback is greatly appreciated and will help improve our products and services.</p>
+                    <p>You may now close this window or browser tab.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-primary" onclick="window.close()">Close Window</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const sessionId = '{{ session_id }}';
+            const voiceId = '{{ voice_id }}';
+            const chatMessages = document.getElementById('chat-messages');
+            const textInput = document.getElementById('text-input');
+            const sendButton = document.getElementById('send-button');
+            const confirmExitButton = document.getElementById('confirm-exit');
+            const sessionTimer = document.getElementById('session-timer');
+            const visualizerInactive = document.getElementById('visualizer-inactive');
+            const visualizerActive = document.getElementById('visualizer-active');
+            
+            // Speech recognition control elements
+            const silenceThresholdSlider = document.getElementById('silenceThreshold');
+            const silenceThresholdValue = document.getElementById('silenceThresholdValue');
+            const noiseThresholdSlider = document.getElementById('noiseThreshold');
+            const noiseThresholdValue = document.getElementById('noiseThresholdValue');
+            const audioVisualizerEnabled = document.getElementById('audioVisualizerEnabled');
+            const noiseFilterEnabled = document.getElementById('noiseFilterEnabled');
+            const audioLevelBar = document.getElementById('audioLevelBar');
+            const currentLevelDisplay = document.getElementById('currentLevel');
+            const silenceTimer = document.getElementById('silenceTimer');
+            const currentSilenceDisplay = document.getElementById('currentSilence');
+            
+            // Speech recognition settings
+            let silenceThreshold = 2000; // 2 seconds in milliseconds
+            let noiseThreshold = 15; // 15% minimum volume
+            let isListening = false;
+            let isSpeaking = false;
+            let silenceStart = null;
+            let lastSpeechTime = Date.now();
+            let audioContext = null;
+            let analyser = null;
+            let microphone = null;
+            let scriptProcessor = null;
+            let audioLevel = 0;
+            
+            // Session state
+            let recognition;
+            let sessionStartTime = new Date();
+            let sessionEnded = false;
+            let currentTranscript = '';
+            let welcomeMessageSent = false;
+            let messagePollingInterval = null;
+            let aiResponsePending = false;
+            
+            // Update control display values
+            silenceThresholdSlider.addEventListener('input', function() {
+                silenceThreshold = this.value * 1000; // Convert seconds to milliseconds
+                silenceThresholdValue.textContent = this.value + 's';
+            });
+            
+            noiseThresholdSlider.addEventListener('input', function() {
+                noiseThreshold = this.value;
+                noiseThresholdValue.textContent = this.value + '%';
+            });
+            
+            // Audio processing functions
+            function initializeAudioProcessor() {
+                try {
+                    // Create audio context
+                    window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioContext = new AudioContext();
+                    
+                    // Get user media
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(function(stream) {
+                            // Create analyser
+                            analyser = audioContext.createAnalyser();
+                            analyser.fftSize = 256;
+                            
+                            // Create microphone source
+                            microphone = audioContext.createMediaStreamSource(stream);
+                            microphone.connect(analyser);
+                            
+                            // Create script processor
+                            scriptProcessor = audioContext.createScriptProcessor(2048, 1, 1);
+                            analyser.connect(scriptProcessor);
+                            scriptProcessor.connect(audioContext.destination);
+                            
+                            // Process audio
+                            scriptProcessor.addEventListener('audioprocess', processAudio);
+                        })
+                        .catch(function(err) {
+                            console.error('Error accessing microphone:', err);
+                        });
+                } catch (e) {
+                    console.error('Audio processing error:', e);
+                    // Fall back to basic Web Speech API
+                }
+            }
+            
+            function processAudio(event) {
+                if (!analyser) return;
+                
+                // Get frequency data
+                const array = new Uint8Array(analyser.frequencyBinCount);
+                analyser.getByteFrequencyData(array);
+                
+                // Calculate audio level (0-100)
+                let values = 0;
+                const length = array.length;
+                for (let i = 0; i < length; i++) {
+                    values += array[i];
+                }
+                audioLevel = Math.round(values / length * 100 / 255);
+                
+                // Update audio level visualizer
+                if (audioVisualizerEnabled.checked) {
+                    audioLevelBar.style.width = audioLevel + '%';
+                    currentLevelDisplay.textContent = audioLevel;
+                    
+                    // Update class based on level
+                    audioLevelBar.classList.remove('bg-danger', 'bg-warning', 'bg-success');
+                    if (audioLevel > 60) {
+                        audioLevelBar.classList.add('bg-danger');
+                    } else if (audioLevel > 30) {
+                        audioLevelBar.classList.add('bg-success');
+                    } else {
+                        audioLevelBar.classList.add('bg-warning');
+                    }
+                }
+                
+                // Handle speech detection
+                const now = Date.now();
+                if (isSpeaking && audioLevel < noiseThreshold) {
+                    // Speech -> Silence transition
+                    if (silenceStart === null) {
+                        silenceStart = now;
+                        silenceTimer.classList.remove('d-none');
+                    }
+                    
+                    // Update silence timer
+                    const silenceDuration = (now - silenceStart) / 1000;
+                    currentSilenceDisplay.textContent = silenceDuration.toFixed(1);
+                    
+                    // Check if silence threshold reached
+                    if (silenceDuration * 1000 >= silenceThreshold && currentTranscript) {
+                        // Send message
+                        sendMessage(currentTranscript);
+                        currentTranscript = '';
+                        silenceStart = null;
+                        silenceTimer.classList.add('d-none');
+                    }
+                } else if (audioLevel >= noiseThreshold) {
+                    // Silence -> Speech transition
+                    isSpeaking = true;
+                    lastSpeechTime = now;
+                    silenceStart = null;
+                    silenceTimer.classList.add('d-none');
+                    
+                    // Show active visualizer
+                    if (audioVisualizerEnabled.checked) {
+                        visualizerActive.classList.remove('d-none');
+                        visualizerInactive.classList.add('d-none');
+                    }
+                } else {
+                    silenceTimer.classList.add('d-none');
+                }
+            }
+            
+            // Initialize Web Speech API
+            function initializeSpeechRecognition() {
+                if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+                    recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+                    recognition.continuous = true;
+                    recognition.interimResults = true;
+                    recognition.lang = 'en-US';
+                    
+                    recognition.onstart = function() {
+                        isListening = true;
+                        document.getElementById('mic-status').textContent = 'Microphone active';
+                    };
+                    
+                    recognition.onresult = function(event) {
+                        let interimTranscript = '';
+                        let finalTranscript = '';
+                        
+                        for (let i = event.resultIndex; i < event.results.length; i++) {
+                            const transcript = event.results[i][0].transcript;
+                            if (event.results[i].isFinal) {
+                                finalTranscript += transcript;
+                            } else {
+                                interimTranscript += transcript;
+                            }
+                        }
+                        
+                        // Apply noise filtering if enabled
+                        if (noiseFilterEnabled.checked && audioLevel < noiseThreshold) {
+                            // Ignore this result as it's likely background noise
+                            return;
+                        }
+                        
+                        if (finalTranscript) {
+                            currentTranscript = finalTranscript;
+                            if (silenceThreshold <= 500) {
+                                // If silence threshold is very low, send immediately
+                                sendMessage(currentTranscript);
+                                currentTranscript = '';
+                            }
+                        } else if (interimTranscript) {
+                            currentTranscript = interimTranscript;
+                            
+                            // Show active visualizer
+                            if (audioVisualizerEnabled.checked) {
+                                visualizerActive.classList.remove('d-none');
+                                visualizerInactive.classList.add('d-none');
+                            }
+                        }
+                    };
+                    
+                    recognition.onend = function() {
+                        isListening = false;
+                        if (!sessionEnded) {
+                            recognition.start();
+                        }
+                    };
+                    
+                    recognition.onerror = function(event) {
+                        console.error('Speech recognition error:', event.error);
+                        document.getElementById('mic-status').textContent = 'Microphone error: ' + event.error;
+                        
+                        // Hide active visualizer
+                        visualizerActive.classList.add('d-none');
+                        visualizerInactive.classList.remove('d-none');
+                    };
+                    
+                    recognition.start();
+                } else {
+                    alert('Speech recognition is not supported in your browser. Please use Chrome, Edge, or Safari.');
+                    document.getElementById('mic-status').textContent = 'Microphone not supported';
+                }
+            }
+            
+            // Send message to server
+            function sendMessage(message) {
+                // Reset speech detection state
+                silenceStart = null;
+                currentTranscript = '';
+                silenceTimer.classList.add('d-none');
+                
+                // Hide active visualizer
+                visualizerActive.classList.add('d-none');
+                visualizerInactive.classList.remove('d-none');
+                
+                // Add user message to chat
+                addMessageToChat('participant', message);
+                
+                // Show loading indicator while waiting for response
+                const loadingIndicator = document.createElement('div');
+                loadingIndicator.id = 'ai-loading-indicator';
+                loadingIndicator.className = 'message message-moderator';
+                const loadingBubble = document.createElement('div');
+                loadingBubble.className = 'message-bubble';
+                loadingBubble.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Thinking...';
+                loadingIndicator.appendChild(loadingBubble);
+                chatMessages.appendChild(loadingIndicator);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Send to server - first try the session API
+                fetch(`/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: {
+                            role: 'user',
+                            content: message
+                        }
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        console.log("Session API failed, trying interview API");
+                        return fetch(`/api/interview/respond`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                session_id: sessionId,
+                                message: message
+                            })
+                        });
+                    }
+                    return response;
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Remove loading indicator
+                    const loadingIndicator = document.getElementById('ai-loading-indicator');
+                    if (loadingIndicator) {
+                        loadingIndicator.remove();
+                    }
+                    
+                    if (data.success || data.message) {
+                        // Extract the response message (different formats between APIs)
+                        const responseText = data.message || data.question || '';
+                        
+                        if (responseText) {
+                            // Add AI response to chat
+                            addMessageToChat('moderator', responseText);
+                            
+                            // Text-to-speech
+                            if (voiceId) {
+                                playTTS(responseText);
+                            }
+                        } else {
+                            // If no direct response, we need to fetch the latest messages to get the AI response
+                            console.log("No direct response from add_message, fetching latest messages");
+                            fetchLatestMessages();
+                        }
+                        
+                        if (data.status === 'completed') {
+                            endSession();
+                        }
+                    } else {
+                        console.error('Error:', data.error || 'Unknown error');
+                        // If error or no response, try fetching latest messages
+                        fetchLatestMessages();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    // Remove loading indicator on error
+                    const loadingIndicator = document.getElementById('ai-loading-indicator');
+                    if (loadingIndicator) {
+                        loadingIndicator.remove();
+                    }
+                    
+                    // Try to recover by fetching latest messages
+                    fetchLatestMessages();
+                });
+            }
+            
+            // Fetch latest messages to ensure we get the AI's response
+            function fetchLatestMessages() {
+                fetch(`/api/session/${sessionId}/messages`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.messages && data.messages.length > 0) {
+                        // Get message count currently in the UI
+                        const currentMessageCount = document.querySelectorAll('.message').length;
+                        
+                        // If there are new messages in the API response
+                        if (data.messages.length > currentMessageCount) {
+                            // Get the latest assistant message
+                            let latestAssistantMessage = null;
+                            for (let i = data.messages.length - 1; i >= 0; i--) {
+                                if (data.messages[i].role === 'assistant') {
+                                    latestAssistantMessage = data.messages[i];
+                                    break;
+                                }
+                            }
+                            
+                            // If we found a new assistant message, display it
+                            if (latestAssistantMessage && latestAssistantMessage.content) {
+                                // Check if this message is already displayed
+                                const messageElements = document.querySelectorAll('.message-moderator .message-content');
+                                let isDuplicate = false;
+                                
+                                messageElements.forEach(el => {
+                                    if (el.textContent === latestAssistantMessage.content) {
+                                        isDuplicate = true;
+                                    }
+                                });
+                                
+                                if (!isDuplicate) {
+                                    // Add AI response to chat
+                                    addMessageToChat('moderator', latestAssistantMessage.content);
+                                    
+                                    // Text-to-speech
+                                    if (voiceId) {
+                                        playTTS(latestAssistantMessage.content);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching latest messages:', error);
+                });
+            }
+            
+            // Add message to chat
+            function addMessageToChat(role, content) {
+                const messageDiv = document.createElement('div');
+                messageDiv.className = `message message-${role}`;
+                
+                const bubbleDiv = document.createElement('div');
+                bubbleDiv.className = 'message-bubble';
+                
+                const paragraph = document.createElement('p');
+                paragraph.className = 'mb-0';
+                paragraph.textContent = content;
+                
+                bubbleDiv.appendChild(paragraph);
+                messageDiv.appendChild(bubbleDiv);
+                chatMessages.appendChild(messageDiv);
+                
+                // Scroll to bottom
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+            
+            // Play TTS audio
+            function playTTS(text) {
+                // Use ElevenLabs API for high-quality TTS
+                fetch('/api/text_to_speech_elevenlabs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ 
+                        text: text,
+                        voice_id: voiceId
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('TTS API error');
+                    }
+                    return response.blob();
+                })
+                .then(audioBlob => {
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audio = new Audio(audioUrl);
+                    
+                    audio.onended = function() {
+                        URL.revokeObjectURL(audioUrl);
+                    };
+                    
+                    audio.onerror = function(e) {
+                        console.error("Audio playback error:", e);
+                        throw new Error("Error playing audio");
+                    };
+                    
+                    audio.play();
+                })
+                .catch(error => {
+                    console.error('TTS error:', error);
+                    // Fallback to browser TTS
+                    const synth = window.speechSynthesis;
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    synth.speak(utterance);
+                });
+            }
+            
+            // Start session
+            function startSession() {
+                // Try to fetch initial message for new discussion model
+                fetch(`/api/session/${sessionId}/messages`, {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                })
+                .then(response => {
+                    // If discussion API fails, try the legacy interview API
+                    if (!response.ok) {
+                        console.log("Session messages API failed, trying interview start API");
+                        return fetch(`/api/interview/start`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                session_id: sessionId
+                            })
+                        });
+                    }
+                    return response;
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Handle different API response formats
+                    if (data.messages && Array.isArray(data.messages)) {
+                        // Handle discussion model response
+                        const messages = data.messages;
+                        
+                        // Clear welcome message placeholder
+                        chatMessages.innerHTML = '';
+                        
+                        // Check if this is a new session (no messages or only system messages)
+                        let isNewSession = messages.length === 0;
+                        if (!isNewSession) {
+                            // Check if there are any non-system messages
+                            isNewSession = !messages.some(msg => msg.role === 'assistant' || msg.role === 'user');
+                        }
+                        
+                        if (isNewSession) {
+                            console.log("New session detected, sending welcome message");
+                            sendWelcomeMessage();
+                        } else {
+                            // Add existing messages to the chat
+                            console.log(`Showing ${messages.length} existing messages`);
+                            
+                            messages.forEach(msg => {
+                                const role = msg.role === 'assistant' ? 'moderator' : 'participant';
+                                addMessageToChat(role, msg.content);
+                            });
+                            
+                            // Mark welcome as sent since we already have messages
+                            welcomeMessageSent = true;
+                            
+                            // Scroll to bottom
+                            chatMessages.scrollTop = chatMessages.scrollHeight;
+                        }
+                    } 
+                    else if (data.success && data.message) {
+                        // Handle legacy model response
+                        chatMessages.innerHTML = ''; // Clear default welcome message
+                        addMessageToChat('moderator', data.message);
+                        
+                        // Text-to-speech
+                        if (voiceId) {
+                            playTTS(data.message);
+                        }
+                        welcomeMessageSent = true;
+                    } 
+                    else if (data.success && data.question) {
+                        // Alternative legacy format
+                        chatMessages.innerHTML = ''; // Clear default welcome message
+                        addMessageToChat('moderator', data.question);
+                        
+                        // Text-to-speech
+                        if (voiceId) {
+                            playTTS(data.question);
+                        }
+                        welcomeMessageSent = true;
+                    }
+                    else {
+                        // If no existing messages or failed to get them, send welcome message
+                        chatMessages.innerHTML = ''; // Clear default welcome message
+                        sendWelcomeMessage();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error starting session:', error);
+                    chatMessages.innerHTML = ''; // Clear default welcome message
+                    sendWelcomeMessage();
+                });
+            }
+            
+            // Send welcome message if needed
+            function sendWelcomeMessage() {
+                if (welcomeMessageSent) return; // Prevent duplicate welcome messages
+                
+                const welcomeMessage = "Hello and welcome to this research session. I'll be asking you some questions about your experiences. Feel free to respond naturally. Shall we begin?";
+                
+                // Add welcome message to chat
+                addMessageToChat('moderator', welcomeMessage);
+                
+                // Text-to-speech
+                if (voiceId) {
+                    playTTS(welcomeMessage);
+                }
+                
+                // Also send to server to record in the conversation
+                fetch(`/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: {
+                            role: 'assistant',
+                            content: welcomeMessage
+                        }
+                    })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to save welcome message");
+                    }
+                    // After recording welcome message, fetch any potential AI response
+                    // (though there shouldn't be one yet)
+                    setTimeout(fetchLatestMessages, 1000);
+                })
+                .catch(err => console.error("Error saving welcome message:", err));
+                
+                welcomeMessageSent = true;
+            }
+            
+            // End session
+            function endSession() {
+                sessionEnded = true;
+                
+                if (recognition) {
+                    recognition.stop();
+                }
+                
+                // Show completion modal
+                const finishedModal = new bootstrap.Modal(document.getElementById('finishedModal'));
+                finishedModal.show();
+            }
+            
+            // Update session timer
+            function updateTimer() {
+                const now = new Date();
+                const diff = Math.floor((now - sessionStartTime) / 1000);
+                const minutes = Math.floor(diff / 60).toString().padStart(2, '0');
+                const seconds = (diff % 60).toString().padStart(2, '0');
+                sessionTimer.textContent = `${minutes}:${seconds}`;
+            }
+            
+            // Handle text input submission
+            sendButton.addEventListener('click', function() {
+                const message = textInput.value.trim();
+                if (message) {
+                    sendMessage(message);
+                    textInput.value = '';
+                }
+            });
+            
+            textInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    const message = textInput.value.trim();
+                    if (message) {
+                        sendMessage(message);
+                        textInput.value = '';
+                    }
+                }
+            });
+            
+            // Handle exit button
+            confirmExitButton.addEventListener('click', function() {
+                endSession();
+                window.close();
+            });
+            
+            // Initialize audio processing
+            initializeAudioProcessor();
+            
+            // Initialize speech recognition
+            initializeSpeechRecognition();
+            
+            // Start the session
+            startSession();
+            
+            // Start microphone
+            startMicrophone();
+            
+            // Set up auto-polling for new messages
+            messagePollingInterval = setInterval(fetchLatestMessages, 5000);
+            
+            // Update timer every second
+            setInterval(updateTimer, 1000);
+        });
+
+        // Reset silence detection
+        function resetSilenceDetection() {
+            silenceStart = null;
+            silenceTimer.classList.add('d-none');
+        }
+
+        // Start microphone and speech recognition
+        function startMicrophone() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                console.error("Speech recognition not supported");
+                alert("Speech recognition is not supported in your browser. Please try Chrome or Edge.");
+                return;
+            }
+            
+            // Create speech recognition object
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            // Configure speech recognition
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
+            // Handle results
+            recognition.onresult = function(event) {
+                // Show active visualizer
+                visualizerInactive.classList.add('d-none');
+                visualizerActive.classList.remove('d-none');
+                
+                // Get transcript
+                const result = event.results[event.results.length - 1];
+                const transcript = result[0].transcript;
+                
+                // Update partial transcript display
+                currentTranscript = transcript;
+                
+                // Remove previous partial message if it exists
+                const previousPartial = document.getElementById('partial-message');
+                if (previousPartial) {
+                    previousPartial.remove();
+                }
+                
+                // Add the partial message to the chat
+                const messageDiv = document.createElement('div');
+                messageDiv.id = 'partial-message';
+                messageDiv.className = 'message message-participant partial';
+                const headerDiv = document.createElement('div');
+                headerDiv.className = 'message-header';
+                headerDiv.innerHTML = '<strong>You</strong> <span class="text-muted">(typing...)</span>';
+                const contentDiv = document.createElement('div');
+                contentDiv.className = 'message-content';
+                contentDiv.textContent = transcript;
+                messageDiv.appendChild(headerDiv);
+                messageDiv.appendChild(contentDiv);
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+                
+                // Start silence detection if this is a final result
+                if (result.isFinal) {
+                    // For final results, reset the silence timer each time
+                    resetSilenceDetection();
+                    if (currentTranscript.trim().length > 0) {
+                        silenceStart = new Date();
+                    }
+                } else {
+                    // For interim results, only start silence detection if we don't already have it running
+                    if (!silenceStart && currentTranscript.trim().length > 0) {
+                        silenceStart = new Date();
+                    }
+                }
+            };
+            
+            // Handle errors
+            recognition.onerror = function(event) {
+                console.error("Speech recognition error", event.error);
+                
+                // If it's a no-speech error and we have partial transcript, try processing it
+                if (event.error === 'no-speech' && currentTranscript && currentTranscript.trim().length > 0) {
+                    handleUserSpeech(currentTranscript);
+                }
+                
+                // Reset and restart
+                resetSilenceDetection();
+                try {
+                    recognition.stop();
+                } catch (e) { /* Ignore if already stopped */ }
+                
+                setTimeout(function() {
+                    try {
+                        recognition.start();
+                    } catch (e) { 
+                        console.error("Failed to restart recognition", e);
+                    }
+                }, 1000);
+            };
+            
+            // If recognition ends for any reason, restart it
+            recognition.onend = function() {
+                // Hide active visualizer
+                visualizerActive.classList.add('d-none');
+                visualizerInactive.classList.remove('d-none');
+                
+                // Check silence one more time before restarting
+                checkSilence();
+                
+                // Restart recognition
+                if (!sessionEnded) {
+                    try {
+                        recognition.start();
+                    } catch (e) {
+                        console.error("Error restarting recognition", e);
+                    }
+                }
+            };
+            
+            // Start recognition
+            try {
+                recognition.start();
+                console.log("Speech recognition started");
+            } catch (e) {
+                console.error("Error starting recognition", e);
+                alert("Could not start speech recognition. Please refresh the page.");
+            }
+        }
+        
+        // Handle user speech
+        function handleUserSpeech(speechText) {
+            // Clear any silence detection
+            resetSilenceDetection();
+            
+            // If already got partial transcript, replace the partial with the final
+            if (currentTranscript) {
+                // Remove the last partial message
+                const partialMessage = document.getElementById('partial-message');
+                if (partialMessage) {
+                    partialMessage.remove();
+                }
+            }
+            
+            // Only process if we have meaningful content
+            if (speechText && speechText.trim().length > 0) {
+                console.log("Processing speech: " + speechText);
+                
+                // If this is very short and might be incomplete, don't send yet
+                if (speechText.trim().length < 3 || speechText.trim().split(' ').length < 2) {
+                    console.log("Speech too short, waiting for more...");
+                    return;
+                }
+                
+                // Set flag to indicate an AI response should be coming
+                aiResponsePending = true;
+                
+                // Send the speech text as a message
+                sendMessage(speechText);
+                
+                // Reset current transcript
+                currentTranscript = '';
+            }
+        }
+        
+        // Handle silence detection
+        function checkSilence() {
+            if (silenceStart && currentTranscript.trim().length > 0) {
+                const now = new Date();
+                const silenceTimeMs = now - silenceStart;
+                
+                // Update silence timer display if we haven't reached threshold yet
+                if (silenceTimeMs < silenceThresholdMs) {
+                    const remainingTimeMs = silenceThresholdMs - silenceTimeMs;
+                    const seconds = Math.ceil(remainingTimeMs / 1000);
+                    silenceTimer.classList.remove('d-none');
+                    silenceTimerText.textContent = `Sending in ${seconds}s...`;
+                    return;
+                }
+                
+                // If we've reached our silence threshold, save the message
+                silenceTimer.classList.add('d-none');
+                
+                // Only process the transcript if it's meaningful
+                if (currentTranscript && currentTranscript.trim().length > 0) {
+                    // Remove the partial message first
+                    const partialMessage = document.getElementById('partial-message');
+                    if (partialMessage) {
+                        partialMessage.remove();
+                    }
+                    
+                    console.log("Silence detected, processing transcript: " + currentTranscript);
+                    
+                    // Process the speech using our centralized handler
+                    handleUserSpeech(currentTranscript);
+                }
+                
+                // Reset silence detection
+                resetSilenceDetection();
+            }
+        }
+    </script>
+</body>
+</html> 
