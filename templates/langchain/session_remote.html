@@ -152,114 +152,134 @@
 </head>
 <body>
     <div class="session-container">
-        <div class="row mb-4">
-            <div class="col-md-8">
-                <h1 class="h3">Research Session: {{ guide.title if guide else "Research Study" }}</h1>
-                <p class="text-muted">Thank you for participating in this research session. Please speak naturally when responding to questions.</p>
-            </div>
-            <div class="col-md-4 text-end">
-                <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exitModal">
-                    <i class="bi bi-door-open me-2"></i>Exit Session
-                </button>
-            </div>
-        </div>
-        
-        <!-- Status Bar -->
-        <div class="status-bar mb-3">
-            <div>
-                <span class="badge bg-success">Connected</span>
-                <span class="ms-2" id="session-timer">00:00</span>
-            </div>
-            <div>
-                <span class="d-flex align-items-center">
-                    <i class="bi bi-mic-fill text-success me-2"></i>
-                    <span id="mic-status">Microphone active</span>
-                </span>
-            </div>
-            <div>
-                <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#speechControls">
-                    <i class="bi bi-sliders me-1"></i> Speech Controls
-                </button>
-            </div>
-        </div>
-        
-        <!-- Speech Recognition Controls -->
-        <div class="collapse mb-3" id="speechControls">
-            <div class="card card-body">
-                <h6 class="mb-3">Speech Recognition Settings</h6>
-                <div class="row g-3">
-                    <div class="col-md-6">
-                        <label for="silenceThreshold" class="form-label small">Silence Detection (seconds)</label>
-                        <div class="d-flex align-items-center">
-                            <input type="range" class="form-range me-2" id="silenceThreshold" min="0.5" max="5" step="0.5" value="2">
-                            <span id="silenceThresholdValue" class="small">2s</span>
-                        </div>
-                        <div class="form-text small">Time of silence before sending message</div>
-                    </div>
-                    <div class="col-md-6">
-                        <label for="noiseThreshold" class="form-label small">Noise Threshold</label>
-                        <div class="d-flex align-items-center">
-                            <input type="range" class="form-range me-2" id="noiseThreshold" min="0" max="100" value="15">
-                            <span id="noiseThresholdValue" class="small">15%</span>
-                        </div>
-                        <div class="form-text small">Minimum volume to detect speech</div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="form-check form-switch mt-2">
-                            <input class="form-check-input" type="checkbox" id="audioVisualizerEnabled" checked>
-                            <label class="form-check-label small" for="audioVisualizerEnabled">Show Audio Visualization</label>
-                        </div>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" id="noiseFilterEnabled" checked>
-                            <label class="form-check-label small" for="noiseFilterEnabled">Noise Filtering</label>
-                        </div>
-                    </div>
-                    <div class="col-md-6">
-                        <div class="d-flex justify-content-between">
-                            <div id="audioLevel" class="mt-2 small">Audio Level: <span id="currentLevel">0</span>%</div>
-                            <div id="silenceTimer" class="mt-2 small d-none">Silence: <span id="currentSilence">0</span>s</div>
-                        </div>
-                        <div class="progress mt-1" style="height: 10px;">
-                            <div id="audioLevelBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
-                        </div>
-                    </div>
+        <div class="container-fluid vh-100 d-flex flex-column">
+            <!-- Header with session info -->
+            <div class="bg-light py-2 px-3 border-bottom d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h5 mb-0">Research Session</h1>
+                    <p class="text-muted small mb-0">
+                        {{ guide.title if guide and guide.title else "Research Session" }}
+                        <span class="badge bg-primary ms-2">{{ character_name|title if character_name else guide.character_select|title if guide and guide.character_select else "AI Interviewer" }}</span>
+                    </p>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Chat Container -->
-        <div class="chat-container">
-            <div class="chat-messages" id="chat-messages">
-                <!-- Messages will be added here -->
-                <div class="message message-moderator">
-                    <div class="message-bubble">
-                        <p class="mb-0">Hello and welcome to this research session. I'll be asking you some questions about your experiences. Feel free to respond naturally.</p>
+                <div class="d-flex align-items-center">
+                    <span class="me-3" id="session-timer">00:00</span>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="audioSwitch" checked>
+                        <label class="form-check-label" for="audioSwitch">Audio</label>
                     </div>
                 </div>
             </div>
             
-            <!-- Audio Visualizer -->
-            <div class="audio-visualizer">
-                <div id="visualizer-inactive">
-                    <i class="bi bi-mic-fill text-muted me-2"></i>
-                    <span class="text-muted">Listening...</span>
+            <div class="row mb-4">
+                <div class="col-md-8">
+                    <h1 class="h3">Research Session: {{ guide.title if guide else "Research Study" }}</h1>
+                    <p class="text-muted">Thank you for participating in this research session. Please speak naturally when responding to questions.</p>
                 </div>
-                <div id="visualizer-active" class="d-none">
-                    <div class="speech-animation">
-                        <div class="speech-bar"></div>
-                        <div class="speech-bar"></div>
-                        <div class="speech-bar"></div>
-                        <div class="speech-bar"></div>
+                <div class="col-md-4 text-end">
+                    <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#exitModal">
+                        <i class="bi bi-door-open me-2"></i>Exit Session
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Status Bar -->
+            <div class="status-bar mb-3">
+                <div>
+                    <span class="badge bg-success">Connected</span>
+                    <span class="ms-2" id="session-timer">00:00</span>
+                </div>
+                <div>
+                    <span class="d-flex align-items-center">
+                        <i class="bi bi-mic-fill text-success me-2"></i>
+                        <span id="mic-status">Microphone active</span>
+                    </span>
+                </div>
+                <div>
+                    <button class="btn btn-sm btn-outline-secondary" type="button" data-bs-toggle="collapse" data-bs-target="#speechControls">
+                        <i class="bi bi-sliders me-1"></i> Speech Controls
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Speech Recognition Controls -->
+            <div class="collapse mb-3" id="speechControls">
+                <div class="card card-body">
+                    <h6 class="mb-3">Speech Recognition Settings</h6>
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="silenceThreshold" class="form-label small">Silence Detection (seconds)</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range me-2" id="silenceThreshold" min="0.5" max="5" step="0.5" value="2">
+                                <span id="silenceThresholdValue" class="small">2s</span>
+                            </div>
+                            <div class="form-text small">Time of silence before sending message</div>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="noiseThreshold" class="form-label small">Noise Threshold</label>
+                            <div class="d-flex align-items-center">
+                                <input type="range" class="form-range me-2" id="noiseThreshold" min="0" max="100" value="15">
+                                <span id="noiseThresholdValue" class="small">15%</span>
+                            </div>
+                            <div class="form-text small">Minimum volume to detect speech</div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-check form-switch mt-2">
+                                <input class="form-check-input" type="checkbox" id="audioVisualizerEnabled" checked>
+                                <label class="form-check-label small" for="audioVisualizerEnabled">Show Audio Visualization</label>
+                            </div>
+                            <div class="form-check form-switch">
+                                <input class="form-check-input" type="checkbox" id="noiseFilterEnabled" checked>
+                                <label class="form-check-label small" for="noiseFilterEnabled">Noise Filtering</label>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="d-flex justify-content-between">
+                                <div id="audioLevel" class="mt-2 small">Audio Level: <span id="currentLevel">0</span>%</div>
+                                <div id="silenceTimer" class="mt-2 small d-none">Silence: <span id="currentSilence">0</span>s</div>
+                            </div>
+                            <div class="progress mt-1" style="height: 10px;">
+                                <div id="audioLevelBar" class="progress-bar" role="progressbar" style="width: 0%"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
             
-            <!-- Input Area (Text Fallback) -->
-            <div class="chat-input">
-                <input type="text" class="form-control" id="text-input" placeholder="Type your response if microphone is not working...">
-                <button class="btn btn-primary" id="send-button">
-                    <i class="bi bi-send"></i>
-                </button>
+            <!-- Chat Container -->
+            <div class="chat-container">
+                <div class="chat-messages" id="chat-messages">
+                    <!-- Messages will be added here -->
+                    <div class="message message-moderator">
+                        <div class="message-bubble">
+                            <p class="mb-0">Hello and welcome to this research session. I'll be asking you some questions about your experiences. Feel free to respond naturally.</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Audio Visualizer -->
+                <div class="audio-visualizer">
+                    <div id="visualizer-inactive">
+                        <i class="bi bi-mic-fill text-muted me-2"></i>
+                        <span class="text-muted">Listening...</span>
+                    </div>
+                    <div id="visualizer-active" class="d-none">
+                        <div class="speech-animation">
+                            <div class="speech-bar"></div>
+                            <div class="speech-bar"></div>
+                            <div class="speech-bar"></div>
+                            <div class="speech-bar"></div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Input Area (Text Fallback) -->
+                <div class="chat-input">
+                    <input type="text" class="form-control" id="text-input" placeholder="Type your response if microphone is not working...">
+                    <button class="btn btn-primary" id="send-button">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>
