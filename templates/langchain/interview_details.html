@@ -3,6 +3,74 @@
 {% block title %}Interview Details - {{ interview.title }}{% endblock %}
 
 {% block content %}
+<!-- Add this style block right after the block content declaration -->
+<style>
+    /* Message styling */
+    .message {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .message-interviewer {
+        background-color: #f0f4f8;
+        border-left: 3px solid #4f46e5;
+    }
+    
+    .message-participant {
+        background-color: #f8f9fa;
+        border-left: 3px solid #0ea5e9;
+    }
+    
+    .message-header {
+        margin-bottom: 5px;
+        color: #6b7280;
+    }
+    
+    .message-content {
+        white-space: pre-line;
+    }
+    
+    /* Analysis styling */
+    .analysis-container .border-bottom {
+        border-bottom-color: #e5e7eb !important;
+    }
+    
+    .analysis-container h5 {
+        color: #4f46e5;
+        font-weight: 600;
+    }
+    
+    .analysis-container .list-group-item {
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    /* Tab styling */
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6b7280;
+        padding: 0.5rem 1rem;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #4f46e5;
+        font-weight: 600;
+        border-bottom: 2px solid #4f46e5;
+        background: transparent;
+    }
+    
+    /* Make the transcript scrollable if it's too long */
+    .interview-transcript {
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+</style>
+
 <div class="container-fluid">
     <div class="d-flex justify-content-between mb-4">
         <h1 class="h3">Interview Details</h1>
@@ -30,7 +98,7 @@
                             {{ interview.created_at.strftime('%b %d, %Y %H:%M') }}
                         {% endif %}
                     {% else %}
-                        {{ interview.creation_date }}
+                        {{ interview.creation_date if interview.creation_date is defined else "Unknown date" }}
                     {% endif %}
                     </span>
                 </div>
@@ -112,10 +180,10 @@
                                         {{ interview.created_at.strftime('%b %d, %Y %H:%M') }}
                                     {% endif %}
                                 {% else %}
-                                    {{ interview.creation_date }}
+                                    {{ interview.creation_date if interview.creation_date is defined else "Unknown date" }}
                                 {% endif %}
                                 </td>
-                                <td>{{ interview.interviewee.get('name', 'Anonymous') }}</td>
+                                <td>{% if interview.interviewee is defined and interview.interviewee is mapping %}{{ interview.interviewee.get('name', 'Anonymous') }}{% else %}Anonymous{% endif %}</td>
                                 <td>
                                     <span class="badge {% if interview.status == 'completed' %}bg-primary{% else %}bg-warning{% endif %}">
                                         {{ interview.status|capitalize }}
@@ -181,6 +249,180 @@
         </div>
     </div>
     
+    <!-- Add this right after the card with interview-settings-form -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Interview Content</span>
+            <ul class="nav nav-tabs card-header-tabs" id="contentTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="transcript-tab" data-bs-toggle="tab" data-bs-target="#transcript" type="button" role="tab" aria-controls="transcript" aria-selected="true">Transcript</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="false">Analysis</button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="contentTabsContent">
+                <!-- Transcript Tab -->
+                <div class="tab-pane fade show active" id="transcript" role="tabpanel" aria-labelledby="transcript-tab">
+                    {% if interview.conversation_history %}
+                        <div class="interview-transcript">
+                            {% for message in interview.conversation_history %}
+                                <div class="message {% if message.role == 'assistant' %}message-interviewer{% else %}message-participant{% endif %} mb-3">
+                                    <div class="message-header">
+                                        <strong>{{ "Interviewer" if message.role == "assistant" else "Participant" }}</strong>
+                                        <span class="text-muted small ms-2">
+                                            {% if message.timestamp %}
+                                                {{ message.timestamp }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="message-content">
+                                        {{ message.content }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elif interview.transcript %}
+                        <div class="interview-transcript">
+                            {% for entry in interview.transcript %}
+                                <div class="message {% if entry.speaker == 'Interviewer' %}message-interviewer{% else %}message-participant{% endif %} mb-3">
+                                    <div class="message-header">
+                                        <strong>{{ entry.speaker_name }}</strong>
+                                        <span class="text-muted small ms-2">
+                                            {% if entry.timestamp %}
+                                                {{ entry.timestamp }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="message-content">
+                                        {{ entry.content }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <p class="text-muted">No transcript available</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+                    {% if interview.analysis %}
+                        <div class="analysis-container">
+                            <!-- Summary Section -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2">Summary</h5>
+                                <p>{{ interview.analysis.summary }}</p>
+                            </div>
+                            
+                            <!-- User Needs Section -->
+                            {% if interview.analysis.user_needs %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">User Needs</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for need in interview.analysis.user_needs %}
+                                            <li class="list-group-item px-0">{{ need }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Goals Section -->
+                            {% if interview.analysis.goals %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Goals</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for goal in interview.analysis.goals %}
+                                            <li class="list-group-item px-0">{{ goal }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Pain Points Section -->
+                            {% if interview.analysis.pain_points %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Pain Points</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for pain in interview.analysis.pain_points %}
+                                            <li class="list-group-item px-0">{{ pain }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Opportunities Section -->
+                            {% if interview.analysis.opportunities %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Opportunities</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for opportunity in interview.analysis.opportunities %}
+                                            <li class="list-group-item px-0">{{ opportunity }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Recommendations Section -->
+                            {% if interview.analysis.recommendations %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Recommendations</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for rec in interview.analysis.recommendations %}
+                                            <li class="list-group-item px-0">{{ rec }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Key Quotes Section -->
+                            {% if interview.analysis.key_quotes %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Key Quotes</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for quote in interview.analysis.key_quotes %}
+                                            <li class="list-group-item px-0"><em>"{{ quote }}"</em></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Analysis Metadata -->
+                            <div class="card bg-light mt-4">
+                                <div class="card-body">
+                                    <p class="text-muted mb-0 small">
+                                        Analysis performed: {{ interview.analysis.performed_at }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <p class="text-muted mb-3">No analysis available for this interview</p>
+                            {% if interview.status == 'completed' %}
+                                <button class="btn btn-primary" id="generate-analysis-btn">
+                                    <i class="bi bi-magic me-2"></i> Generate Analysis
+                                </button>
+                                <div class="spinner-border text-primary d-none mt-3" id="analysis-spinner" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div class="alert alert-danger mt-3 d-none" id="analysis-error"></div>
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    Interview must be completed before analysis can be generated.
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <!-- Action Buttons -->
     <div class="d-flex justify-content-between">
         <button class="btn btn-outline-primary">
@@ -211,6 +453,10 @@ function copyLink() {
 function sendEmailWithLink() {
     const link = document.getElementById('interview-link').value;
     const subject = encodeURIComponent("Remote Interview Invitation - {{ interview.title }}");
+    
+    // Get recipient email if available
+    const recipient = "{{ interview.interviewee.get('email') if interview.interviewee is defined and interview.interviewee is mapping else '' }}";
+    
     const body = encodeURIComponent(`Hello,
 
 You have been invited to participate in a remote interview session: "{{ interview.title }}".
@@ -223,7 +469,7 @@ Thank you for your participation!
 Best regards,
 The Research Team`);
     
-    window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+    window.open(`mailto:${recipient}?subject=${subject}&body=${body}`, '_blank');
 }
 
 function updateInterviewStatus(isActive) {
@@ -317,6 +563,64 @@ document.addEventListener('DOMContentLoaded', function() {
             const expirationDate = document.getElementById('expiration-date').value;
             updateExpirationDate(expirationDate);
         });
+    }
+});
+
+function generateAnalysis() {
+    // Show spinner, hide button
+    const button = document.getElementById('generate-analysis-btn');
+    const spinner = document.getElementById('analysis-spinner');
+    const errorElement = document.getElementById('analysis-error');
+    
+    if (button) button.classList.add('d-none');
+    if (spinner) spinner.classList.remove('d-none');
+    if (errorElement) {
+        errorElement.classList.add('d-none');
+        errorElement.textContent = '';
+    }
+    
+    // Call the analyze endpoint
+    fetch(`/api/interview/analyze/{{ session_id }}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload the page to show the analysis
+            window.location.reload();
+        } else {
+            // Show error
+            if (errorElement) {
+                errorElement.textContent = data.error || 'An error occurred while generating the analysis';
+                errorElement.classList.remove('d-none');
+            }
+            // Hide spinner, show button
+            if (spinner) spinner.classList.add('d-none');
+            if (button) button.classList.remove('d-none');
+        }
+    })
+    .catch(error => {
+        // Show error
+        console.error('Error:', error);
+        if (errorElement) {
+            errorElement.textContent = 'Network error occurred while generating analysis';
+            errorElement.classList.remove('d-none');
+        }
+        // Hide spinner, show button
+        if (spinner) spinner.classList.add('d-none');
+        if (button) button.classList.remove('d-none');
+    });
+}
+
+// Add event listener for the generate analysis button
+document.addEventListener('DOMContentLoaded', function() {
+    const generateAnalysisButton = document.getElementById('generate-analysis-btn');
+    if (generateAnalysisButton) {
+        generateAnalysisButton.addEventListener('click', generateAnalysis);
     }
 });
 </script>
