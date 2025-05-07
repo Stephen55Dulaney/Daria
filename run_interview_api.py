@@ -12,7 +12,7 @@ import datetime
 import uuid
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
-from flask import Flask, request, jsonify, render_template, redirect, Response, flash
+from flask import Flask, request, jsonify, render_template, redirect, Response, flash, send_file, url_for, session
 from flask_cors import CORS
 import yaml
 import requests
@@ -926,47 +926,29 @@ def get_character(character_name):
 def check_services():
     """Check if required services are available."""
     try:
-        # Check if audio service is running
+        # Check if audio services are running
         tts_service_running = False
         stt_service_running = False
         
         try:
-            # Check if port 5015 is open (TTS service)
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(0.5)
-            tts_result = s.connect_ex(('localhost', 5015))
-            s.close()
-            
-            # Check if port 5016 is open (STT service)
-            s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-            s.settimeout(0.5)
-            stt_result = s.connect_ex(('localhost', 5016))
-            s.close()
-            
-            if tts_result == 0:
-                # Port is open, TTS service might be running
-                tts_service_running = True
+            # Directly check health endpoints instead of just checking socket connection
+            try:
+                tts_response = requests.get('http://localhost:5015/health', timeout=1)
+                tts_service_running = tts_response.status_code == 200
+                logging.info(f"TTS service check: {tts_service_running}, response: {tts_response.status_code}")
+            except requests.exceptions.RequestException as e:
+                logging.error(f"TTS service check failed: {str(e)}")
+                tts_service_running = False
                 
-            if stt_result == 0:
-                # Port is open, STT service might be running
-                stt_service_running = True
-                
-            # Try to verify services by calling their health endpoints
-            if tts_service_running or stt_service_running:
-                if tts_service_running:
-                    try:
-                        tts_response = requests.get('http://localhost:5015/health', timeout=1)
-                        tts_service_running = tts_response.status_code == 200
-                    except:
-                        pass
-                        
-                if stt_service_running:
-                    try:
-                        stt_response = requests.get('http://localhost:5016/health', timeout=1)
-                        stt_service_running = stt_response.status_code == 200
-                    except:
-                        pass
-        except:
+            try:
+                stt_response = requests.get('http://localhost:5016/health', timeout=1)
+                stt_service_running = stt_response.status_code == 200
+                logging.info(f"STT service check: {stt_service_running}, response: {stt_response.status_code}")
+            except requests.exceptions.RequestException as e:
+                logging.error(f"STT service check failed: {str(e)}")
+                stt_service_running = False
+        except Exception as e:
+            logging.error(f"Error checking service health: {str(e)}")
             pass
     
         return jsonify({
@@ -1163,123 +1145,71 @@ def join_interview(interview_id):
                     # Participant needs to accept terms
                     name = request.args.get('name', '')
                     email = request.args.get('email', '')
-                    voice_id = request.args.get('voice_id', 'EXAVITQu4vr4xnSDxMaL')
+                    role = request.args.get('role', '')
+                    department = request.args.get('department', '')
+                    voice_id = request.args.get('voice_id', '')
                     accepted = request.args.get('accepted', 'false').lower() == 'true'
                     
                     if not accepted:
-                        try:
-                            # Show terms acceptance page first
-                            return render_template('langchain/session_terms.html', 
-                                                  session_id=interview_id, 
-                                                  guide=guide, 
-                                                  name=name, 
-                                                  email=email,
-                                                  voice_id=voice_id)
-                        except Exception as template_err:
-                            logger.error(f"Template error: {str(template_err)}")
-                            # Fallback to a simpler template
-                            return render_template('langchain/interview_welcome.html',
-                                                 session_id=interview_id,
-                                                 title=guide.get('title', 'Research Session') if guide else 'Research Session',
-                                                 voice_id=voice_id,
-                                                 is_remote=True)
-                    
-                    # Update participant info if provided
-                    if name or email:
-                        interviewee_data = session.get('interviewee', {})
-                        if name:
-                            interviewee_data['name'] = name
-                        if email:
-                            interviewee_data['email'] = email
-                            
-                        discussion_service.update_session(interview_id, {
-                            'interviewee': interviewee_data
-                        })
-                    
-                    # Show the participant view
-                    try:
-                        return render_template('langchain/session_remote.html', 
-                                              session=session, 
-                                              guide=guide, 
-                                              session_id=interview_id,
-                                              voice_id=voice_id)
-                    except Exception as template_err:
-                        logger.error(f"Template error: {str(template_err)}")
-                        # Return a simple error page
-                        return render_template('langchain/error.html',
-                                             error="Could not load the remote interview view. Please contact support.")
-                
-                # Otherwise show the researcher view
-                return render_template('langchain/session_conduct.html', 
-                                      session=session, 
-                                      guide=guide, 
-                                      session_id=interview_id)
-        
-        # If we get here, try treating it as a legacy interview
-        logger.info(f"Join interview request for ID: {interview_id}")
-        
-        # Check if interview session exists
-        interview_file = os.path.join(DATA_DIR, f"{interview_id}.json")
-        
-        if os.path.exists(interview_file):
-            # Read the interview details
-            with open(interview_file, 'r') as f:
-                interview_data = json.load(f)
-            
-            # Check if it's a remote participant view
-            remote = request.args.get('remote', 'false').lower() == 'true'
-            if remote:
-                # Get participant info from query parameters
-                name = request.args.get('name', '')
-                email = request.args.get('email', '')
-                voice_id = request.args.get('voice_id', 'EXAVITQu4vr4xnSDxMaL')
-                accepted = request.args.get('accepted', 'false').lower() == 'true'
-                
-                if not accepted:
-                    try:
-                        # Show terms acceptance page
-                        return render_template('langchain/interview_terms.html', 
-                                              interview_id=interview_id, 
-                                              interview=interview_data,
-                                              name=name, 
+                        # Show the participant terms and consent page
+                        return render_template('langchain/interview_terms.html',
+                                              interview_id=interview_id,
+                                              guide=guide,
+                                              name=name,
                                               email=email,
+                                              role=role,
+                                              department=department,
                                               voice_id=voice_id)
-                    except Exception as template_err:
-                        logger.error(f"Template error: {str(template_err)}")
-                        # Fallback to welcome template
-                        return render_template('langchain/interview_welcome.html',
-                                             session_id=interview_id,
-                                             title=interview_data.get('title', 'Interview Session'),
-                                             voice_id=voice_id,
-                                             is_remote=True)
-                
-                # Show the participant view
-                try:
-                    return render_template('langchain/interview_session.html', 
-                                          interview=interview_data, 
-                                          interview_id=interview_id,
-                                          voice_id=voice_id,
-                                          remote=True)
-                except Exception as template_err:
-                    logger.error(f"Template error: {str(template_err)}")
-                    # Return a simple error page
-                    return render_template('langchain/error.html',
-                                         error="Could not load the interview session. Please contact support.")
-            else:
-                # Show the moderator/research view
-                return render_template('langchain/interview_session.html', 
-                                      interview=interview_data, 
-                                      interview_id=interview_id,
-                                      remote=False)
-        else:
+                    else:
+                        # Get character name if available
+                        character_name = guide.get('character_select', '') if guide else ''
+                        
+                        # Check if we need to update the session with interviewee info
+                        if name and email:
+                            # Get current session data
+                            current_session = discussion_service.get_session(interview_id)
+                            if current_session:
+                                # Update interviewee info if not set
+                                if not current_session.get('interviewee'):
+                                    current_session['interviewee'] = {
+                                        'name': name,
+                                        'email': email,
+                                        'role': role,
+                                        'department': department
+                                    }
+                                    discussion_service.update_session(interview_id, current_session)
+                        
+                        # Show the remote session interface
+                        return render_template('langchain/session_remote.html',
+                                              session_id=interview_id,
+                                              guide=guide,
+                                              character_name=character_name,
+                                              voice_id=voice_id,
+                                              remote=True)
+                else:
+                    # This is the researcher view
+                    # Use a different template for a research session
+                    return render_template('langchain/session_conduct.html',
+                                         session_id=interview_id,
+                                         session=session,
+                                         guide=guide)
+        
+        # If we get here, treat as a legacy interview
+        interview = load_interview(interview_id)
+        if not interview:
             logger.warning(f"Interview not found: {interview_id}")
-            return render_template('langchain/error.html',
-                                 error=f"Interview {interview_id} not found or has expired")
-    
+            return redirect(url_for('dashboard'))
+        
+        # Pass as much information as we have to the template
+        return render_template('interview.html',
+                              interview_id=interview_id,
+                              interview=interview)
     except Exception as e:
         logger.error(f"Error joining interview: {str(e)}")
-        return render_template('langchain/error.html',
-                             error=f"Error accessing interview: {str(e)}")
+        # Use session.flash instead of direct flash to avoid import issues
+        error_message = f"Error: {str(e)}"
+        session['_flashes'] = session.get('_flashes', []) + [('danger', error_message)]
+        return redirect(url_for('dashboard'))
 
 # ------ UI Routes ------
 
@@ -1424,89 +1354,93 @@ def edit_prompt(prompt_id):
 
 @app.route('/monitor_interview')
 def monitor_interview():
-    """Show available interviews for monitoring."""
+    """Render monitoring dashboard for live sessions."""
     try:
-        # Get all available interviews
-        interviews = {}
+        if not discussion_service:
+            return render_template('langchain/error.html', 
+                                error="Discussion service not available")
         
-        if discussion_service:
-            # Get all sessions from discussion service
-            sessions = discussion_service.get_all_sessions()
+        # Get all active sessions
+        try:
+            active_sessions = discussion_service.get_all_sessions()
             
-            # Current time for activity calculation
-            now = time.time()
-            
-            for session_id, session in sessions.items():
-                # Calculate last activity time
-                last_message_time = 0
-                if 'messages' in session and session['messages']:
-                    last_message_time = session['messages'][-1].get('timestamp', 0)
-                    # Convert ISO timestamp to epoch if needed
-                    if isinstance(last_message_time, str):
-                        try:
-                            dt = datetime.datetime.fromisoformat(last_message_time.replace('Z', '+00:00'))
-                            last_message_time = dt.timestamp()
-                        except:
-                            last_message_time = 0
+            # Sort sessions by last activity (most recent first)
+            active_sessions = sorted(
+                active_sessions, 
+                key=lambda s: s.get('last_updated', s.get('created_at', '')),
+                reverse=True
+            )
+        except AttributeError as e:
+            logger.error(f"Error calling get_all_sessions: {str(e)}")
+            # Fall back to using list_guide_sessions from all available guides
+            active_sessions = []
+            try:
+                guides = discussion_service.list_guides()
+                for guide in guides:
+                    guide_id = guide.get('id')
+                    if guide_id:
+                        guide_sessions = discussion_service.get_guide_sessions(guide_id)
+                        active_sessions.extend(guide_sessions)
                 
-                # Only add if it's not archived
-                if session.get('status', 'active').lower() != 'archived':
-                    session['last_message_time'] = last_message_time
-                    
-                    # Add friendly "last updated" time
-                    if last_message_time > 0:
-                        time_diff = now - last_message_time
-                        if time_diff < 60:
-                            session['last_updated'] = 'Just now'
-                        elif time_diff < 3600:
-                            minutes = int(time_diff / 60)
-                            session['last_updated'] = f'{minutes} minute{"s" if minutes != 1 else ""} ago'
-                        elif time_diff < 86400:
-                            hours = int(time_diff / 3600)
-                            session['last_updated'] = f'{hours} hour{"s" if hours != 1 else ""} ago'
-                        else:
-                            days = int(time_diff / 86400)
-                            session['last_updated'] = f'{days} day{"s" if days != 1 else ""} ago'
-                    
-                    interviews[session_id] = session
+                # Sort sessions by last activity (most recent first)
+                active_sessions = sorted(
+                    active_sessions, 
+                    key=lambda s: s.get('last_updated', s.get('created_at', '')),
+                    reverse=True
+                )
+            except Exception as inner_e:
+                logger.error(f"Error in fallback method for retrieving sessions: {str(inner_e)}")
+                # If all else fails, return an empty list
+                active_sessions = []
         
-        # Also add legacy interviews (if any)
-        legacy_interviews = load_all_interviews()
-        if legacy_interviews:
-            for interview_id, interview in legacy_interviews.items():
-                if interview.get('status', 'active').lower() != 'archived':
-                    # Don't overwrite newer discussion service sessions
-                    if interview_id not in interviews:
-                        interviews[interview_id] = interview
-        
-        return render_template("langchain/monitor_interview_list.html", 
-                              title="Available Interviews for Monitoring", 
-                              interviews=interviews,
-                              now=time.time())
-                              
+        return render_template('langchain/monitor_dashboard.html', 
+                            sessions=active_sessions)
     except Exception as e:
         logger.error(f"Error loading monitor page: {str(e)}")
-        return render_template("langchain/error.html", 
-                              error=f"Error loading monitor page: {str(e)}")
+        return render_template('langchain/error.html', 
+                            error=f"Error loading monitor page: {str(e)}")
 
 @app.route('/monitor_interview/<session_id>')
 def monitor_interview_session(session_id):
     """Monitor a specific interview session."""
     try:
         if not discussion_service:
-            return redirect('/interview_details/' + session_id)  # Fallback if service not available
+            logger.warning(f"Discussion service not available for monitoring session {session_id}")
+            return redirect(url_for('interview_details', session_id=session_id))
         
+        # Get the session details
         session = discussion_service.get_session(session_id)
         if not session:
-            return render_template('langchain/error.html', error="Session not found"), 404
+            logger.warning(f"Session {session_id} not found for monitoring")
+            return render_template('langchain/error.html', 
+                                error=f"Session {session_id} not found")
         
-        guide_id = session.get('guide_id')
-        guide = discussion_service.get_guide(guide_id) if guide_id else None
+        # Get the discussion guide if available
+        guide = None
+        if 'guide_id' in session and session.get('guide_id'):
+            try:
+                guide = discussion_service.get_guide(session.get('guide_id'))
+            except Exception as e:
+                logger.warning(f"Error loading guide for session {session_id}: {str(e)}")
         
-        return render_template('langchain/monitor_session.html', session=session, guide=guide, session_id=session_id)
+        # Make sure session has a title
+        if 'title' not in session or not session.get('title'):
+            session['title'] = f"Session {session_id[:8]}"
+        
+        # Ensure session_id is in the session data for JavaScript to use
+        if 'session_id' not in session:
+            session['session_id'] = session_id
+            
+        # Return the monitor page
+        logger.info(f"Rendering monitoring page for session {session_id}")
+        return render_template('langchain/monitor_session.html', 
+                            session=session,
+                            guide=guide,
+                            session_id=session_id)
     except Exception as e:
-        logger.error(f"Error loading monitoring page: {str(e)}")
-        return render_template('langchain/error.html', error=str(e))
+        logger.error(f"Error loading monitoring session {session_id}: {str(e)}")
+        return render_template('langchain/error.html', 
+                            error=f"Error loading monitoring page: {str(e)}")
 
 @app.route('/interview_details/<session_id>')
 def interview_details(session_id):
@@ -1998,7 +1932,8 @@ def add_session_message(session_id):
                 logger.info(f"Generating AI response for session {session_id}")
                 ai_response = interview_service.generate_response(
                     messages=messages,
-                    character=character
+                    character=character,
+                    session_data=session
                 )
                 
                 # Create AI message
@@ -2534,23 +2469,135 @@ def handle_researcher_message(data):
         if 'timestamp' not in message:
             message['timestamp'] = datetime.datetime.now().isoformat()
         
-        # Add message to the session
-        discussion_service.add_message(session_id, message)
+        # Process different message types
+        message_type = message.get('type', 'suggestion')
         
-        # Emit to all clients in the monitoring room
-        socketio.emit('new_message', {
-            'session_id': session_id,
-            'message': message
-        }, room=f"monitor_{session_id}")
+        # For direct questions, we need to add them directly as an AI message
+        if message_type == 'direct_question':
+            # Create an AI message with the researcher's question
+            ai_message = {
+                'role': 'assistant',
+                'content': message['content'],
+                'id': str(uuid.uuid4()),
+                'timestamp': datetime.datetime.now().isoformat(),
+                'researcher_generated': True
+            }
+            
+            # Add the message to the session
+            discussion_service.add_message(session_id, ai_message)
+            
+            # Emit to all clients in the monitoring room
+            socketio.emit('new_message', {
+                'session_id': session_id,
+                'message': ai_message
+            }, room=f"monitor_{session_id}")
+            
+            logger.info(f"Direct researcher question sent to session {session_id}")
+            
+        # For custom questions to add to the AI prompt
+        elif message_type == 'custom_question':
+            # Add the custom question to the session's custom_questions list
+            session = discussion_service.get_session(session_id)
+            if session:
+                # Create or update the custom_questions list
+                if 'custom_questions' not in session:
+                    session['custom_questions'] = []
+                
+                # Add the new question
+                session['custom_questions'].append({
+                    'text': message['content'],
+                    'priority': message.get('priority', 'normal'),
+                    'added_at': datetime.datetime.now().isoformat(),
+                    'asked': False
+                })
+                
+                # Update the session
+                discussion_service.update_session(session_id, session)
+                
+                # Log and emit confirmation
+                logger.info(f"Custom question added to session {session_id}")
+                socketio.emit('custom_question_added', {
+                    'session_id': session_id,
+                    'question': message['content']
+                }, room=f"monitor_{session_id}")
+            
+        # Regular suggestions and notes
+        else:
+            # Add message to the session as a system message
+            discussion_service.add_message(session_id, message)
+            
+            # Emit to all clients in the monitoring room
+            socketio.emit('new_message', {
+                'session_id': session_id,
+                'message': message
+            }, room=f"monitor_{session_id}")
+            
+            logger.info(f"Researcher {message_type} sent to session {session_id}")
         
-        logger.info(f"Researcher message sent to session {session_id}")
     except Exception as e:
         logger.error(f"Error in researcher_message: {str(e)}")
+        socketio.emit('error', {
+            'message': f"Error processing researcher message: {str(e)}"
+        }, room=request.sid)
+
+@app.route('/api/prompts/edit/<prompt_id>', methods=['POST'])
+def api_edit_prompt(prompt_id):
+    """API endpoint to save prompt edits."""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        logger.info(f"Editing prompt {prompt_id} with data: {data}")
+        
+        # Load current prompt to preserve structure
+        try:
+            config = prompt_mgr.load_prompt(prompt_id)
+            if not config:
+                config = {}
+        except Exception as e:
+            logger.error(f"Error loading prompt {prompt_id}: {str(e)}")
+            return jsonify({'success': False, 'error': f"Error loading prompt: {str(e)}"}), 500
+        
+        # Update fields from request data
+        for key, value in data.items():
+            config[key] = value
+        
+        # Save the updated config
+        try:
+            success = prompt_mgr.save_prompt(prompt_id, config)
+            if not success:
+                return jsonify({'success': False, 'error': 'Failed to save prompt'}), 500
+            
+            # Clear cache for this prompt
+            if prompt_id in prompt_cache:
+                del prompt_cache[prompt_id]
+                
+            return jsonify({'success': True, 'message': f"Prompt {prompt_id} updated successfully"})
+        except Exception as e:
+            logger.error(f"Error saving prompt {prompt_id}: {str(e)}")
+            return jsonify({'success': False, 'error': f"Error saving prompt: {str(e)}"}), 500
+    except Exception as e:
+        logger.error(f"Error in api_edit_prompt for {prompt_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # Start the app
 if __name__ == '__main__':
-    print(f"Starting DARIA Interview API on port {args.port}")
-    print(f"Health check endpoint: http://127.0.0.1:{args.port}/api/health")
-    print(f"Interview start endpoint: http://127.0.0.1:{args.port}/api/interview/start")
-    print(f"Monitor interviews: http://127.0.0.1:{args.port}/monitor_interview")
-    socketio.run(app, host='0.0.0.0', port=args.port, debug=args.debug) 
+    debug_mode = False
+    if '--debug' in sys.argv:
+        debug_mode = True
+    
+    # Check if a custom port is specified
+    port = 5025
+    port_index = -1
+    if '--port' in sys.argv:
+        port_index = sys.argv.index('--port')
+        if port_index >= 0 and port_index + 1 < len(sys.argv):
+            port = int(sys.argv[port_index + 1])
+            
+    print(f"Starting DARIA Interview API on port {port}")
+    print(f"Health check endpoint: http://127.0.0.1:{port}/api/health")
+    print(f"Interview start endpoint: http://127.0.0.1:{port}/api/interview/start")
+    print(f"Monitor interviews: http://127.0.0.1:{port}/monitor_interview")
+    
+    socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode, allow_unsafe_werkzeug=True) 

@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA Debug - TTS/STT Orchestration</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2 {
+            color: #1a1a1a;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .debug-panel {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        button:hover {
+            background-color: #0069bd;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .log-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.8em;
+        }
+        .tts-log {
+            color: #0078d4;
+        }
+        .stt-log {
+            color: #107c10;
+        }
+        .error-log {
+            color: #d83b01;
+        }
+        .warn-log {
+            color: #ff8c00;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-active {
+            background-color: #107c10;
+        }
+        .status-inactive {
+            background-color: #d83b01;
+        }
+        .status-warn {
+            background-color: #ff8c00;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .settings-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .settings-item label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        input[type="number"] {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <h1>DARIA Debug - TTS/STT Orchestration</h1>
+    <p>This tool helps debug the coordination between TTS (text-to-speech) and STT (speech-to-text) components.</p>
+    
+    <div class="container">
+        <div class="debug-panel">
+            <h2>TTS-STT Orchestration Test</h2>
+            <div class="settings-grid">
+                <div class="settings-item">
+                    <label for="tts-voice">TTS Voice:</label>
+                    <select id="tts-voice">
+                        <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
+                        <option value="21m00Tcm4TlvDq8ikWAM">Adam (Male)</option>
+                        <option value="AZnzlk1XvdvUeBnXmlld">Domi (Female)</option>
+                        <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
+                        <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Male)</option>
+                        <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Male)</option>
+                    </select>
+                </div>
+                <div class="settings-item">
+                    <label for="stt-timeout">STT Timeout (ms):</label>
+                    <input type="number" id="stt-timeout" min="1000" max="20000" value="5000">
+                </div>
+                <div class="settings-item">
+                    <label for="stt-restart-delay">STT Restart Delay (ms):</label>
+                    <input type="number" id="stt-restart-delay" min="100" max="2000" value="500">
+                </div>
+                <div class="settings-item">
+                    <label for="tts-stt-delay">TTS-STT Transition Delay (ms):</label>
+                    <input type="number" id="tts-stt-delay" min="0" max="2000" value="300">
+                </div>
+            </div>
+
+            <div>
+                <input type="checkbox" id="auto-stop-stt" checked>
+                <label for="auto-stop-stt">Auto-stop STT when TTS is active</label>
+            </div>
+            <div>
+                <input type="checkbox" id="auto-start-stt" checked>
+                <label for="auto-start-stt">Auto-start STT after TTS completes</label>
+            </div>
+            
+            <h3>Text to Speak:</h3>
+            <textarea id="tts-text">Hello, I'm the DARIA interview assistant. I'll be asking you some questions today.</textarea>
+            
+            <div class="control-panel">
+                <button id="run-test">Run Full Test</button>
+                <button id="tts-only">Test TTS Only</button>
+                <button id="stt-only">Test STT Only</button>
+                <button id="tts-then-stt">Test TTS → STT</button>
+                <button id="stop-all">Stop All</button>
+            </div>
+            
+            <div>
+                <span>TTS Status: </span>
+                <span class="status-indicator status-inactive" id="tts-status"></span>
+                <span id="tts-status-text">Inactive</span>
+                
+                <span style="margin-left: 20px;">STT Status: </span>
+                <span class="status-indicator status-inactive" id="stt-status"></span>
+                <span id="stt-status-text">Inactive</span>
+            </div>
+            
+            <h3>Recognition Results:</h3>
+            <textarea id="stt-results" readonly placeholder="Spoken text will appear here..."></textarea>
+        </div>
+        
+        <div class="debug-panel">
+            <h2>Debug Log</h2>
+            <button id="clear-log">Clear Log</button>
+            <div class="log-container" id="log-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        const ttsAudio = new Audio();
+        let recognition = null;
+        let ttsActive = false;
+        let sttActive = false;
+        let ttsEndedTimeout = null;
+        let noSpeechTimeout = null;
+        
+        // DOM Elements
+        const ttsVoiceSelect = document.getElementById('tts-voice');
+        const sttTimeoutInput = document.getElementById('stt-timeout');
+        const sttRestartDelayInput = document.getElementById('stt-restart-delay');
+        const ttsSttDelayInput = document.getElementById('tts-stt-delay');
+        const autoStopSttCheckbox = document.getElementById('auto-stop-stt');
+        const autoStartSttCheckbox = document.getElementById('auto-start-stt');
+        const ttsText = document.getElementById('tts-text');
+        const runTestBtn = document.getElementById('run-test');
+        const ttsOnlyBtn = document.getElementById('tts-only');
+        const sttOnlyBtn = document.getElementById('stt-only');
+        const ttsThenSttBtn = document.getElementById('tts-then-stt');
+        const stopAllBtn = document.getElementById('stop-all');
+        const ttsStatusIndicator = document.getElementById('tts-status');
+        const ttsStatusText = document.getElementById('tts-status-text');
+        const sttStatusIndicator = document.getElementById('stt-status');
+        const sttStatusText = document.getElementById('stt-status-text');
+        const sttResults = document.getElementById('stt-results');
+        const clearLogBtn = document.getElementById('clear-log');
+        const logContainer = document.getElementById('log-container');
+        
+        // Logging function
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const timestamp = document.createElement('span');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = new Date().toLocaleTimeString() + ' - ';
+            
+            const content = document.createElement('span');
+            content.className = type + '-log';
+            content.textContent = message;
+            
+            entry.appendChild(timestamp);
+            entry.appendChild(content);
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Also log to console for debugging
+            console.log(`[${type}] ${message}`);
+        }
+        
+        // Update TTS status
+        function updateTTSStatus(isActive, message) {
+            ttsActive = isActive;
+            
+            if (isActive) {
+                ttsStatusIndicator.className = 'status-indicator status-active';
+            } else {
+                ttsStatusIndicator.className = 'status-indicator status-inactive';
+            }
+            
+            ttsStatusText.textContent = message;
+        }
+        
+        // Update STT status
+        function updateSTTStatus(isActive, message, isWarning = false) {
+            sttActive = isActive;
+            
+            if (isWarning) {
+                sttStatusIndicator.className = 'status-indicator status-warn';
+            } else if (isActive) {
+                sttStatusIndicator.className = 'status-indicator status-active';
+            } else {
+                sttStatusIndicator.className = 'status-indicator status-inactive';
+            }
+            
+            sttStatusText.textContent = message;
+        }
+        
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            // Reset existing recognition if exists
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    // Ignore errors on stop
+                }
+                recognition = null;
+            }
+            
+            try {
+                window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.continuous = false; // Important: set to false to avoid multiple recognitions
+                recognition.interimResults = true;
+                
+                recognition.onstart = function() {
+                    updateSTTStatus(true, 'Listening');
+                    log('Speech recognition started', 'stt');
+                    
+                    // Set timeout for no-speech error
+                    if (noSpeechTimeout) {
+                        clearTimeout(noSpeechTimeout);
+                    }
+                    
+                    noSpeechTimeout = setTimeout(() => {
+                        log('No speech detected within timeout period', 'warn');
+                        updateSTTStatus(true, 'No speech (timeout)', true);
+                        
+                        // Safely stop recognition
+                        try {
+                            recognition.stop();
+                        } catch (e) {
+                            log(`Error stopping recognition: ${e.message}`, 'error');
+                        }
+                    }, parseInt(sttTimeoutInput.value));
+                };
+                
+                recognition.onresult = function(event) {
+                    const result = event.results[event.results.length - 1];
+                    const transcript = result[0].transcript;
+                    
+                    // Clear no-speech timeout as we got results
+                    if (noSpeechTimeout) {
+                        clearTimeout(noSpeechTimeout);
+                        noSpeechTimeout = null;
+                    }
+                    
+                    if (result.isFinal) {
+                        sttResults.value += transcript + '\n';
+                        log(`Speech recognized: ${transcript}`, 'stt');
+                        
+                        // Stop recognition after final result to prevent multiple recognitions
+                        try {
+                            recognition.stop();
+                        } catch (e) {
+                            log(`Error stopping recognition after final result: ${e.message}`, 'error');
+                        }
+                    } else {
+                        // Update status with interim result
+                        updateSTTStatus(true, `Listening: ${transcript.substring(0, 20)}${transcript.length > 20 ? '...' : ''}`);
+                    }
+                };
+                
+                recognition.onerror = function(event) {
+                    // Clear no-speech timeout
+                    if (noSpeechTimeout) {
+                        clearTimeout(noSpeechTimeout);
+                        noSpeechTimeout = null;
+                    }
+                    
+                    if (event.error === 'no-speech') {
+                        log('No speech detected', 'warn');
+                        updateSTTStatus(false, 'No speech detected', true);
+                        
+                        // Don't auto-restart for no-speech error to avoid excessive restarts
+                        // Instead, we'll let the delay restart mechanism handle this
+                    } else {
+                        log(`Speech recognition error: ${event.error}`, 'error');
+                        updateSTTStatus(false, `Error: ${event.error}`, true);
+                    }
+                };
+                
+                recognition.onend = function() {
+                    log('Speech recognition ended', 'stt');
+                    updateSTTStatus(false, 'Ready');
+                    
+                    // Clear any existing timeout
+                    if (noSpeechTimeout) {
+                        clearTimeout(noSpeechTimeout);
+                        noSpeechTimeout = null;
+                    }
+                    
+                    // Don't auto-restart to avoid cascading errors
+                    // We'll handle restarts manually
+                };
+                
+                log('Speech recognition initialized', 'stt');
+                updateSTTStatus(false, 'Ready');
+                return true;
+            } catch (error) {
+                log(`Error initializing speech recognition: ${error.message}`, 'error');
+                updateSTTStatus(false, 'Not supported', true);
+                return false;
+            }
+        }
+        
+        // Start speech recognition with safeguards
+        function startSpeechRecognition() {
+            if (!recognition) {
+                if (!initSpeechRecognition()) {
+                    return false;
+                }
+            }
+            
+            if (ttsActive && autoStopSttCheckbox.checked) {
+                log('Not starting STT because TTS is active and auto-stop is enabled', 'warn');
+                return false;
+            }
+            
+            try {
+                recognition.start();
+                return true;
+            } catch (error) {
+                log(`Error starting speech recognition: ${error.message}`, 'error');
+                
+                // If error is about recognition already started, reinitialize
+                if (error.message.includes('already started')) {
+                    log('Recognition already started. Reinitializing...', 'warn');
+                    initSpeechRecognition();
+                    
+                    // Try again with delay
+                    setTimeout(() => {
+                        try {
+                            recognition.start();
+                            log('Recognition restarted after reinitialization', 'stt');
+                        } catch (e) {
+                            log(`Failed to restart recognition: ${e.message}`, 'error');
+                        }
+                    }, 100);
+                }
+                
+                return false;
+            }
+        }
+        
+        // Stop speech recognition safely
+        function stopSpeechRecognition() {
+            if (recognition) {
+                try {
+                    recognition.stop();
+                    log('Speech recognition stopped', 'stt');
+                    return true;
+                } catch (error) {
+                    log(`Error stopping speech recognition: ${error.message}`, 'error');
+                    
+                    // If it fails, reinitialize
+                    initSpeechRecognition();
+                    return false;
+                }
+            }
+            return false;
+        }
+        
+        // Play TTS with proper error handling
+        function playTTS(text) {
+            if (!text) {
+                log('No text provided for TTS', 'error');
+                return false;
+            }
+            
+            // If STT is active and auto-stop is enabled, stop it
+            if (sttActive && autoStopSttCheckbox.checked) {
+                stopSpeechRecognition();
+            }
+            
+            const voiceId = ttsVoiceSelect.value;
+            const url = '/api/text_to_speech_elevenlabs';
+            
+            updateTTSStatus(true, 'Preparing speech...');
+            log(`Preparing TTS: ${text.substring(0, 30)}${text.length > 30 ? '...' : ''}`, 'tts');
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(`API error: ${err.error || 'Unknown error'}`);
+                    });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const audioUrl = URL.createObjectURL(blob);
+                ttsAudio.src = audioUrl;
+                
+                ttsAudio.onplay = () => {
+                    updateTTSStatus(true, 'Speaking...');
+                    log('TTS playing', 'tts');
+                };
+                
+                ttsAudio.onended = () => {
+                    updateTTSStatus(false, 'Completed');
+                    log('TTS finished', 'tts');
+                    
+                    // Clear any existing timeout
+                    if (ttsEndedTimeout) {
+                        clearTimeout(ttsEndedTimeout);
+                    }
+                    
+                    // Start STT after delay if auto-start is enabled
+                    if (autoStartSttCheckbox.checked) {
+                        const delay = parseInt(ttsSttDelayInput.value);
+                        log(`Will start STT in ${delay}ms`, 'stt');
+                        
+                        ttsEndedTimeout = setTimeout(() => {
+                            startSpeechRecognition();
+                        }, delay);
+                    }
+                };
+                
+                ttsAudio.onerror = (e) => {
+                    updateTTSStatus(false, 'Error');
+                    log(`TTS error: ${e.error || 'Audio playback error'}`, 'error');
+                };
+                
+                ttsAudio.play();
+                return true;
+            })
+            .catch(error => {
+                updateTTSStatus(false, 'Error');
+                log(`TTS error: ${error.message}`, 'error');
+                return false;
+            });
+        }
+        
+        // Stop TTS playback
+        function stopTTS() {
+            ttsAudio.pause();
+            ttsAudio.currentTime = 0;
+            updateTTSStatus(false, 'Stopped');
+            log('TTS stopped', 'tts');
+            
+            // Clear TTS ended timeout
+            if (ttsEndedTimeout) {
+                clearTimeout(ttsEndedTimeout);
+                ttsEndedTimeout = null;
+            }
+        }
+        
+        // Run the full orchestration test
+        function runFullTest() {
+            log('Starting full orchestration test', 'info');
+            
+            // Clear results
+            sttResults.value = '';
+            
+            // Step 1: Play TTS
+            playTTS(ttsText.value);
+            
+            // Step 2: STT will be started automatically after TTS ends (if enabled)
+        }
+        
+        // Run TTS only test
+        function runTTSOnly() {
+            log('Testing TTS only', 'tts');
+            playTTS(ttsText.value);
+        }
+        
+        // Run STT only test
+        function runSTTOnly() {
+            log('Testing STT only', 'stt');
+            sttResults.value = '';
+            startSpeechRecognition();
+        }
+        
+        // Run TTS followed by STT test
+        function runTTSThenSTT() {
+            log('Testing TTS followed by manual STT', 'info');
+            
+            // Clear results
+            sttResults.value = '';
+            
+            // First play TTS
+            playTTS(ttsText.value);
+            
+            // Then manually start STT after delay
+            setTimeout(() => {
+                if (!ttsActive) {
+                    startSpeechRecognition();
+                } else {
+                    log('TTS still active, delaying STT start', 'warn');
+                    
+                    // Wait for TTS to finish
+                    const checkTTS = setInterval(() => {
+                        if (!ttsActive) {
+                            clearInterval(checkTTS);
+                            startSpeechRecognition();
+                        }
+                    }, 500);
+                }
+            }, parseInt(ttsSttDelayInput.value) + 100);
+        }
+        
+        // Stop all activities
+        function stopAll() {
+            log('Stopping all activities', 'info');
+            
+            // Stop TTS
+            stopTTS();
+            
+            // Stop STT
+            stopSpeechRecognition();
+            
+            // Clear timeouts
+            if (ttsEndedTimeout) {
+                clearTimeout(ttsEndedTimeout);
+                ttsEndedTimeout = null;
+            }
+            
+            if (noSpeechTimeout) {
+                clearTimeout(noSpeechTimeout);
+                noSpeechTimeout = null;
+            }
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Initialize speech recognition
+            initSpeechRecognition();
+            
+            // Add event listeners
+            runTestBtn.addEventListener('click', runFullTest);
+            ttsOnlyBtn.addEventListener('click', runTTSOnly);
+            sttOnlyBtn.addEventListener('click', runSTTOnly);
+            ttsThenSttBtn.addEventListener('click', runTTSThenSTT);
+            stopAllBtn.addEventListener('click', stopAll);
+            clearLogBtn.addEventListener('click', () => {
+                logContainer.innerHTML = '';
+                log('Log cleared', 'info');
+            });
+            
+            // Audio tracks to monitor TTS status
+            ttsAudio.addEventListener('play', () => {
+                ttsActive = true;
+                
+                // If STT is active and auto-stop is enabled, stop it
+                if (sttActive && autoStopSttCheckbox.checked) {
+                    stopSpeechRecognition();
+                }
+            });
+            
+            ttsAudio.addEventListener('pause', () => {
+                ttsActive = false;
+            });
+            
+            ttsAudio.addEventListener('ended', () => {
+                ttsActive = false;
+            });
+            
+            log('Debug orchestration tool initialized', 'info');
+        });
+    </script>
+</body>
+</html> 

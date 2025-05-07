@@ -1,0 +1,1394 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA Debug - Full Interview Flow</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2, h3 {
+            color: #1a1a1a;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .debug-panel {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        button:hover {
+            background-color: #0069bd;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        .log-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            font-size: 14px;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.8em;
+        }
+        .tts-log {
+            color: #0078d4;
+        }
+        .stt-log {
+            color: #107c10;
+        }
+        .error-log {
+            color: #d83b01;
+        }
+        .warn-log {
+            color: #ff8c00;
+        }
+        .llm-log {
+            color: #8064a2;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-active {
+            background-color: #107c10;
+        }
+        .status-inactive {
+            background-color: #d83b01;
+        }
+        .status-warn {
+            background-color: #ff8c00;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+            margin-bottom: 10px;
+        }
+        .message-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .assistant-message {
+            background-color: #f0f7ff;
+            border-left: 4px solid #0078d4;
+        }
+        .user-message {
+            background-color: #f9f9f9;
+            border-left: 4px solid #107c10;
+            text-align: right;
+        }
+        .settings-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        .settings-item {
+            display: flex;
+            flex-direction: column;
+        }
+        .settings-item label {
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+        input[type="number"] {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .flex-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        .slider-container {
+            display: flex;
+            flex-direction: column;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 5px;
+        }
+        .slider-label {
+            font-weight: bold;
+        }
+        .slider-value {
+            font-family: monospace;
+        }
+        input[type="range"] {
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        .two-column {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>DARIA Debug - Full Interview Flow</h1>
+    <p>This tool tests the complete interview flow including TTS, STT, and LLM integration.</p>
+    
+    <div class="container">
+        <div class="debug-panel">
+            <h2>Connection Settings</h2>
+            <div class="flex-row">
+                <div class="settings-item" style="flex: 1;">
+                    <label for="api-port">API Port:</label>
+                    <input type="number" id="api-port" min="1000" max="65535" value="5010">
+                </div>
+                <div class="settings-item" style="flex: 2;">
+                    <label for="session-id">Session ID (optional):</label>
+                    <input type="text" id="session-id" placeholder="Leave empty to create new session" style="width: 100%;">
+                </div>
+                <div style="display: flex; align-items: flex-end;">
+                    <button id="connect-btn">Connect</button>
+                </div>
+            </div>
+            <div>
+                <span>Connection Status: </span>
+                <span class="status-indicator status-inactive" id="connection-status"></span>
+                <span id="connection-status-text">Not Connected</span>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h2>Interview Conversation</h2>
+            <div class="message-container" id="message-container">
+                <!-- Messages will appear here -->
+                <div class="message assistant-message">Connect to start a conversation</div>
+            </div>
+            
+            <h3>Your Response:</h3>
+            <textarea id="user-input" placeholder="Type your response here..." disabled></textarea>
+            
+            <div class="control-panel">
+                <button id="send-message" disabled>Send Message</button>
+                <button id="skip-stt" disabled>Skip STT (Send Text Directly)</button>
+                <button id="reset-interview" disabled>Reset Interview</button>
+            </div>
+        </div>
+
+        <div class="two-column">
+            <div class="debug-panel">
+                <h2>TTS Settings</h2>
+                
+                <div class="settings-item">
+                    <label for="tts-voice">TTS Voice:</label>
+                    <select id="tts-voice">
+                        <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
+                        <option value="21m00Tcm4TlvDq8ikWAM">Adam (Male)</option>
+                        <option value="AZnzlk1XvdvUeBnXmlld">Domi (Female)</option>
+                        <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
+                        <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Male)</option>
+                        <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Male)</option>
+                    </select>
+                </div>
+                
+                <div class="control-panel" style="margin-top: 10px;">
+                    <button id="play-last-tts" disabled>Replay Last Message</button>
+                    <button id="stop-tts" disabled>Stop TTS</button>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <input type="checkbox" id="auto-tts" checked>
+                    <label for="auto-tts">Auto-play TTS for assistant messages</label>
+                </div>
+                
+                <div>
+                    <span>TTS Status: </span>
+                    <span class="status-indicator status-inactive" id="tts-status"></span>
+                    <span id="tts-status-text">Inactive</span>
+                </div>
+            </div>
+            
+            <div class="debug-panel">
+                <h2>STT Settings</h2>
+                
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span class="slider-label">STT Timeout (ms):</span>
+                        <span class="slider-value" id="stt-timeout-value">5000</span>
+                    </div>
+                    <input type="range" id="stt-timeout" min="1000" max="20000" step="100" value="5000">
+                    <small>How long to wait for speech before timing out</small>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span class="slider-label">STT Restart Delay (ms):</span>
+                        <span class="slider-value" id="stt-restart-delay-value">500</span>
+                    </div>
+                    <input type="range" id="stt-restart-delay" min="100" max="2000" step="100" value="500">
+                    <small>Delay before restarting STT after an error</small>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span class="slider-label">TTS-STT Transition Delay (ms):</span>
+                        <span class="slider-value" id="tts-stt-delay-value">300</span>
+                    </div>
+                    <input type="range" id="tts-stt-delay" min="0" max="2000" step="50" value="300">
+                    <small>Delay between TTS ending and STT starting</small>
+                </div>
+                
+                <div class="slider-container">
+                    <div class="slider-header">
+                        <span class="slider-label">STT to Submit Delay (ms):</span>
+                        <span class="slider-value" id="stt-submit-delay-value">500</span>
+                    </div>
+                    <input type="range" id="stt-submit-delay" min="0" max="5000" step="100" value="500">
+                    <small>Delay between STT completion and auto-submitting message</small>
+                </div>
+                
+                <div class="control-panel">
+                    <button id="start-stt" disabled>Start Listening</button>
+                    <button id="stop-stt" disabled>Stop Listening</button>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <input type="checkbox" id="auto-stop-stt" checked>
+                    <label for="auto-stop-stt">Auto-stop STT when TTS is active</label>
+                </div>
+                
+                <div style="margin-top: 5px;">
+                    <input type="checkbox" id="auto-start-stt" checked>
+                    <label for="auto-start-stt">Auto-start STT after TTS completes</label>
+                </div>
+                
+                <div style="margin-top: 5px;">
+                    <input type="checkbox" id="auto-submit-stt" checked>
+                    <label for="auto-submit-stt">Auto-submit message after STT completes</label>
+                </div>
+                
+                <div style="margin-top: 10px;">
+                    <span>STT Status: </span>
+                    <span class="status-indicator status-inactive" id="stt-status"></span>
+                    <span id="stt-status-text">Inactive</span>
+                </div>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h2>Full Automation</h2>
+            <p>Complete hands-free interview cycle with automatic TTS, STT, and message submission.</p>
+            
+            <div class="control-panel">
+                <button id="start-automation" disabled>Start Full Automation</button>
+                <button id="stop-automation" disabled>Stop Automation</button>
+                <button id="get-params" disabled>Get Timing Parameters</button>
+            </div>
+            
+            <div style="margin-top: 10px;">
+                <span>Automation Status: </span>
+                <span class="status-indicator status-inactive" id="automation-status"></span>
+                <span id="automation-status-text">Not Running</span>
+            </div>
+            
+            <div id="params-output" style="display: none; margin-top: 15px;">
+                <h4>Timing Parameters:</h4>
+                <pre id="params-text" style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;"></pre>
+                <p><small>Copy these values to use in your main application.</small></p>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h2>Debug Log</h2>
+            <button id="clear-log">Clear Log</button>
+            <div class="log-container" id="log-container"></div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        const ttsAudio = new Audio();
+        let recognition = null;
+        let ttsActive = false;
+        let sttActive = false;
+        let ttsEndedTimeout = null;
+        let noSpeechTimeout = null;
+        let sttSubmitTimeout = null;
+        let apiPort = 5010;
+        let sessionId = null;
+        let lastAssistantMessage = "";
+        let isConnected = false;
+        let automationActive = false;
+        
+        // DOM Elements
+        const apiPortInput = document.getElementById('api-port');
+        const sessionIdInput = document.getElementById('session-id');
+        const connectBtn = document.getElementById('connect-btn');
+        const connectionStatus = document.getElementById('connection-status');
+        const connectionStatusText = document.getElementById('connection-status-text');
+        
+        const messageContainer = document.getElementById('message-container');
+        const userInput = document.getElementById('user-input');
+        const sendMessageBtn = document.getElementById('send-message');
+        const skipSttBtn = document.getElementById('skip-stt');
+        const resetInterviewBtn = document.getElementById('reset-interview');
+        
+        const ttsVoiceSelect = document.getElementById('tts-voice');
+        const playLastTtsBtn = document.getElementById('play-last-tts');
+        const stopTtsBtn = document.getElementById('stop-tts');
+        const autoTtsCheckbox = document.getElementById('auto-tts');
+        const ttsStatusIndicator = document.getElementById('tts-status');
+        const ttsStatusText = document.getElementById('tts-status-text');
+        
+        const sttTimeoutSlider = document.getElementById('stt-timeout');
+        const sttTimeoutValue = document.getElementById('stt-timeout-value');
+        const sttRestartDelaySlider = document.getElementById('stt-restart-delay');
+        const sttRestartDelayValue = document.getElementById('stt-restart-delay-value');
+        const ttsSttDelaySlider = document.getElementById('tts-stt-delay');
+        const ttsSttDelayValue = document.getElementById('tts-stt-delay-value');
+        const sttSubmitDelaySlider = document.getElementById('stt-submit-delay');
+        const sttSubmitDelayValue = document.getElementById('stt-submit-delay-value');
+        const startSttBtn = document.getElementById('start-stt');
+        const stopSttBtn = document.getElementById('stop-stt');
+        const autoStopSttCheckbox = document.getElementById('auto-stop-stt');
+        const autoStartSttCheckbox = document.getElementById('auto-start-stt');
+        const autoSubmitSttCheckbox = document.getElementById('auto-submit-stt');
+        const sttStatusIndicator = document.getElementById('stt-status');
+        const sttStatusText = document.getElementById('stt-status-text');
+        
+        const startAutomationBtn = document.getElementById('start-automation');
+        const stopAutomationBtn = document.getElementById('stop-automation');
+        const getParamsBtn = document.getElementById('get-params');
+        const paramsOutput = document.getElementById('params-output');
+        const paramsText = document.getElementById('params-text');
+        const automationStatusIndicator = document.getElementById('automation-status');
+        const automationStatusText = document.getElementById('automation-status-text');
+        
+        const clearLogBtn = document.getElementById('clear-log');
+        const logContainer = document.getElementById('log-container');
+        
+        // Logging function
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const timestamp = document.createElement('span');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = new Date().toLocaleTimeString() + ' - ';
+            
+            const content = document.createElement('span');
+            content.className = type + '-log';
+            content.textContent = message;
+            
+            entry.appendChild(timestamp);
+            entry.appendChild(content);
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Also log to console for debugging
+            console.log(`[${type}] ${message}`);
+        }
+        
+        // Update connection status
+        function updateConnectionStatus(isActive, message) {
+            isConnected = isActive;
+            
+            if (isActive) {
+                connectionStatus.className = 'status-indicator status-active';
+                
+                // Enable UI elements
+                userInput.disabled = false;
+                sendMessageBtn.disabled = false;
+                skipSttBtn.disabled = false;
+                resetInterviewBtn.disabled = false;
+                playLastTtsBtn.disabled = false;
+                stopTtsBtn.disabled = false;
+                startSttBtn.disabled = false;
+                stopSttBtn.disabled = false;
+                startAutomationBtn.disabled = false;
+                stopAutomationBtn.disabled = true; // Initially disabled until automation starts
+                getParamsBtn.disabled = false;
+            } else {
+                connectionStatus.className = 'status-indicator status-inactive';
+                
+                // Disable UI elements
+                userInput.disabled = true;
+                sendMessageBtn.disabled = true;
+                skipSttBtn.disabled = true;
+                resetInterviewBtn.disabled = true;
+                playLastTtsBtn.disabled = true;
+                stopTtsBtn.disabled = true;
+                startSttBtn.disabled = true;
+                stopSttBtn.disabled = true;
+                startAutomationBtn.disabled = true;
+                stopAutomationBtn.disabled = true;
+                getParamsBtn.disabled = true;
+            }
+            
+            connectionStatusText.textContent = message;
+        }
+        
+        // Update TTS status
+        function updateTTSStatus(isActive, message) {
+            ttsActive = isActive;
+            
+            if (isActive) {
+                ttsStatusIndicator.className = 'status-indicator status-active';
+                
+                // If STT is active and auto-stop is enabled, stop it
+                if (sttActive && autoStopSttCheckbox.checked) {
+                    stopSpeechRecognition();
+                }
+            } else {
+                ttsStatusIndicator.className = 'status-indicator status-inactive';
+            }
+            
+            ttsStatusText.textContent = message;
+        }
+        
+        // Update STT status
+        function updateSTTStatus(isActive, message, isWarning = false) {
+            sttActive = isActive;
+            
+            if (isWarning) {
+                sttStatusIndicator.className = 'status-indicator status-warn';
+            } else if (isActive) {
+                sttStatusIndicator.className = 'status-indicator status-active';
+            } else {
+                sttStatusIndicator.className = 'status-indicator status-inactive';
+            }
+            
+            sttStatusText.textContent = message;
+        }
+        
+        // Update Automation status
+        function updateAutomationStatus(isActive, message) {
+            automationActive = isActive;
+            
+            if (isActive) {
+                automationStatusIndicator.className = 'status-indicator status-active';
+                startAutomationBtn.disabled = true;
+                stopAutomationBtn.disabled = false;
+                // Disable manual controls during automation
+                sendMessageBtn.disabled = true;
+                skipSttBtn.disabled = true;
+                startSttBtn.disabled = true;
+                playLastTtsBtn.disabled = true;
+            } else {
+                automationStatusIndicator.className = 'status-indicator status-inactive';
+                startAutomationBtn.disabled = false;
+                stopAutomationBtn.disabled = true;
+                // Re-enable manual controls when automation is stopped
+                if (isConnected) {
+                    sendMessageBtn.disabled = false;
+                    skipSttBtn.disabled = false;
+                    startSttBtn.disabled = false;
+                    playLastTtsBtn.disabled = false;
+                }
+            }
+            
+            automationStatusText.textContent = message;
+        }
+        
+        // Add message to conversation
+        function addMessage(content, role) {
+            const messageElem = document.createElement('div');
+            messageElem.className = 'message ' + (role === 'assistant' ? 'assistant-message' : 'user-message');
+            messageElem.textContent = content;
+            
+            messageContainer.appendChild(messageElem);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            
+            if (role === 'assistant') {
+                lastAssistantMessage = content;
+                
+                // Auto-play TTS if enabled
+                if (autoTtsCheckbox.checked) {
+                    playTTS(content);
+                }
+            }
+        }
+        
+        // Connect to API server
+        async function connectToServer() {
+            apiPort = parseInt(apiPortInput.value);
+            const customSessionId = sessionIdInput.value.trim();
+            
+            updateConnectionStatus(false, 'Connecting...');
+            log(`Connecting to API server on port ${apiPort}`, 'info');
+            
+            try {
+                // Test connection to API server
+                const healthResponse = await fetch(`http://localhost:${apiPort}/api/health`);
+                
+                if (!healthResponse.ok) {
+                    throw new Error(`API server returned status: ${healthResponse.status}`);
+                }
+                
+                const healthData = await healthResponse.json();
+                
+                if (healthData.status !== 'ok') {
+                    throw new Error('API server health check failed');
+                }
+                
+                log(`API server connection successful. LangChain enabled: ${healthData.langchain_enabled || false}`, 'info');
+                
+                // If session ID is provided, try to use it
+                if (customSessionId) {
+                    sessionId = customSessionId;
+                    log(`Using provided session ID: ${sessionId}`, 'info');
+                    
+                    // Verify session exists
+                    const sessionResponse = await fetch(`http://localhost:${apiPort}/api/session/${sessionId}`);
+                    
+                    if (!sessionResponse.ok) {
+                        throw new Error(`Session not found: ${sessionId}`);
+                    }
+                    
+                    const sessionData = await sessionResponse.json();
+                    
+                    if (!sessionData.success) {
+                        throw new Error(sessionData.error || 'Failed to load session');
+                    }
+                    
+                    log(`Session loaded: ${sessionId}`, 'info');
+                } else {
+                    // Create a new session using the first available discussion guide
+                    log('No session ID provided. Creating a new session...', 'info');
+                    
+                    // Get available discussion guides
+                    const guidesResponse = await fetch(`http://localhost:${apiPort}/api/discussion_guides`);
+                    
+                    if (!guidesResponse.ok) {
+                        throw new Error(`Failed to fetch discussion guides: ${guidesResponse.status}`);
+                    }
+                    
+                    const guidesData = await guidesResponse.json();
+                    
+                    if (!guidesData.success || !guidesData.guides || guidesData.guides.length === 0) {
+                        throw new Error('No discussion guides available');
+                    }
+                    
+                    // Use the first guide
+                    const guideId = guidesData.guides[0].id;
+                    log(`Using discussion guide: ${guideId}`, 'info');
+                    
+                    // Create a new session
+                    const createResponse = await fetch(`http://localhost:${apiPort}/api/session/create`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            guide_id: guideId,
+                            interviewee: {
+                                name: 'Debug User'
+                            }
+                        })
+                    });
+                    
+                    if (!createResponse.ok) {
+                        throw new Error(`Failed to create session: ${createResponse.status}`);
+                    }
+                    
+                    const createData = await createResponse.json();
+                    
+                    if (!createData.success) {
+                        throw new Error(createData.error || 'Failed to create session');
+                    }
+                    
+                    sessionId = createData.session_id;
+                    sessionIdInput.value = sessionId;
+                    log(`Created new session: ${sessionId}`, 'info');
+                }
+                
+                // Get session messages
+                await loadSessionMessages();
+                
+                // Update UI
+                updateConnectionStatus(true, 'Connected');
+                
+                // Initialize speech recognition
+                initSpeechRecognition();
+                
+            } catch (error) {
+                log(`Connection error: ${error.message}`, 'error');
+                updateConnectionStatus(false, 'Connection Failed');
+            }
+        }
+        
+        // Load session messages
+        async function loadSessionMessages() {
+            if (!sessionId) {
+                log('No session ID available', 'error');
+                return;
+            }
+            
+            try {
+                const messagesResponse = await fetch(`http://localhost:${apiPort}/api/session/${sessionId}/messages`);
+                
+                if (!messagesResponse.ok) {
+                    throw new Error(`Failed to fetch messages: ${messagesResponse.status}`);
+                }
+                
+                const messagesData = await messagesResponse.json();
+                
+                if (!messagesData.success) {
+                    throw new Error(messagesData.error || 'Failed to load messages');
+                }
+                
+                const messages = messagesData.messages || [];
+                
+                // Clear existing messages
+                messageContainer.innerHTML = '';
+                
+                // Add messages to UI
+                if (messages.length > 0) {
+                    for (const message of messages) {
+                        addMessage(message.content, message.role);
+                    }
+                    log(`Loaded ${messages.length} messages`, 'info');
+                } else {
+                    log('No messages found in session', 'warn');
+                    addMessage("Hello, I'm your interview assistant. How can I help you today?", 'assistant');
+                }
+                
+            } catch (error) {
+                log(`Error loading messages: ${error.message}`, 'error');
+            }
+        }
+        
+        // Send user message to API
+        async function sendUserMessage(message) {
+            if (!sessionId || !message) {
+                log('Cannot send message: missing session ID or message content', 'error');
+                return false;
+            }
+            
+            try {
+                log(`Sending message: ${message.substring(0, 30)}${message.length > 30 ? '...' : ''}`, 'info');
+                
+                // Check for "end the interview" or similar phrases
+                const lowerMessage = message.toLowerCase();
+                if (lowerMessage.includes("end the interview") || 
+                    lowerMessage.includes("end interview") || 
+                    lowerMessage.includes("finish the interview") || 
+                    lowerMessage.includes("complete the interview") ||
+                    lowerMessage.includes("stop the interview")) {
+                    
+                    log('End interview request detected', 'info');
+                    
+                    // Stop automation if active
+                    if (automationActive) {
+                        stopAutomation();
+                    }
+                    
+                    // Add a thank you message
+                    addMessage(message, 'user');
+                    addMessage("Thank you for testing the interview! The debug interface will remain open for additional testing.", 'assistant');
+                    
+                    // Play thank you message if auto-TTS is enabled
+                    if (autoTtsCheckbox.checked) {
+                        playTTS("Thank you for testing the interview! The debug interface will remain open for additional testing.");
+                    }
+                    
+                    return true;
+                }
+                
+                // Add message to UI
+                addMessage(message, 'user');
+                
+                // Send to API
+                const response = await fetch(`http://localhost:${apiPort}/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: {
+                            role: 'user',
+                            content: message
+                        }
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API returned status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to send message');
+                }
+                
+                log('Message sent successfully', 'info');
+                
+                // Wait for AI response
+                setTimeout(async () => {
+                    await getAIResponse();
+                }, 1000);
+                
+                return true;
+                
+            } catch (error) {
+                log(`Error sending message: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Get AI response
+        async function getAIResponse() {
+            if (!sessionId) {
+                log('Cannot get AI response: missing session ID', 'error');
+                return false;
+            }
+            
+            try {
+                log('Getting AI response...', 'llm');
+                
+                // Get latest messages
+                const messagesResponse = await fetch(`http://localhost:${apiPort}/api/session/${sessionId}/messages`);
+                
+                if (!messagesResponse.ok) {
+                    throw new Error(`Failed to fetch messages: ${messagesResponse.status}`);
+                }
+                
+                const messagesData = await messagesResponse.json();
+                
+                if (!messagesData.success) {
+                    throw new Error(messagesData.error || 'Failed to load messages');
+                }
+                
+                const messages = messagesData.messages || [];
+                
+                // Find the latest assistant message
+                let latestAssistantMessage = null;
+                
+                for (let i = messages.length - 1; i >= 0; i--) {
+                    if (messages[i].role === 'assistant') {
+                        latestAssistantMessage = messages[i];
+                        break;
+                    }
+                }
+                
+                if (latestAssistantMessage && latestAssistantMessage.content !== lastAssistantMessage) {
+                    log('Received new AI response', 'llm');
+                    addMessage(latestAssistantMessage.content, 'assistant');
+                    
+                    // If automation is active, TTS will play automatically (via addMessage),
+                    // and then STT will start automatically after TTS ends
+                    
+                    return true;
+                } else {
+                    log('No new AI response found. Trying again in 2 seconds...', 'warn');
+                    
+                    // Try again after delay, but only if automation is still active or this was called manually
+                    if (automationActive) {
+                        setTimeout(async () => {
+                            await getAIResponse();
+                        }, 2000);
+                    }
+                    
+                    return false;
+                }
+                
+            } catch (error) {
+                log(`Error getting AI response: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            // Reset existing recognition if exists
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    // Ignore errors on stop
+                }
+                recognition = null;
+            }
+            
+            try {
+                window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = 'en-US';
+                recognition.continuous = false; // Important: set to false to avoid multiple recognitions
+                recognition.interimResults = true;
+                
+                recognition.onstart = function() {
+                    updateSTTStatus(true, 'Listening');
+                    log('Speech recognition started', 'stt');
+                    
+                    // Set timeout for no-speech error
+                    if (noSpeechTimeout) {
+                        clearTimeout(noSpeechTimeout);
+                    }
+                    
+                    noSpeechTimeout = setTimeout(() => {
+                        log('No speech detected within timeout period', 'warn');
+                        updateSTTStatus(true, 'No speech (timeout)', true);
+                        
+                        // Safely stop recognition
+                        try {
+                            recognition.stop();
+                        } catch (e) {
+                            log(`Error stopping recognition: ${e.message}`, 'error');
+                        }
+                    }, parseInt(sttTimeoutSlider.value));
+                };
+                
+                recognition.onresult = function(event) {
+                    const result = event.results[event.results.length - 1];
+                    const transcript = result[0].transcript;
+                    
+                    // Clear no-speech timeout as we got results
+                    if (noSpeechTimeout) {
+                        clearTimeout(noSpeechTimeout);
+                        noSpeechTimeout = null;
+                    }
+                    
+                    if (result.isFinal) {
+                        userInput.value = transcript;
+                        log(`Speech recognized: ${transcript}`, 'stt');
+                        
+                        // Stop recognition after final result to prevent multiple recognitions
+                        try {
+                            recognition.stop();
+                        } catch (e) {
+                            log(`Error stopping recognition after final result: ${e.message}`, 'error');
+                        }
+                        
+                        // Auto-submit if enabled
+                        if (autoSubmitSttCheckbox.checked) {
+                            const delay = parseInt(sttSubmitDelaySlider.value);
+                            log(`Will auto-submit message in ${delay}ms`, 'info');
+                            
+                            // Clear any existing timeout
+                            if (sttSubmitTimeout) {
+                                clearTimeout(sttSubmitTimeout);
+                            }
+                            
+                            sttSubmitTimeout = setTimeout(() => {
+                                if (transcript.trim()) {
+                                    log('Auto-submitting message', 'info');
+                                    
+                                    // Check for end interview phrases in auto-submit mode as well
+                                    const lowerTranscript = transcript.toLowerCase();
+                                    if (lowerTranscript.includes("end the interview") || 
+                                        lowerTranscript.includes("end interview") || 
+                                        lowerTranscript.includes("finish the interview") || 
+                                        lowerTranscript.includes("complete the interview") ||
+                                        lowerTranscript.includes("stop the interview")) {
+                                        
+                                        log('End interview request detected in auto-submit', 'info');
+                                        
+                                        // Stop automation if active
+                                        if (automationActive) {
+                                            stopAutomation();
+                                        }
+                                        
+                                        // Add the messages manually
+                                        addMessage(transcript, 'user');
+                                        addMessage("Thank you for testing the interview! The debug interface will remain open for additional testing.", 'assistant');
+                                        
+                                        // Play thank you message if auto-TTS is enabled
+                                        if (autoTtsCheckbox.checked) {
+                                            playTTS("Thank you for testing the interview! The debug interface will remain open for additional testing.");
+                                        }
+                                        
+                                        userInput.value = '';
+                                        return;
+                                    }
+                                    
+                                    sendUserMessage(transcript);
+                                    userInput.value = '';
+                                } else {
+                                    log('No text to submit', 'warn');
+                                }
+                            }, delay);
+                        }
+                    } else {
+                        // Update status with interim result
+                        updateSTTStatus(true, `Listening: ${transcript.substring(0, 20)}${transcript.length > 20 ? '...' : ''}`);
+                    }
+                };
+                
+                recognition.onerror = function(event) {
+                    // Clear no-speech timeout
+                    if (noSpeechTimeout) {
+                        clearTimeout(noSpeechTimeout);
+                        noSpeechTimeout = null;
+                    }
+                    
+                    if (event.error === 'no-speech') {
+                        log('No speech detected', 'warn');
+                        updateSTTStatus(false, 'No speech detected', true);
+                        
+                        // Don't auto-restart for no-speech error to avoid excessive restarts
+                        // Instead, we'll let the delay restart mechanism handle this
+                    } else {
+                        log(`Speech recognition error: ${event.error}`, 'error');
+                        updateSTTStatus(false, `Error: ${event.error}`, true);
+                    }
+                };
+                
+                recognition.onend = function() {
+                    log('Speech recognition ended', 'stt');
+                    updateSTTStatus(false, 'Ready');
+                    
+                    // Clear any existing timeout
+                    if (noSpeechTimeout) {
+                        clearTimeout(noSpeechTimeout);
+                        noSpeechTimeout = null;
+                    }
+                };
+                
+                log('Speech recognition initialized', 'stt');
+                updateSTTStatus(false, 'Ready');
+                return true;
+            } catch (error) {
+                log(`Error initializing speech recognition: ${error.message}`, 'error');
+                updateSTTStatus(false, 'Not supported', true);
+                return false;
+            }
+        }
+        
+        // Start speech recognition with safeguards
+        function startSpeechRecognition() {
+            if (!isConnected) {
+                log('Cannot start STT: not connected to server', 'error');
+                return false;
+            }
+            
+            if (!recognition) {
+                if (!initSpeechRecognition()) {
+                    return false;
+                }
+            }
+            
+            if (ttsActive && autoStopSttCheckbox.checked) {
+                log('Not starting STT because TTS is active and auto-stop is enabled', 'warn');
+                return false;
+            }
+            
+            try {
+                recognition.start();
+                startSttBtn.disabled = true;
+                stopSttBtn.disabled = false;
+                return true;
+            } catch (error) {
+                log(`Error starting speech recognition: ${error.message}`, 'error');
+                
+                // If error is about recognition already started, reinitialize
+                if (error.message.includes('already started')) {
+                    log('Recognition already started. Reinitializing...', 'warn');
+                    initSpeechRecognition();
+                    
+                    // Try again with delay
+                    setTimeout(() => {
+                        try {
+                            recognition.start();
+                            log('Recognition restarted after reinitialization', 'stt');
+                            startSttBtn.disabled = true;
+                            stopSttBtn.disabled = false;
+                        } catch (e) {
+                            log(`Failed to restart recognition: ${e.message}`, 'error');
+                            startSttBtn.disabled = false;
+                            stopSttBtn.disabled = true;
+                        }
+                    }, parseInt(sttRestartDelaySlider.value));
+                }
+                
+                return false;
+            }
+        }
+        
+        // Stop speech recognition safely
+        function stopSpeechRecognition() {
+            if (recognition) {
+                try {
+                    recognition.stop();
+                    log('Speech recognition stopped', 'stt');
+                    startSttBtn.disabled = false;
+                    stopSttBtn.disabled = true;
+                    return true;
+                } catch (error) {
+                    log(`Error stopping speech recognition: ${error.message}`, 'error');
+                    
+                    // If it fails, reinitialize
+                    initSpeechRecognition();
+                    startSttBtn.disabled = false;
+                    stopSttBtn.disabled = true;
+                    return false;
+                }
+            }
+            startSttBtn.disabled = false;
+            stopSttBtn.disabled = true;
+            return false;
+        }
+        
+        // Play TTS with proper error handling
+        function playTTS(text) {
+            if (!text) {
+                log('No text provided for TTS', 'error');
+                return false;
+            }
+            
+            // If STT is active and auto-stop is enabled, stop it
+            if (sttActive && autoStopSttCheckbox.checked) {
+                stopSpeechRecognition();
+            }
+            
+            const voiceId = ttsVoiceSelect.value;
+            const url = `http://localhost:${apiPort}/api/text_to_speech_elevenlabs`;
+            
+            updateTTSStatus(true, 'Preparing speech...');
+            log(`Preparing TTS: ${text.substring(0, 30)}${text.length > 30 ? '...' : ''}`, 'tts');
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(`API error: ${err.error || 'Unknown error'}`);
+                    });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const audioUrl = URL.createObjectURL(blob);
+                ttsAudio.src = audioUrl;
+                
+                ttsAudio.onplay = () => {
+                    updateTTSStatus(true, 'Speaking...');
+                    log('TTS playing', 'tts');
+                };
+                
+                ttsAudio.onended = () => {
+                    updateTTSStatus(false, 'Completed');
+                    log('TTS finished', 'tts');
+                    
+                    // Clear any existing timeout
+                    if (ttsEndedTimeout) {
+                        clearTimeout(ttsEndedTimeout);
+                    }
+                    
+                    // Start STT after delay if auto-start is enabled
+                    if ((autoStartSttCheckbox.checked || automationActive) && isConnected) {
+                        const delay = parseInt(ttsSttDelaySlider.value);
+                        log(`Will start STT in ${delay}ms`, 'stt');
+                        
+                        ttsEndedTimeout = setTimeout(() => {
+                            startSpeechRecognition();
+                        }, delay);
+                    }
+                };
+                
+                ttsAudio.onerror = (e) => {
+                    updateTTSStatus(false, 'Error');
+                    log(`TTS error: ${e.error || 'Audio playback error'}`, 'error');
+                };
+                
+                ttsAudio.play();
+                return true;
+            })
+            .catch(error => {
+                updateTTSStatus(false, 'Error');
+                log(`TTS error: ${error.message}`, 'error');
+                return false;
+            });
+        }
+        
+        // Stop TTS playback
+        function stopTTS() {
+            ttsAudio.pause();
+            ttsAudio.currentTime = 0;
+            updateTTSStatus(false, 'Stopped');
+            log('TTS stopped', 'tts');
+            
+            // Clear TTS ended timeout
+            if (ttsEndedTimeout) {
+                clearTimeout(ttsEndedTimeout);
+                ttsEndedTimeout = null;
+            }
+        }
+        
+        // Reset the interview
+        async function resetInterview() {
+            if (!isConnected) {
+                log('Cannot reset: not connected to server', 'error');
+                return;
+            }
+            
+            // Stop automation if active
+            if (automationActive) {
+                stopAutomation();
+            }
+            
+            // Stop any active TTS/STT
+            stopTTS();
+            stopSpeechRecognition();
+            
+            // Clear all timeouts
+            if (ttsEndedTimeout) {
+                clearTimeout(ttsEndedTimeout);
+                ttsEndedTimeout = null;
+            }
+            
+            if (noSpeechTimeout) {
+                clearTimeout(noSpeechTimeout);
+                noSpeechTimeout = null;
+            }
+            
+            if (sttSubmitTimeout) {
+                clearTimeout(sttSubmitTimeout);
+                sttSubmitTimeout = null;
+            }
+            
+            // Clear user input
+            userInput.value = '';
+            
+            // Clear message container
+            messageContainer.innerHTML = '';
+            
+            // Create a new session
+            sessionId = null;
+            sessionIdInput.value = '';
+            
+            // Connect to server (will create new session)
+            await connectToServer();
+        }
+
+        // Event Listeners for Sliders
+        sttTimeoutSlider.addEventListener('input', () => {
+            sttTimeoutValue.textContent = sttTimeoutSlider.value;
+        });
+        
+        sttRestartDelaySlider.addEventListener('input', () => {
+            sttRestartDelayValue.textContent = sttRestartDelaySlider.value;
+        });
+        
+        ttsSttDelaySlider.addEventListener('input', () => {
+            ttsSttDelayValue.textContent = ttsSttDelaySlider.value;
+        });
+        
+        sttSubmitDelaySlider.addEventListener('input', () => {
+            sttSubmitDelayValue.textContent = sttSubmitDelaySlider.value;
+        });
+        
+        // Connection event listeners
+        connectBtn.addEventListener('click', connectToServer);
+        
+        // Message input event listeners
+        sendMessageBtn.addEventListener('click', () => {
+            const message = userInput.value.trim();
+            if (message) {
+                sendUserMessage(message);
+                userInput.value = '';
+            } else {
+                log('No message to send', 'warn');
+            }
+        });
+        
+        skipSttBtn.addEventListener('click', () => {
+            const message = userInput.value.trim();
+            if (message) {
+                sendUserMessage(message);
+                userInput.value = '';
+            } else {
+                log('No message to send', 'warn');
+            }
+        });
+        
+        resetInterviewBtn.addEventListener('click', resetInterview);
+        
+        // TTS event listeners
+        playLastTtsBtn.addEventListener('click', () => {
+            if (lastAssistantMessage) {
+                playTTS(lastAssistantMessage);
+            } else {
+                log('No assistant message to play', 'warn');
+            }
+        });
+        
+        stopTtsBtn.addEventListener('click', stopTTS);
+        
+        // STT event listeners
+        startSttBtn.addEventListener('click', startSpeechRecognition);
+        stopSttBtn.addEventListener('click', stopSpeechRecognition);
+        
+        // Automation event listeners
+        startAutomationBtn.addEventListener('click', startAutomation);
+        stopAutomationBtn.addEventListener('click', stopAutomation);
+        getParamsBtn.addEventListener('click', getTimingParameters);
+        
+        // Log event listeners
+        clearLogBtn.addEventListener('click', () => {
+            logContainer.innerHTML = '';
+            log('Log cleared', 'info');
+        });
+        
+        // Additional event listeners for audio element
+        ttsAudio.addEventListener('play', () => {
+            ttsActive = true;
+            
+            // If STT is active and auto-stop is enabled, stop it
+            if (sttActive && autoStopSttCheckbox.checked) {
+                stopSpeechRecognition();
+            }
+        });
+        
+        ttsAudio.addEventListener('pause', () => {
+            ttsActive = false;
+        });
+        
+        ttsAudio.addEventListener('ended', () => {
+            ttsActive = false;
+        });
+        
+        // Allow sending messages with Enter key
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessageBtn.click();
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if API port is in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const portParam = urlParams.get('port');
+            const sessionIdParam = urlParams.get('session_id');
+            
+            if (portParam) {
+                apiPortInput.value = portParam;
+            }
+            
+            if (sessionIdParam) {
+                sessionIdInput.value = sessionIdParam;
+            }
+            
+            log('Debug interview flow tool initialized', 'info');
+            
+            // Auto-connect if URL parameters are provided
+            if (portParam || sessionIdParam) {
+                connectToServer();
+            }
+        });
+
+        // Get timing parameters in a format usable for the main application
+        function getTimingParameters() {
+            const params = {
+                tts_stt_delay_ms: parseInt(ttsSttDelaySlider.value),
+                stt_submit_delay_ms: parseInt(sttSubmitDelaySlider.value),
+                stt_timeout_ms: parseInt(sttTimeoutSlider.value),
+                stt_restart_delay_ms: parseInt(sttRestartDelaySlider.value),
+                auto_tts: autoTtsCheckbox.checked,
+                auto_start_stt: autoStartSttCheckbox.checked,
+                auto_stop_stt: autoStopSttCheckbox.checked,
+                auto_submit_stt: autoSubmitSttCheckbox.checked
+            };
+            
+            // Format as JSON with some spacing
+            const formattedParams = JSON.stringify(params, null, 2);
+            
+            // Display in the UI
+            paramsOutput.style.display = 'block';
+            paramsText.textContent = formattedParams;
+            
+            // Also create a JS or Python code snippet
+            const jsConfig = `// JavaScript configuration for interview app
+const interviewConfig = {
+    ttsSttDelay: ${params.tts_stt_delay_ms}, // Delay between TTS ending and STT starting
+    sttSubmitDelay: ${params.stt_submit_delay_ms}, // Delay between STT completion and message submission
+    sttTimeout: ${params.stt_timeout_ms}, // How long to wait for speech before timing out
+    sttRestartDelay: ${params.stt_restart_delay_ms}, // Delay before restarting STT after an error
+    autoTts: ${params.auto_tts}, // Auto-play TTS for assistant messages
+    autoStartStt: ${params.auto_start_stt}, // Auto-start STT after TTS completes
+    autoStopStt: ${params.auto_stop_stt}, // Auto-stop STT when TTS is active
+    autoSubmitStt: ${params.auto_submit_stt} // Auto-submit message after STT completes
+};`;
+            
+            // Log the parameters
+            log('Timing parameters extracted', 'info');
+            
+            return formattedParams;
+        }
+    </script>
+</body>
+</html> 
