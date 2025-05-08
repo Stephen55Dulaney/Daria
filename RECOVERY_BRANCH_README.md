@@ -16,14 +16,26 @@ A centralized debugging dashboard is now available at http://localhost:5025/debu
 
 ### 2. Full End-to-End Automation
 
-The Debug Interview Flow tool at http://localhost:5025/static/debug_interview_flow.html?port=5025 now supports:
+The Debug Interview Flow tool (http://localhost:5025/static/debug_interview_flow.html?port=5025) now supports complete end-to-end automation for the entire interview process:
 
-- **Fully Automated Interview Flow**: Complete TTS → STT → LangChain response cycle works end-to-end
-- **LangChain Integration**: AI responses are properly generated and added to the session
-- **Customizable Timing**: Adjustable delays between TTS and STT for optimal performance
-- **Robust Error Handling**: Prevents common issues that previously broke the interview flow
+- **Full Automation Mode**: Test complete interviews with one click
+- **TTS-STT Integration**: Automated text-to-speech and speech-to-text processing
+- **LangChain Response Generation**: Properly integrated with OpenAI for interview progression
+- **Automatic Transcript Creation**: Correctly builds and stores interview transcripts
+- **Debug Controls**: Pause, resume, and step through the interview process
 
-### 3. Disaster Recovery
+### 3. User Authentication System
+
+A new Flask-Login based authentication system has been implemented to secure the application:
+
+- **User Registration**: New users can sign up with username, email, and password
+- **Secure Login**: Password hashing with Werkzeug security
+- **Role-based Access**: Support for different user roles (admin, researcher, user)
+- **Protected Routes**: All sensitive routes now require authentication
+- **Session Management**: Remember me functionality and session timeout settings
+- **Password Reset**: Built-in workflow for password reset requests
+
+### 4. Disaster Recovery
 
 This branch includes robust disaster recovery capabilities:
 
@@ -113,4 +125,76 @@ The Recovery branch is focused on stability and debugging. Planned improvements 
 
 ## Feedback and Contributions
 
-Please report any issues or suggestions for the Recovery branch via the issue tracker. Include "Debug Toolkit" in issue titles related to the new toolkit functionality. 
+Please report any issues or suggestions for the Recovery branch via the issue tracker. Include "Debug Toolkit" in issue titles related to the new toolkit functionality.
+
+## Recovery Procedures
+
+If you encounter issues with the Daria Interview Tool, follow these recovery procedures:
+
+### Quick Recovery Script
+
+The quickest way to recover all services is to use the recovery script:
+
+```bash
+./start_daria_with_recovery.sh
+```
+
+This script will:
+1. Stop all running Daria services
+2. Verify environment variables
+3. Start all required services in the correct order
+4. Verify service health
+
+### Manual Recovery
+
+If the recovery script doesn't work, follow these manual steps:
+
+1. **Stop all services**:
+   ```bash
+   ./stop_daria_services.sh
+   ```
+
+2. **Check environment variables**:
+   Make sure the following environment variables are set:
+   - `OPENAI_API_KEY`
+   - `ELEVENLABS_API_KEY`
+
+3. **Start services individually**:
+   ```bash
+   # Start ElevenLabs TTS service
+   python services/elevenlabs_tts_direct.py --port 5015 &
+   
+   # Start Speech-to-Text service
+   python services/speech_to_text.py --port 5016 &
+   
+   # Start main API server with LangChain
+   python run_interview_api.py --port 5025 --debug --use-langchain &
+   ```
+
+4. **Verify services**:
+   Open the Debug Toolkit at http://localhost:5025/debug to verify all services are running.
+
+### Common Issues
+
+#### TTS Not Working
+If text-to-speech is not working:
+
+1. Check the ElevenLabs API key is set: `echo $ELEVENLABS_API_KEY`
+2. Verify the TTS service is running on port 5015
+3. Restart the TTS service: `python services/elevenlabs_tts_direct.py --port 5015`
+
+#### STT Not Working
+If speech-to-text is not working:
+
+1. Ensure microphone permissions are granted
+2. Verify the STT service is running on port 5016
+3. Restart the STT service: `python services/speech_to_text.py --port 5016`
+
+#### LangChain/API Issues
+If the API or LangChain is not working:
+
+1. Check the OpenAI API key is set: `echo $OPENAI_API_KEY`
+2. Make sure you're using the `--use-langchain` parameter when starting the API
+3. Check for any errors in the console output
+4. Look for the "datetime.now()" error which requires a quick fix in the code
+5. If you see Session ID errors, make sure you're loading a valid session 
