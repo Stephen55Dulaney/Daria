@@ -105,6 +105,9 @@
             <a href="/discussion_guides" class="btn btn-outline-secondary">
                 <i class="bi bi-arrow-left me-1"></i> Back to Guides
             </a>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGuideModal">
+                <i class="bi bi-trash me-1"></i> Delete Guide
+            </button>
         </div>
     </div>
     
@@ -314,11 +317,15 @@
                             <tbody>
                                 {% for question in guide.custom_questions %}
                                 <tr>
-                                    <td>{{ question.text }}</td>
+                                    <td>{{ question.text if question is mapping and question.text is defined else question }}</td>
                                     <td>
+                                        {% if question is mapping and question.priority is defined %}
                                         <span class="badge bg-{{ 'danger' if question.priority == 'high' else 'warning' if question.priority == 'medium' else 'info' }}">
                                             {{ question.priority|title }}
                                         </span>
+                                        {% else %}
+                                        <span class="badge bg-info">Normal</span>
+                                        {% endif %}
                                     </td>
                                 </tr>
                                 {% endfor %}
@@ -348,15 +355,15 @@
                             <label class="form-label text-muted">Options</label>
                             <ul class="list-group list-group-flush">
                                 <li class="list-group-item">
-                                    <i class="bi {{ 'bi-check-circle-fill text-success' if guide.options.record_transcript else 'bi-x-circle-fill text-danger' }} me-2"></i>
+                                    <i class="bi {{ 'bi-check-circle-fill text-success' if guide.options and guide.options.get('record_transcript', False) else 'bi-x-circle-fill text-danger' }} me-2"></i>
                                     Record Transcript
                                 </li>
                                 <li class="list-group-item">
-                                    <i class="bi {{ 'bi-check-circle-fill text-success' if guide.options.analysis else 'bi-x-circle-fill text-danger' }} me-2"></i>
+                                    <i class="bi {{ 'bi-check-circle-fill text-success' if guide.options and guide.options.get('analysis', False) else 'bi-x-circle-fill text-danger' }} me-2"></i>
                                     Automatic Analysis
                                 </li>
                                 <li class="list-group-item">
-                                    <i class="bi {{ 'bi-check-circle-fill text-success' if guide.options.use_tts else 'bi-x-circle-fill text-danger' }} me-2"></i>
+                                    <i class="bi {{ 'bi-check-circle-fill text-success' if guide.options and guide.options.get('use_tts', False) else 'bi-x-circle-fill text-danger' }} me-2"></i>
                                     Use Text-to-Speech
                                 </li>
                             </ul>
@@ -525,26 +532,24 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteGuideModalLabel">Delete Discussion Guide Permanently</h5>
+                <h5 class="modal-title" id="deleteGuideModalLabel">Delete Discussion Guide</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                <div class="alert alert-danger">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                    <strong>Warning: This action cannot be undone!</strong>
+                <p>Are you sure you want to delete <strong>{{ guide.title }}</strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. Sessions associated with this guide will be marked as orphaned but will remain accessible.
                 </div>
-                <p>Are you absolutely sure you want to <strong>permanently delete</strong> this discussion guide?</p>
-                <p>The guide will be completely removed from the system. Any existing sessions will be preserved but will be disconnected from this guide.</p>
-                <div class="form-check mt-3">
-                    <input class="form-check-input" type="checkbox" id="confirmDeleteCheck">
-                    <label class="form-check-label" for="confirmDeleteCheck">
-                        I understand that this action is permanent and cannot be undone.
-                    </label>
+                {% if sessions and sessions|length > 0 %}
+                <div class="alert alert-info">
+                    <p><strong>This guide has {{ sessions|length }} session{% if sessions|length != 1 %}s{% endif %}.</strong> All sessions will still be accessible from the sessions archive.</p>
                 </div>
+                {% endif %}
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                <button type="button" class="btn btn-danger" id="confirmDeleteBtn" disabled>Delete Permanently</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
             </div>
         </div>
     </div>
@@ -555,7 +560,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const createSessionBtn = document.getElementById('createSessionBtn');
     const confirmArchiveBtn = document.getElementById('confirmArchiveBtn');
     const confirmDuplicateBtn = document.getElementById('confirmDuplicateBtn');
-    const confirmDeleteCheck = document.getElementById('confirmDeleteCheck');
     const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
     
     // Create new session
@@ -700,24 +704,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Permanent deletion confirmation
-    if (confirmDeleteCheck && confirmDeleteBtn) {
-        // Enable/disable delete button based on checkbox
-        confirmDeleteCheck.addEventListener('change', function() {
-            confirmDeleteBtn.disabled = !this.checked;
-        });
-        
-        // Handle delete button click
+    // Delete guide functionality
+    if (confirmDeleteBtn) {
         confirmDeleteBtn.addEventListener('click', function() {
-            if (!confirmDeleteCheck.checked) {
-                alert('Please confirm that you understand this action is permanent.');
-                return;
-            }
+            const guideId = "{{ guide_id }}";
             
-            confirmDeleteBtn.disabled = true;
-            confirmDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
-            
-            fetch('/api/discussion_guide/{{ guide_id }}/delete', {
+            fetch(`/api/discussion_guide/${guideId}/delete`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
@@ -726,19 +718,15 @@ document.addEventListener('DOMContentLoaded', function() {
             .then(response => response.json())
             .then(data => {
                 if (data.success) {
-                    // Redirect to guides list
+                    // Redirect to the guides list page
                     window.location.href = '/discussion_guides';
                 } else {
-                    alert('Error deleting guide: ' + data.error);
-                    confirmDeleteBtn.disabled = false;
-                    confirmDeleteBtn.innerHTML = 'Delete Permanently';
+                    alert(`Error: ${data.error || 'Failed to delete guide'}`);
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                console.error('Error deleting guide:', error);
                 alert('An error occurred while deleting the guide. Please try again.');
-                confirmDeleteBtn.disabled = false;
-                confirmDeleteBtn.innerHTML = 'Delete Permanently';
             });
         });
     }
