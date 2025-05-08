@@ -2,6 +2,17 @@
 
 A research interview assistant that uses AI to conduct interviews with text-to-speech (TTS) and speech-to-text (STT) capabilities.
 
+## Recent Updates
+
+### May 2025 Update
+- Fixed critical indentation error in transcript processing code
+- Created convenient server start/stop scripts (`start_server.sh`, `stop_server.sh`)
+- Successfully tested and verified LangChain integration
+- Improved transcript upload functionality with better speaker identification
+- Added comprehensive project status documentation
+- See `PROJECT_STATUS.md` for detailed status information
+- See `REMAINING_TASKS.md` for pending improvements
+
 ## Overview
 
 Daria is a comprehensive research interview tool designed to facilitate and automate the interview process. It includes:
