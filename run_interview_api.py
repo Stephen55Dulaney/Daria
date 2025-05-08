@@ -880,7 +880,11 @@ def get_interviews():
             
             interview_list.append(serializable_data)
         
-        return jsonify(interview_list)
+        # Return as object with success field and interviews array to match dashboard.html expectations
+        return jsonify({
+            'success': True,
+            'interviews': interview_list
+        })
     except Exception as e:
         logger.error(f"Error getting interviews: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
