@@ -24,10 +24,12 @@ from langchain_features.services.discussion_service import DiscussionService
 from langchain_features.services.observer_service import ObserverService
 from flask_socketio import SocketIO, emit, join_room, leave_room
 import openai
-from flask_login import login_required, current_user
+from flask_login import LoginManager, current_user, login_required
+from models.user import User, UserRepository
 
-# Import auth module
-from auth_routes import init_auth
+# Import user routes
+from user_routes import user_bp
+from auth_routes import auth_bp
 
 # Set up logging
 logging.basicConfig(
@@ -50,10 +52,19 @@ app = Flask(__name__,
            template_folder='templates',
            static_folder='static')
 
-# App configuration
-app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'development-secret-key-change-in-production')
-app.config['SESSION_TYPE'] = 'filesystem'
-app.config['PERMANENT_SESSION_LIFETIME'] = datetime.timedelta(days=7)
+# Configure secret key for sessions
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'daria-interview-tool-secret-key')
+
+# Initialize Flask-Login
+login_manager = LoginManager()
+login_manager.init_app(app)
+login_manager.login_view = 'auth.login'
+
+@login_manager.user_loader
+def load_user(user_id):
+    """Load a user from the user repository."""
+    repo = UserRepository()
+    return repo.get_user_by_id(user_id)
 
 # Enable CORS with extended headers support
 CORS(app, resources={r"/*": {"origins": "*", "allow_headers": ["Content-Type", "Authorization"]}})
@@ -62,9 +73,6 @@ logger.info("CORS enabled for all origins with extended header support")
 # Initialize SocketIO for WebSocket support
 socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 logger.info("SocketIO initialized for real-time communication")
-
-# Initialize authentication
-init_auth(app)
 
 # Define paths
 BASE_DIR = Path(__file__).parent.absolute()
@@ -1243,259 +1251,1373 @@ def debug_toolkit():
     return redirect('/static/debug_toolkit.html')
 
 @app.route('/dashboard')
-@login_required
 def dashboard():
-    """Show the dashboard."""
+    """Render dashboard page."""
     return render_template('langchain/dashboard.html')
 
 @app.route('/interview_setup')
-@login_required
 def interview_setup():
-    """Create a new interview."""
-    # Get all available prompts
-    prompts = load_all_prompts()
-    
-    # Create prompt choices
-    prompt_choices = [(name, config.get('agent_name', name)) for name, config in prompts.items()]
-    
-    # Get discussion guides
-    discussion_guides = []
-    if discussion_service:
-        try:
-            guides = discussion_service.get_guides()
-            discussion_guides = [(guide.get('id'), guide.get('title')) for guide in guides]
-        except Exception as e:
-            logger.error(f"Error fetching discussion guides: {str(e)}")
-
-    return render_template('langchain/interview_setup.html', 
-                          prompts=prompt_choices,
-                          guides=discussion_guides,
-                          use_langchain=use_langchain)
+    """Render interview setup page with proper title and character data."""
+    try:
+        # Load available characters/prompts
+        characters = []
+        prompts = load_all_prompts()
+        for name, config in prompts.items():
+            characters.append({
+                'name': name,
+                'display_name': config.get('agent_name', name.capitalize()),
+                'role': config.get('role', ''),
+                'description': config.get('description', '')
+            })
+        
+        # Set default interview prompt
+        interview_prompt = "You are an AI assistant conducting a research interview. Ask open-ended questions, follow up on interesting points, and help the participant share their experiences and perspectives."
+        
+        # Set default analysis prompt
+        analysis_prompt = "Based on the interview transcript, please provide:\n1. Key insights\n2. Pain points and frustrations\n3. Opportunities for improvement"
+        
+        # Render the template with data
+        return render_template(
+            'langchain/interview_setup.html', 
+            title="Discussion Guide Setup",
+            characters=characters,
+            interview_prompt=interview_prompt,
+            analysis_prompt=analysis_prompt
+        )
+    except Exception as e:
+        logger.error(f"Error loading interview setup page: {str(e)}")
+        return render_template('langchain/interview_setup.html', characters=[])
 
 @app.route('/interview_archive')
-@login_required
 def interview_archive():
-    """Show all interviews."""
+    """Render interview archive page."""
     try:
-        # Load interviews from Discussion service
-        interviews = []
+        # Load all interviews
+        interviews = load_all_interviews()
         
-        if discussion_service:
-            session_ids = discussion_service.get_session_ids()
-            logger.info(f"Loaded {len(session_ids)} interviews for archive page")
+        # Convert to list for the template
+        interview_list = []
+        for session_id, data in interviews.items():
+            # Convert datetime objects to strings if needed
+            serializable_data = {}
+            for key, value in data.items():
+                if isinstance(value, datetime.datetime):
+                    serializable_data[key] = value.isoformat()
+                else:
+                    serializable_data[key] = value
             
-            for session_id in session_ids:
-                try:
-                    session = discussion_service.get_session(session_id)
-                    if session:
-                        interviews.append(session)
-                except Exception as e:
-                    logger.error(f"Error loading interview archive: {str(e)}")
+            # Add session_id to the data
+            serializable_data['session_id'] = session_id
+            interview_list.append(serializable_data)
         
-        return render_template('langchain/interview_archive.html', interviews=interviews)
+        logger.info(f"Loaded {len(interview_list)} interviews for archive page")
+        
+        return render_template('langchain/interview_archive.html', interviews=interview_list)
     except Exception as e:
-        logger.error(f"Error displaying interview archive: {str(e)}")
-        flash(f"Error displaying interview archive: {str(e)}", "danger")
-        return redirect('/dashboard')
+        logger.error(f"Error loading interview archive: {str(e)}")
+        return render_template('langchain/interview_archive.html', interviews=[], error=str(e))
 
 @app.route('/prompts/')
-@login_required
 def prompts_manager():
-    """Show all prompts."""
+    """Render prompts manager page."""
     try:
-        agent_names = prompt_mgr.get_available_agents()
-        logger.info(f"Found {len(agent_names)} agent prompts: {agent_names}")
+        prompts = load_all_prompts()
         
-        prompts = []
-        for agent_name in agent_names:
-            try:
-                config = prompt_mgr.load_prompt(agent_name)
-                if config:
-                    # Add ID to config
-                    config['id'] = agent_name
-                    prompts.append(config)
-            except Exception as e:
-                logger.error(f"Error loading prompt {agent_name}: {str(e)}")
+        prompt_list = []
+        for name, config in prompts.items():
+            prompt_list.append({
+                'id': name,
+                'name': config.get('agent_name', name.capitalize()),
+                'description': config.get('description', ''),
+                'role': config.get('role', ''),
+                'version': config.get('version', 'v1.0')
+            })
         
-        return render_template('langchain/prompts_manager.html', prompts=prompts)
+        # Sort prompts by name
+        prompt_list.sort(key=lambda x: x['name'])
+        
+        return render_template(
+            'langchain/prompt_manager.html',
+            prompts=prompt_list,
+            title="Prompt Manager",
+            section="prompts"
+        )
     except Exception as e:
-        logger.error(f"Error displaying prompts: {str(e)}")
-        flash(f"Error displaying prompts: {str(e)}", "danger")
-        return redirect('/dashboard')
+        logger.error(f"Error loading prompts page: {str(e)}")
+        return render_template(
+            'langchain/prompt_manager.html',
+            prompts=[],
+            title="Prompt Manager",
+            section="prompts",
+            error=str(e)
+        )
 
 @app.route('/prompts/view/<prompt_id>')
-@login_required
 def view_prompt(prompt_id):
-    """View a prompt."""
+    """View a specific prompt."""
     try:
-        config = prompt_mgr.load_prompt(prompt_id)
+        prompt_id = prompt_id.lower()
+        
+        # Load prompt config
+        config = None
+        if prompt_id in prompt_cache:
+            config = prompt_cache[prompt_id]
+        else:
+            config = prompt_mgr.load_prompt(prompt_id)
+            if config:
+                prompt_cache[prompt_id] = config
+        
         if not config:
-            flash(f"Prompt {prompt_id} not found", "danger")
-            return redirect('/prompts')
+            return redirect('/prompts/')
         
-        # Add ID to config
-        config['id'] = prompt_id
-        
-        return render_template('langchain/prompt_view.html', prompt=config)
+        return render_template(
+            'langchain/view_prompt.html',
+            prompt_id=prompt_id,
+            agent=config.get('agent_name', prompt_id),
+            config=config,
+            title=f"View Prompt: {config.get('agent_name', prompt_id)}",
+            section="prompts"
+        )
     except Exception as e:
         logger.error(f"Error viewing prompt {prompt_id}: {str(e)}")
-        flash(f"Error viewing prompt {prompt_id}: {str(e)}", "danger")
-        return redirect('/prompts')
+        return redirect('/prompts/')
 
 @app.route('/prompts/edit/<prompt_id>')
-@login_required
 def edit_prompt(prompt_id):
-    """Edit a prompt."""
+    """Edit a specific prompt."""
     try:
-        config = prompt_mgr.load_prompt(prompt_id)
+        prompt_id = prompt_id.lower()
+        
+        # Load prompt config
+        config = None
+        if prompt_id in prompt_cache:
+            config = prompt_cache[prompt_id]
+        else:
+            config = prompt_mgr.load_prompt(prompt_id)
+            if config:
+                prompt_cache[prompt_id] = config
+        
         if not config:
-            flash(f"Prompt {prompt_id} not found", "danger")
-            return redirect('/prompts')
+            return redirect('/prompts/')
         
-        # Add ID to config
-        config['id'] = prompt_id
-        
-        return render_template('langchain/prompt_edit.html', prompt=config)
+        return render_template(
+            'langchain/edit_prompt.html',
+            prompt_id=prompt_id,
+            agent=config.get('agent_name', prompt_id),
+            config=config,
+            title=f"Edit Prompt: {config.get('agent_name', prompt_id)}",
+            section="prompts"
+        )
     except Exception as e:
         logger.error(f"Error editing prompt {prompt_id}: {str(e)}")
-        flash(f"Error editing prompt {prompt_id}: {str(e)}", "danger")
-        return redirect('/prompts')
+        return redirect('/prompts/')
 
 @app.route('/monitor_interview')
-@login_required
 def monitor_interview():
-    """Monitor interviews in real-time."""
+    """Render monitoring dashboard for live sessions."""
     try:
-        # Load active sessions from Discussion service
-        active_sessions = []
+        if not discussion_service:
+            return render_template('langchain/error.html', 
+                                error="Discussion service not available")
         
-        if discussion_service:
-            session_ids = discussion_service.get_session_ids()
+        # Get all active sessions
+        try:
+            active_sessions = discussion_service.get_all_sessions()
             
-            for session_id in session_ids:
-                try:
-                    session = discussion_service.get_session(session_id)
-                    if session:
-                        # Only show sessions in the last 24 hours
-                        created_at = session.get('created_at')
-                        if isinstance(created_at, str):
-                            try:
-                                created_at = datetime.datetime.fromisoformat(created_at)
-                            except ValueError:
-                                created_at = None
-                        
-                        if created_at:
-                            now = datetime.datetime.now()
-                            age = now - created_at
-                            if age.days < 1:  # Less than 24 hours old
-                                active_sessions.append(session)
-                except Exception as e:
-                    logger.error(f"Error loading session {session_id}: {str(e)}")
+            # Sort sessions by last activity (most recent first)
+            active_sessions = sorted(
+                active_sessions, 
+                key=lambda s: s.get('last_updated', s.get('created_at', '')),
+                reverse=True
+            )
+        except AttributeError as e:
+            logger.error(f"Error calling get_all_sessions: {str(e)}")
+            # Fall back to using list_guide_sessions from all available guides
+            active_sessions = []
+            try:
+                guides = discussion_service.list_guides()
+                for guide in guides:
+                    guide_id = guide.get('id')
+                    if guide_id:
+                        guide_sessions = discussion_service.get_guide_sessions(guide_id)
+                        active_sessions.extend(guide_sessions)
+                
+                # Sort sessions by last activity (most recent first)
+                active_sessions = sorted(
+                    active_sessions, 
+                    key=lambda s: s.get('last_updated', s.get('created_at', '')),
+                    reverse=True
+                )
+            except Exception as inner_e:
+                logger.error(f"Error in fallback method for retrieving sessions: {str(inner_e)}")
+                # If all else fails, return an empty list
+                active_sessions = []
         
-        return render_template('langchain/monitor_interview.html', sessions=active_sessions)
+        return render_template('langchain/monitor_dashboard.html', 
+                            sessions=active_sessions)
     except Exception as e:
-        logger.error(f"Error displaying monitor page: {str(e)}")
-        flash(f"Error displaying monitor page: {str(e)}", "danger")
-        return redirect('/dashboard')
+        logger.error(f"Error loading monitor page: {str(e)}")
+        return render_template('langchain/error.html', 
+                            error=f"Error loading monitor page: {str(e)}")
 
 @app.route('/monitor_interview/<session_id>')
-@login_required
 def monitor_interview_session(session_id):
     """Monitor a specific interview session."""
     try:
         if not discussion_service:
-            flash("Discussion service not available", "danger")
-            return redirect('/monitor_interview')
+            logger.warning(f"Discussion service not available for monitoring session {session_id}")
+            return redirect(url_for('interview_details', session_id=session_id))
+        
+        # Get the session details
+        session = discussion_service.get_session(session_id)
+        if not session:
+            logger.warning(f"Session {session_id} not found for monitoring")
+            return render_template('langchain/error.html', 
+                                error=f"Session {session_id} not found")
+        
+        # Get the discussion guide if available
+        guide = None
+        if 'guide_id' in session and session.get('guide_id'):
+            try:
+                guide = discussion_service.get_guide(session.get('guide_id'))
+            except Exception as e:
+                logger.warning(f"Error loading guide for session {session_id}: {str(e)}")
+        
+        # Make sure session has a title
+        if 'title' not in session or not session.get('title'):
+            session['title'] = f"Session {session_id[:8]}"
+        
+        # Ensure session_id is in the session data for JavaScript to use
+        if 'session_id' not in session:
+            session['session_id'] = session_id
+            
+        # Return the monitor page
+        logger.info(f"Rendering monitoring page for session {session_id}")
+        return render_template('langchain/monitor_session.html', 
+                            session=session,
+                            guide=guide,
+                            session_id=session_id)
+    except Exception as e:
+        logger.error(f"Error loading monitoring session {session_id}: {str(e)}")
+        return render_template('langchain/error.html', 
+                            error=f"Error loading monitoring page: {str(e)}")
+
+@app.route('/interview_details/<session_id>')
+def interview_details(session_id):
+    """Show details for a specific interview."""
+    interview_data = load_interview(session_id)
+    if not interview_data:
+        return render_template('langchain/interview_error.html',
+                               error=f"No interview found for session: {session_id}")
+    
+    return render_template('langchain/interview_details.html',
+                           interview=interview_data,
+                           session_id=session_id)
+
+@app.route('/api/interview/analyze/<interview_id>', methods=['POST'])
+def analyze_interview(interview_id):
+    """Analyze an interview and generate insights."""
+    try:
+        # Load the interview data
+        interview_data = load_interview(interview_id)
+        if not interview_data:
+            return jsonify({
+                'success': False,
+                'error': f"Interview with ID {interview_id} not found."
+            }), 404
+        
+        # Check if interview is completed
+        if interview_data.get('status') != 'completed':
+            return jsonify({
+                'success': False,
+                'error': "Only completed interviews can be analyzed."
+            }), 400
+        
+        # Check if interview already has analysis
+        if 'analysis' in interview_data and interview_data['analysis']:
+            # If force parameter is not provided or false, return existing analysis
+            if not request.json or not request.json.get('force', False):
+                return jsonify({
+                    'success': True,
+                    'message': "Analysis already exists for this interview.",
+                    'interview_id': interview_id,
+                    'analysis': interview_data['analysis']
+                })
+            # Otherwise continue with new analysis (force=true)
+        
+        # Get the character's analysis prompt
+        character_name = interview_data.get('character', 'interviewer')
+        
+        # Try to get character-specific analysis prompt
+        analysis_prompt = None
+        
+        # First check if there's a specific analysis_prompt in the interview data
+        if 'analysis_prompt' in interview_data and interview_data['analysis_prompt']:
+            analysis_prompt = interview_data['analysis_prompt']
+        # Then try to get it from the prompt manager
+        else:
+            try:
+                character_config = prompt_mgr.load_prompt(character_name)
+                if character_config and 'analysis_prompt' in character_config:
+                    analysis_prompt = character_config['analysis_prompt']
+            except Exception as e:
+                logger.warning(f"Could not load analysis prompt for {character_name}: {str(e)}")
+        
+        # If no specific analysis prompt found, use a generic one
+        if not analysis_prompt:
+            analysis_prompt = """
+            Analyze this interview transcript to identify:
+            
+            1. User Needs: What specific needs, wants, or requirements did the user express?
+            2. Goals: What short-term and long-term goals did the user mention?
+            3. Pain Points: What frustrations, challenges, or obstacles did the user describe?
+            4. Opportunities: What potential improvements or solutions could address the identified needs and pain points?
+            5. Key Quotes: What specific quotes from the user best illustrate the above points?
+            
+            Structure your analysis in a clear, comprehensive way addressing each of these points.
+            """
+        
+        # Prepare the transcript in a format suitable for analysis
+        formatted_transcript = format_transcript_for_analysis(interview_data)
+        
+        # Send to LLM for analysis
+        # If using LangChain
+        if use_langchain and interview_service:
+            logger.info(f"Using LangChain for interview analysis: {interview_id}")
+            analysis_result = interview_service.generate_analysis(
+                transcript=formatted_transcript,
+                prompt=analysis_prompt
+            )
+        # Otherwise use simple implementation
+        else:
+            logger.info(f"Using simple implementation for interview analysis: {interview_id}")
+            analysis_result = simple_analysis_generation(
+                transcript=formatted_transcript,
+                prompt=analysis_prompt
+            )
+        
+        # Parse and structure the analysis
+        structured_analysis = parse_analysis_response(analysis_result, analysis_prompt)
+        
+        # Update the interview with the analysis
+        interview_data['analysis'] = structured_analysis
+        interview_data['status'] = 'analyzed'  # Mark as analyzed
+        interview_data['last_updated'] = datetime.datetime.now()
+        
+        # Save the updated interview
+        success = save_interview(interview_id, interview_data)
+        if not success:
+            return jsonify({
+                'success': False,
+                'error': "Failed to save analysis results."
+            }), 500
+        
+        return jsonify({
+            'success': True,
+            'message': "Analysis completed successfully.",
+            'interview_id': interview_id,
+            'analysis': structured_analysis
+        })
+    
+    except Exception as e:
+        logger.error(f"Error analyzing interview {interview_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f"Failed to analyze interview: {str(e)}"
+        }), 500
+
+
+def format_transcript_for_analysis(interview_data):
+    """Format interview transcript for analysis."""
+    formatted = ""
+    
+    # Check if there's conversation_history
+    if 'conversation_history' in interview_data and interview_data['conversation_history']:
+        # Add basic metadata
+        formatted += f"Interview Title: {interview_data.get('title', 'Untitled Interview')}\n"
+        formatted += f"Date: {interview_data.get('created_at', '')}\n"
+        formatted += f"Character: {interview_data.get('character', 'Interviewer')}\n\n"
+        formatted += "TRANSCRIPT:\n\n"
+        
+        # Add conversation history
+        for message in interview_data['conversation_history']:
+            speaker = "Interviewer" if message.get('role') == 'assistant' else "Participant"
+            formatted += f"{speaker}: {message.get('content', '')}\n\n"
+    
+    # If there's a transcript field in the new format
+    elif 'transcript' in interview_data and isinstance(interview_data['transcript'], list):
+        # Add basic metadata
+        formatted += f"Interview Title: {interview_data.get('title', 'Untitled Interview')}\n"
+        formatted += f"Date: {interview_data.get('created_at', '')}\n"
+        formatted += f"Character: {interview_data.get('character', 'Interviewer')}\n\n"
+        formatted += "TRANSCRIPT:\n\n"
+        
+        # Add transcript entries
+        for entry in interview_data['transcript']:
+            formatted += f"{entry.get('speaker_name', 'Unknown')}: {entry.get('content', '')}\n\n"
+    
+    return formatted
+
+
+def simple_analysis_generation(transcript, prompt):
+    """Generate analysis using a simple OpenAI API call."""
+    try:
+        import os
+        import openai
+        
+        # Check for API key
+        api_key = os.environ.get('OPENAI_API_KEY')
+        if not api_key:
+            logger.error("OPENAI_API_KEY environment variable not set")
+            return "Error: OpenAI API key not found. Please set the OPENAI_API_KEY environment variable."
+        
+        client = openai.OpenAI(api_key=api_key)
+        
+        # Send request to OpenAI
+        response = client.chat.completions.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": prompt},
+                {"role": "user", "content": transcript}
+            ],
+            temperature=0.3,
+            max_tokens=1500
+        )
+        
+        # Return the analysis
+        return response.choices[0].message.content
+    
+    except Exception as e:
+        logger.error(f"Error generating analysis: {str(e)}")
+        return f"Error generating analysis: {str(e)}"
+
+
+def parse_analysis_response(response, prompt_used):
+    """Parse the LLM response into a structured analysis format."""
+    # This implementation does basic parsing of common sections
+    # A more sophisticated implementation could use structured output from GPT
+    
+    # Initialize the structure
+    analysis = {
+        "performed_at": datetime.datetime.now().isoformat(),
+        "analysis_prompt_used": prompt_used,
+        "raw_analysis": response,  # Keep the original for reference
+        "summary": "",
+        "user_needs": [],
+        "goals": [],
+        "pain_points": [],
+        "opportunities": [],
+        "recommendations": [],
+        "key_quotes": []
+    }
+    
+    # Extract summary (first paragraph often contains summary)
+    paragraphs = response.split('\n\n')
+    if paragraphs:
+        analysis["summary"] = paragraphs[0].strip()
+    
+    # Look for section headers in the response
+    sections = {
+        "user needs": "user_needs",
+        "needs": "user_needs",
+        "goals": "goals",
+        "pain points": "pain_points",
+        "challenges": "pain_points",
+        "opportunities": "opportunities",
+        "recommendations": "recommendations",
+        "key quotes": "key_quotes",
+        "quotes": "key_quotes"
+    }
+    
+    current_section = None
+    section_content = []
+    
+    for line in response.split('\n'):
+        line = line.strip()
+        if not line:
+            continue
+        
+        # Check if this line is a section header
+        is_header = False
+        for header, section_name in sections.items():
+            # Look for section headers (e.g., "User Needs:", "Goals:", etc.)
+            if line.lower().startswith(header.lower() + ':') or line.lower() == header.lower():
+                # If we were building a previous section, add it
+                if current_section and section_content:
+                    analysis[current_section].append(' '.join(section_content))
+                    section_content = []
+                
+                # Start new section
+                current_section = section_name
+                # Remove the header from the content
+                content = line.split(':', 1)[-1].strip() if ':' in line else ""
+                if content:
+                    section_content.append(content)
+                is_header = True
+                break
+        
+        # If not a header and we're in a section, add to current section
+        if not is_header and current_section:
+            # Check if this is a bullet point
+            if line.startswith('- ') or line.startswith('• '):
+                # If we have accumulated content, add it as an item
+                if section_content:
+                    analysis[current_section].append(' '.join(section_content))
+                    section_content = []
+                # Start a new item
+                section_content.append(line[2:].strip())
+            else:
+                # Continue with current item
+                section_content.append(line)
+    
+    # Add the last section if there is one
+    if current_section and section_content:
+        analysis[current_section].append(' '.join(section_content))
+    
+    return analysis
+
+# ------ Discussion Guide and Session API Routes ------
+
+@app.route('/discussion_guide/create', methods=['POST'])
+def create_discussion_guide():
+    """Create a new discussion guide."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        data = request.json
+        logger.info(f"Create discussion guide request: {data}")
+        
+        # Generate a unique ID
+        guide_id = str(uuid.uuid4())
+        
+        # Current time
+        now = datetime.datetime.now()
+        
+        # Prepare the guide data
+        guide_data = {
+            'id': guide_id,
+            'title': data.get('title', 'Untitled Guide'),
+            'project': data.get('project', ''),
+            'interview_type': data.get('interview_type', 'custom_interview'),
+            'prompt': data.get('prompt', ''),
+            'interview_prompt': data.get('interview_prompt', ''),
+            'analysis_prompt': data.get('analysis_prompt', ''),
+            'character_select': data.get('character_select', ''),
+            'voice_id': data.get('voice_id', 'EXAVITQu4vr4xnSDxMaL'),
+            'target_audience': data.get('interviewee', {}),  # Map interviewee to target_audience
+            'created_at': now,
+            'updated_at': now,
+            'status': 'active',
+            'sessions': [],
+            'custom_questions': data.get('custom_questions', []),
+            'time_per_question': data.get('time_per_question', 3),
+            'options': data.get('options', {})
+        }
+        
+        # Save the guide
+        created_id = discussion_service.create_guide(guide_data)
+        logger.info(f"Created new discussion guide with ID: {created_id}")
+        
+        # Return success response with guide ID and redirect URL
+        return jsonify({
+            'status': 'success',
+            'guide_id': created_id,
+            'redirect_url': f"/discussion_guide/{created_id}"
+        })
+    except Exception as e:
+        logger.error(f"Error creating discussion guide: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/discussion_guides', methods=['GET'])
+def get_discussion_guides():
+    """Get all discussion guides."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        active_only = request.args.get('active_only', 'false').lower() == 'true'
+        guides = discussion_service.list_guides(active_only=active_only)
+        return jsonify({'success': True, 'guides': guides})
+    except Exception as e:
+        logger.error(f"Error getting discussion guides: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/discussion_guide/<guide_id>', methods=['GET'])
+def get_discussion_guide(guide_id):
+    """Get a discussion guide by ID."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        guide = discussion_service.get_guide(guide_id)
+        if not guide:
+            return jsonify({'success': False, 'error': 'Guide not found'}), 404
+        
+        return jsonify({'success': True, 'guide': guide})
+    except Exception as e:
+        logger.error(f"Error getting discussion guide: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/discussion_guide/<guide_id>/sessions', methods=['GET'])
+def get_guide_sessions(guide_id):
+    """Get all sessions for a discussion guide."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        sessions = discussion_service.list_guide_sessions(guide_id)
+        return jsonify({'success': True, 'sessions': sessions})
+    except Exception as e:
+        logger.error(f"Error getting guide sessions: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/session/<session_id>', methods=['GET'])
+def get_session(session_id):
+    """Get a session by ID."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        session = discussion_service.get_session(session_id)
+        if not session:
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
+        
+        return jsonify({'success': True, 'session': session})
+    except Exception as e:
+        logger.error(f"Error getting session: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/session/create', methods=['POST'])
+def create_session():
+    """Create a new session for a discussion guide."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        data = request.json
+        guide_id = data.get('guide_id')
+        interviewee = data.get('interviewee', {})
+        
+        if not guide_id:
+            return jsonify({'success': False, 'error': 'Missing guide_id'}), 400
+        
+        session_id = discussion_service.create_session(guide_id, interviewee)
+        if not session_id:
+            return jsonify({'success': False, 'error': 'Failed to create session'}), 500
+        
+        return jsonify({
+            'success': True, 
+            'session_id': session_id,
+            'redirect_url': f"/session/{session_id}"
+        })
+    except Exception as e:
+        logger.error(f"Error creating session: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/session/<session_id>/add_message', methods=['POST'])
+def api_add_session_message(session_id):
+    """Add a message to a session and generate an AI response if needed."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        data = request.json
+        message_content = data.get('content')
+        role = data.get('role', 'user')
+        
+        if not message_content:
+            return jsonify({'success': False, 'error': 'Message content is required'}), 400
+        
+        # Get the session
+        session = discussion_service.get_session(session_id)
+        if not session:
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
+        
+        # Add the message
+        message_id = str(uuid.uuid4())
+        message = {
+            'id': message_id,
+            'content': message_content,
+            'role': role,
+            'timestamp': datetime.datetime.now().isoformat(),
+        }
+        
+        success = discussion_service.add_message(session_id, message)
+        if not success:
+            return jsonify({'success': False, 'error': 'Failed to add message to session'}), 500
+        
+        # Generate AI response if it's a user message and AI is enabled
+        ai_response = None
+        if role == 'user' and interview_service:
+            try:
+                # Get the guide ID and character
+                guide_id = session.get('guide_id')
+                guide = discussion_service.get_guide(guide_id) if guide_id else None
+                character = guide.get('character_select', 'interviewer') if guide else 'interviewer'
+                
+                # Get all messages for context
+                messages = session.get('messages', [])
+                
+                # Generate AI response
+                logger.info(f"Generating AI response for session {session_id}")
+                ai_response = interview_service.generate_response(
+                    messages=messages,
+                    character=character
+                )
+                
+                # Create AI message
+                ai_message_id = str(uuid.uuid4())
+                ai_message = {
+                    'id': ai_message_id,
+                    'content': ai_response,
+                    'role': 'assistant',
+                    'timestamp': datetime.datetime.now().isoformat(),
+                }
+                
+                # Add AI message to session
+                discussion_service.add_message(session_id, ai_message)
+                
+                # Create observation for monitoring if enabled
+                if observer_service:
+                    try:
+                        # Create observation of user message
+                        observation = observer_service.analyze_message(
+                            session_id, 
+                            message, 
+                            messages[-5:] if len(messages) > 5 else messages
+                        )
+                        
+                        # Emit the observation to the monitoring room
+                        socketio.emit('new_observation', {
+                            'session_id': session_id,
+                            'observation': observation,
+                            'message_id': message_id
+                        }, room=f"monitor_{session_id}")
+                        
+                        logger.info(f"Emitted new observation for message {message_id}")
+                    except Exception as e:
+                        logger.error(f"Error creating observation: {str(e)}")
+                
+            except Exception as e:
+                logger.error(f"Error generating AI response: {str(e)}")
+        
+        return jsonify({
+            'success': True,
+            'message_id': message_id,
+            'ai_response': ai_response
+        })
+    except Exception as e:
+        logger.error(f"Error adding message to session: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/session/<session_id>/complete', methods=['POST'])
+def complete_session(session_id):
+    """Mark a session as completed."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        # Get additional data if provided
+        data = request.json or {}
+        
+        # Update session with additional information before marking as complete
+        if data:
+            # Get the current session
+            session = discussion_service.get_session(session_id)
+            if not session:
+                return jsonify({'success': False, 'error': 'Session not found'}), 404
+                
+            # Add researcher notes if provided
+            if 'researcher_notes' in data:
+                session['researcher_notes'] = data['researcher_notes']
+                
+            # Add session quality if provided
+            if 'session_quality' in data:
+                session['session_quality'] = data['session_quality']
+                
+            # Add end reason if provided
+            if 'end_reason' in data:
+                session['end_reason'] = data['end_reason']
+                
+            # Add final message if provided
+            if 'final_message' in data:
+                session['final_message'] = data['final_message']
+                
+            # Update participant information if provided
+            if 'additional_participant_info' in data and data['additional_participant_info']:
+                # Get current interviewee data or create empty dict
+                interviewee = session.get('interviewee', {})
+                
+                # Update with additional information
+                additional_info = data['additional_participant_info']
+                if 'role_details' in additional_info and additional_info['role_details']:
+                    interviewee['role_details'] = additional_info['role_details']
+                    
+                if 'experience_level' in additional_info and additional_info['experience_level']:
+                    interviewee['experience_level'] = additional_info['experience_level']
+                    
+                if 'additional_context' in additional_info and additional_info['additional_context']:
+                    interviewee['additional_context'] = additional_info['additional_context']
+                
+                # Update the session with enriched interviewee data
+                session['interviewee'] = interviewee
+                
+            # Save the updated session data
+            discussion_service.update_session(session_id, session)
+        
+        # Mark the session as complete
+        success = discussion_service.complete_session(session_id)
+        if not success:
+            return jsonify({'success': False, 'error': 'Failed to complete session'}), 500
+        
+        # Notify researchers via WebSocket that the session has been completed
+        try:
+            socketio.emit('session_completed', {
+                'session_id': session_id,
+                'timestamp': datetime.datetime.now().isoformat(),
+                'message': "The interview session has been completed."
+            }, room=f"monitor_{session_id}")
+            logger.info(f"Emitted session_completed event for session {session_id}")
+        except Exception as e:
+            logger.error(f"Error emitting session_completed event: {str(e)}")
+        
+        # Check if auto-analysis should be run based on request data
+        should_analyze = data.get('should_analyze', True)
+        
+        # If auto-analysis is enabled, generate analysis
+        if should_analyze:
+            session = discussion_service.get_session(session_id)
+            guide_id = session.get('guide_id')
+            guide = discussion_service.get_guide(guide_id)
+            
+            if guide and guide.get('options', {}).get('analysis', True):
+                try:
+                    # Get the transcript
+                    transcript = session.get('transcript', '')
+                    
+                    # Get analysis prompt
+                    analysis_prompt = guide.get('analysis_prompt', 'Analyze the transcript')
+                    
+                    # Generate analysis using LangChain
+                    if interview_service:
+                        logger.info(f"Automatically generating analysis for session {session_id}")
+                        analysis = interview_service.generate_analysis(transcript, analysis_prompt)
+                        
+                        # Save the analysis
+                        discussion_service.analyze_session(session_id, {
+                            'content': analysis,
+                            'generated_at': datetime.datetime.now().isoformat()
+                        })
+                        
+                        # Notify researchers via WebSocket that the analysis is ready
+                        try:
+                            socketio.emit('analysis_complete', {
+                                'session_id': session_id,
+                                'timestamp': datetime.datetime.now().isoformat(),
+                                'message': "The interview analysis is now ready."
+                            }, room=f"monitor_{session_id}")
+                            logger.info(f"Emitted analysis_complete event for session {session_id}")
+                        except Exception as e:
+                            logger.error(f"Error emitting analysis_complete event: {str(e)}")
+                except Exception as ae:
+                    logger.error(f"Error generating automatic analysis: {str(ae)}")
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error completing session: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/session/<session_id>/analyze', methods=['POST'])
+def analyze_session(session_id):
+    """Generate analysis for a session."""
+    if not discussion_service or not interview_service:
+        return jsonify({'success': False, 'error': 'Required services not available'}), 500
+    
+    try:
+        # Get the session
+        session = discussion_service.get_session(session_id)
+        if not session:
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
+        
+        # Get the transcript
+        transcript = session.get('transcript', '')
+        if not transcript:
+            return jsonify({'success': False, 'error': 'No transcript available for analysis'}), 400
+        
+        # Get the guide
+        guide_id = session.get('guide_id')
+        guide = discussion_service.get_guide(guide_id)
+        
+        # Get analysis prompt
+        analysis_prompt = guide.get('analysis_prompt', 'Analyze the transcript') if guide else 'Analyze the transcript'
+        
+        # Generate analysis
+        analysis = interview_service.generate_analysis(transcript, analysis_prompt)
+        
+        # Save the analysis
+        success = discussion_service.analyze_session(session_id, {
+            'content': analysis,
+            'generated_at': datetime.datetime.now().isoformat()
+        })
+        
+        if not success:
+            return jsonify({'success': False, 'error': 'Failed to save analysis'}), 500
+        
+        return jsonify({'success': True, 'analysis': analysis})
+    except Exception as e:
+        logger.error(f"Error analyzing session: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/discussion_guide/<guide_id>/archive', methods=['POST'])
+def archive_discussion_guide(guide_id):
+    """Archive a discussion guide."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        success = discussion_service.archive_guide(guide_id)
+        if not success:
+            return jsonify({'success': False, 'error': 'Guide not found or could not be archived'}), 404
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error archiving guide {guide_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/discussion_guide/<guide_id>/delete', methods=['POST'])
+def delete_discussion_guide(guide_id):
+    """Permanently delete a discussion guide."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        success = discussion_service.delete_guide(guide_id)
+        if not success:
+            return jsonify({'success': False, 'error': 'Guide not found or could not be deleted'}), 404
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error deleting guide {guide_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/discussion_guide/<guide_id>/duplicate', methods=['POST'])
+def duplicate_discussion_guide(guide_id):
+    """Duplicate a discussion guide."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        data = request.json
+        title = data.get('title')
+        
+        if not title:
+            return jsonify({'success': False, 'error': 'Missing title'}), 400
+        
+        # Get the source guide
+        source_guide = discussion_service.get_guide(guide_id)
+        if not source_guide:
+            return jsonify({'success': False, 'error': 'Guide not found'}), 404
+        
+        # Create a copy with a new ID
+        new_guide = source_guide.copy()
+        new_guide.pop('id', None)
+        new_guide['title'] = title
+        new_guide['created_at'] = datetime.datetime.now()
+        new_guide['updated_at'] = datetime.datetime.now()
+        new_guide['sessions'] = []
+        new_guide['status'] = 'active'
+        
+        # Save the new guide
+        new_guide_id = discussion_service.create_guide(new_guide)
+        
+        return jsonify({
+            'success': True,
+            'guide_id': new_guide_id
+        })
+    except Exception as e:
+        logger.error(f"Error duplicating guide {guide_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ------ Frontend Routes for Discussion Guides and Sessions ------
+
+@app.route('/discussion_guides', methods=['GET'])
+def discussion_guides_list():
+    """Show the discussion guides list page."""
+    try:
+        if not discussion_service:
+            return redirect('/interview_archive')  # Fallback to old view if not available
+        
+        guides = discussion_service.list_guides()
+        return render_template('langchain/discussion_guides.html', guides=guides)
+    except Exception as e:
+        logger.error(f"Error loading discussion guides page: {str(e)}")
+        return render_template('error.html', error=str(e))
+
+@app.route('/discussion_guide/<guide_id>', methods=['GET'])
+def discussion_guide_details(guide_id):
+    """Show the discussion guide details page."""
+    try:
+        if not discussion_service:
+            return redirect('/interview_details/' + guide_id)  # Fallback to old view if not available
+        
+        guide = discussion_service.get_guide(guide_id)
+        if not guide:
+            return render_template('langchain/error.html', error="Discussion guide not found"), 404
+        
+        sessions = discussion_service.list_guide_sessions(guide_id)
+        return render_template('langchain/discussion_guide.html', guide=guide, sessions=sessions, guide_id=guide_id)
+    except Exception as e:
+        logger.error(f"Error loading discussion guide page: {str(e)}")
+        return render_template('langchain/error.html', error=str(e))
+
+@app.route('/session/<session_id>', methods=['GET'])
+def session_details(session_id):
+    """Show the interview session details page."""
+    try:
+        if not discussion_service:
+            return redirect('/interview_details/' + session_id)  # Fallback to old view if not available
         
         session = discussion_service.get_session(session_id)
         if not session:
-            flash(f"Session {session_id} not found", "danger")
-            return redirect('/monitor_interview')
+            return render_template('langchain/error.html', error="Session not found"), 404
         
-        # Get guide details
         guide_id = session.get('guide_id')
-        guide = None
-        if guide_id:
-            guide = discussion_service.get_guide(guide_id)
+        guide = discussion_service.get_guide(guide_id) if guide_id else None
         
-        # Prepare observer state if available
-        observer_state = None
-        if observer_service:
-            try:
-                observer_state = observer_service.get_state(session_id)
-            except Exception as e:
-                logger.error(f"Error getting observer state: {str(e)}")
-        
-        return render_template('langchain/monitor_session.html', 
-                              session=session,
-                              guide=guide,
-                              observer_state=observer_state)
+        return render_template('langchain/session.html', session=session, guide=guide, session_id=session_id)
     except Exception as e:
-        logger.error(f"Error monitoring session {session_id}: {str(e)}")
-        flash(f"Error monitoring session {session_id}: {str(e)}", "danger")
-        return redirect('/monitor_interview')
+        logger.error(f"Error loading session page: {str(e)}")
+        return render_template('langchain/error.html', error=str(e))
 
-@app.route('/interview_details/<session_id>')
-@login_required
-def interview_details(session_id):
-    """Show interview details."""
-    return redirect(f'/session/{session_id}')
-
-# ------ Discussion Guide Routes ------
-
-@app.route('/discussion_guides', methods=['GET'])
-@login_required
-def discussion_guides_list():
-    """Show all discussion guides."""
+@app.route('/api/session/<session_id>/messages', methods=['GET'])
+def get_session_messages(session_id):
+    """Get all messages for a session."""
     if not discussion_service:
-        flash("Discussion service not available", "danger")
-        return redirect('/dashboard')
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
     
-    # Redirect to the interview archive for now
-    return redirect('/interview_archive')
+    try:
+        # Get the session
+        session = discussion_service.get_session(session_id)
+        if not session:
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
+        
+        # Return the messages
+        messages = session.get('messages', [])
+        
+        return jsonify({
+            'success': True, 
+            'session_id': session_id,
+            'messages': messages
+        })
+    except Exception as e:
+        logger.error(f"Error getting session messages: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/discussion_guide/<guide_id>', methods=['GET'])
-@login_required
-def discussion_guide_details(guide_id):
-    """Show discussion guide details."""
-    if not discussion_service:
-        flash("Discussion service not available", "danger")
-        return redirect('/dashboard')
-    
-    guide = discussion_service.get_guide(guide_id)
-    if not guide:
-        flash(f"Discussion guide not found: {guide_id}", "danger")
-        return redirect('/discussion_guides')
-    
-    return render_template('langchain/discussion_guide.html', guide=guide)
+# ------ AI Observer API Routes ------
 
-@app.route('/session/<session_id>', methods=['GET'])
-@login_required
-def session_details(session_id):
-    """Show session details."""
-    if not discussion_service:
-        flash("Discussion service not available", "danger")
-        return redirect('/dashboard')
+@app.route('/api/observer/<session_id>/analyze_message', methods=['POST'])
+def analyze_session_message(session_id):
+    """Analyze a session message using the AI observer."""
+    if not observer_service:
+        return jsonify({'success': False, 'error': 'Observer service not available'}), 500
     
-    session = discussion_service.get_session(session_id)
-    if not session:
-        flash(f"Session not found: {session_id}", "danger")
-        return redirect('/interview_archive')
-    
-    # Get guide details
-    guide_id = session.get('guide_id')
-    guide = None
-    if guide_id:
-        guide = discussion_service.get_guide(guide_id)
-    
-    return render_template('langchain/session_details.html', session=session, guide=guide)
+    try:
+        data = request.json
+        message = data.get('message')
+        
+        if not message:
+            return jsonify({'success': False, 'error': 'Missing message data'}), 400
+        
+        # Get context from the session
+        context = []
+        if discussion_service:
+            session = discussion_service.get_session(session_id)
+            if session:
+                messages = session.get('messages', [])
+                # Get the last few messages for context
+                context = messages[-5:] if len(messages) > 5 else messages
+        
+        # Analyze the message
+        observation = observer_service.analyze_message(session_id, message, context)
+        
+        # Emit the observation to the monitoring room
+        socketio.emit('new_observation', {
+            'session_id': session_id,
+            'observation': observation
+        }, room=f"monitor_{session_id}")
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'observation': observation
+        })
+    except Exception as e:
+        logger.error(f"Error analyzing message: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
-# ------ Main Entry Point ------
+@app.route('/api/observer/<session_id>/state', methods=['GET'])
+def get_observer_state(session_id):
+    """Get the current observer state for a session."""
+    if not observer_service:
+        return jsonify({'success': False, 'error': 'Observer service not available'}), 500
+    
+    try:
+        # Get the observer state
+        state = observer_service.get_observer_state(session_id)
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'observer_state': state
+        })
+    except Exception as e:
+        logger.error(f"Error getting observer state: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
+@app.route('/api/observer/<session_id>/summary', methods=['POST'])
+def generate_observer_summary(session_id):
+    """Generate a summary of the observer notes for a session."""
+    if not observer_service:
+        return jsonify({'success': False, 'error': 'Observer service not available'}), 500
+    
+    try:
+        # Generate the summary
+        summary = observer_service.generate_summary(session_id)
+        
+        # Emit the summary to the monitoring room
+        socketio.emit('observer_summary', {
+            'session_id': session_id,
+            'summary': summary
+        }, room=f"monitor_{session_id}")
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'summary': summary
+        })
+    except Exception as e:
+        logger.error(f"Error generating observer summary: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# ------ SocketIO Event Handlers ------
+
+@socketio.on('connect')
+def handle_connect():
+    """Handle a new WebSocket connection."""
+    logger.info(f"New client connected: {request.sid}")
+    emit('connection_ack', {'status': 'connected', 'client_id': request.sid})
+
+@socketio.on('disconnect')
+def handle_disconnect():
+    """Handle a WebSocket disconnection."""
+    logger.info(f"Client disconnected: {request.sid}")
+
+@socketio.on('join_monitor_room')
+def handle_join_room(data):
+    """Join a monitoring room for a specific session."""
+    session_id = data.get('session_id')
+    if not session_id:
+        emit('error', {'message': 'No session_id provided'})
+        return
+    
+    # Join the room for this session
+    room = f"monitor_{session_id}"
+    join_room(room)
+    logger.info(f"Client {request.sid} joined monitoring room for session {session_id}")
+    
+    # Send confirmation
+    emit('joined_room', {
+        'room': room,
+        'session_id': session_id
+    })
+    
+    # Send initial data if available
+    if discussion_service:
+        try:
+            session = discussion_service.get_session(session_id)
+            if session:
+                messages = session.get('messages', [])
+                emit('session_data', {
+                    'session_id': session_id,
+                    'messages': messages
+                })
+                
+                # If observer service is available, send initial observer data
+                if observer_service:
+                    observer_state = observer_service.get_observer_state(session_id)
+                    emit('observer_data', {
+                        'session_id': session_id,
+                        'observer_state': observer_state
+                    })
+        except Exception as e:
+            logger.error(f"Error sending initial data: {str(e)}")
+            emit('error', {'message': f"Error loading session data: {str(e)}"})
+
+@socketio.on('leave_monitor_room')
+def handle_leave_room(data):
+    """Handle client leaving a monitoring room."""
+    try:
+        session_id = data.get('session_id')
+        if not session_id:
+            return
+        
+        room = f"monitor_{session_id}"
+        leave_room(room)
+        logger.info(f"Client {request.sid} left monitoring room for session {session_id}")
+    except Exception as e:
+        logger.error(f"Error in leave_monitor_room: {str(e)}")
+
+@socketio.on('researcher_message')
+def handle_researcher_message(data):
+    """Handle system message from researcher to participant."""
+    try:
+        session_id = data.get('session_id')
+        message = data.get('message')
+        
+        if not session_id or not message or not discussion_service:
+            return
+        
+        # Add message ID and timestamp if not provided
+        if 'id' not in message:
+            message['id'] = str(uuid.uuid4())
+        
+        if 'timestamp' not in message:
+            message['timestamp'] = datetime.datetime.now().isoformat()
+        
+        # Process different message types
+        message_type = message.get('type', 'suggestion')
+        
+        # For direct questions, we need to add them directly as an AI message
+        if message_type == 'direct_question':
+            # Create an AI message with the researcher's question
+            ai_message = {
+                'role': 'assistant',
+                'content': message['content'],
+                'id': str(uuid.uuid4()),
+                'timestamp': datetime.datetime.now().isoformat(),
+                'researcher_generated': True
+            }
+            
+            # Add the message to the session
+            discussion_service.add_message(session_id, ai_message)
+            
+            # Emit to all clients in the monitoring room
+            socketio.emit('new_message', {
+                'session_id': session_id,
+                'message': ai_message
+            }, room=f"monitor_{session_id}")
+            
+            logger.info(f"Direct researcher question sent to session {session_id}")
+            
+        # For custom questions to add to the AI prompt
+        elif message_type == 'custom_question':
+            # Add the custom question to the session's custom_questions list
+            session = discussion_service.get_session(session_id)
+            if session:
+                # Create or update the custom_questions list
+                if 'custom_questions' not in session:
+                    session['custom_questions'] = []
+                
+                # Add the new question
+                session['custom_questions'].append({
+                    'text': message['content'],
+                    'priority': message.get('priority', 'normal'),
+                    'added_at': datetime.datetime.now().isoformat(),
+                    'asked': False
+                })
+                
+                # Update the session
+                discussion_service.update_session(session_id, session)
+                
+                # Log and emit confirmation
+                logger.info(f"Custom question added to session {session_id}")
+                socketio.emit('custom_question_added', {
+                    'session_id': session_id,
+                    'question': message['content']
+                }, room=f"monitor_{session_id}")
+            
+        # Regular suggestions and notes
+        else:
+            # Add message to the session as a system message
+            discussion_service.add_message(session_id, message)
+            
+            # Emit to all clients in the monitoring room
+            socketio.emit('new_message', {
+                'session_id': session_id,
+                'message': message
+            }, room=f"monitor_{session_id}")
+            
+            logger.info(f"Researcher {message_type} sent to session {session_id}")
+        
+    except Exception as e:
+        logger.error(f"Error in researcher_message: {str(e)}")
+        socketio.emit('error', {
+            'message': f"Error processing researcher message: {str(e)}"
+        }, room=request.sid)
+
+@app.route('/api/prompts/edit/<prompt_id>', methods=['POST'])
+def api_edit_prompt(prompt_id):
+    """API endpoint to save prompt edits."""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+        
+        logger.info(f"Editing prompt {prompt_id} with data: {data}")
+        
+        # Load current prompt to preserve structure
+        try:
+            config = prompt_mgr.load_prompt(prompt_id)
+            if not config:
+                config = {}
+        except Exception as e:
+            logger.error(f"Error loading prompt {prompt_id}: {str(e)}")
+            return jsonify({'success': False, 'error': f"Error loading prompt: {str(e)}"}), 500
+        
+        # Update fields from request data
+        for key, value in data.items():
+            config[key] = value
+        
+        # Save the updated config
+        try:
+            success = prompt_mgr.save_prompt(prompt_id, config)
+            if not success:
+                return jsonify({'success': False, 'error': 'Failed to save prompt'}), 500
+            
+            # Clear cache for this prompt
+            if prompt_id in prompt_cache:
+                del prompt_cache[prompt_id]
+                
+            return jsonify({'success': True, 'message': f"Prompt {prompt_id} updated successfully"})
+        except Exception as e:
+            logger.error(f"Error saving prompt {prompt_id}: {str(e)}")
+            return jsonify({'success': False, 'error': f"Error saving prompt: {str(e)}"}), 500
+    except Exception as e:
+        logger.error(f"Error in api_edit_prompt for {prompt_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Register blueprints
+app.register_blueprint(user_bp, url_prefix='/user')
+app.register_blueprint(auth_bp, url_prefix='/auth')
+
+# Start the app
 if __name__ == '__main__':
-    print(f"Starting DARIA Interview API on port {args.port}")
-    print(f"Health check endpoint: http://127.0.0.1:{args.port}/api/health")
-    print(f"Interview start endpoint: http://127.0.0.1:{args.port}/api/interview/start")
-    print(f"Monitor interviews: http://127.0.0.1:{args.port}/monitor_interview")
+    debug_mode = False
+    if '--debug' in sys.argv:
+        debug_mode = True
     
-    socketio.run(app, host='0.0.0.0', port=args.port, debug=args.debug) 
+    # Check if a custom port is specified
+    port = 5025
+    port_index = -1
+    if '--port' in sys.argv:
+        port_index = sys.argv.index('--port')
+        if port_index >= 0 and port_index + 1 < len(sys.argv):
+            port = int(sys.argv[port_index + 1])
+            
+    print(f"Starting DARIA Interview API on port {port}")
+    print(f"Health check endpoint: http://127.0.0.1:{port}/api/health")
+    print(f"Interview start endpoint: http://127.0.0.1:{port}/api/interview/start")
+    print(f"Monitor interviews: http://127.0.0.1:{port}/monitor_interview")
+    
+    socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode, allow_unsafe_werkzeug=True) 
