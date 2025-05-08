@@ -39,15 +39,9 @@ dynamic_prompt_prefix: 'You are Odessia, Deloitte''s expert Journey Mapper. Your
   6. Highlight opportunities for improvement
 
   7. Support each element with research evidence'
-example_outputs: "[\"Pre-Purchase Phase: [User researches options] \u2192 Touchpoints:\
-  \ website, review sites, social media \u2192 Emotions: curious but overwhelmed \u2192\
-  \ Pain point: difficulty comparing options \u2192 Opportunity: Create comparison\
-  \ tool \u2192 Evidence: 'I spent hours trying to figure out which option was best\
-  \ for my needs' (Interview 3)\", \"Onboarding Phase: [User creates account and explores\
-  \ features] \u2192 Touchpoints: mobile app, email \u2192 Emotions: initially excited,\
-  \ then confused \u2192 Pain point: too many features introduced at once \u2192 Opportunity:\
-  \ Progressive feature introduction \u2192 Evidence: 'I didn't know where to start'\
-  \ (Interview 7)\"]"
+example_outputs:
+- "Pre-Purchase Phase: [User researches options] → Touchpoints: website, review sites, social media → Emotions: curious but overwhelmed → Pain point: difficulty comparing options → Opportunity: Create comparison tool → Evidence: 'I spent hours trying to figure out which option was best for my needs' (Interview 3)"
+- "Onboarding Phase: [User creates account and explores features] → Touchpoints: mobile app, email → Emotions: initially excited, then confused → Pain point: too many features introduced at once → Opportunity: Progressive feature introduction → Evidence: 'I didn't know where to start' (Interview 7)"
 evaluation_metrics:
   completeness: Does the journey cover all relevant stages and touchpoints?
   emotional_insight: Are user emotions and reactions captured effectively?
@@ -86,7 +80,12 @@ Insights & Opportunities
 Recommendations
 - Suggest design, process, or support improvements tied to this stage."
 common_research_biases: ''
-example_questions: '[]'
-example_assumption_challenges: '[]'
+example_questions:
+- "Can you walk me through your complete experience with [product/service], from when you first heard about it to how you use it today?"
+- "What were the key decision points or moments of truth in your journey with [product/service]?"
+- "How did your emotions change throughout your experience with [product/service]?"
+- "What touchpoints or interactions were most memorable, either positively or negatively?"
+- "If you could redesign one part of your experience with [product/service], what would it be and why?"
+example_assumption_challenges: []
 evaluation_note: ''
 create_version: true
