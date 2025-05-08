@@ -74,13 +74,20 @@ interview_service = None
 discussion_service = None
 observer_service = None
 
+# Always initialize discussion service
+try:
+    discussion_service = DiscussionService(data_dir=str(DATA_DIR))
+    logger.info("Discussion service initialized successfully")
+except Exception as e:
+    logger.error(f"Error initializing discussion service: {str(e)}")
+    discussion_service = None
+
 if use_langchain:
     try:
         interview_service = InterviewService(data_dir=str(DATA_DIR))
         logger.info("LangChain interview service initialized successfully")
         
-        discussion_service = DiscussionService(data_dir=str(DATA_DIR))
-        logger.info("Discussion service initialized successfully")
+        # discussion_service is already initialized above
         
         observer_service = ObserverService(openai_api_key=os.environ.get('OPENAI_API_KEY'))
         logger.info("Observer service initialized successfully")
@@ -1218,6 +1225,11 @@ def home():
     """Redirect to dashboard."""
     return redirect('/dashboard')
 
+@app.route('/debug')
+def debug_toolkit():
+    """Redirect to the debug toolkit page."""
+    return redirect('/static/debug_toolkit.html')
+
 @app.route('/dashboard')
 def dashboard():
     """Render dashboard page."""
@@ -1225,8 +1237,36 @@ def dashboard():
 
 @app.route('/interview_setup')
 def interview_setup():
-    """Render interview setup page."""
-    return render_template('langchain/interview_setup.html')
+    """Render interview setup page with proper title and character data."""
+    try:
+        # Load available characters/prompts
+        characters = []
+        prompts = load_all_prompts()
+        for name, config in prompts.items():
+            characters.append({
+                'name': name,
+                'display_name': config.get('agent_name', name.capitalize()),
+                'role': config.get('role', ''),
+                'description': config.get('description', '')
+            })
+        
+        # Set default interview prompt
+        interview_prompt = "You are an AI assistant conducting a research interview. Ask open-ended questions, follow up on interesting points, and help the participant share their experiences and perspectives."
+        
+        # Set default analysis prompt
+        analysis_prompt = "Based on the interview transcript, please provide:\n1. Key insights\n2. Pain points and frustrations\n3. Opportunities for improvement"
+        
+        # Render the template with data
+        return render_template(
+            'langchain/interview_setup.html', 
+            title="Discussion Guide Setup",
+            characters=characters,
+            interview_prompt=interview_prompt,
+            analysis_prompt=analysis_prompt
+        )
+    except Exception as e:
+        logger.error(f"Error loading interview setup page: {str(e)}")
+        return render_template('langchain/interview_setup.html', characters=[])
 
 @app.route('/interview_archive')
 def interview_archive():
@@ -1856,140 +1896,97 @@ def create_session():
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/session/<session_id>/add_message', methods=['POST'])
-def add_session_message(session_id):
-    """Add a message to a session."""
+def api_add_session_message(session_id):
+    """Add a message to a session and generate an AI response if needed."""
     if not discussion_service:
         return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
     
     try:
         data = request.json
-        message = data.get('message', {})
+        message_content = data.get('content')
+        role = data.get('role', 'user')
         
-        if not message or 'content' not in message or 'role' not in message:
-            return jsonify({'success': False, 'error': 'Invalid message data'}), 400
+        if not message_content:
+            return jsonify({'success': False, 'error': 'Message content is required'}), 400
         
-        # Add an ID if not provided
-        if 'id' not in message:
-            message['id'] = str(uuid.uuid4())
-            
-        # Add timestamp if not provided
-        if 'timestamp' not in message:
-            message['timestamp'] = datetime.datetime.now().isoformat()
+        # Get the session
+        session = discussion_service.get_session(session_id)
+        if not session:
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
         
-        # First, add the user's message
+        # Add the message
+        message_id = str(uuid.uuid4())
+        message = {
+            'id': message_id,
+            'content': message_content,
+            'role': role,
+            'timestamp': datetime.now().isoformat(),
+        }
+        
         success = discussion_service.add_message(session_id, message)
         if not success:
-            return jsonify({'success': False, 'error': 'Failed to add message'}), 500
+            return jsonify({'success': False, 'error': 'Failed to add message to session'}), 500
         
-        # Get current session messages
-        session = discussion_service.get_session(session_id)
-        messages = session.get('messages', []) if session else []
-        
-        # Emit the new message via WebSocket
-        socketio.emit('new_message', {
-            'session_id': session_id,
-            'message': message
-        }, room=f"monitor_{session_id}")
-        
-        # Process with AI observer if available
-        if observer_service and len(messages) > 0:
+        # Generate AI response if it's a user message and AI is enabled
+        ai_response = None
+        if role == 'user' and interview_service:
             try:
-                # Get previous messages for context (up to 5)
-                context = messages[-6:-1] if len(messages) >= 6 else messages[:-1]
-                
-                # Analyze the message
-                observation = observer_service.analyze_message(
-                    session_id=session_id,
-                    message=message,
-                    context=context
-                )
-                
-                # Emit the observation
-                socketio.emit('new_observation', {
-                    'session_id': session_id,
-                    'observation': observation,
-                    'message_id': message.get('id')
-                }, room=f"monitor_{session_id}")
-                
-                logger.info(f"Emitted new observation for message {message.get('id')}")
-            except Exception as e:
-                logger.error(f"Error processing message with AI observer: {str(e)}")
-        
-        # Now generate an AI response if this was a user message
-        if message.get('role') == 'user' and interview_service:
-            try:
-                # Get the guide for character info
-                guide = None
-                if session:
-                    guide_id = session.get('guide_id')
-                    if guide_id:
-                        guide = discussion_service.get_guide(guide_id)
-                
-                # Get character name
+                # Get the guide ID and character
+                guide_id = session.get('guide_id')
+                guide = discussion_service.get_guide(guide_id) if guide_id else None
                 character = guide.get('character_select', 'interviewer') if guide else 'interviewer'
+                
+                # Get all messages for context
+                messages = session.get('messages', [])
                 
                 # Generate AI response
                 logger.info(f"Generating AI response for session {session_id}")
+                # Fix: Remove session_data parameter, only pass messages and character
                 ai_response = interview_service.generate_response(
                     messages=messages,
-                    character=character,
-                    session_data=session
+                    character=character
                 )
                 
                 # Create AI message
+                ai_message_id = str(uuid.uuid4())
                 ai_message = {
-                    'role': 'assistant',
+                    'id': ai_message_id,
                     'content': ai_response,
-                    'id': str(uuid.uuid4()),
-                    'timestamp': datetime.datetime.now().isoformat()
+                    'role': 'assistant',
+                    'timestamp': datetime.now().isoformat(),
                 }
                 
-                # Add the AI response to the session
+                # Add AI message to session
                 discussion_service.add_message(session_id, ai_message)
                 
-                # Emit the AI response via WebSocket
-                socketio.emit('new_message', {
-                    'session_id': session_id,
-                    'message': ai_message
-                }, room=f"monitor_{session_id}")
-                
-                # Also analyze the AI response with the observer
+                # Create observation for monitoring if enabled
                 if observer_service:
                     try:
-                        # Include the user's message in context
-                        updated_session = discussion_service.get_session(session_id)
-                        updated_messages = updated_session.get('messages', []) if updated_session else []
-                        
-                        # Analyze the AI response
-                        ai_observation = observer_service.analyze_message(
-                            session_id=session_id,
-                            message=ai_message,
-                            context=updated_messages[-6:-1] if len(updated_messages) >= 6 else updated_messages[:-1]
+                        # Create observation of user message
+                        observation = observer_service.analyze_message(
+                            session_id, 
+                            message, 
+                            messages[-5:] if len(messages) > 5 else messages
                         )
                         
-                        # Emit the observation
+                        # Emit the observation to the monitoring room
                         socketio.emit('new_observation', {
                             'session_id': session_id,
-                            'observation': ai_observation,
-                            'message_id': ai_message.get('id')
+                            'observation': observation,
+                            'message_id': message_id
                         }, room=f"monitor_{session_id}")
                         
-                        logger.info(f"Emitted new observation for AI message {ai_message.get('id')}")
+                        logger.info(f"Emitted new observation for message {message_id}")
                     except Exception as e:
-                        logger.error(f"Error processing AI message with observer: {str(e)}")
+                        logger.error(f"Error creating observation: {str(e)}")
                 
-                # Return both messages
-                return jsonify({
-                    'success': True,
-                    'messages': [message, ai_message]
-                })
             except Exception as e:
                 logger.error(f"Error generating AI response: {str(e)}")
         
-        # If we're here, just return success with the added message
         return jsonify({
             'success': True,
-            'message': message
+            'message_id': message_id,
+            'ai_response': ai_response
         })
     except Exception as e:
         logger.error(f"Error adding message to session: {str(e)}")
