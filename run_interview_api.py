@@ -939,6 +939,7 @@ def get_character(character_name):
             'role': config.get('role', ''),
             'description': config.get('description', ''),
             'prompt': config.get('dynamic_prompt_prefix', ''),
+            'dynamic_prompt_prefix': config.get('dynamic_prompt_prefix', ''),
             'system_prompt': config.get('dynamic_prompt_prefix', ''),
             'analysis_prompt': config.get('analysis_prompt', '')
         })

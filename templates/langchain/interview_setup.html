@@ -1,12 +1,12 @@
 {% extends "langchain/base.html" %}
 
-{% block title %}LangChain Interview Setup{% endblock %}
+{% block title %}{{ title|default('Discussion Guide Setup') }}{% endblock %}
 
 {% block content %}
 <div class="container-fluid">
     <div class="mb-4">
-        <h1 class="h3">Interview Setup</h1>
-        <p class="text-muted">Configure your LangChain-powered interview session</p>
+        <h1 class="h3">Discussion Guide Setup</h1>
+        <p class="text-muted">Configure your LangChain-powered research discussion guide</p>
     </div>
     
     <div class="card">
@@ -15,8 +15,8 @@
                 <!-- Project Information -->
                 <div class="row mb-4">
                     <div class="col-md-6 mb-3">
-                        <label for="title" class="form-label">Interview Title <span class="text-danger">*</span></label>
-                        <input type="text" id="title" name="title" class="form-control" placeholder="E.g., UX Research Interview with John Smith" required>
+                        <label for="title" class="form-label">Discussion Guide Title <span class="text-danger">*</span></label>
+                        <input type="text" id="title" name="title" class="form-control" placeholder="E.g., Mobile App UX Research Guide" required>
                     </div>
                     
                     <div class="col-md-6 mb-3">
@@ -229,7 +229,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 console.log("Character data:", data);
                 if (data.success) {
                     // Populate the prompt fields with the character's prompts
-                    interviewPrompt.value = data.dynamic_prompt_prefix || '';
+                    // Try dynamic_prompt_prefix first, then fall back to prompt if needed
+                    interviewPrompt.value = data.dynamic_prompt_prefix || data.prompt || '';
                     if (data.analysis_prompt) {
                         analysisPrompt.value = data.analysis_prompt;
                     }
