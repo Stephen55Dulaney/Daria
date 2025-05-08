@@ -171,6 +171,28 @@
                             </a>
                         </li>
                     </ul>
+                    
+                    <!-- User Authentication Section -->
+                    <div class="mt-auto border-top pt-3">
+                        {% if current_user.is_authenticated %}
+                        <div class="d-flex align-items-center mb-2">
+                            <div class="me-2">
+                                <span class="badge bg-success"><i class="bi bi-person-check"></i></span>
+                            </div>
+                            <div>
+                                <div class="fw-bold">{{ current_user.username }}</div>
+                                <div class="small text-muted">{{ current_user.role }}</div>
+                            </div>
+                        </div>
+                        <a href="{{ url_for('auth.logout') }}" class="btn btn-outline-secondary btn-sm w-100">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </a>
+                        {% else %}
+                        <a href="{{ url_for('auth.login') }}" class="btn btn-primary btn-sm w-100">
+                            <i class="bi bi-box-arrow-in-right"></i> Login
+                        </a>
+                        {% endif %}
+                    </div>
                 </div>
             </div>
             
