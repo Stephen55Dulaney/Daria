@@ -1,6 +1,6 @@
 {% extends "langchain/base.html" %}
 
-{% block title %}Monitor Interview: {{ interview.title }}{% endblock %}
+{% block title %}Monitor Interview: {{ session.title if session and session.title else "Session" }}{% endblock %}
 
 {% block extra_css %}
 <style>
@@ -238,6 +238,62 @@
     .toggle-observer input {
         margin-right: 5px;
     }
+    .mood-indicator {
+        display: flex;
+        flex-direction: column;
+        margin-bottom: 15px;
+    }
+    .mood-label {
+        display: flex;
+        justify-content: space-between;
+        font-size: 0.75rem;
+        color: #6c757d;
+    }
+    .mood-bar {
+        height: 5px;
+        background: linear-gradient(to right, #dc3545, #ffc107, #28a745);
+        border-radius: 2px;
+        margin: 5px 0;
+        position: relative;
+    }
+    .mood-marker {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        background-color: #212529;
+        border-radius: 50%;
+        top: -2.5px;
+        transform: translateX(-50%);
+        transition: left 0.3s ease;
+    }
+    .key-insights {
+        background-color: rgba(79, 70, 229, 0.05);
+        border-radius: 8px;
+        padding: 10px;
+        margin-top: 15px;
+    }
+    .insight-item {
+        display: flex;
+        margin-bottom: 8px;
+    }
+    .insight-item i {
+        color: #4f46e5;
+        margin-right: 8px;
+        margin-top: 2px;
+    }
+    .quick-suggestion:hover, .direct-intervention:hover {
+        transform: translateY(-2px);
+        transition: transform 0.2s;
+    }
+    .ai-suggestion {
+        border-left: 3px solid #198754;
+        text-align: left;
+        transition: all 0.2s ease;
+    }
+    .ai-suggestion:hover {
+        background-color: rgba(25, 135, 84, 0.1);
+        transform: translateX(3px);
+    }
 </style>
 {% endblock %}
 
@@ -312,6 +368,54 @@
                         <div class="form-text">This will be sent as a suggestion to the interviewer.</div>
                     </div>
                     
+                    <!-- Quick Suggestion Buttons -->
+                    <div class="mb-4">
+                        <label class="form-label">Quick Suggestions:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-sm btn-outline-primary quick-suggestion" data-suggestion="Ask why">Ask why</button>
+                            <button class="btn btn-sm btn-outline-primary quick-suggestion" data-suggestion="Please elaborate">Please elaborate</button>
+                            <button class="btn btn-sm btn-outline-primary quick-suggestion" data-suggestion="Provide an example">Provide an example</button>
+                            <button class="btn btn-sm btn-outline-primary quick-suggestion" data-suggestion="How does that make you feel?">How does that feel?</button>
+                            <button class="btn btn-sm btn-outline-primary quick-suggestion" data-suggestion="What challenges did you face?">Challenges faced?</button>
+                            <button class="btn btn-sm btn-outline-primary quick-suggestion" data-suggestion="What would you change?">What would you change?</button>
+                        </div>
+                    </div>
+                    
+                    <!-- AI Suggested Questions -->
+                    <div class="mb-4">
+                        <label class="form-label d-flex align-items-center">
+                            <span>AI Suggested Questions:</span>
+                            <span class="badge bg-primary ms-2"><i class="bi bi-robot"></i></span>
+                            <button id="refresh-questions-btn" class="btn btn-sm btn-link p-0 ms-auto">
+                                <i class="bi bi-arrow-clockwise"></i>
+                            </button>
+                        </label>
+                        <div id="ai-suggested-questions" class="d-flex flex-column gap-2">
+                            <div class="text-center text-muted small py-2">
+                                <i class="bi bi-hourglass-split me-1"></i> Waiting for AI suggestions...
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Intervention Options -->
+                    <div class="mb-4">
+                        <label class="form-label">Direct Interventions:</label>
+                        <div class="d-flex flex-wrap gap-2">
+                            <button class="btn btn-sm btn-warning direct-intervention" data-intervention="change-topic">
+                                <i class="bi bi-arrow-right-circle"></i> Change Topic
+                            </button>
+                            <button class="btn btn-sm btn-info direct-intervention" data-intervention="pause">
+                                <i class="bi bi-pause-circle"></i> Pause Briefly
+                            </button>
+                            <button class="btn btn-sm btn-success direct-intervention" data-intervention="go-deeper">
+                                <i class="bi bi-arrow-down-circle"></i> Go Deeper
+                            </button>
+                            <button class="btn btn-sm btn-secondary direct-intervention" data-intervention="summarize">
+                                <i class="bi bi-list-check"></i> Summarize So Far
+                            </button>
+                        </div>
+                    </div>
+                    
                     <div class="d-flex justify-content-between mt-4">
                         <button class="btn btn-outline-primary" id="add-note-btn">
                             <i class="bi bi-journal-plus"></i> Add Research Note
@@ -352,6 +456,19 @@
                         </label>
                     </div>
                     
+                    <!-- Current Participant Mood -->
+                    <h6 class="mb-2">Participant Mood</h6>
+                    <div class="mood-indicator">
+                        <div class="mood-bar">
+                            <div class="mood-marker" id="current-mood-marker" style="left: 50%;"></div>
+                        </div>
+                        <div class="mood-label">
+                            <span>Negative</span>
+                            <span>Neutral</span>
+                            <span>Positive</span>
+                        </div>
+                    </div>
+                    
                     <h6 class="mb-2">Mood Timeline</h6>
                     <div id="mood-timeline" class="mood-timeline">
                         <!-- Mood points will be added here -->
@@ -360,6 +477,14 @@
                     <h6 class="mb-2">Detected Topics</h6>
                     <div id="topics-list" class="topic-list mb-3">
                         <!-- Topics will be added here -->
+                    </div>
+                    
+                    <!-- AI Key Insights Section -->
+                    <h6 class="mb-2">Key Insights</h6>
+                    <div id="key-insights" class="key-insights mb-3">
+                        <div class="text-center text-muted py-2">
+                            <small>Insights will appear here as the interview progresses</small>
+                        </div>
                     </div>
                     
                     <button id="generate-summary-btn" class="btn btn-primary w-100">
@@ -512,24 +637,123 @@
         socket.on('connect', function() {
             socket.emit('join_monitor_room', { session_id: sessionId });
             console.log('Connected to monitoring room for session:', sessionId);
+            
+            // Request AI suggested questions
+            socket.emit('request_suggested_questions', { session_id: sessionId });
         });
         
         // Listen for new messages
         socket.on('new_message', function(data) {
             if (data.session_id === sessionId && data.message) {
+                console.log('New message received:', data.message);
+                
+                // Clear initial placeholder if present
+                const placeholder = document.querySelector('.text-center.text-muted.py-5');
+                if (placeholder) {
+                    placeholder.remove();
+                }
+                
                 // Add message to the transcript
-                appendMessage(data.message);
+                const transcriptContent = document.getElementById('transcript-content');
+                const messageDiv = document.createElement('div');
+                
+                if (data.message.role === 'assistant') {
+                    messageDiv.className = 'interviewer-message';
+                    messageDiv.innerHTML = `<strong>AI Interviewer:</strong> ${data.message.content}`;
+                } else if (data.message.role === 'user') {
+                    messageDiv.className = 'participant-message';
+                    messageDiv.innerHTML = `<strong>Participant:</strong> ${data.message.content}`;
+                } else if (data.message.role === 'system') {
+                    messageDiv.className = 'system-message alert alert-info';
+                    messageDiv.innerHTML = `<i class="bi bi-info-circle me-2"></i><strong>System:</strong> ${data.message.content}`;
+                }
+                
+                // Add data attribute for message ID
+                if (data.message.id) {
+                    messageDiv.setAttribute('data-message-id', data.message.id);
+                }
+                
+                // Add to transcript
+                transcriptContent.appendChild(messageDiv);
+                
+                // Update message count
+                const messageCount = document.getElementById('message-count');
+                if (messageCount) {
+                    messageCount.textContent = parseInt(messageCount.textContent || 0) + 1;
+                }
                 
                 // Scroll to bottom 
-                transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+                transcriptContent.scrollTop = transcriptContent.scrollHeight;
             }
         });
         
         // Listen for new observations
         socket.on('new_observation', function(data) {
             if (data.session_id === sessionId && data.observation) {
-                // Update AI observer panel
-                updateObservations(data.observation);
+                console.log('New observation received:', data.observation);
+                
+                // Update AI observer status indicator
+                const observerStatus = document.getElementById('observer-status');
+                const statusIndicator = document.querySelector('.status-indicator');
+                if (observerStatus && statusIndicator) {
+                    observerStatus.textContent = 'Active';
+                    statusIndicator.classList.add('active');
+                }
+                
+                // Update mood timeline if there's a mood value
+                if (data.observation.mood !== undefined) {
+                    const moodTimeline = document.getElementById('mood-timeline');
+                    if (moodTimeline) {
+                        const point = document.createElement('div');
+                        point.className = 'mood-point';
+                        
+                        // Calculate position (mood is -10 to 10, translate to 0-100% height)
+                        const x = Math.floor(Math.random() * 95) + 2; // Random horizontal position (2-97%)
+                        const y = 100 - ((data.observation.mood + 10) / 20 * 100); // Vertical position based on mood
+                        
+                        point.style.left = `${x}%`;
+                        point.style.top = `${y}%`;
+                        
+                        // Add tooltip with the note
+                        if (data.observation.note) {
+                            point.title = data.observation.note;
+                        }
+                        
+                        moodTimeline.appendChild(point);
+                    }
+                }
+                
+                // Update topics list if there are tags
+                if (data.observation.tags && data.observation.tags.length > 0) {
+                    const topicsList = document.getElementById('topics-list');
+                    if (topicsList) {
+                        data.observation.tags.forEach(tag => {
+                            // Check if tag already exists to avoid duplicates
+                            if (!document.querySelector(`.topic-tag[data-tag="${tag}"]`)) {
+                                const tagElem = document.createElement('span');
+                                tagElem.className = 'topic-tag';
+                                tagElem.setAttribute('data-tag', tag);
+                                tagElem.textContent = tag;
+                                topicsList.appendChild(tagElem);
+                            }
+                        });
+                    }
+                }
+                
+                // Update current mood if available
+                if (data.observation.mood !== undefined) {
+                    const moodMarker = document.getElementById('current-mood-marker');
+                    if (moodMarker) {
+                        // Convert mood from -10 to 10 scale to 0 to 100% position
+                        const position = ((data.observation.mood + 10) / 20) * 100;
+                        moodMarker.style.left = `${position}%`;
+                    }
+                    
+                    // Add to key insights if there's a note
+                    if (data.observation.note) {
+                        addInsight(data.observation.note, 'observation', data.observation.tags || []);
+                    }
+                }
             }
         });
         
@@ -586,6 +810,53 @@
                     `;
                 }
             }
+        });
+        
+        // Listen for suggested questions from AI
+        socket.on('suggested_questions', function(data) {
+            if (data.session_id === sessionId && data.questions) {
+                updateSuggestedQuestions(data.questions);
+            }
+        });
+        
+        // Function to update suggested questions UI
+        function updateSuggestedQuestions(questions) {
+            const container = document.getElementById('ai-suggested-questions');
+            if (!container) return;
+            
+            // Clear existing content
+            container.innerHTML = '';
+            
+            if (!questions || questions.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted small py-2">
+                        <i class="bi bi-exclamation-circle me-1"></i> No questions available yet
+                    </div>
+                `;
+                return;
+            }
+            
+            // Add each question as a button
+            questions.forEach(question => {
+                const button = document.createElement('button');
+                button.className = 'btn btn-sm btn-outline-success ai-suggestion mb-1';
+                button.setAttribute('data-suggestion', question.text);
+                button.innerHTML = `<i class="bi bi-robot me-1"></i> ${question.text}`;
+                container.appendChild(button);
+                
+                // Add click handler
+                button.addEventListener('click', function() {
+                    const suggestion = this.getAttribute('data-suggestion');
+                    messageInput.value = suggestion;
+                    sendBtn.click();
+                });
+            });
+        }
+        
+        // Refresh questions button
+        document.getElementById('refresh-questions-btn').addEventListener('click', function() {
+            socket.emit('request_suggested_questions', { session_id: sessionId });
+            showNotification('Refreshing', 'Requesting new question suggestions...', 'info');
         });
         
         // Send a suggestion to the interviewer
@@ -693,108 +964,88 @@
             }
         });
         
-        // Helper function to append message to transcript
-        function appendMessage(message) {
-            const messageDiv = document.createElement('div');
-            messageDiv.className = `message message-${message.role}`;
-            
-            if (message.role === 'system') {
-                // System messages (suggestions, notes)
-                messageDiv.className += ' message-system';
-                let icon = 'info-circle';
-                let title = 'System';
+        // Quick suggestion buttons
+        document.querySelectorAll('.quick-suggestion').forEach(button => {
+            button.addEventListener('click', function() {
+                const suggestion = this.getAttribute('data-suggestion');
+                messageInput.value = suggestion;
+                sendBtn.click();
+            });
+        });
+        
+        // Direct intervention buttons
+        document.querySelectorAll('.direct-intervention').forEach(button => {
+            button.addEventListener('click', function() {
+                const intervention = this.getAttribute('data-intervention');
+                let message = '';
                 
-                if (message.type === 'suggestion') {
-                    icon = 'lightbulb';
-                    title = 'Suggestion';
-                } else if (message.type === 'researcher_note') {
-                    icon = 'journal-text';
-                    title = 'Research Note';
-                    
-                    if (message.note_type === 'insight') {
-                        icon = 'lightbulb';
-                        title = 'Insight';
-                    } else if (message.note_type === 'question') {
-                        icon = 'question-circle';
-                        title = 'Follow-up Question';
+                switch(intervention) {
+                    case 'change-topic':
+                        message = 'Please transition to the next topic.';
+                        break;
+                    case 'pause':
+                        message = 'Take a brief pause and then continue with the interview.';
+                        break;
+                    case 'go-deeper':
+                        message = 'Please explore this topic in more depth with follow-up questions.';
+                        break;
+                    case 'summarize':
+                        message = 'Summarize the key points discussed so far.';
+                        break;
+                }
+                
+                // Send as a direct instruction rather than suggestion
+                socket.emit('researcher_message', {
+                    session_id: sessionId,
+                    message: {
+                        role: 'system',
+                        content: message,
+                        type: 'direct_question'
                     }
-                }
+                });
                 
-                messageDiv.innerHTML = `
-                    <div class="message-header">
-                        <i class="bi bi-${icon}"></i>
-                        <strong>${title}</strong>
-                        <span class="text-muted ms-2 small">${formatTimestamp(message.timestamp)}</span>
-                    </div>
-                    <div class="message-content">${message.content}</div>
-                `;
-            } else {
-                // Regular messages (user/assistant)
-                const role = message.role === 'assistant' ? 'AI' : 'Participant';
-                
-                messageDiv.innerHTML = `
-                    <div class="message-header">
-                        <strong>${role}</strong>
-                        <span class="text-muted ms-2 small">${formatTimestamp(message.timestamp)}</span>
-                    </div>
-                    <div class="message-content">${message.content}</div>
-                `;
-            }
-            
-            transcriptContainer.appendChild(messageDiv);
-        }
+                // Show confirmation
+                showNotification('Intervention Sent', 'Your direction has been sent to the AI interviewer.', 'warning');
+            });
+        });
         
-        // Helper function to update AI observations
-        function updateObservations(observation) {
-            // Implementation depends on your UI structure
-            // This is just a placeholder that should be adapted to your actual UI
+        // Function to add an insight to the key insights section
+        function addInsight(text, type = 'observation', tags = []) {
+            const insightsContainer = document.getElementById('key-insights');
             
-            // Update mood chart if available
-            if (observation.sentiment && typeof updateMoodChart === 'function') {
-                updateMoodChart(observation.sentiment);
+            // Remove placeholder if present
+            const placeholder = insightsContainer.querySelector('.text-center.text-muted');
+            if (placeholder) {
+                placeholder.remove();
             }
             
-            // Update topics/tags if available
-            if (observation.topics && observation.topics.length > 0) {
-                const topicsContainer = document.getElementById('detected-topics');
-                if (topicsContainer) {
-                    observation.topics.forEach(topic => {
-                        if (!document.querySelector(`.topic-tag[data-topic="${topic}"]`)) {
-                            const topicTag = document.createElement('span');
-                            topicTag.className = 'badge bg-info me-1 mb-1 topic-tag';
-                            topicTag.setAttribute('data-topic', topic);
-                            topicTag.textContent = topic;
-                            topicsContainer.appendChild(topicTag);
-                        }
-                    });
-                }
-            }
+            // Create insight element
+            const insight = document.createElement('div');
+            insight.className = 'insight-item';
             
-            // Add observation to notes list if available
-            if (observation.notes && observation.notes.length > 0) {
-                const notesContainer = document.getElementById('ai-observations');
-                if (notesContainer) {
-                    observation.notes.forEach(note => {
-                        const noteDiv = document.createElement('div');
-                        noteDiv.className = 'observation-note mb-2 p-2 border-start border-3 border-info';
-                        noteDiv.innerHTML = `<p class="mb-0 small">${note}</p>`;
-                        notesContainer.appendChild(noteDiv);
-                    });
-                }
-            }
+            // Choose icon based on type
+            let icon = 'bi-eye';
+            if (type === 'key_point') icon = 'bi-star';
+            if (type === 'question') icon = 'bi-question-circle';
+            if (type === 'sentiment') icon = 'bi-emoji-smile';
+            
+            insight.innerHTML = `
+                <i class="bi ${icon}"></i>
+                <div class="insight-content">
+                    <div>${text}</div>
+                    ${tags.length > 0 ? `
+                        <div class="ai-tags">
+                            ${tags.map(tag => `<span class="ai-tag">${tag}</span>`).join('')}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+            
+            insightsContainer.prepend(insight);
         }
-        
-        // Helper function to format timestamp
-        function formatTimestamp(timestamp) {
-            if (!timestamp) return '';
-            
-            try {
-                const date = new Date(timestamp);
-                return date.toLocaleTimeString();
-            } catch (e) {
-                return timestamp;
-            }
-        }
+
+        // Initialize with a placeholder insight
+        addInsight('Waiting for conversation to begin...', 'observation', ['system']);
         
         // Helper function to show notifications
         function showNotification(title, message, type) {
@@ -832,6 +1083,93 @@
                 notification.remove();
             }, 5000);
         }
+
+        // Listen for new insights from AI
+        socket.on('new_insights', function(data) {
+            if (data.session_id === sessionId && data.insights) {
+                console.log('New insights received:', data.insights);
+                updateInsights(data.insights);
+            }
+        });
+        
+        // Function to update insights UI
+        function updateInsights(insights) {
+            const container = document.getElementById('key-insights');
+            if (!container) return;
+            
+            // Clear placeholder if present
+            const placeholder = container.querySelector('.text-center.text-muted');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            // Add each insight
+            insights.slice(0, 3).forEach(insight => {
+                // Skip if this insight already exists
+                if (document.querySelector(`.insight-item[data-id="${insight.id}"]`)) {
+                    return;
+                }
+                
+                // Create insight element
+                const insightElem = document.createElement('div');
+                insightElem.className = 'insight-item mb-3';
+                insightElem.setAttribute('data-id', insight.id);
+                
+                // Format importance badge
+                let importanceClass = 'bg-secondary';
+                let importanceIcon = 'info-circle';
+                
+                if (insight.importance) {
+                    const importance = insight.importance.toUpperCase();
+                    if (importance.includes('HIGH')) {
+                        importanceClass = 'bg-danger';
+                        importanceIcon = 'exclamation-circle';
+                    } else if (importance.includes('MEDIUM')) {
+                        importanceClass = 'bg-warning text-dark';
+                        importanceIcon = 'asterisk';
+                    }
+                }
+                
+                insightElem.innerHTML = `
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-lightbulb-fill text-primary me-2 mt-1"></i>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="fw-medium">${insight.text}</span>
+                                <span class="badge ${importanceClass} ms-2">
+                                    <i class="bi bi-${importanceIcon} me-1"></i>
+                                    ${insight.importance || 'MEDIUM'}
+                                </span>
+                            </div>
+                            ${insight.evidence ? `<div class="text-muted small mt-1">${insight.evidence}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                // Insert at the top
+                container.insertBefore(insightElem, container.firstChild);
+            });
+        }
+        
+        // Initialize - request insights on load
+        socket.on('connect', function() {
+            // We already have the join_monitor_room call
+            // Add request for initial insights
+            socket.emit('request_insights', { session_id: sessionId });
+        });
+        
+        // Add refresh insights button to the key insights section
+        document.getElementById('key-insights').parentElement.querySelector('h6').innerHTML += `
+            <button id="refresh-insights-btn" class="btn btn-sm btn-link p-0 ms-auto float-end">
+                <i class="bi bi-arrow-clockwise"></i>
+            </button>
+        `;
+        
+        // Add event listener for refresh insights button
+        document.getElementById('refresh-insights-btn').addEventListener('click', function() {
+            socket.emit('request_insights', { session_id: sessionId });
+            showNotification('Refreshing', 'Requesting new insights...', 'info');
+        });
     });
 </script>
 {% endblock %} 

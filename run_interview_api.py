@@ -104,15 +104,19 @@ except Exception as e:
     logger.error(f"Error initializing discussion service: {str(e)}")
     discussion_service = None
 
+# Initialize observer service regardless of LangChain setting
+# This ensures monitoring capability works even with basic mode
+try:
+    observer_service = ObserverService(openai_api_key=os.environ.get('OPENAI_API_KEY'))
+    logger.info("Observer service initialized successfully")
+except Exception as e:
+    logger.error(f"Error initializing observer service: {str(e)}")
+    observer_service = None
+
 if use_langchain:
     try:
         interview_service = InterviewService(data_dir=str(DATA_DIR))
         logger.info("LangChain interview service initialized successfully")
-        
-        # discussion_service is already initialized above
-        
-        observer_service = ObserverService(openai_api_key=os.environ.get('OPENAI_API_KEY'))
-        logger.info("Observer service initialized successfully")
     except Exception as e:
         logger.error(f"Error initializing LangChain services: {str(e)}")
         logger.warning("Falling back to simple response generation")
@@ -1494,16 +1498,22 @@ def monitor_interview_session(session_id):
         if 'title' not in session or not session.get('title'):
             session['title'] = f"Session {session_id[:8]}"
         
-        # Ensure session_id is in the session data for JavaScript to use
-        if 'session_id' not in session:
-            session['session_id'] = session_id
+        # Ensure messages list exists for JavaScript usage
+        if 'messages' not in session:
+            session['messages'] = []
             
-        # Return the monitor page
+        # Ensure session_id is in the session data for JavaScript to use
+        session['session_id'] = session_id
+            
+        # Log connection to monitor page
         logger.info(f"Rendering monitoring page for session {session_id}")
+        
+        # Return the monitor page
         return render_template('langchain/monitor_session.html', 
                             session=session,
                             guide=guide,
-                            session_id=session_id)
+                            session_id=session_id,
+                            observer_enabled=(observer_service is not None))
     except Exception as e:
         logger.error(f"Error loading monitoring session {session_id}: {str(e)}")
         return render_template('langchain/error.html', 
@@ -2003,9 +2013,27 @@ def api_add_session_message(session_id):
                         }, room=f"monitor_{session_id}")
                         
                         logger.info(f"Emitted new observation for message {message_id}")
+                        
+                        # Also get and emit any AI insights that may have been generated
+                        insights = observer_service.get_key_insights(session_id)
+                        if insights and len(insights) > 0:
+                            socketio.emit('new_insights', {
+                                'session_id': session_id,
+                                'insights': insights[-3:] # Send the 3 most recent insights
+                            }, room=f"monitor_{session_id}")
+                            logger.info(f"Emitted {len(insights[-3:])} insights for session {session_id}")
+                            
+                        # Get and emit suggested questions
+                        questions = observer_service.get_suggested_questions(session_id)
+                        if questions and len(questions) > 0:
+                            socketio.emit('suggested_questions', {
+                                'session_id': session_id,
+                                'questions': questions
+                            }, room=f"monitor_{session_id}")
+                            logger.info(f"Emitted {len(questions)} question suggestions for session {session_id}")
+                        
                     except Exception as e:
                         logger.error(f"Error creating observation: {str(e)}")
-                
             except Exception as e:
                 logger.error(f"Error generating AI response: {str(e)}")
         
@@ -2444,22 +2472,66 @@ def handle_join_room(data):
         try:
             session = discussion_service.get_session(session_id)
             if session:
+                # Send session messages for transcript display
                 messages = session.get('messages', [])
                 emit('session_data', {
                     'session_id': session_id,
-                    'messages': messages
+                    'messages': messages,
+                    'title': session.get('title', f'Session {session_id[:8]}'),
+                    'status': session.get('status', 'active')
                 })
+                
+                # Broadcast to all clients in the room that someone joined
+                emit('monitor_event', {
+                    'type': 'user_joined',
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'message': 'A new observer joined the monitoring room'
+                }, room=room, include_self=False)
                 
                 # If observer service is available, send initial observer data
                 if observer_service:
-                    observer_state = observer_service.get_observer_state(session_id)
-                    emit('observer_data', {
-                        'session_id': session_id,
-                        'observer_state': observer_state
-                    })
+                    try:
+                        observer_state = observer_service.get_observer_state(session_id)
+                        emit('observer_data', {
+                            'session_id': session_id,
+                            'observer_state': observer_state
+                        })
+                    except Exception as obs_error:
+                        logger.error(f"Error loading observer state: {str(obs_error)}")
+                        emit('error', {'message': f"Error loading observer data: {str(obs_error)}"})
+            else:
+                emit('error', {'message': f"Session {session_id} not found"})
         except Exception as e:
             logger.error(f"Error sending initial data: {str(e)}")
             emit('error', {'message': f"Error loading session data: {str(e)}"})
+
+@socketio.on('request_suggested_questions')
+def handle_request_suggested_questions(data):
+    """Handle a request for AI-suggested interview questions."""
+    session_id = data.get('session_id')
+    if not session_id:
+        emit('error', {'message': 'No session_id provided'})
+        return
+        
+    try:
+        if observer_service:
+            # Get suggested questions from observer service
+            questions = observer_service.get_suggested_questions(session_id)
+            
+            # Send back to client
+            emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': questions
+            })
+        else:
+            # Send empty list if observer service not available
+            emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': []
+            })
+    except Exception as e:
+        logger.error(f"Error getting suggested questions: {str(e)}")
+        emit('error', {'message': f"Error getting suggested questions: {str(e)}"})
 
 @socketio.on('leave_monitor_room')
 def handle_leave_room(data):
@@ -2603,6 +2675,34 @@ def api_edit_prompt(prompt_id):
     except Exception as e:
         logger.error(f"Error in api_edit_prompt for {prompt_id}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@socketio.on('request_insights')
+def handle_request_insights(data):
+    """Handle a request for AI insights for a session."""
+    session_id = data.get('session_id')
+    if not session_id:
+        emit('error', {'message': 'No session_id provided'})
+        return
+        
+    try:
+        if observer_service:
+            # Get insights from observer service
+            insights = observer_service.get_key_insights(session_id)
+            
+            # Send back to client
+            emit('new_insights', {
+                'session_id': session_id,
+                'insights': insights
+            })
+        else:
+            # Send empty list if observer service not available
+            emit('new_insights', {
+                'session_id': session_id,
+                'insights': []
+            })
+    except Exception as e:
+        logger.error(f"Error getting insights: {str(e)}")
+        emit('error', {'message': f"Error getting insights: {str(e)}"})
 
 # Register blueprints
 app.register_blueprint(user_bp, url_prefix='/user')
@@ -2963,6 +3063,45 @@ def api_upload_transcript():
 def upload_transcript_page():
     """Render the upload transcript page."""
     return render_template('langchain/upload_transcript.html', title="Upload Transcript")
+
+# Add a route to test WebSocket connection on monitor
+@app.route('/api/test_monitor_ws/<session_id>', methods=['GET'])
+def test_monitor_websocket(session_id):
+    """Test WebSocket connection to monitor interface."""
+    try:
+        # Send a test message to the monitor room
+        socketio.emit('new_message', {
+            'session_id': session_id,
+            'message': {
+                'id': str(uuid.uuid4()),
+                'role': 'system',
+                'content': 'This is a test message from the server. WebSocket connection is working!',
+                'type': 'system_message',
+                'timestamp': datetime.datetime.now().isoformat()
+            }
+        }, room=f"monitor_{session_id}")
+        
+        # Also send a test observation if observer service is available
+        if observer_service:
+            socketio.emit('new_observation', {
+                'session_id': session_id,
+                'observation': {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'note': 'This is a test observation from the AI Observer.',
+                    'tags': ['test', 'websocket', 'observation'],
+                    'mood': 5,
+                    'speaker': 'System'
+                }
+            }, room=f"monitor_{session_id}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Test message sent to monitor room for session {session_id}'
+        })
+    except Exception as e:
+        logger.error(f"Error testing monitor WebSocket: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # Start the app
 if __name__ == '__main__':
