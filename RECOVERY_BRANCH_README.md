@@ -14,23 +14,52 @@ A centralized debugging dashboard is now available at http://localhost:5025/debu
 - **Monitoring Tools**: Access interview monitoring and other tools
 - **Quick Links**: Direct access to key setup and configuration pages
 
-### 2. Improved Error Handling
+### 2. Full End-to-End Automation
 
-- **Discussion Guide Resilience**: Fixed errors where missing fields in discussion guides caused crashes
-- **Session Data Validation**: Better validation of session data to prevent runtime errors
-- **API Error Handling**: Enhanced error handling in API endpoints to provide more helpful error messages
+The Debug Interview Flow tool at http://localhost:5025/static/debug_interview_flow.html?port=5025 now supports:
 
-### 3. TTS/STT Service Enhancements
+- **Fully Automated Interview Flow**: Complete TTS → STT → LangChain response cycle works end-to-end
+- **LangChain Integration**: AI responses are properly generated and added to the session
+- **Customizable Timing**: Adjustable delays between TTS and STT for optimal performance
+- **Robust Error Handling**: Prevents common issues that previously broke the interview flow
 
-- **Direct ElevenLabs Integration**: More reliable text-to-speech using direct API calls
-- **Speech Recognition Improvements**: Fixed issues with partial sentence recognition
-- **Service Health Checks**: Added proper health check endpoints for all services
+### 3. Disaster Recovery
 
-### 4. System Recovery Tools
+This branch includes robust disaster recovery capabilities:
 
-- **Recovery Startup Script**: Improved startup script that ensures data directories and requirements
-- **Shutdown Management**: Proper service shutdown to prevent orphaned processes
-- **Error Logging**: Enhanced logging for easier troubleshooting
+- **Service Auto-Recovery**: Automatic restart of failed services
+- **Graceful Degradation**: System continues to function even if some services are unavailable
+- **Data Preservation**: Enhanced backup and restoration procedures for interview data
+- **Error Logging**: Improved logging for easier troubleshooting
+
+## Known Issues and Fixes
+
+1. **DateTime Bug Fix**: Fixed issue in api_add_session_message where `datetime.now()` was incorrectly used instead of `datetime.datetime.now()`, causing LangChain responses to fail.
+
+2. **Discussion Guide Handling**: Fixed issues with missing fields in discussion guides by adding default values.
+
+3. **Interview Flow Fix**: The debug interview flow automation now properly cycles through the entire interview process with working TTS, STT, and LangChain responses.
+
+## Getting Started
+
+To start the Daria Interview Tool with the recovery features:
+
+```bash
+./start_daria_with_recovery.sh
+```
+
+To stop all services:
+
+```bash
+./stop_daria_services.sh
+```
+
+## Testing
+
+The primary testing tool is the Debug Interview Flow at:
+http://localhost:5025/static/debug_interview_flow.html?port=5025
+
+This tool allows complete testing of the end-to-end interview flow, including TTS, STT, and LangChain integration.
 
 ## Migration from Previous Versions
 
