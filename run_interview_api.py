@@ -1920,7 +1920,7 @@ def api_add_session_message(session_id):
             'id': message_id,
             'content': message_content,
             'role': role,
-            'timestamp': datetime.now().isoformat(),
+            'timestamp': datetime.datetime.now().isoformat(),
         }
         
         success = discussion_service.add_message(session_id, message)
@@ -1941,7 +1941,6 @@ def api_add_session_message(session_id):
                 
                 # Generate AI response
                 logger.info(f"Generating AI response for session {session_id}")
-                # Fix: Remove session_data parameter, only pass messages and character
                 ai_response = interview_service.generate_response(
                     messages=messages,
                     character=character
@@ -1953,7 +1952,7 @@ def api_add_session_message(session_id):
                     'id': ai_message_id,
                     'content': ai_response,
                     'role': 'assistant',
-                    'timestamp': datetime.now().isoformat(),
+                    'timestamp': datetime.datetime.now().isoformat(),
                 }
                 
                 # Add AI message to session
