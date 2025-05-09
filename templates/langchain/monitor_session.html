@@ -642,6 +642,106 @@
             socket.emit('request_suggested_questions', { session_id: sessionId });
         });
         
+        // Track message timestamps for calculating statistics
+        let messageTimestamps = [];
+        let participantMessageCount = 0;
+        let interviewerMessageCount = 0;
+        let participantCharCount = 0;
+        let interviewerCharCount = 0;
+        let sessionStartTime = new Date();
+        
+        // Function to update session statistics
+        function updateSessionStats() {
+            // Update message count
+            const messageCountElem = document.getElementById('message-count');
+            const totalMessages = participantMessageCount + interviewerMessageCount;
+            if (messageCountElem) {
+                messageCountElem.textContent = totalMessages;
+            }
+            
+            // Calculate and update duration
+            const durationElem = document.getElementById('session-duration');
+            if (durationElem) {
+                const now = new Date();
+                const diffMs = now - sessionStartTime;
+                const hours = Math.floor(diffMs / (1000 * 60 * 60)).toString().padStart(2, '0');
+                const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
+                const seconds = Math.floor((diffMs % (1000 * 60)) / 1000).toString().padStart(2, '0');
+                durationElem.textContent = `${hours}:${minutes}:${seconds}`;
+            }
+            
+            // Calculate and update average response time
+            const avgResponseTimeElem = document.getElementById('avg-response-time');
+            if (avgResponseTimeElem && messageTimestamps.length >= 3) {
+                // We need at least 3 messages to calculate response time (participant, AI, participant)
+                let totalResponseTime = 0;
+                let responseCount = 0;
+                
+                for (let i = 2; i < messageTimestamps.length; i += 2) {
+                    if (messageTimestamps[i] && messageTimestamps[i-1]) {
+                        const responseTime = messageTimestamps[i] - messageTimestamps[i-1];
+                        if (responseTime > 0) {
+                            totalResponseTime += responseTime;
+                            responseCount++;
+                        }
+                    }
+                }
+                
+                if (responseCount > 0) {
+                    const avgResponseTimeMs = totalResponseTime / responseCount;
+                    const avgResponseTimeSec = Math.floor(avgResponseTimeMs / 1000);
+                    avgResponseTimeElem.textContent = `${avgResponseTimeSec}s`;
+                }
+            }
+            
+            // Calculate and update interviewer talk percentage
+            const interviewerTalkPercentElem = document.getElementById('interviewer-talk-percent');
+            if (interviewerTalkPercentElem && totalMessages > 0) {
+                // Method 1: By message count
+                const interviewerPercentByCount = Math.round((interviewerMessageCount / totalMessages) * 100);
+                
+                // Method 2: By character count (more accurate)
+                let interviewerPercentByChars = 0;
+                if (participantCharCount + interviewerCharCount > 0) {
+                    interviewerPercentByChars = Math.round((interviewerCharCount / (participantCharCount + interviewerCharCount)) * 100);
+                }
+                
+                // Use character-based percentage if we have that data, otherwise fall back to message count
+                const finalPercent = (interviewerCharCount > 0) ? interviewerPercentByChars : interviewerPercentByCount;
+                interviewerTalkPercentElem.textContent = `${finalPercent}%`;
+            }
+        }
+        
+        // Process new messages for stats calculation
+        socket.on('new_message', function(data) {
+            if (data.session_id === sessionId && data.message) {
+                const message = data.message;
+                const timestamp = new Date(message.timestamp || Date.now());
+                
+                // Store message timestamp for response time calculation
+                messageTimestamps.push(timestamp);
+                
+                // Update message counts
+                if (message.role === 'assistant') {
+                    interviewerMessageCount++;
+                    if (message.content) {
+                        interviewerCharCount += message.content.length;
+                    }
+                } else if (message.role === 'user') {
+                    participantMessageCount++;
+                    if (message.content) {
+                        participantCharCount += message.content.length;
+                    }
+                }
+                
+                // Update stats
+                updateSessionStats();
+            }
+        });
+        
+        // Update stats every 1 second for duration
+        setInterval(updateSessionStats, 1000);
+        
         // Listen for new messages
         socket.on('new_message', function(data) {
             if (data.session_id === sessionId && data.message) {
@@ -687,16 +787,14 @@
             }
         });
         
-        // Listen for new observations
+        // Listen for new observations from AI
         socket.on('new_observation', function(data) {
             if (data.session_id === sessionId && data.observation) {
-                console.log('New observation received:', data.observation);
+                console.log('New observation:', data.observation);
                 
-                // Update AI observer status indicator
-                const observerStatus = document.getElementById('observer-status');
+                // Update status indicator
                 const statusIndicator = document.querySelector('.status-indicator');
-                if (observerStatus && statusIndicator) {
-                    observerStatus.textContent = 'Active';
+                if (statusIndicator) {
                     statusIndicator.classList.add('active');
                 }
                 
@@ -753,6 +851,16 @@
                     if (data.observation.note) {
                         addInsight(data.observation.note, 'observation', data.observation.tags || []);
                     }
+                }
+                
+                // Update session stats
+                updateSessionStats();
+                
+                // Update the observer status to show it's active
+                const observerStatus = document.getElementById('observer-status');
+                if (observerStatus) {
+                    observerStatus.textContent = 'Active';
+                    observerStatus.className = 'text-success small';
                 }
             }
         });
@@ -932,6 +1040,72 @@
                 showNotification('Error', 'Network error occurred while ending interview.', 'danger');
             });
         });
+        
+        // Function to initialize session statistics from existing messages
+        function initializeSessionStats() {
+            // Fetch existing messages to calculate initial stats
+            fetch(`/api/session/${sessionId}/messages`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.messages && data.messages.length > 0) {
+                        // Get session start time from the first message
+                        if (data.messages[0] && data.messages[0].timestamp) {
+                            sessionStartTime = new Date(data.messages[0].timestamp);
+                        }
+                        
+                        // Process existing messages for stats
+                        data.messages.forEach(message => {
+                            const timestamp = new Date(message.timestamp || Date.now());
+                            messageTimestamps.push(timestamp);
+                            
+                            if (message.role === 'assistant') {
+                                interviewerMessageCount++;
+                                if (message.content) {
+                                    interviewerCharCount += message.content.length;
+                                }
+                            } else if (message.role === 'user') {
+                                participantMessageCount++;
+                                if (message.content) {
+                                    participantCharCount += message.content.length;
+                                }
+                            }
+                        });
+                        
+                        // Update stats display
+                        updateSessionStats();
+                    }
+                })
+                .catch(error => {
+                    console.error('Error loading session messages:', error);
+                });
+        }
+        
+        // Initialize session stats when page loads
+        initializeSessionStats();
+        
+        // Periodically refresh session stats to ensure accuracy
+        setInterval(function() {
+            fetch(`/api/session/${sessionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.session) {
+                        // Update message count from actual session data
+                        const messageCountElem = document.getElementById('message-count');
+                        if (messageCountElem && data.session.messages) {
+                            messageCountElem.textContent = data.session.messages.length;
+                        }
+                        
+                        // Check if we should refresh all stats
+                        if (data.session.messages && data.session.messages.length > participantMessageCount + interviewerMessageCount) {
+                            console.log('Detected new messages, refreshing all stats...');
+                            initializeSessionStats();
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.warn('Error refreshing session stats:', error);
+                });
+        }, 30000); // Refresh every 30 seconds
         
         // Add Note button click
         addNoteBtn.addEventListener('click', function() {

@@ -297,7 +297,7 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Continue Session</button>
-                    <button type="button" class="btn btn-danger" id="confirm-exit">Exit Session</button>
+                    <button type="button" class="btn btn-danger" id="confirm-exit-button">Exit Session</button>
                 </div>
             </div>
         </div>
@@ -319,7 +319,7 @@
                     <p>You may now close this window or browser tab.</p>
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="window.close()">Close Window</button>
+                    <button type="button" class="btn btn-primary" id="close-window-btn">Close Window</button>
                 </div>
             </div>
         </div>
@@ -328,27 +328,65 @@
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            const sessionId = '{{ session_id }}';
-            const voiceId = '{{ voice_id }}';
+            // Get DOM references
             const chatMessages = document.getElementById('chat-messages');
             const textInput = document.getElementById('text-input');
             const sendButton = document.getElementById('send-button');
-            const confirmExitButton = document.getElementById('confirm-exit');
             const sessionTimer = document.getElementById('session-timer');
-            const visualizerInactive = document.getElementById('visualizer-inactive') || { classList: { add: () => {}, remove: () => {} } };
-            const visualizerActive = document.getElementById('visualizer-active') || { classList: { add: () => {}, remove: () => {} } };
+            const confirmExitButton = document.getElementById('confirm-exit-button') || document.getElementById('confirm-exit');
+            const currentLevelDisplay = document.getElementById('current-level') || document.getElementById('currentLevel');
+            const currentSilenceDisplay = document.getElementById('current-silence') || document.getElementById('currentSilence');
+            const audioLevelBar = document.getElementById('audio-level-bar') || document.getElementById('audioLevelBar');
+            const noiseFilterEnabled = document.getElementById('noise-filter-enabled') || document.getElementById('noiseFilterEnabled');
+            const audioVisualizerEnabled = document.getElementById('audio-visualizer-enabled') || document.getElementById('audioVisualizerEnabled');
+            const silenceTimer = document.getElementById('silence-timer') || document.getElementById('silenceTimer');
+            const visualizerActive = document.getElementById('active-visualizer') || document.getElementById('visualizer-active');
+            const visualizerInactive = document.getElementById('inactive-visualizer') || document.getElementById('visualizer-inactive');
+            
+            // Initialize visualizer states if they exist
+            if (visualizerActive) visualizerActive.classList.add('d-none');
+            if (visualizerInactive) visualizerInactive.classList.remove('d-none');
+            
+            // Create fallback objects for elements that might not exist
+            // This prevents errors when trying to access properties of null
+            if (!visualizerActive) {
+                visualizerActive = { classList: { add: () => {}, remove: () => {} } };
+            }
+            if (!visualizerInactive) {
+                visualizerInactive = { classList: { add: () => {}, remove: () => {} } };
+            }
+            if (!silenceTimer) {
+                silenceTimer = { classList: { add: () => {}, remove: () => {} } };
+            }
+            
+            // Get session ID from URL
+            const sessionId = '{{ session_id }}';
+            const voiceId = '{{ voice_id }}';
+            
+            // Function to extract session ID from URL if needed
+            function getSessionId() {
+                // If we already have it from server-side template, use that
+                if ('{{ session_id }}') {
+                    return '{{ session_id }}';
+                }
+                
+                // Otherwise extract from URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const pathParts = window.location.pathname.split('/');
+                // Look for session ID in the path (usually as /interview/SESSION_ID)
+                for (let i = 0; i < pathParts.length; i++) {
+                    if (pathParts[i] === 'interview' && i < pathParts.length - 1) {
+                        return pathParts[i + 1];
+                    }
+                }
+                return null;
+            }
             
             // Speech recognition control elements
             const silenceThresholdSlider = document.getElementById('silenceThreshold');
             const silenceThresholdValue = document.getElementById('silenceThresholdValue');
             const noiseThresholdSlider = document.getElementById('noiseThreshold');
             const noiseThresholdValue = document.getElementById('noiseThresholdValue');
-            const audioVisualizerEnabled = document.getElementById('audioVisualizerEnabled');
-            const noiseFilterEnabled = document.getElementById('noiseFilterEnabled');
-            const audioLevelBar = document.getElementById('audioLevelBar');
-            const currentLevelDisplay = document.getElementById('currentLevel');
-            const silenceTimer = document.getElementById('silenceTimer');
-            const currentSilenceDisplay = document.getElementById('currentSilence');
             
             // Speech recognition settings
             let silenceThreshold = 2000; // 2 seconds in milliseconds
@@ -574,14 +612,19 @@
                 // Add user message to chat
                 addMessageToChat('participant', message);
                 
-                // Show loading indicator while waiting for response
+                // Show loading indicator while waiting for AI response
                 const loadingIndicator = document.createElement('div');
                 loadingIndicator.id = 'ai-loading-indicator';
-                loadingIndicator.className = 'message message-moderator';
-                const loadingBubble = document.createElement('div');
-                loadingBubble.className = 'message-bubble';
-                loadingBubble.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Thinking...';
-                loadingIndicator.appendChild(loadingBubble);
+                loadingIndicator.className = 'message message-moderator-loading';
+                loadingIndicator.innerHTML = `
+                    <div class="message-bubble">
+                        <div class="typing-indicator">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </div>
+                    </div>
+                `;
                 chatMessages.appendChild(loadingIndicator);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
                 
@@ -592,29 +635,39 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: {
-                            role: 'user',
-                            content: message
-                        }
+                        content: message,
+                        role: 'user'
                     })
                 })
                 .then(response => {
                     if (!response.ok) {
-                        console.log("Session API failed, trying interview API");
-                        return fetch(`/api/interview/respond`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                session_id: sessionId,
-                                message: message
-                            })
-                        });
+                        // If the session API fails with 404, try the interview API
+                        if (response.status === 404) {
+                            console.log('Session API failed, trying interview API');
+                            // Fall back to interview API
+                            return fetch(`/api/interview/respond`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    session_id: sessionId,
+                                    user_message: message
+                                })
+                            });
+                        } else {
+                            // For other errors, throw to be caught in the catch block
+                            throw new Error(`Session API error: ${response.status}`);
+                        }
                     }
                     return response;
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     // Remove loading indicator
                     const loadingIndicator = document.getElementById('ai-loading-indicator');
@@ -622,25 +675,26 @@
                         loadingIndicator.remove();
                     }
                     
-                    if (data.success || data.message) {
-                        // Extract the response message (different formats between APIs)
-                        const responseText = data.message || data.question || '';
-                        
-                        if (responseText) {
+                    // Process API response
+                    if (data.success) {
+                        if (data.ai_message) {
                             // Add AI response to chat
-                            addMessageToChat('moderator', responseText);
+                            addMessageToChat('moderator', data.ai_message);
                             
                             // Text-to-speech
                             if (voiceId) {
-                                playTTS(responseText);
+                                playTTS(data.ai_message);
                             }
-                        } else {
-                            // If no direct response, we need to fetch the latest messages to get the AI response
-                            console.log("No direct response from add_message, fetching latest messages");
-                            fetchLatestMessages();
-                        }
-                        
-                        if (data.status === 'completed') {
+                        } else if (data.message && data.message.content) {
+                            // Add AI response to chat
+                            addMessageToChat('moderator', data.message.content);
+                            
+                            // Text-to-speech
+                            if (voiceId) {
+                                playTTS(data.message.content);
+                            }
+                        } else if (data.end_session) {
+                            // End session if requested by server
                             endSession();
                         }
                     } else {
@@ -657,20 +711,90 @@
                         loadingIndicator.remove();
                     }
                     
+                    // Add error message to the chat
+                    addMessageToChat('system', 'There was an error communicating with the server. Your message was saved, but the AI response may be delayed.');
+                    
                     // Try to recover by fetching latest messages
                     fetchLatestMessages();
+                });
+
+                // Also emit the message via WebSocket for real-time monitoring
+                emitUserMessage(message);
+            }
+            
+            // Setup WebSocket connection for monitoring
+            function setupSocketConnection(message) {
+                if (!window.socket) {
+                    window.socket = io();
+                    
+                    window.socket.on('connect', function() {
+                        console.log('Socket connected for monitoring');
+                        emitUserMessage(message);
+                    });
+                    
+                    window.socket.on('error', function(error) {
+                        console.error('Socket error:', error);
+                    });
+                } else if (window.socket.connected) {
+                    emitUserMessage(message);
+                }
+            }
+            
+            // Emit user message via websocket for monitoring
+            function emitUserMessage(message) {
+                if (window.socket && window.socket.connected) {
+                    try {
+                        const userMessageObj = {
+                            session_id: sessionId,
+                            message: {
+                                content: message,
+                                role: 'user',
+                                id: generateUUID(),
+                                timestamp: new Date().toISOString()
+                            }
+                        };
+                        
+                        window.socket.emit('new_message', userMessageObj);
+                        console.log('Emitted user message to monitor via WebSocket');
+                    } catch (error) {
+                        console.error('Error emitting message via WebSocket:', error);
+                    }
+                } else {
+                    console.log('WebSocket not connected, cannot emit user message');
+                    // Try to reconnect the socket
+                    initializeWebSocket();
+                }
+            }
+            
+            // Simple UUID generator for message IDs
+            function generateUUID() {
+                return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                    var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+                    return v.toString(16);
                 });
             }
             
             // Fetch latest messages to ensure we get the AI's response
             function fetchLatestMessages() {
+                console.log(`Fetching latest messages for session ${sessionId}`);
+                
                 fetch(`/api/session/${sessionId}/messages`, {
                     method: 'GET',
                     headers: {
                         'Content-Type': 'application/json'
                     }
                 })
-                .then(response => response.json())
+                .then(response => {
+                    if (!response.ok) {
+                        // If session not found or other error
+                        if (response.status === 404) {
+                            console.warn(`Session ${sessionId} not found. This may be normal for new sessions or if the session has been archived.`);
+                            return { messages: [] };
+                        }
+                        throw new Error(`API error: ${response.status}`);
+                    }
+                    return response.json();
+                })
                 .then(data => {
                     if (data.messages && data.messages.length > 0) {
                         // Get message count currently in the UI
@@ -714,6 +838,8 @@
                 })
                 .catch(error => {
                     console.error('Error fetching latest messages:', error);
+                    // Don't keep trying if we're getting persistent errors
+                    // Instead, fall back to waiting for the next user message
                 });
             }
             
@@ -782,6 +908,9 @@
             
             // Start session
             function startSession() {
+                // Join the monitoring room first if WebSocket is available
+                initializeWebSocket();
+                
                 // Try to fetch initial message for new discussion model
                 fetch(`/api/session/${sessionId}/messages`, {
                     method: 'GET',
@@ -897,10 +1026,8 @@
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: {
-                            role: 'assistant',
-                            content: welcomeMessage
-                        }
+                        content: welcomeMessage,
+                        role: 'assistant'
                     })
                 })
                 .then(response => {
@@ -918,15 +1045,96 @@
             
             // End session
             function endSession() {
-                sessionEnded = true;
+                // Create a div to show ending status
+                const endingDiv = document.createElement('div');
+                endingDiv.className = 'alert alert-info text-center mt-4';
+                endingDiv.innerHTML = `
+                    <div class="spinner-border spinner-border-sm text-primary me-2" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <strong>Ending Interview</strong>
+                    <p>Please wait while we complete the session...</p>
+                `;
+                document.body.appendChild(endingDiv);
                 
-                if (recognition) {
-                    recognition.stop();
-                }
+                // Show an ending message
+                const endMessage = "Thank you for your time today. The interview is now complete.";
                 
-                // Show completion modal
-                const finishedModal = new bootstrap.Modal(document.getElementById('finishedModal'));
-                finishedModal.show();
+                // Add ending message to chat
+                addMessageToChat('system', endMessage);
+            
+                // Scroll to see the ending message
+                window.scrollTo(0, document.body.scrollHeight);
+                
+                // Mark the session as complete and request analysis
+                fetch(`/api/session/${sessionId}/complete`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        should_analyze: true,
+                        end_reason: "User requested to end the interview",
+                        final_message: endMessage
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // End the session
+                        sessionEnded = true;
+                        
+                        // Try to stop speech recognition
+                        if (recognition) {
+                            try {
+                                recognition.stop();
+                            } catch (e) { /* Ignore if already stopped */ }
+                        }
+                        
+                        // Show finished modal
+                        const finishedModal = new bootstrap.Modal(document.getElementById('finishedModal'));
+                        finishedModal.show();
+                        
+                        // Set up the close window button handler
+                        document.getElementById('close-window-btn').addEventListener('click', function() {
+                            try {
+                                // Try to close the window
+                                window.close();
+                            } catch (e) {
+                                console.log("Unable to close window automatically due to browser restrictions.");
+                            }
+                            
+                            // If we're still here, redirect to the interview details page
+                            setTimeout(() => {
+                                window.location.href = `/interview_details/${sessionId}`;
+                            }, 1000);
+                        });
+                        
+                        // Redirect to the interview details page after a delay
+                        setTimeout(() => {
+                            window.location.href = `/interview_details/${sessionId}`;
+                        }, 10000);
+                    } else {
+                        // Show error
+                        console.error("Error completing interview:", data.error);
+                        endingDiv.className = 'alert alert-danger text-center mt-4';
+                        endingDiv.innerHTML = `
+                            <strong>Error Completing Interview</strong>
+                            <p>${data.error || "Unknown error occurred"}</p>
+                            <p>You can close this window now.</p>
+                        `;
+                    }
+                })
+                .catch(error => {
+                    // Show error
+                    console.error("Error completing interview:", error);
+                    endingDiv.className = 'alert alert-danger text-center mt-4';
+                    endingDiv.innerHTML = `
+                        <strong>Error Completing Interview</strong>
+                        <p>A network error occurred while trying to complete the interview.</p>
+                        <p>You can close this window now.</p>
+                    `;
+                });
             }
             
             // Update session timer
@@ -1109,7 +1317,7 @@
         
         // Handle user speech
         function handleUserSpeech(speechText) {
-            // Clear any silence detection
+            // Reset silence detection
             resetSilenceDetection();
             
             // If already got partial transcript, replace the partial with the final
@@ -1290,6 +1498,126 @@
                 // Reset silence detection
                 resetSilenceDetection();
             }
+        }
+
+        // Initialize WebSocket connection for monitoring
+        function initializeWebSocket() {
+            try {
+                // Load Socket.IO if not already loaded
+                if (!window.io) {
+                    console.log("Loading Socket.IO library for monitoring");
+                    const socketScript = document.createElement('script');
+                    socketScript.src = 'https://cdn.socket.io/4.7.2/socket.io.min.js';
+                    socketScript.async = true;
+                    socketScript.onload = function() {
+                        setupMonitoringConnection();
+                    };
+                    document.head.appendChild(socketScript);
+                } else {
+                    setupMonitoringConnection();
+                }
+            } catch (error) {
+                console.error("Error initializing WebSocket:", error);
+            }
+        }
+        
+        // Set up the monitoring WebSocket connection
+        function setupMonitoringConnection() {
+            if (window.socket) {
+                try {
+                    window.socket.disconnect();
+                } catch (e) {
+                    console.log("Socket was already disconnected");
+                }
+            }
+            
+            window.socket = io({
+                reconnection: true,
+                reconnectionAttempts: 10,
+                reconnectionDelay: 2000,
+                reconnectionDelayMax: 10000
+            });
+            
+            window.socket.on('connect', function() {
+                console.log(`WebSocket connected for monitoring. Session ID: ${sessionId}`);
+                
+                // Join the monitoring room for this session
+                window.socket.emit('join_monitor_room', {
+                    session_id: sessionId
+                });
+                
+                // Listen for acknowledgment
+                window.socket.on('joined_room', function(data) {
+                    console.log('Joined monitoring room:', data.room);
+                });
+                
+                // Listen for events from the monitoring interface
+                window.socket.on('researcher_message', function(data) {
+                    console.log('Received researcher message:', data);
+                    if (data.message && data.message.type === 'direct_question') {
+                        console.log('Received direct question from researcher');
+                        // Handle the message as if it came from the AI
+                        addMessageToChat('moderator', data.message.content);
+                        
+                        // Play TTS if enabled
+                        if (voiceId) {
+                            playTTS(data.message.content);
+                        }
+                    }
+                });
+                
+                // Confirm socket connection
+                window.socket.emit('ping', { time: new Date().getTime() });
+            });
+            
+            window.socket.on('pong', function(data) {
+                console.log('WebSocket ping-pong successful, connection confirmed', data);
+            });
+            
+            window.socket.on('error', function(error) {
+                console.error('WebSocket error:', error);
+            });
+            
+            window.socket.on('connect_error', function(error) {
+                console.error('WebSocket connection error:', error);
+            });
+            
+            window.socket.on('connect_timeout', function() {
+                console.error('WebSocket connection timeout');
+            });
+            
+            window.socket.on('reconnect', function(attemptNumber) {
+                console.log(`WebSocket reconnected after ${attemptNumber} attempts`);
+                
+                // Re-join the monitoring room after reconnection
+                window.socket.emit('join_monitor_room', {
+                    session_id: sessionId
+                });
+            });
+            
+            window.socket.on('reconnect_attempt', function(attemptNumber) {
+                console.log(`WebSocket reconnection attempt ${attemptNumber}`);
+            });
+            
+            window.socket.on('reconnect_error', function(error) {
+                console.error('WebSocket reconnection error:', error);
+            });
+            
+            window.socket.on('reconnect_failed', function() {
+                console.error('WebSocket reconnection failed after all attempts');
+            });
+            
+            window.socket.on('disconnect', function(reason) {
+                console.log('WebSocket disconnected:', reason);
+                
+                // If disconnected due to transport close, try to reconnect manually
+                if (reason === 'transport close' && !window.socket.connected) {
+                    setTimeout(function() {
+                        console.log('Attempting manual WebSocket reconnection');
+                        setupMonitoringConnection();
+                    }, 5000);
+                }
+            });
         }
     </script>
 </body>
