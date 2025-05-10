@@ -1,0 +1,50 @@
+{
+  "id": "f011a7dd-255a-408c-84c6-8ccbfe837033",
+  "guide_id": "dcaf2077-9a15-434b-843e-2ff0bd810960",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "4c6274e2-2f41-4bf7-8ee6-837240a5b47a",
+      "content": "like to conduct an interview and make sure that everything is working correctly",
+      "role": "user",
+      "timestamp": "2025-05-08T09:05:33.368527"
+    },
+    {
+      "id": "3ae3f9c7-4c7a-4e5c-aeba-55ad4745785e",
+      "content": "What evidence or data do you have to support that assumption?",
+      "role": "assistant",
+      "timestamp": "2025-05-08T09:05:34.408816"
+    },
+    {
+      "id": "62ca4f8a-4786-4ab3-b49b-c94801e243b5",
+      "content": "well so far the assumption is everything works with health check came back with Lynch and been able to status okay version 1.1 available prompts came up Cynthia Eureka skeptica ask you odysseo interview research these two dollars so everything looks good on the startup I still do not see in the lower left hand column the login information",
+      "role": "user",
+      "timestamp": "2025-05-08T09:06:06.104428"
+    },
+    {
+      "id": "3d37f444-b2e2-4d0b-99bd-fd39ba8f48d9",
+      "content": "Skeptica: What specific aspects or components are you looking to ensure are working correctly through the interview process? Can you provide examples or details to help better understand the scope of this statement?",
+      "role": "assistant",
+      "timestamp": "2025-05-08T09:06:06.862524"
+    },
+    {
+      "id": "4fcc84ec-4f50-4c0e-8d0f-01c803464186",
+      "content": "I wanted to work a little bit on the user management to make sure we can add new users and I want to make sure that I'm logged in right now as admin and if I get logged out there's a way for me to log back in safely",
+      "role": "user",
+      "timestamp": "2025-05-08T09:06:40.349707"
+    },
+    {
+      "id": "dfb3b73d-c3e5-4cfe-ba1c-793e1f013dfd",
+      "content": "Skeptica: It seems like you have mentioned that everything appears to be working correctly based on the health check and status checks. However, you also mentioned that you are not able to see the login information in the lower left-hand column. Can you provide more information on why the absence of login information is a concern for you and how it ties into the overall functionality of the system?",
+      "role": "assistant",
+      "timestamp": "2025-05-08T09:06:41.654420"
+    }
+  ],
+  "transcript": "\n\nParticipant: like to conduct an interview and make sure that everything is working correctly\n\nModerator: What evidence or data do you have to support that assumption?\n\nParticipant: well so far the assumption is everything works with health check came back with Lynch and been able to status okay version 1.1 available prompts came up Cynthia Eureka skeptica ask you odysseo interview research these two dollars so everything looks good on the startup I still do not see in the lower left hand column the login information\n\nModerator: Skeptica: What specific aspects or components are you looking to ensure are working correctly through the interview process? Can you provide examples or details to help better understand the scope of this statement?\n\nParticipant: I wanted to work a little bit on the user management to make sure we can add new users and I want to make sure that I'm logged in right now as admin and if I get logged out there's a way for me to log back in safely\n\nModerator: Skeptica: It seems like you have mentioned that everything appears to be working correctly based on the health check and status checks. However, you also mentioned that you are not able to see the login information in the lower left-hand column. Can you provide more information on why the absence of login information is a concern for you and how it ties into the overall functionality of the system?",
+  "analysis": null,
+  "created_at": "2025-05-08T09:05:22.159124",
+  "updated_at": "2025-05-08T09:06:41.654765"
+}

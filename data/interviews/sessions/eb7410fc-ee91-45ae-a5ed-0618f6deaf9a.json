@@ -1,0 +1,52 @@
+{
+  "id": "eb7410fc-ee91-45ae-a5ed-0618f6deaf9a",
+  "created_at": "2025-05-09T08:25:35.075779",
+  "updated_at": "2025-05-09T08:36:45.236169",
+  "status": "completed",
+  "messages": [
+    {
+      "id": "43a187a1-242a-4b27-bc64-bb7b88ff33b0",
+      "content": " yeah",
+      "role": "user",
+      "timestamp": "2025-05-09T08:25:35.078909"
+    },
+    {
+      "id": "c3f29ea4-93df-445a-8469-4d7f1afb8098",
+      "content": "Can you tell me more about a specific challenge you faced while using the product/service? How did you try to overcome it?",
+      "role": "assistant",
+      "timestamp": "2025-05-09T08:25:40.029045"
+    },
+    {
+      "id": "50539abe-cdfd-4acc-b2ae-7272fee947aa",
+      "content": "There are some web console errors: eb7410fc-ee91-45ae-a\u2026e&accepted=true:632   POST http://127.0.0.1:5025/api/session/eb7410fc-ee91-45ae-a5ed-0618f6deaf9a/add_message 500 (INTERNAL SERVER ERROR) sendMessage\t@\teb7410fc-ee91-45ae-a\u2026e&accepted=true:632 processAudio\t@\teb7410fc-ee91-45ae-a\u2026e&accepted=true:506  eb7410fc-ee91-45ae-a\u2026e&accepted=true:707 Error: Error: Session API error: 500     at eb7410fc-ee91-45ae-a\u2026ccepted=true:660:35",
+      "role": "user",
+      "timestamp": "2025-05-09T08:25:58.515162"
+    },
+    {
+      "id": "c2be6994-22e9-42cc-8876-4ce89e432ed6",
+      "content": "What particular aspect of the product or service do you find the most challenging to use or understand? Can you elaborate on your experience with it and any specific difficulties you encountered?",
+      "role": "assistant",
+      "timestamp": "2025-05-09T08:25:59.434983"
+    },
+    {
+      "role": "system",
+      "content": "How did this challenge impact your overall experience with the product/service?",
+      "type": "suggestion",
+      "id": "92e7c194-ab44-4f1b-8f4c-d632978c2c29",
+      "timestamp": "2025-05-09T08:26:21.870262"
+    },
+    {
+      "role": "assistant",
+      "content": "Please transition to the next topic.",
+      "id": "2b43ee19-cd4d-4568-b39f-d588831a608f",
+      "timestamp": "2025-05-09T08:27:24.219866",
+      "researcher_generated": true
+    }
+  ],
+  "transcript": "\n\nParticipant:  yeah\n\nModerator: Can you tell me more about a specific challenge you faced while using the product/service? How did you try to overcome it?\n\nParticipant: There are some web console errors: eb7410fc-ee91-45ae-a\u2026e&accepted=true:632   POST http://127.0.0.1:5025/api/session/eb7410fc-ee91-45ae-a5ed-0618f6deaf9a/add_message 500 (INTERNAL SERVER ERROR) sendMessage\t@\teb7410fc-ee91-45ae-a\u2026e&accepted=true:632 processAudio\t@\teb7410fc-ee91-45ae-a\u2026e&accepted=true:506  eb7410fc-ee91-45ae-a\u2026e&accepted=true:707 Error: Error: Session API error: 500     at eb7410fc-ee91-45ae-a\u2026ccepted=true:660:35\n\nModerator: What particular aspect of the product or service do you find the most challenging to use or understand? Can you elaborate on your experience with it and any specific difficulties you encountered?\n\nParticipant: How did this challenge impact your overall experience with the product/service?\n\nModerator: Please transition to the next topic.",
+  "interviewee": {
+    "name": "Participant"
+  },
+  "end_reason": "User requested to end the interview",
+  "final_message": "Thank you for your time today. The interview is now complete."
+}

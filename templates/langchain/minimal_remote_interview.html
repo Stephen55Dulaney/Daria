@@ -1,0 +1,588 @@
+{% extends "langchain/remote_interview_base.html" %}
+
+{% block title %}Minimal Remote Interview - {{ interview.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="welcome-message bg-light p-3 mb-4 rounded">
+            <h2 class="h5">Welcome to this minimal remote interview session</h2>
+            <p>This is a simplified interface with no modals and minimal JavaScript.</p>
+            
+            <!-- Debug Information (Only visible in development) -->
+            {% if debug_info %}
+            <div class="mt-3 p-2 border-top border-secondary small">
+                <h6 class="text-muted">Debug Information</h6>
+                <div class="row">
+                    <div class="col-md-3"><strong>Character:</strong></div>
+                    <div class="col-md-9">{{ debug_info.character }}</div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="bg-white rounded-3 shadow-sm p-3 d-flex flex-column" style="min-height: 70vh;">
+            <!-- Hidden input to store session ID -->
+            <input type="hidden" id="sessionId" value="{{ session_id }}">
+            <input type="hidden" id="voiceId" value="{{ voice_id|default('EXAVITQu4vr4xnSDxMaL') }}">
+            
+            <!-- Main chat interface -->
+            <div id="chat-container" class="flex-grow-1 d-flex flex-column mb-3">
+                <div id="chat-messages" class="flex-grow-1 overflow-auto p-3"></div>
+                <div class="typing-indicator d-none" id="typingIndicator">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            
+            <!-- User input area -->
+            <div id="user-input-container" class="mt-auto">
+                <div class="input-group">
+                    <textarea id="userText" class="form-control" placeholder="Type your response..." rows="2"></textarea>
+                    <button id="sendBtn" class="btn btn-primary" onclick="sendMessage()">
+                        <i class="bi bi-send"></i>
+                    </button>
+                </div>
+                <div class="d-flex justify-content-between mt-1">
+                    <div class="text-muted small" id="status-text">Ready</div>
+                </div>
+            </div>
+            
+            <!-- Debug Controls -->
+            <div class="bg-light p-2 rounded mt-3">
+                <h6>Debug Controls</h6>
+                <div class="d-flex gap-2">
+                    <button id="testTtsBtn" class="btn btn-sm btn-outline-primary">
+                        Test TTS
+                    </button>
+                    <button id="endInterviewBtn" class="btn btn-sm btn-outline-danger">
+                        End Interview
+                    </button>
+                </div>
+                <div class="mt-2">
+                    <div id="tts-status" class="small text-muted">TTS status: Ready</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Typing indicator animation */
+    .typing-indicator {
+        display: flex;
+        padding: 10px;
+        justify-content: center;
+    }
+    
+    .dot {
+        width: 8px;
+        height: 8px;
+        margin: 0 4px;
+        background-color: #0078d4;
+        border-radius: 50%;
+        animation: bounce 1.5s infinite;
+    }
+    
+    .dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+    
+    .dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+    
+    @keyframes bounce {
+        0%, 80%, 100% { transform: translateY(0); }
+        40% { transform: translateY(-8px); }
+    }
+    
+    /* Message styling */
+    .message {
+        margin-bottom: 15px;
+        padding: 10px 15px;
+        border-radius: 8px;
+        max-width: 85%;
+    }
+    
+    .message.user {
+        background-color: #e9f5fe;
+        margin-left: auto;
+        text-align: right;
+        border-right: 3px solid #0078d4;
+    }
+    
+    .message.assistant {
+        background-color: #f5f5f5;
+        margin-right: auto;
+        border-left: 3px solid #6c757d;
+    }
+    
+    /* Speaking indicator */
+    .speaking {
+        border-left: 3px solid #20c997 !important;
+        animation: pulseBorder 1.5s infinite;
+    }
+    
+    @keyframes pulseBorder {
+        0% { border-left-color: rgba(32, 201, 151, 0.6); }
+        50% { border-left-color: rgba(32, 201, 151, 1); }
+        100% { border-left-color: rgba(32, 201, 151, 0.6); }
+    }
+</style>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Minimal remote interview page loaded');
+        
+        // Get session ID from the hidden input
+        const sessionId = document.getElementById('sessionId').value;
+        const voiceId = document.getElementById('voiceId').value;
+        console.log('Session ID:', sessionId);
+        console.log('Voice ID:', voiceId);
+        
+        // DOM elements
+        const chatMessages = document.getElementById('chat-messages');
+        const sendBtn = document.getElementById('sendBtn');
+        const statusText = document.getElementById('status-text');
+        const typingIndicator = document.getElementById('typingIndicator');
+        const userText = document.getElementById('userText');
+        const testTtsBtn = document.getElementById('testTtsBtn');
+        const endInterviewBtn = document.getElementById('endInterviewBtn');
+        const ttsStatus = document.getElementById('tts-status');
+        
+        // Audio elements cache
+        const audioElements = [];
+        let currentAudioElement = null;
+        
+        // Initialize the interview
+        startInterview();
+        
+        // Handle enter key in textarea
+        userText.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Test TTS button
+        testTtsBtn.addEventListener('click', function() {
+            const testMessage = "This is a test of the text-to-speech system. If you can hear this message, TTS is working correctly.";
+            addMessage("TEST: " + testMessage, 'assistant');
+            speakText(testMessage);
+        });
+        
+        // End interview button
+        endInterviewBtn.addEventListener('click', function() {
+            endInterview();
+        });
+        
+        // Function to start the interview
+        function startInterview() {
+            // Show loading state
+            showTypingIndicator();
+            statusText.innerText = 'Starting interview...';
+            ttsStatus.innerText = 'TTS status: Initializing...';
+            
+            // Call the API to start the interview
+            fetch('/api/interview/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                if (data.success) {
+                    statusText.innerText = 'Interview started successfully';
+                    
+                    // Add the AI's greeting
+                    addMessage(data.message, 'assistant');
+                    
+                    // Use text-to-speech for the greeting
+                    speakText(data.message);
+                } else {
+                    console.error('Error starting interview:', data.error);
+                    statusText.innerText = 'Error starting interview';
+                    ttsStatus.innerText = 'TTS status: Error starting interview';
+                    addMessage('Error starting interview. Please refresh the page or contact support.', 'assistant');
+                }
+            })
+            .catch(error => {
+                console.error('Error starting interview:', error);
+                hideTypingIndicator();
+                statusText.innerText = 'Connection error';
+                ttsStatus.innerText = 'TTS status: Connection error';
+                addMessage('Error starting interview. Please refresh the page or contact support.', 'assistant');
+            });
+        }
+        
+        // Function to send a message
+        window.sendMessage = function() {
+            const text = userText.value.trim();
+            if (!text) return;
+            
+            // Add the user's message to the chat
+            addMessage(text, 'user');
+            
+            // Clear the input
+            userText.value = '';
+            
+            // Show typing indicator and update status
+            showTypingIndicator();
+            statusText.innerText = 'Processing your response...';
+            
+            // Call the API to process the user's message
+            fetch('/api/interview/respond', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    message: text,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                if (data.success) {
+                    // Update status
+                    statusText.innerText = 'Response received';
+                    
+                    // Add the AI's response
+                    addMessage(data.message, 'assistant');
+                    
+                    // Use text-to-speech for the response
+                    speakText(data.message);
+                } else {
+                    console.error('Error getting response:', data.error);
+                    statusText.innerText = 'Error: Failed to get response';
+                    ttsStatus.innerText = 'TTS status: Error getting response';
+                    addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+                }
+            })
+            .catch(error => {
+                console.error('Error getting response:', error);
+                hideTypingIndicator();
+                statusText.innerText = 'Connection error';
+                ttsStatus.innerText = 'TTS status: Connection error';
+                addMessage('Sorry, I encountered an error. Please try again.', 'assistant');
+            });
+        };
+        
+        // Enhanced TTS implementation without external dependencies
+        function speakText(text) {
+            // Log intent to speak
+            console.log('Speaking text:', text.substring(0, 50) + (text.length > 50 ? '...' : ''));
+            statusText.innerText = 'Speaking...';
+            ttsStatus.innerText = 'TTS status: Preparing audio...';
+            
+            // Add visual speaking indicator to latest message
+            setSpeakingIndicator(true);
+            
+            // Preemptively stop any playing audio
+            stopAllAudio();
+            
+            // Create a new audio element - this avoids issues with reusing the same element
+            const audio = new Audio();
+            audioElements.push(audio);
+            currentAudioElement = audio;
+            
+            // Set up audio event handlers
+            audio.onplay = () => {
+                console.log('TTS audio playing');
+                statusText.innerText = 'Assistant is speaking...';
+                ttsStatus.innerText = 'TTS status: Playing audio';
+            };
+            
+            audio.onended = () => {
+                console.log('TTS audio finished');
+                statusText.innerText = 'Ready';
+                ttsStatus.innerText = 'TTS status: Finished successfully';
+                setSpeakingIndicator(false);
+                
+                // Remove this audio element from cache after it's done
+                const index = audioElements.indexOf(audio);
+                if (index > -1) {
+                    audioElements.splice(index, 1);
+                }
+                
+                if (audio.src) {
+                    URL.revokeObjectURL(audio.src);
+                }
+            };
+            
+            audio.onerror = (error) => {
+                console.error('TTS audio error:', error);
+                statusText.innerText = 'Audio playback error. Using fallback...';
+                ttsStatus.innerText = 'TTS status: Audio error, using fallback';
+                setSpeakingIndicator(false);
+                
+                // Remove this audio element from cache
+                const index = audioElements.indexOf(audio);
+                if (index > -1) {
+                    audioElements.splice(index, 1);
+                }
+                
+                if (audio.src) {
+                    URL.revokeObjectURL(audio.src);
+                }
+                
+                // Use browser TTS as fallback
+                useBrowserTTS(text);
+            };
+            
+            // Get the TTS audio from the server - explicitly declare content type
+            fetch('/api/text_to_speech_elevenlabs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'audio/mpeg, application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice_id: voiceId,
+                    session_id: sessionId
+                })
+            })
+            .then(response => {
+                console.log('TTS response received, status:', response.status);
+                ttsStatus.innerText = `TTS status: Response received (${response.status})`;
+                
+                if (!response.ok) {
+                    const contentType = response.headers.get('content-type');
+                    if (contentType && contentType.includes('application/json')) {
+                        return response.json().then(data => {
+                            throw new Error(`TTS server error: ${data.error || response.statusText}`);
+                        });
+                    } else {
+                        throw new Error(`TTS server error: ${response.status} ${response.statusText}`);
+                    }
+                }
+                
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('audio')) {
+                    return response.blob();
+                } else {
+                    return response.json().then(data => {
+                        // If server sent a JSON response instead of audio, likely a fallback signal
+                        throw new Error(`Expected audio but got JSON: ${JSON.stringify(data)}`);
+                    });
+                }
+            })
+            .then(blob => {
+                console.log('TTS blob received, size:', blob.size);
+                ttsStatus.innerText = `TTS status: Audio received (${Math.round(blob.size/1024)}KB)`;
+                
+                if (blob.size < 100) {
+                    // If we get a very small blob, it's likely not valid audio
+                    throw new Error('Received too small audio file, likely not valid');
+                }
+                
+                const url = URL.createObjectURL(blob);
+                audio.src = url;
+                
+                // Set explicit type (may help with playback issues)
+                audio.type = 'audio/mpeg';
+                
+                // Try playing with a promise catch for autoplay blocking
+                const playPromise = audio.play();
+                
+                if (playPromise !== undefined) {
+                    playPromise.catch(error => {
+                        console.error('Error playing TTS audio (autoplay blocked):', error);
+                        ttsStatus.innerText = 'TTS status: Autoplay blocked, using fallback';
+                        
+                        // When autoplay is blocked, fall back to browser TTS
+                        useBrowserTTS(text);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('TTS fetch error:', error);
+                ttsStatus.innerText = `TTS status: Error - ${error.message}`;
+                
+                // Reset speaking indicator
+                setSpeakingIndicator(false);
+                
+                // Use browser's built-in TTS as fallback
+                useBrowserTTS(text);
+            });
+        }
+        
+        // Function to stop all audio playback
+        function stopAllAudio() {
+            // Stop any currently playing audio elements
+            audioElements.forEach(audio => {
+                try {
+                    audio.pause();
+                    if (audio.src) {
+                        URL.revokeObjectURL(audio.src);
+                    }
+                } catch (e) {
+                    console.error('Error stopping audio:', e);
+                }
+            });
+            
+            // Also make sure to stop any browser TTS
+            if ('speechSynthesis' in window) {
+                try {
+                    speechSynthesis.cancel();
+                } catch (e) {
+                    console.error('Error canceling speech synthesis:', e);
+                }
+            }
+        }
+        
+        // Function to set or remove speaking indicator
+        function setSpeakingIndicator(isSpeaking) {
+            try {
+                const messages = document.querySelectorAll('.message.assistant');
+                if (messages.length > 0) {
+                    const latestMessage = messages[messages.length - 1];
+                    
+                    if (isSpeaking) {
+                        latestMessage.classList.add('speaking');
+                    } else {
+                        latestMessage.classList.remove('speaking');
+                    }
+                }
+            } catch (error) {
+                console.error('Error setting speaking indicator:', error);
+            }
+        }
+        
+        // Browser TTS fallback
+        function useBrowserTTS(text) {
+            console.log('Using browser TTS fallback');
+            ttsStatus.innerText = 'TTS status: Using browser TTS fallback';
+            
+            if ('speechSynthesis' in window) {
+                try {
+                    // Cancel any ongoing speech synthesis
+                    speechSynthesis.cancel();
+                    
+                    // Create and configure the utterance
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    // Set event handlers
+                    utterance.onstart = () => {
+                        console.log('Browser TTS started');
+                        statusText.innerText = 'Speaking (browser TTS)...';
+                        ttsStatus.innerText = 'TTS status: Playing (browser fallback)';
+                    };
+                    
+                    utterance.onend = () => {
+                        console.log('Browser TTS ended');
+                        statusText.innerText = 'Ready';
+                        ttsStatus.innerText = 'TTS status: Finished (browser fallback)';
+                        setSpeakingIndicator(false);
+                    };
+                    
+                    utterance.onerror = (event) => {
+                        console.error('Browser TTS error:', event);
+                        statusText.innerText = 'TTS error. Please read the message.';
+                        ttsStatus.innerText = `TTS status: Browser TTS error - ${event.error}`;
+                        setSpeakingIndicator(false);
+                    };
+                    
+                    // Start speaking
+                    speechSynthesis.speak(utterance);
+                } catch (error) {
+                    console.error('Error using browser TTS:', error);
+                    statusText.innerText = 'TTS error. Please read the message.';
+                    ttsStatus.innerText = `TTS status: Browser TTS error - ${error.message}`;
+                    setSpeakingIndicator(false);
+                }
+            } else {
+                console.error('Browser TTS not supported');
+                statusText.innerText = 'TTS not supported. Please read the message.';
+                ttsStatus.innerText = 'TTS status: Browser does not support TTS';
+                setSpeakingIndicator(false);
+            }
+        }
+        
+        // Function to add a message to the chat
+        function addMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            
+            const nameSpan = document.createElement('strong');
+            nameSpan.textContent = sender === 'user' ? 'You: ' : 'Assistant: ';
+            
+            const contentSpan = document.createElement('span');
+            contentSpan.textContent = text;
+            
+            messageElement.appendChild(nameSpan);
+            messageElement.appendChild(document.createElement('br'));
+            messageElement.appendChild(contentSpan);
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Function to show typing indicator
+        function showTypingIndicator() {
+            typingIndicator.classList.remove('d-none');
+        }
+        
+        // Function to hide typing indicator
+        function hideTypingIndicator() {
+            typingIndicator.classList.add('d-none');
+        }
+        
+        // Function to end the interview
+        function endInterview() {
+            statusText.innerText = 'Ending interview...';
+            ttsStatus.innerText = 'TTS status: Interview ending';
+            
+            // Add a farewell message
+            addMessage("Thank you for participating in this interview. Your responses have been recorded.", 'assistant');
+            speakText("Thank you for participating in this interview. Your responses have been recorded.");
+            
+            // Call the API to end the interview
+            fetch('/api/interview/end', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Interview ended successfully');
+                    statusText.innerText = 'Interview ended successfully';
+                    ttsStatus.innerText = 'TTS status: Interview completed';
+                } else {
+                    console.error('Error ending interview:', data.error);
+                    statusText.innerText = 'Error ending interview';
+                    ttsStatus.innerText = 'TTS status: Error ending interview';
+                }
+            })
+            .catch(error => {
+                console.error('Error ending interview:', error);
+                statusText.innerText = 'Error ending interview';
+                ttsStatus.innerText = 'TTS status: Connection error while ending';
+            });
+        }
+    });
+</script>
+{% endblock %} 

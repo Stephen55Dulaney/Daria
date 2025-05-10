@@ -111,7 +111,7 @@
     <h5 class="mb-3">Quick Access</h5>
     <div class="row" id="quick-access">
         <!-- Cards will be added here -->
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card interview-card card-hover mb-3" onclick="window.location.href='/interview_setup'">
                 <div class="card-body text-center p-4">
                     <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-block mb-3">
@@ -122,7 +122,18 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
+            <div class="card interview-card card-hover mb-3" onclick="window.location.href='/upload_transcript'">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-warning bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="bi bi-cloud-upload fs-1 text-warning"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Upload Transcript</h5>
+                    <p class="card-text text-muted mb-0">Import existing transcripts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
             <div class="card interview-card card-hover mb-3" onclick="window.location.href='/interview_archive'">
                 <div class="card-body text-center p-4">
                     <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-block mb-3">
@@ -133,7 +144,7 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4">
+        <div class="col-md-3">
             <div class="card interview-card card-hover mb-3" onclick="window.location.href='/prompts/'">
                 <div class="card-body text-center p-4">
                     <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-block mb-3">
@@ -155,6 +166,16 @@
         fetchInterviews();
         checkServices();
     });
+    
+    // Function to ensure session ID is valid before navigating to monitor page
+    function ensureSessionId(event, sessionId) {
+        if (!sessionId || sessionId === 'undefined' || sessionId === 'null') {
+            event.preventDefault();
+            alert('Cannot monitor this interview: Invalid session ID');
+            return false;
+        }
+        return true;
+    }
     
     // Function to fetch interviews from the API
     function fetchInterviews() {
@@ -258,7 +279,7 @@
                                 `<a href="/interview_session/${interview.session_id}" class="btn btn-outline-primary" title="Continue Interview">
                                     <i class="bi bi-mic"></i>
                                 </a>
-                                <a href="/monitor_interview/${interview.session_id}" class="btn btn-outline-info" title="Monitor Interview">
+                                <a href="/monitor_interview/${interview.session_id || interview.id}" class="btn btn-outline-info" title="Monitor Interview" onclick="return ensureSessionId(event, '${interview.session_id || interview.id}')">
                                     <i class="bi bi-display"></i>
                                 </a>` : 
                                 `<a href="/view_completed_interview/${interview.session_id}" class="btn btn-outline-success" title="View Transcript">

@@ -1,0 +1,168 @@
+{
+  "session_id": "d96002e7-9fa5-4db6-9c5b-b8905da6f177",
+  "title": "Stephen wants this to work",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "prompt": "You are a research analyst examining interview data about {topic}.\nRead the following transcript(s) carefully and identify key themes, patterns, and insights.\nFocus on what the data actually says rather than assumptions or preconceptions.\n\nResearch questions:\n{questions}\n\nTranscript data:\n{data}",
+  "interview_prompt": "You are a research analyst examining interview data about {topic}.\nRead the following transcript(s) carefully and identify key themes, patterns, and insights.\nFocus on what the data actually says rather than assumptions or preconceptions.\n\nResearch questions:\n{questions}\n\nTranscript data:\n{data}",
+  "analysis_prompt": "Analyze the provided data systematically. Identify recurring themes, interesting outliers,\nand potential insights. Consider both explicit statements and implicit meanings.\nOrganize your findings into clear categories and note any limitations of the data.\n",
+  "character_select": "researcher",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL",
+  "interviewee": {
+    "name": "Stephen Dulaney",
+    "role": "UX Researcher",
+    "email": "sdulaney@deloitte.com"
+  },
+  "created_at": "2025-05-06T00:00:32.477714",
+  "creation_date": "2025-05-06 00:00",
+  "last_updated": "2025-05-06T10:15:23.784398",
+  "expiration_date": "2025-06-05T00:00:32.477714",
+  "status": "analyzed",
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "casting the speech to text and want to see if my voice shows up and it does yoga",
+      "timestamp": "2025-05-06T10:08:03.961905"
+    },
+    {
+      "role": "assistant",
+      "content": "That's great to hear that your voice shows up and that you enjoy practicing yoga! How has incorporating yoga into your routine impacted your overall well-being and productivity?",
+      "timestamp": "2025-05-06T10:08:05.677942"
+    },
+    {
+      "role": "user",
+      "content": "I start work with a more relaxed frame of mind and when I'm waiting for a connection on",
+      "timestamp": "2025-05-06T10:08:24.985259"
+    },
+    {
+      "role": "assistant",
+      "content": "That's great to hear! Starting work with a relaxed mindset can often improve focus and productivity. How do you typically maintain that relaxed state as you wait for a connection or transition into your work tasks?",
+      "timestamp": "2025-05-06T10:08:25.894830"
+    },
+    {
+      "role": "user",
+      "content": "I try to do",
+      "timestamp": "2025-05-06T10:08:52.113966"
+    },
+    {
+      "role": "assistant",
+      "content": "That's great to hear! Can you tell me about a specific project or accomplishment you're proud of that demonstrates your ability to take initiative and get things done?",
+      "timestamp": "2025-05-06T10:08:52.929579"
+    },
+    {
+      "role": "user",
+      "content": "I decided to try to make an AI interview and research assistant on a project and I just decided I would try to use AI tools to do it so that's why we're here",
+      "timestamp": "2025-05-06T10:09:17.664471"
+    },
+    {
+      "role": "assistant",
+      "content": "That sounds like a fascinating project! What specific tasks or responsibilities do you envision your AI interview and research assistant handling?",
+      "timestamp": "2025-05-06T10:09:18.489914"
+    },
+    {
+      "role": "user",
+      "content": "well after conducting multiple rounds of industrial inquiry with user researchers and individual genetic research studies I have determined that they have some pain points that were not a jersey yet which is in the recruiting but as far as facilitating the interview creating a robust transcript creating a semantic analysis of the transcript in real time where we have an AI monitor of the interview take notes in semantic identification of things throughout the transcript and then manipulating the transcription",
+      "timestamp": "2025-05-06T10:10:14.497467"
+    },
+    {
+      "role": "assistant",
+      "content": "It sounds like you have identified some key pain points in the research process. Developing a system for real-time semantic analysis and transcription manipulation could indeed be very beneficial. Have you started working on any prototypes or solutions to address these pain points, or are you still in the planning phase?",
+      "timestamp": "2025-05-06T10:10:15.715884"
+    },
+    {
+      "role": "user",
+      "content": "I am speaking with a prototype about this research project you are currently conducting an interview with me about a research project",
+      "timestamp": "2025-05-06T10:10:46.878669"
+    },
+    {
+      "role": "assistant",
+      "content": "That's great to hear that you are working on a research project! Can you tell me more about the specific goals or objectives of your research? What are you hoping to achieve through this project?",
+      "timestamp": "2025-05-06T10:10:49.403995"
+    },
+    {
+      "role": "user",
+      "content": "I'm hoping to achieve I can show that we can have a conversation and interview that you can lead and then at the end of that energy the transcript will be saved and that have meaningful analysis of the transcript that will lead to insights",
+      "timestamp": "2025-05-06T10:11:20.322172"
+    },
+    {
+      "role": "assistant",
+      "content": "That's a great goal! To get started, can you tell me more about the type of conversation or interview you have in mind? Are you looking to discuss a specific topic, gather feedback, or explore new ideas?",
+      "timestamp": "2025-05-06T10:11:21.233496"
+    },
+    {
+      "role": "user",
+      "content": "I have created six characters the first one would be asked you who is an expert at asking right questions and helps researchers when they want to develop discussion guides",
+      "timestamp": "2025-05-06T10:11:47.618636"
+    },
+    {
+      "role": "assistant",
+      "content": "That's an interesting character you've created! It sounds like they have a valuable skill set. Can you tell me more about this character's background and how they developed their expertise in asking the right questions for research purposes?",
+      "timestamp": "2025-05-06T10:11:48.562088"
+    },
+    {
+      "role": "user",
+      "content": "well we created an industry best practices reference guide that Askia references and then she looks throughout the entire internet in the large language model to use her background and experience to ask questions about specific projects in addition we have the Sia who is an expert on asking the right questions to dive deep and understand all you need to know to generate",
+      "timestamp": "2025-05-06T10:12:26.149114"
+    },
+    {
+      "role": "assistant",
+      "content": "That sounds like a comprehensive approach to gathering information and asking the right questions. How do Askia and Sia complement each other's skills and expertise in ensuring thorough understanding and effective communication during projects?",
+      "timestamp": "2025-05-06T10:12:27.313229"
+    },
+    {
+      "role": "user",
+      "content": "who is the journey map Builder",
+      "timestamp": "2025-05-06T10:12:51.669232"
+    },
+    {
+      "role": "assistant",
+      "content": "The journey map builder is typically a member of the UX (User Experience) team or a marketing team within an organization. They are responsible for creating visual representations of the customer journey to help understand and improve the overall user experience.\n\nWould you like to learn more about how journey maps are used in business and design processes, or do you have any specific questions about creating journey maps?",
+      "timestamp": "2025-05-06T10:12:53.741273"
+    },
+    {
+      "role": "user",
+      "content": "will we have odessia who is our character who does the specialist in Journey mapping so she will conduct interviews at Lisa Journey maps in addition we have Eureka who is an opportunity identifier she can take the transcripts from any of the previous interviews and identify opportunities and finally we have skeptical who is the Assumption Buster she will take all these and",
+      "timestamp": "2025-05-06T10:13:48.580906"
+    },
+    {
+      "role": "assistant",
+      "content": "That sounds like a strong team you have for conducting interviews and analyzing journey maps! It's great to have specialists like Odessia, Eureka, and Skeptical bringing their unique skills to the table. \n\nTo delve deeper into their roles, could you provide more insight into how their individual expertise will contribute to the overall success of your project?",
+      "timestamp": "2025-05-06T10:13:49.980951"
+    },
+    {
+      "role": "user",
+      "content": "well in the end after we kind of have people asking questions from different points of view and helping researchers craft the right questions in the right plans and Gatherings right information and insights we hope to take that into planning features and opportunity Matrix that we can turn into a prompts so that we can give the courser or any other Idol a prompt that would generate software",
+      "timestamp": "2025-05-06T10:14:39.012126"
+    },
+    {
+      "role": "assistant",
+      "content": "That sounds like a comprehensive process for gathering insights and planning features. Could you tell me more about how you prioritize which features to focus on based on the information and insights gathered?",
+      "timestamp": "2025-05-06T10:14:39.651464"
+    }
+  ],
+  "completion_date": "2025-05-06T10:15:15.889529",
+  "summary": "Key topics discussed:\n- Incorporating yoga into daily routine\n- Developing an AI interview and research assistant\n- Conducting industrial inquiry and genetic research studies\n- Real-time semantic analysis and transcription manipulation\n- Creating characters for interviews and journey mapping\n- Prioritizing features based on insights gathered\n\nMain insights:\n- The participant uses yoga to start work with a relaxed mindset, improving focus and productivity.\n- The participant is working on developing an AI interview and research assistant to address pain points in the research process.\n- The participant has created characters with specific expertise for conducting interviews and analyzing journey maps.\n- The project aims to gather insights from interviews and research to prioritize features for software development.\n\nNotable points made by the interviewee:\n- The participant is conducting industrial inquiry and genetic research studies to identify pain points in the research process.\n- The participant envisions the AI assistant conducting real-time semantic analysis and transcription manipulation during interviews.\n- The participant has created characters like Askia, Sia, Odessia, Eureka, and Skeptical with specific roles in the research project.\n- The project aims to generate software prompts based on insights gathered from interviews and research.",
+  "analysis": {
+    "performed_at": "2025-05-06T10:15:23.784281",
+    "analysis_prompt_used": "Analyze the provided data systematically. Identify recurring themes, interesting outliers,\nand potential insights. Consider both explicit statements and implicit meanings.\nOrganize your findings into clear categories and note any limitations of the data.\n",
+    "raw_analysis": "Themes:\n1. Importance of Yoga: The participant mentions incorporating yoga into their routine, which has positively impacted their well-being and productivity. This theme of self-care and relaxation is evident throughout the interview.\n\n2. AI Research Assistant Project: The participant discusses their project of creating an AI interview and research assistant to address pain points in the research process. This theme of innovation and problem-solving is central to the conversation.\n\n3. Team of Characters: The participant introduces a team of characters, each with specific expertise in asking the right questions, conducting interviews, mapping journeys, and identifying opportunities. This theme of collaboration and specialization highlights the importance of diverse skills in research projects.\n\nInsights:\n1. The participant's focus on creating a system for real-time semantic analysis and transcription manipulation shows a deep understanding of the research process and a commitment to improving efficiency and accuracy.\n\n2. The use of AI tools in research projects can lead to more meaningful analysis and insights, showcasing the potential for technology to enhance traditional research methods.\n\n3. The participant's goal of generating software prompts based on gathered insights demonstrates a practical application of research findings and a focus on actionable outcomes.\n\nLimitations:\n1. The interview lacks specific details about the AI research assistant project, such as the technology being used, the timeline for development, and potential challenges faced. More information on these aspects would provide a clearer picture of the project's scope and feasibility.\n\n2. The conversation briefly touches on the participant's research goals and objectives but does not delve deeply into the specific research questions or methodology being employed. A more detailed discussion of these aspects would enhance the understanding of the project's purpose and potential impact.",
+    "summary": "Themes:\n1. Importance of Yoga: The participant mentions incorporating yoga into their routine, which has positively impacted their well-being and productivity. This theme of self-care and relaxation is evident throughout the interview.",
+    "user_needs": [],
+    "goals": [],
+    "pain_points": [],
+    "opportunities": [],
+    "recommendations": [],
+    "key_quotes": []
+  },
+  "id": "d96002e7-9fa5-4db6-9c5b-b8905da6f177",
+  "updated_at": "2025-05-08T09:59:07.568281",
+  "sessions": [
+    "4fa98cba-0c5b-43e6-873e-3c2ddcae3026"
+  ],
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "custom_questions": []
+}

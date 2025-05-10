@@ -1,0 +1,26 @@
+{
+  "id": "0c6e363b-21e3-404f-87b1-af888029740a",
+  "guide_id": "f389643d-18e4-45bc-b82d-21d813819d9d",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "user",
+      "content": "I would like for you to convert my speech to text",
+      "id": "c627a4ab-3269-411a-910e-49e8362bfe4d",
+      "timestamp": "2025-05-07T17:45:14.468212"
+    },
+    {
+      "role": "user",
+      "content": "Hello this is a test of the speech to text I think it's gonna work",
+      "id": "e3377f32-fee7-4eb6-8dab-cd2767e06369",
+      "timestamp": "2025-05-07T17:47:21.855552"
+    }
+  ],
+  "transcript": "\n\nParticipant: I would like for you to convert my speech to text\n\nParticipant: Hello this is a test of the speech to text I think it's gonna work",
+  "analysis": null,
+  "created_at": "2025-05-07T17:45:00.431744",
+  "updated_at": "2025-05-07T17:47:21.858724"
+}

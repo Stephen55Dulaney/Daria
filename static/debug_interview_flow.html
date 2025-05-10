@@ -203,7 +203,7 @@
             <div class="flex-row">
                 <div class="settings-item" style="flex: 1;">
                     <label for="api-port">API Port:</label>
-                    <input type="number" id="api-port" min="1000" max="65535" value="5010">
+                    <input type="number" id="api-port" min="1000" max="65535" value="5025">
                 </div>
                 <div class="settings-item" style="flex: 2;">
                     <label for="session-id">Session ID (optional):</label>
@@ -376,7 +376,7 @@
         let ttsEndedTimeout = null;
         let noSpeechTimeout = null;
         let sttSubmitTimeout = null;
-        let apiPort = 5010;
+        let apiPort = 5025;
         let sessionId = null;
         let lastAssistantMessage = "";
         let isConnected = false;
@@ -428,6 +428,14 @@
         
         const clearLogBtn = document.getElementById('clear-log');
         const logContainer = document.getElementById('log-container');
+        
+        // Get port from URL parameters if available
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('port')) {
+            apiPort = urlParams.get('port');
+        }
+        
+        let apiUrl = `http://localhost:${apiPort}`;
         
         // Logging function
         function log(message, type = 'info') {
@@ -582,7 +590,7 @@
             
             try {
                 // Test connection to API server
-                const healthResponse = await fetch(`http://localhost:${apiPort}/api/health`);
+                const healthResponse = await fetch(`${apiUrl}/api/health`);
                 
                 if (!healthResponse.ok) {
                     throw new Error(`API server returned status: ${healthResponse.status}`);
@@ -602,7 +610,7 @@
                     log(`Using provided session ID: ${sessionId}`, 'info');
                     
                     // Verify session exists
-                    const sessionResponse = await fetch(`http://localhost:${apiPort}/api/session/${sessionId}`);
+                    const sessionResponse = await fetch(`${apiUrl}/api/session/${sessionId}`);
                     
                     if (!sessionResponse.ok) {
                         throw new Error(`Session not found: ${sessionId}`);
@@ -620,7 +628,7 @@
                     log('No session ID provided. Creating a new session...', 'info');
                     
                     // Get available discussion guides
-                    const guidesResponse = await fetch(`http://localhost:${apiPort}/api/discussion_guides`);
+                    const guidesResponse = await fetch(`${apiUrl}/api/discussion_guides`);
                     
                     if (!guidesResponse.ok) {
                         throw new Error(`Failed to fetch discussion guides: ${guidesResponse.status}`);
@@ -637,7 +645,7 @@
                     log(`Using discussion guide: ${guideId}`, 'info');
                     
                     // Create a new session
-                    const createResponse = await fetch(`http://localhost:${apiPort}/api/session/create`, {
+                    const createResponse = await fetch(`${apiUrl}/api/session/create`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
@@ -688,7 +696,7 @@
             }
             
             try {
-                const messagesResponse = await fetch(`http://localhost:${apiPort}/api/session/${sessionId}/messages`);
+                const messagesResponse = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
                 
                 if (!messagesResponse.ok) {
                     throw new Error(`Failed to fetch messages: ${messagesResponse.status}`);
@@ -762,16 +770,14 @@
                 addMessage(message, 'user');
                 
                 // Send to API
-                const response = await fetch(`http://localhost:${apiPort}/api/session/${sessionId}/add_message`, {
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        message: {
-                            role: 'user',
-                            content: message
-                        }
+                        content: message,
+                        role: 'user'
                     })
                 });
                 
@@ -811,7 +817,7 @@
                 log('Getting AI response...', 'llm');
                 
                 // Get latest messages
-                const messagesResponse = await fetch(`http://localhost:${apiPort}/api/session/${sessionId}/messages`);
+                const messagesResponse = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
                 
                 if (!messagesResponse.ok) {
                     throw new Error(`Failed to fetch messages: ${messagesResponse.status}`);
@@ -878,12 +884,20 @@
                 window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
                 recognition = new SpeechRecognition();
                 recognition.lang = 'en-US';
-                recognition.continuous = false; // Important: set to false to avoid multiple recognitions
+                recognition.continuous = true; // Changed: true to keep listening until explicitly stopped
                 recognition.interimResults = true;
+                recognition.maxAlternatives = 3; // Get multiple possible interpretations
+                
+                // Set a longer silence timeout
+                let finalTranscript = '';
+                let recognitionTimeout = null;
+                let silenceTimer = null;
+                const SILENCE_THRESHOLD = 1500; // 1.5 seconds of silence before considering speech complete
                 
                 recognition.onstart = function() {
                     updateSTTStatus(true, 'Listening');
                     log('Speech recognition started', 'stt');
+                    finalTranscript = '';
                     
                     // Set timeout for no-speech error
                     if (noSpeechTimeout) {
@@ -891,19 +905,30 @@
                     }
                     
                     noSpeechTimeout = setTimeout(() => {
-                        log('No speech detected within timeout period', 'warn');
-                        updateSTTStatus(true, 'No speech (timeout)', true);
-                        
-                        // Safely stop recognition
-                        try {
-                            recognition.stop();
-                        } catch (e) {
-                            log(`Error stopping recognition: ${e.message}`, 'error');
+                        if (sttActive && autoSubmitSttCheckbox.checked) {
+                            log(`No speech detected after ${sttTimeoutSlider.value}ms, stopping`, 'warn');
+                            stopSpeechRecognition();
+                            
+                            // If automation is active, restart STT after delay
+                            if (automationActive) {
+                                log(`Will restart STT in ${sttRestartDelaySlider.value}ms`, 'info');
+                                setTimeout(() => {
+                                    if (automationActive) {
+                                        startSpeechRecognition();
+                                    }
+                                }, parseInt(sttRestartDelaySlider.value));
+                            }
                         }
                     }, parseInt(sttTimeoutSlider.value));
                 };
                 
                 recognition.onresult = function(event) {
+                    // Clear any existing silence timer
+                    if (silenceTimer) {
+                        clearTimeout(silenceTimer);
+                    }
+                    
+                    // Get the latest result
                     const result = event.results[event.results.length - 1];
                     const transcript = result[0].transcript;
                     
@@ -914,68 +939,84 @@
                     }
                     
                     if (result.isFinal) {
-                        userInput.value = transcript;
-                        log(`Speech recognized: ${transcript}`, 'stt');
+                        // Add to the final transcript
+                        finalTranscript += ' ' + transcript;
+                        finalTranscript = finalTranscript.trim();
                         
-                        // Stop recognition after final result to prevent multiple recognitions
-                        try {
-                            recognition.stop();
-                        } catch (e) {
-                            log(`Error stopping recognition after final result: ${e.message}`, 'error');
-                        }
+                        // Display in the input box
+                        userInput.value = finalTranscript;
+                        log(`Final transcript part: ${transcript}`, 'stt');
                         
-                        // Auto-submit if enabled
-                        if (autoSubmitSttCheckbox.checked) {
-                            const delay = parseInt(sttSubmitDelaySlider.value);
-                            log(`Will auto-submit message in ${delay}ms`, 'info');
+                        // Start silence detection timer to auto-submit after silence
+                        silenceTimer = setTimeout(() => {
+                            log('Silence detected, processing complete sentence', 'stt');
                             
-                            // Clear any existing timeout
-                            if (sttSubmitTimeout) {
-                                clearTimeout(sttSubmitTimeout);
-                            }
-                            
-                            sttSubmitTimeout = setTimeout(() => {
-                                if (transcript.trim()) {
-                                    log('Auto-submitting message', 'info');
+                            // Only stop recognition if we have meaningful content
+                            if (finalTranscript.trim().length > 3) {
+                                try {
+                                    recognition.stop();
+                                } catch (e) {
+                                    log(`Error stopping recognition: ${e.message}`, 'error');
+                                }
+                                
+                                // Auto-submit if enabled
+                                if (autoSubmitSttCheckbox.checked) {
+                                    const delay = parseInt(sttSubmitDelaySlider.value);
+                                    log(`Will auto-submit message in ${delay}ms`, 'info');
                                     
-                                    // Check for end interview phrases in auto-submit mode as well
-                                    const lowerTranscript = transcript.toLowerCase();
-                                    if (lowerTranscript.includes("end the interview") || 
-                                        lowerTranscript.includes("end interview") || 
-                                        lowerTranscript.includes("finish the interview") || 
-                                        lowerTranscript.includes("complete the interview") ||
-                                        lowerTranscript.includes("stop the interview")) {
-                                        
-                                        log('End interview request detected in auto-submit', 'info');
-                                        
-                                        // Stop automation if active
-                                        if (automationActive) {
-                                            stopAutomation();
-                                        }
-                                        
-                                        // Add the messages manually
-                                        addMessage(transcript, 'user');
-                                        addMessage("Thank you for testing the interview! The debug interface will remain open for additional testing.", 'assistant');
-                                        
-                                        // Play thank you message if auto-TTS is enabled
-                                        if (autoTtsCheckbox.checked) {
-                                            playTTS("Thank you for testing the interview! The debug interface will remain open for additional testing.");
-                                        }
-                                        
-                                        userInput.value = '';
-                                        return;
+                                    // Clear any existing timeout
+                                    if (sttSubmitTimeout) {
+                                        clearTimeout(sttSubmitTimeout);
                                     }
                                     
-                                    sendUserMessage(transcript);
-                                    userInput.value = '';
-                                } else {
-                                    log('No text to submit', 'warn');
+                                    sttSubmitTimeout = setTimeout(() => {
+                                        if (finalTranscript.trim()) {
+                                            log('Auto-submitting message', 'info');
+                                            
+                                            // Check for end interview phrases in auto-submit mode as well
+                                            const lowerTranscript = finalTranscript.toLowerCase();
+                                            if (lowerTranscript.includes("end the interview") || 
+                                                lowerTranscript.includes("end interview") || 
+                                                lowerTranscript.includes("finish the interview") || 
+                                                lowerTranscript.includes("complete the interview") ||
+                                                lowerTranscript.includes("stop the interview")) {
+                                                
+                                                log('End interview request detected in auto-submit', 'info');
+                                                
+                                                // Stop automation if active
+                                                if (automationActive) {
+                                                    stopAutomation();
+                                                }
+                                                
+                                                // Add the messages manually
+                                                addMessage(finalTranscript, 'user');
+                                                addMessage("Thank you for testing the interview! The debug interface will remain open for additional testing.", 'assistant');
+                                                
+                                                // Play thank you message if auto-TTS is enabled
+                                                if (autoTtsCheckbox.checked) {
+                                                    playTTS("Thank you for testing the interview! The debug interface will remain open for additional testing.");
+                                                }
+                                                
+                                                userInput.value = '';
+                                                return;
+                                            }
+                                            
+                                            sendUserMessage(finalTranscript);
+                                            userInput.value = '';
+                                            finalTranscript = '';
+                                        } else {
+                                            log('No text to submit', 'warn');
+                                        }
+                                    }, delay);
                                 }
-                            }, delay);
-                        }
+                            }
+                        }, SILENCE_THRESHOLD);
                     } else {
                         // Update status with interim result
-                        updateSTTStatus(true, `Listening: ${transcript.substring(0, 20)}${transcript.length > 20 ? '...' : ''}`);
+                        updateSTTStatus(true, `Listening: ${transcript.substring(0, 30)}${transcript.length > 30 ? '...' : ''}`);
+                        
+                        // Display interim results in the input box, but don't submit
+                        userInput.value = finalTranscript + ' ' + transcript;
                     }
                 };
                 
@@ -1001,11 +1042,19 @@
                 recognition.onend = function() {
                     log('Speech recognition ended', 'stt');
                     updateSTTStatus(false, 'Ready');
+                    sttActive = false;
+                    startSttBtn.disabled = false;
+                    stopSttBtn.disabled = true;
                     
                     // Clear any existing timeout
                     if (noSpeechTimeout) {
                         clearTimeout(noSpeechTimeout);
                         noSpeechTimeout = null;
+                    }
+                    
+                    if (silenceTimer) {
+                        clearTimeout(silenceTimer);
+                        silenceTimer = null;
                     }
                 };
                 
@@ -1019,53 +1068,103 @@
             }
         }
         
-        // Start speech recognition with safeguards
+        // Check and request microphone permissions explicitly
+        function checkMicrophonePermission() {
+            log('Checking microphone permissions...', 'info');
+            
+            // First, check if the browser supports the permissions API
+            if (navigator.permissions && navigator.permissions.query) {
+                navigator.permissions.query({ name: 'microphone' })
+                    .then(function(permissionStatus) {
+                        log(`Microphone permission status: ${permissionStatus.state}`, 'info');
+                        
+                        if (permissionStatus.state === 'granted') {
+                            log('Microphone permission already granted', 'info');
+                        } else if (permissionStatus.state === 'prompt') {
+                            log('Will need to request microphone permission', 'warn');
+                            // Request permission by getting user media
+                            requestMicrophoneAccess();
+                        } else if (permissionStatus.state === 'denied') {
+                            log('Microphone permission denied by browser settings. Please enable in your browser settings.', 'error');
+                            alert('Microphone access is blocked. Please enable microphone access in your browser settings and reload the page.');
+                        }
+                        
+                        // Listen for changes to permission state
+                        permissionStatus.onchange = function() {
+                            log(`Microphone permission changed to: ${this.state}`, 'info');
+                        };
+                    })
+                    .catch(function(error) {
+                        log(`Error checking permissions: ${error.message}`, 'error');
+                        // Fallback to direct request
+                        requestMicrophoneAccess();
+                    });
+            } else {
+                log('Permissions API not supported, trying direct access request', 'warn');
+                requestMicrophoneAccess();
+            }
+        }
+        
+        // Request microphone access explicitly
+        function requestMicrophoneAccess() {
+            log('Requesting microphone access...', 'info');
+            
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    log('Microphone access granted', 'info');
+                    // Stop the tracks to release the microphone
+                    stream.getTracks().forEach(track => track.stop());
+                })
+                .catch(function(error) {
+                    log(`Microphone access error: ${error.name} - ${error.message}`, 'error');
+                    alert(`Microphone access denied: ${error.message}\n\nPlease allow microphone access in your browser settings and reload the page.`);
+                });
+        }
+        
+        // Modify startSpeechRecognition to check permissions first
         function startSpeechRecognition() {
-            if (!isConnected) {
-                log('Cannot start STT: not connected to server', 'error');
-                return false;
+            if (sttActive) {
+                log('Speech recognition already active', 'warn');
+                return;
             }
             
-            if (!recognition) {
-                if (!initSpeechRecognition()) {
-                    return false;
-                }
-            }
+            // Check microphone permission before starting
+            checkMicrophonePermission();
             
-            if (ttsActive && autoStopSttCheckbox.checked) {
-                log('Not starting STT because TTS is active and auto-stop is enabled', 'warn');
-                return false;
-            }
+            // Continue with normal initialization
+            initSpeechRecognition();
             
             try {
                 recognition.start();
+                sttActive = true;
+                log('Starting speech recognition', 'stt');
+                
+                // Update UI
                 startSttBtn.disabled = true;
                 stopSttBtn.disabled = false;
-                return true;
+                
+                // Set timeout for no speech detection
+                noSpeechTimeout = setTimeout(() => {
+                    if (sttActive && autoSubmitSttCheckbox.checked) {
+                        log(`No speech detected after ${sttTimeoutSlider.value}ms, stopping`, 'warn');
+                        stopSpeechRecognition();
+                        
+                        // If automation is active, restart STT after delay
+                        if (automationActive) {
+                            log(`Will restart STT in ${sttRestartDelaySlider.value}ms`, 'info');
+                            setTimeout(() => {
+                                if (automationActive) {
+                                    startSpeechRecognition();
+                                }
+                            }, parseInt(sttRestartDelaySlider.value));
+                        }
+                    }
+                }, parseInt(sttTimeoutSlider.value));
+                
             } catch (error) {
                 log(`Error starting speech recognition: ${error.message}`, 'error');
-                
-                // If error is about recognition already started, reinitialize
-                if (error.message.includes('already started')) {
-                    log('Recognition already started. Reinitializing...', 'warn');
-                    initSpeechRecognition();
-                    
-                    // Try again with delay
-                    setTimeout(() => {
-                        try {
-                            recognition.start();
-                            log('Recognition restarted after reinitialization', 'stt');
-                            startSttBtn.disabled = true;
-                            stopSttBtn.disabled = false;
-                        } catch (e) {
-                            log(`Failed to restart recognition: ${e.message}`, 'error');
-                            startSttBtn.disabled = false;
-                            stopSttBtn.disabled = true;
-                        }
-                    }, parseInt(sttRestartDelaySlider.value));
-                }
-                
-                return false;
+                sttActive = false;
+                updateSTTStatus(false, 'Error');
             }
         }
         
@@ -1106,7 +1205,7 @@
             }
             
             const voiceId = ttsVoiceSelect.value;
-            const url = `http://localhost:${apiPort}/api/text_to_speech_elevenlabs`;
+            const url = `${apiUrl}/api/text_to_speech_elevenlabs`;
             
             updateTTSStatus(true, 'Preparing speech...');
             log(`Preparing TTS: ${text.substring(0, 30)}${text.length > 30 ? '...' : ''}`, 'tts');
@@ -1328,6 +1427,39 @@
             }
         });
         
+        // Start full automation
+        function startAutomation() {
+            if (!isConnected) {
+                log('Cannot start automation: not connected to server', 'error');
+                return;
+            }
+            
+            log('Starting full automation', 'info');
+            automationActive = true;
+            updateAutomationStatus(true, 'Running');
+            
+            // If TTS is playing, wait for it to end
+            if (ttsActive) {
+                log('TTS is active, waiting for it to finish before starting STT', 'info');
+                // The onended event of TTS will trigger STT if automationActive is true
+            } else {
+                // If no TTS is playing, start STT directly
+                if (!sttActive) {
+                    log('Starting speech recognition as part of automation', 'info');
+                    startSpeechRecognition();
+                }
+            }
+        }
+        
+        // Stop automation
+        function stopAutomation() {
+            log('Stopping automation', 'info');
+            automationActive = false;
+            updateAutomationStatus(false, 'Not Running');
+            
+            // Don't stop STT and TTS, just stop the automation process
+        }
+        
         // Initialize
         document.addEventListener('DOMContentLoaded', () => {
             // Check if API port is in URL
@@ -1344,6 +1476,9 @@
             }
             
             log('Debug interview flow tool initialized', 'info');
+            
+            // Pre-check microphone permissions on page load
+            checkMicrophonePermission();
             
             // Auto-connect if URL parameters are provided
             if (portParam || sessionIdParam) {

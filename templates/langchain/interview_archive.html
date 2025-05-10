@@ -123,12 +123,17 @@
             <h1 class="h3">Interview Archive</h1>
             <p class="text-muted">View and analyze completed interviews</p>
         </div>
-        <div class="search-container">
-            <div class="input-group">
-                <input type="text" class="form-control" id="searchInput" placeholder="Search interviews...">
-                <button class="btn btn-outline-secondary" type="button" id="searchBtn">
-                    <i class="bi bi-search"></i>
-                </button>
+        <div class="d-flex">
+            <a href="{{ url_for('upload_transcript_page') }}" class="btn btn-primary me-2">
+                <i class="bi bi-cloud-upload"></i> Upload Transcript
+            </a>
+            <div class="search-container">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search interviews...">
+                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
             </div>
         </div>
     </div>

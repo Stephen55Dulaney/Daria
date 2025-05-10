@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TTS Debug Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #333;
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        textarea, select, input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-right: 10px;
+        }
+        button:hover {
+            background: #45a049;
+        }
+        button:disabled {
+            background: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 15px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .info {
+            background-color: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+        audio {
+            width: 100%;
+            margin-top: 15px;
+        }
+        .debug-info {
+            background: #333;
+            color: #fff;
+            padding: 10px;
+            border-radius: 4px;
+            max-height: 300px;
+            overflow-y: auto;
+            font-family: monospace;
+            margin-top: 20px;
+        }
+        #logWindow {
+            height: 200px;
+            overflow-y: auto;
+            border: 1px solid #ccc;
+            padding: 10px;
+            margin-top: 15px;
+            font-family: monospace;
+            font-size: 12px;
+            background-color: #f5f5f5;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .log-time {
+            color: #666;
+            margin-right: 10px;
+        }
+        .log-error {
+            color: #d9534f;
+        }
+        .log-success {
+            color: #5cb85c;
+        }
+        .log-info {
+            color: #5bc0de;
+        }
+    </style>
+</head>
+<body>
+    <h1>TTS Debug Tool</h1>
+    
+    <div class="card">
+        <h2>TTS Test</h2>
+        <div class="form-group">
+            <label for="sessionId">Session ID (from interview):</label>
+            <input type="text" id="sessionId" placeholder="Enter the interview session ID" 
+                   value="" />
+        </div>
+        
+        <div class="form-group">
+            <label for="voiceId">Voice ID:</label>
+            <select id="voiceId">
+                <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
+                <option value="21m00Tcm4TlvDq8ikWAM">Adam (Male)</option>
+                <option value="AZnzlk1XvdvUeBnXmlld">Domi (Female)</option>
+                <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
+                <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Male)</option>
+                <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Male)</option>
+            </select>
+        </div>
+        
+        <div class="form-group">
+            <label for="ttsText">Text to Convert:</label>
+            <textarea id="ttsText" rows="5" placeholder="Enter text to convert to speech...">Hello, this is a test of the text-to-speech system. Is this working correctly?</textarea>
+        </div>
+        
+        <div class="controls">
+            <button id="testTtsBtn">Test TTS with ElevenLabs</button>
+            <button id="testBrowserTtsBtn">Test Browser TTS</button>
+            <button id="stopTtsBtn" disabled>Stop</button>
+        </div>
+        
+        <div id="ttsStatus" class="status"></div>
+        <audio id="ttsAudio" controls style="display: none;"></audio>
+    </div>
+    
+    <div class="card">
+        <h2>Debug Logs</h2>
+        <div id="logWindow"></div>
+        <button id="clearLogsBtn">Clear Logs</button>
+    </div>
+    
+    <div class="card">
+        <h2>Browser Information</h2>
+        <div id="browserInfo"></div>
+    </div>
+
+    <script>
+        // DOM elements
+        const sessionIdInput = document.getElementById('sessionId');
+        const voiceIdSelect = document.getElementById('voiceId');
+        const ttsTextArea = document.getElementById('ttsText');
+        const testTtsBtn = document.getElementById('testTtsBtn');
+        const testBrowserTtsBtn = document.getElementById('testBrowserTtsBtn');
+        const stopTtsBtn = document.getElementById('stopTtsBtn');
+        const ttsStatus = document.getElementById('ttsStatus');
+        const ttsAudio = document.getElementById('ttsAudio');
+        const logWindow = document.getElementById('logWindow');
+        const clearLogsBtn = document.getElementById('clearLogsBtn');
+        const browserInfo = document.getElementById('browserInfo');
+        
+        // Try to get session ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.has('session_id')) {
+            sessionIdInput.value = urlParams.get('session_id');
+            log('Session ID loaded from URL: ' + sessionIdInput.value, 'info');
+        }
+        
+        // Log browser info
+        function displayBrowserInfo() {
+            const info = {
+                'User Agent': navigator.userAgent,
+                'Platform': navigator.platform,
+                'TTS Support': 'speechSynthesis' in window ? 'Yes' : 'No',
+                'AudioContext Support': 'AudioContext' in window ? 'Yes' : 'No'
+            };
+            
+            if ('speechSynthesis' in window) {
+                info['Voices Available'] = window.speechSynthesis.getVoices().length;
+            }
+            
+            let html = '<ul>';
+            for (const [key, value] of Object.entries(info)) {
+                html += `<li><strong>${key}:</strong> ${value}</li>`;
+            }
+            html += '</ul>';
+            
+            browserInfo.innerHTML = html;
+        }
+        
+        // Call display browser info with a slight delay to allow voices to load
+        setTimeout(displayBrowserInfo, 500);
+        
+        // Event listeners
+        testTtsBtn.addEventListener('click', testElevenLabsTTS);
+        testBrowserTtsBtn.addEventListener('click', testBrowserTTS);
+        stopTtsBtn.addEventListener('click', stopTTS);
+        clearLogsBtn.addEventListener('click', clearLogs);
+        
+        // Test ElevenLabs TTS
+        function testElevenLabsTTS() {
+            const text = ttsTextArea.value;
+            const voiceId = voiceIdSelect.value;
+            const sessionId = sessionIdInput.value;
+            
+            if (!text) {
+                updateStatus('Please enter some text to convert to speech.', 'error');
+                log('Error: No text provided for TTS', 'error');
+                return;
+            }
+            
+            updateStatus('Converting text to speech using ElevenLabs...', 'info');
+            log(`TTS Request: text length=${text.length}, voice=${voiceId}, session=${sessionId || 'none'}`, 'info');
+            
+            // Disable buttons during processing
+            testTtsBtn.disabled = true;
+            testBrowserTtsBtn.disabled = true;
+            stopTtsBtn.disabled = false;
+            
+            // Make the API call
+            fetch('/api/text_to_speech_elevenlabs', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    text: text,
+                    voice_id: voiceId,
+                    session_id: sessionId || undefined
+                })
+            })
+            .then(response => {
+                log(`TTS API response status: ${response.status}`, response.ok ? 'success' : 'error');
+                
+                if (!response.ok) {
+                    return response.json().then(data => {
+                        throw new Error(`TTS API error: ${data.error || response.statusText}`);
+                    });
+                }
+                
+                // Check content type to determine response type
+                const contentType = response.headers.get('content-type');
+                if (contentType && contentType.includes('application/json')) {
+                    return response.json().then(data => {
+                        log('Received JSON fallback response', 'info');
+                        return { type: 'json', data };
+                    });
+                } else {
+                    return response.blob().then(blob => {
+                        log(`Received audio blob: type=${blob.type}, size=${blob.size} bytes`, 'success');
+                        return { type: 'audio', data: blob };
+                    });
+                }
+            })
+            .then(result => {
+                if (result.type === 'audio') {
+                    // Handle audio response
+                    const audioUrl = URL.createObjectURL(result.data);
+                    ttsAudio.src = audioUrl;
+                    ttsAudio.style.display = 'block';
+                    
+                    ttsAudio.onended = function() {
+                        URL.revokeObjectURL(audioUrl);
+                        stopTtsBtn.disabled = true;
+                        testTtsBtn.disabled = false;
+                        testBrowserTtsBtn.disabled = false;
+                        log('Audio playback completed', 'success');
+                    };
+                    
+                    ttsAudio.onerror = function(e) {
+                        log(`Audio playback error: ${e}`, 'error');
+                        updateStatus("Error playing audio", 'error');
+                        stopTtsBtn.disabled = true;
+                        testTtsBtn.disabled = false;
+                        testBrowserTtsBtn.disabled = false;
+                    };
+                    
+                    ttsAudio.play()
+                        .then(() => log('Audio playback started', 'success'))
+                        .catch(err => log(`Error starting audio: ${err}`, 'error'));
+                    
+                    updateStatus("ElevenLabs TTS completed successfully", 'success');
+                    
+                } else if (result.type === 'json') {
+                    // Handle JSON fallback response
+                    updateStatus("Using browser fallback TTS", 'info');
+                    log('Falling back to browser TTS', 'info');
+                    
+                    // Use browser speech synthesis
+                    useBrowserTTS(result.data.text);
+                }
+            })
+            .catch(error => {
+                console.error('TTS API error:', error);
+                log(`TTS API error: ${error.message}`, 'error');
+                updateStatus(`Error: ${error.message}`, 'error');
+                stopTtsBtn.disabled = true;
+                testTtsBtn.disabled = false;
+                testBrowserTtsBtn.disabled = false;
+            });
+        }
+        
+        // Test browser TTS directly
+        function testBrowserTTS() {
+            const text = ttsTextArea.value;
+            
+            if (!text) {
+                updateStatus('Please enter some text to convert to speech.', 'error');
+                log('Error: No text provided for browser TTS', 'error');
+                return;
+            }
+            
+            updateStatus('Using browser speech synthesis...', 'info');
+            log(`Testing browser TTS: text length=${text.length}`, 'info');
+            
+            // Disable controls during playback
+            testTtsBtn.disabled = true;
+            testBrowserTtsBtn.disabled = true;
+            stopTtsBtn.disabled = false;
+            
+            useBrowserTTS(text);
+        }
+        
+        // Common browser TTS function
+        function useBrowserTTS(text) {
+            if (!('speechSynthesis' in window)) {
+                updateStatus('Browser speech synthesis not available.', 'error');
+                log('Browser speech synthesis not supported', 'error');
+                testTtsBtn.disabled = false;
+                testBrowserTtsBtn.disabled = false;
+                stopTtsBtn.disabled = true;
+                return;
+            }
+            
+            try {
+                const utterance = new SpeechSynthesisUtterance(text);
+                
+                // Get available voices
+                let voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    // Try to find an English voice
+                    const englishVoices = voices.filter(voice => voice.lang.includes('en'));
+                    if (englishVoices.length > 0) {
+                        utterance.voice = englishVoices[0];
+                        log(`Using browser voice: ${utterance.voice.name}`, 'info');
+                    } else {
+                        log(`No English voices found, using default voice`, 'info');
+                    }
+                } else {
+                    log('No voices available for browser TTS', 'info');
+                }
+                
+                utterance.onend = function() {
+                    log('Browser TTS playback completed', 'success');
+                    updateStatus('Browser speech synthesis completed.', 'success');
+                    testTtsBtn.disabled = false;
+                    testBrowserTtsBtn.disabled = false;
+                    stopTtsBtn.disabled = true;
+                };
+                
+                utterance.onerror = function(event) {
+                    log(`Browser TTS error: ${event.error}`, 'error');
+                    updateStatus(`Speech synthesis error: ${event.error}`, 'error');
+                    testTtsBtn.disabled = false;
+                    testBrowserTtsBtn.disabled = false;
+                    stopTtsBtn.disabled = true;
+                };
+                
+                window.speechSynthesis.speak(utterance);
+                log('Browser TTS playback started', 'success');
+                
+            } catch (error) {
+                log(`Browser TTS exception: ${error}`, 'error');
+                updateStatus(`Error: ${error.message}`, 'error');
+                testTtsBtn.disabled = false;
+                testBrowserTtsBtn.disabled = false;
+                stopTtsBtn.disabled = true;
+            }
+        }
+        
+        // Stop audio playback
+        function stopTTS() {
+            log('Stopping TTS playback', 'info');
+            
+            if (ttsAudio && !ttsAudio.paused) {
+                ttsAudio.pause();
+                ttsAudio.currentTime = 0;
+                log('Stopped audio element playback', 'info');
+            }
+            
+            if ('speechSynthesis' in window) {
+                window.speechSynthesis.cancel();
+                log('Stopped browser speech synthesis', 'info');
+            }
+            
+            stopTtsBtn.disabled = true;
+            testTtsBtn.disabled = false;
+            testBrowserTtsBtn.disabled = false;
+            updateStatus('Audio playback stopped.', 'info');
+        }
+        
+        // Logging function
+        function log(message, type = 'info') {
+            const now = new Date();
+            const timestamp = now.toLocaleTimeString() + '.' + now.getMilliseconds().toString().padStart(3, '0');
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'log-time';
+            timeSpan.textContent = `[${timestamp}]`;
+            
+            const messageSpan = document.createElement('span');
+            messageSpan.className = `log-${type}`;
+            messageSpan.textContent = ` ${message}`;
+            
+            logEntry.appendChild(timeSpan);
+            logEntry.appendChild(messageSpan);
+            
+            logWindow.appendChild(logEntry);
+            logWindow.scrollTop = logWindow.scrollHeight;
+            
+            // Also log to console
+            console.log(`[${type.toUpperCase()}] ${message}`);
+        }
+        
+        // Clear logs
+        function clearLogs() {
+            logWindow.innerHTML = '';
+            log('Logs cleared', 'info');
+        }
+        
+        // Update status message
+        function updateStatus(message, type) {
+            ttsStatus.textContent = message;
+            ttsStatus.className = 'status ' + type;
+            log(`Status update: ${message}`, type);
+        }
+        
+        // Initial log entry
+        log('TTS Debug Tool loaded', 'info');
+        
+        // Initialize speech synthesis voices
+        if ('speechSynthesis' in window) {
+            window.speechSynthesis.onvoiceschanged = function() {
+                let voices = window.speechSynthesis.getVoices();
+                log(`Browser has ${voices.length} speech synthesis voices available`, 'info');
+                displayBrowserInfo();
+            };
+            
+            // Initial voice loading
+            setTimeout(() => {
+                const voices = window.speechSynthesis.getVoices();
+                if (voices.length > 0) {
+                    log(`Browser has ${voices.length} speech synthesis voices available`, 'info');
+                }
+            }, 100);
+        } else {
+            log('Browser speech synthesis not supported', 'error');
+        }
+    </script>
+</body>
+</html> 

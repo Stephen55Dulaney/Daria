@@ -110,6 +110,16 @@ class DiscussionService:
                 if active_only and guide_data.get("status") != "active":
                     continue
                     
+                # Ensure essential fields exist
+                if "id" not in guide_data:
+                    guide_data["id"] = file_path.stem
+                
+                if "updated_at" not in guide_data:
+                    guide_data["updated_at"] = datetime.now().isoformat()
+                
+                if "created_at" not in guide_data:
+                    guide_data["created_at"] = datetime.now().isoformat()
+                    
                 guides.append(guide_data)
             except Exception as e:
                 logger.error(f"Error loading guide from {file_path}: {str(e)}")
@@ -172,6 +182,42 @@ class DiscussionService:
         except Exception as e:
             logger.error(f"Error deleting guide {guide_id}: {str(e)}")
             return False
+    
+    def get_all_sessions(self) -> List[Dict[str, Any]]:
+        """Get all interview sessions across all guides.
+        
+        Returns:
+            List[Dict]: List of all sessions
+        """
+        all_sessions = []
+        
+        # List all session files in the sessions directory
+        try:
+            session_files = list(self.sessions_dir.glob("*.json"))
+            
+            for session_file in session_files:
+                try:
+                    session_id = session_file.stem
+                    session = self._load_session(session_id)
+                    if session:
+                        all_sessions.append(session)
+                except Exception as e:
+                    logger.error(f"Error loading session from {session_file}: {str(e)}")
+                    continue
+                
+            # Sort by last updated time, most recent first
+            all_sessions = sorted(
+                all_sessions, 
+                key=lambda s: s.get("updated_at", s.get("created_at", "")),
+                reverse=True
+            )
+            
+            logger.info(f"Loaded {len(all_sessions)} sessions across all guides")
+            return all_sessions
+            
+        except Exception as e:
+            logger.error(f"Error getting all sessions: {str(e)}")
+            return []
     
     # Session Methods
     
@@ -410,21 +456,52 @@ class DiscussionService:
             return False
     
     def _load_guide(self, guide_id: str) -> Optional[Dict[str, Any]]:
-        """Load a discussion guide from file.
+        """Load a discussion guide from disk.
         
         Args:
             guide_id (str): The guide ID
             
         Returns:
-            Dict: The guide data or None if not found
+            Dict or None: The guide data or None if not found
         """
+        guide_path = self.data_dir / f"{guide_id}.json"
+        if not guide_path.exists():
+            logger.warning(f"Guide file not found: {guide_path}")
+            return None
+        
         try:
-            file_path = self.data_dir / f"{guide_id}.json"
-            if not file_path.exists():
-                return None
+            with open(guide_path, "r") as f:
+                guide_data = json.load(f)
             
-            with open(file_path, "r") as f:
-                return json.load(f)
+            # Ensure essential fields exist
+            if "id" not in guide_data:
+                guide_data["id"] = guide_id
+            
+            if "updated_at" not in guide_data:
+                guide_data["updated_at"] = datetime.now().isoformat()
+            
+            if "created_at" not in guide_data:
+                guide_data["created_at"] = datetime.now().isoformat()
+                
+            if "status" not in guide_data:
+                guide_data["status"] = "active"
+                
+            if "sessions" not in guide_data:
+                guide_data["sessions"] = []
+            
+            # Ensure options field exists to prevent template errors
+            if "options" not in guide_data:
+                guide_data["options"] = {
+                    "record_transcript": True,
+                    "analysis": True,
+                    "use_tts": True
+                }
+                
+            # Ensure custom_questions field exists
+            if "custom_questions" not in guide_data:
+                guide_data["custom_questions"] = []
+                
+            return guide_data
         except Exception as e:
             logger.error(f"Error loading guide {guide_id}: {str(e)}")
             return None

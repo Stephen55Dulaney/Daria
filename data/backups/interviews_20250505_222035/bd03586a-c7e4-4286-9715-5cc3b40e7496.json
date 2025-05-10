@@ -1,0 +1,40 @@
+{
+  "session_id": "bd03586a-c7e4-4286-9715-5cc3b40e7496",
+  "title": "Untitled Interview",
+  "description": "",
+  "character": "interviewer",
+  "system_prompt": "You are an expert interviewer conducting a research interview.\nFocus on asking open-ended questions that allow the interviewee to share detailed experiences\nand perspectives. Begin by building rapport, then transition to more focused questions.\nMake the interviewee feel comfortable sharing their honest thoughts.\n",
+  "remote": false,
+  "voice_id": "EXAVITQu4vr4xnSDxMaL",
+  "status": "active",
+  "created_at": "2025-05-05T17:55:01.741074",
+  "last_updated": "2025-05-05T19:13:14.721590",
+  "expiration_date": "2025-05-12T17:55:01.741074",
+  "conversation_history": [
+    {
+      "role": "assistant",
+      "content": "Hello! I'm your professional research interviewer. Today I'll be asking you a series of questions to gather your insights and experiences. Let's get started with a simple question: could you tell me a bit about yourself and your role?",
+      "timestamp": "2025-05-05T17:55:01.741074"
+    },
+    {
+      "role": "user",
+      "content": "My role is customer researcher",
+      "timestamp": "2025-05-05T17:55:57.483293"
+    },
+    {
+      "role": "assistant",
+      "content": "That's valuable insight. How has this impacted your approach to similar situations?",
+      "timestamp": "2025-05-05T17:55:57.483293"
+    },
+    {
+      "role": "user",
+      "content": "I'm saying something important in this interview.",
+      "timestamp": "2025-05-05T19:13:14.721590"
+    },
+    {
+      "role": "assistant",
+      "content": "I appreciate your thoughts on this. If you could change one aspect of what you've described, what would it be and why?",
+      "timestamp": "2025-05-05T19:13:14.721590"
+    }
+  ]
+}

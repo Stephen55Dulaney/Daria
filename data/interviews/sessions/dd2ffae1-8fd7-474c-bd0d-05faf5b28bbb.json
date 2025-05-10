@@ -1,0 +1,56 @@
+{
+  "id": "dd2ffae1-8fd7-474c-bd0d-05faf5b28bbb",
+  "guide_id": "c7fb1d41-1b1c-407e-83cb-c4926beb3b44",
+  "interviewee": {
+    "name": "Synthia Sue",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Ask why",
+      "type": "suggestion",
+      "id": "defc33bc-9406-4701-add9-c7f738775ca6",
+      "timestamp": "2025-05-08T15:19:05.348541"
+    },
+    {
+      "role": "system",
+      "content": "what color is your cat?",
+      "type": "suggestion",
+      "id": "1785c30c-1005-421e-8179-3601c39c7f44",
+      "timestamp": "2025-05-08T15:19:28.734827"
+    },
+    {
+      "id": "a4e7dc35-bbfa-412c-93e9-a4abe278f53e",
+      "content": "I want to see the stream working",
+      "role": "user",
+      "timestamp": "2025-05-08T15:21:35.240136"
+    },
+    {
+      "id": "aabfcc4a-627f-47a3-9d84-fa9b9a549ac0",
+      "content": "What made you curious about the color of my cat?",
+      "role": "assistant",
+      "timestamp": "2025-05-08T15:21:36.287879"
+    },
+    {
+      "role": "system",
+      "content": "Please elaborate",
+      "type": "suggestion",
+      "id": "5eb8388a-d890-4e55-a810-5bc97ffaf90f",
+      "timestamp": "2025-05-08T15:22:10.545343"
+    }
+  ],
+  "transcript": "\n\nParticipant: Ask why\n\nParticipant: what color is your cat?\n\nParticipant: I want to see the stream working\n\nModerator: What made you curious about the color of my cat?\n\nParticipant: Please elaborate",
+  "analysis": null,
+  "created_at": "2025-05-08T15:17:20.444203",
+  "updated_at": "2025-05-08T15:22:10.545481"
+}

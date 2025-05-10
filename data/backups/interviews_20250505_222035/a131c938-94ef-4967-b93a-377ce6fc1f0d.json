@@ -1,0 +1,78 @@
+{
+  "session_id": "a131c938-94ef-4967-b93a-377ce6fc1f0d",
+  "title": "skeptical interview",
+  "description": "want to get the stt working so that we can have a interview with each of the charaters so see what we get.",
+  "character": "skeptica",
+  "remote": true,
+  "status": "active",
+  "created_at": "2025-05-05T16:26:05.647183",
+  "last_updated": "2025-05-05T16:27:44.287091",
+  "expiration_date": "2025-05-12T16:26:05.647183",
+  "conversation_history": [
+    {
+      "role": "assistant",
+      "content": "Hello! I'm Skeptica, Deloitte's Assumption Buster. I'll be conducting this interview today to help challenge assumptions and ensure research integrity. Let's get started. Could you please introduce yourself?",
+      "timestamp": "2025-05-05T16:26:05.647183"
+    },
+    {
+      "role": "user",
+      "content": "hello my name is Steven",
+      "timestamp": "2025-05-05T16:26:22.343434"
+    },
+    {
+      "role": "assistant",
+      "content": "I appreciate your thoughts on this. If you could change one aspect of what you've described, what would it be and why?",
+      "timestamp": "2025-05-05T16:26:22.343434"
+    },
+    {
+      "role": "user",
+      "content": "I would change the time it takes to run some certain plan so that we had at the time we need to to do interviews and analyze the research",
+      "timestamp": "2025-05-05T16:26:39.538289"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that. Could you tell me more about the specific examples or experiences that shaped this view?",
+      "timestamp": "2025-05-05T16:26:39.538289"
+    },
+    {
+      "role": "user",
+      "content": "mini projects we have we run out of time and so I have to just like I still like to follow the process so I'll find interviews and do them myself still like we're at the same process with personas and journey Maps",
+      "timestamp": "2025-05-05T16:26:59.671786"
+    },
+    {
+      "role": "assistant",
+      "content": "I appreciate your thoughts on this. If you could change one aspect of what you've described, what would it be and why?",
+      "timestamp": "2025-05-05T16:26:59.671786"
+    },
+    {
+      "role": "user",
+      "content": "I would change the way you're asking questions to make sure you're not doing the same question twice",
+      "timestamp": "2025-05-05T16:27:15.398918"
+    },
+    {
+      "role": "assistant",
+      "content": "That's valuable insight. How has this impacted your approach to similar situations?",
+      "timestamp": "2025-05-05T16:27:15.398918"
+    },
+    {
+      "role": "user",
+      "content": "well I need to see the debugging data and that way I can tell if you're really looking at my answers or are you just making up next Friday going",
+      "timestamp": "2025-05-05T16:27:29.984177"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that. Could you tell me more about the specific examples or experiences that shaped this view?",
+      "timestamp": "2025-05-05T16:27:29.984177"
+    },
+    {
+      "role": "user",
+      "content": "it sounds to me like your questions are not being driven by the prompts that I've given you",
+      "timestamp": "2025-05-05T16:27:44.287091"
+    },
+    {
+      "role": "assistant",
+      "content": "That's valuable insight. How has this impacted your approach to similar situations?",
+      "timestamp": "2025-05-05T16:27:44.287091"
+    }
+  ]
+}

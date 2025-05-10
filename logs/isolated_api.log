@@ -1,0 +1,381 @@
+/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/langchain/chat_models/__init__.py:31: LangChainDeprecationWarning: Importing chat models from langchain is deprecated. Importing from langchain will no longer be supported as of langchain==0.2.0. Please import from langchain-community instead:
+
+`from langchain_community.chat_models import ChatOpenAI`.
+
+To install langchain-community run `pip install -U langchain-community`.
+  warnings.warn(
+INFO:__main__:CORS enabled for all origins with extended header support
+INFO:__main__:SocketIO initialized for real-time communication
+INFO:__main__:Initialized PromptManager with prompt_dir=/Users/sdulaney/DariaInterviewTool/tools/prompt_manager/prompts
+INFO:langchain_features.services.interview_service:Initialized InterviewService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:LangChain interview service initialized successfully
+INFO:langchain_features.services.discussion_service:Initialized DiscussionService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:Discussion service initialized successfully
+INFO:__main__:Observer service initialized successfully
+WARNING:werkzeug:Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+Starting DARIA Interview API on port 5050
+Health check endpoint: http://127.0.0.1:5050/api/health
+Interview start endpoint: http://127.0.0.1:5050/api/interview/start
+Monitor interviews: http://127.0.0.1:5050/monitor_interview
+ * Serving Flask app 'run_interview_api'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5050
+ * Running on http://192.168.86.42:5050
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/langchain/chat_models/__init__.py:31: LangChainDeprecationWarning: Importing chat models from langchain is deprecated. Importing from langchain will no longer be supported as of langchain==0.2.0. Please import from langchain-community instead:
+
+`from langchain_community.chat_models import ChatOpenAI`.
+
+To install langchain-community run `pip install -U langchain-community`.
+  warnings.warn(
+INFO:__main__:CORS enabled for all origins with extended header support
+INFO:__main__:SocketIO initialized for real-time communication
+INFO:__main__:Initialized PromptManager with prompt_dir=/Users/sdulaney/DariaInterviewTool/tools/prompt_manager/prompts
+INFO:langchain_features.services.interview_service:Initialized InterviewService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:LangChain interview service initialized successfully
+INFO:langchain_features.services.discussion_service:Initialized DiscussionService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:Discussion service initialized successfully
+INFO:__main__:Observer service initialized successfully
+WARNING:werkzeug:Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 124-683-066
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:24] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:25] "GET /socket.io/?EIO=4&transport=polling&t=PQijjOD HTTP/1.1" 200 -
+INFO:__main__:New client connected: AdGY8YNDCm9hlHKXAAAB
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:25] "POST /socket.io/?EIO=4&transport=polling&t=PQijjOK&sid=FAw1DZKO0gUNhzAmAAAA HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:25] "GET /socket.io/?EIO=4&transport=polling&t=PQijjOK.0&sid=FAw1DZKO0gUNhzAmAAAA HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:25] "GET /socket.io/?EIO=4&transport=polling&t=PQijjOR&sid=FAw1DZKO0gUNhzAmAAAA HTTP/1.1" 200 -
+INFO:__main__:Client AdGY8YNDCm9hlHKXAAAB joined monitoring room for session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:25] "POST /socket.io/?EIO=4&transport=polling&t=PQijjOS&sid=FAw1DZKO0gUNhzAmAAAA HTTP/1.1" 200 -
+INFO:__main__:Found 9 agent prompts: ['synthia', 'eurekia', 'skeptica', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:__main__:Loaded prompt config for synthia: Synthia
+INFO:__main__:Loaded prompt config for eurekia: eurekia
+INFO:__main__:Loaded prompt config for skeptica: Skeptica
+INFO:__main__:Loaded prompt config for askia: Askia
+INFO:__main__:Loaded prompt config for odessia: Odessia
+INFO:__main__:Loaded prompt config for interviewer: interviewer
+INFO:__main__:Loaded prompt config for researcher: researcher
+INFO:__main__:Loaded prompt config for thesea: Thesea
+INFO:__main__:Loaded prompt config for daria: Daria
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:25] "GET /api/health HTTP/1.1" 200 -
+INFO:__main__:Create discussion guide request: {'title': 'Debug Interview Guide', 'project': 'Debug Testing', 'interview_type': 'debug_test', 'prompt': 'Testing conversation history with isolated LangChain'}
+INFO:langchain_features.services.discussion_service:Created discussion guide with ID f389643d-18e4-45bc-b82d-21d813819d9d
+INFO:__main__:Created new discussion guide with ID: f389643d-18e4-45bc-b82d-21d813819d9d
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:25] "POST /discussion_guide/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:26] "GET /dashboard HTTP/1.1" 200 -
+ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111e4b620>: Failed to establish a new connection: [Errno 61] Connection refused'))
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:26] "GET /api/interviews HTTP/1.1" 200 -
+ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Read timed out. (read timeout=1)
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:27] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:29] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:32] "GET /interview_setup HTTP/1.1" 200 -
+ERROR:__main__:Error calling get_all_sessions: 'DiscussionService' object has no attribute 'get_all_sessions'
+ERROR:__main__:Error in fallback method for retrieving sessions: 'DiscussionService' object has no attribute 'get_guide_sessions'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:33] "GET /monitor_interview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:34] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:34] "GET /discussion_guides HTTP/1.1" 200 -
+INFO:__main__:Loaded 35 interviews for archive page
+ERROR:__main__:Error loading interview archive: 'dict object' has no attribute 'updated_at'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:36] "GET /interview_archive HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:37] "[32mGET /prompts HTTP/1.1[0m" 308 -
+INFO:__main__:Found 9 agent prompts: ['synthia', 'eurekia', 'skeptica', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:37] "GET /prompts/ HTTP/1.1" 200 -
+INFO:__main__:Loaded 35 interviews for archive page
+ERROR:__main__:Error loading interview archive: 'dict object' has no attribute 'updated_at'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:38] "GET /interview_archive HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:39] "GET /discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:39] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:42] "GET /discussion_guide/f389643d-18e4-45bc-b82d-21d813819d9d HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:44] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:49] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Created session 456f9528-0e3f-4a2e-8c7d-b85e153a6920 for guide f389643d-18e4-45bc-b82d-21d813819d9d
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:50] "POST /api/session/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:50] "GET /session/456f9528-0e3f-4a2e-8c7d-b85e153a6920 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:52] "GET /interview/456f9528-0e3f-4a2e-8c7d-b85e153a6920?remote=true&accepted=true HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:52] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:54] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message fa582516-952c-4a2c-a3f2-9f07590bba73
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:54] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:56] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:57] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:46:59] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:00] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:02] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:04] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:07] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 76ba43ea-cb48-41c3-9fe4-c2711e1aa9d0
+INFO:__main__:Generating AI response for session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:09] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:09] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:12] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:14] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message b8817e13-f85d-4d2d-a488-c482a6e13151
+INFO:__main__:Generating AI response for session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:15] "POST /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/add_message HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 2f40d9c4-15b7-42f5-bd3f-0e8a4620623d
+INFO:__main__:Generating AI response for session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:16] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:17] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:19] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:22] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 280a050e-a659-44bc-a6d6-93bf54bde270
+INFO:__main__:Generating AI response for session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:23] "POST /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/add_message HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message bd8cbdf2-6581-4894-b219-7fd0311fdc10
+INFO:__main__:Generating AI response for session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:24] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:24] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 6e0f570b-7f62-4e5d-b497-d45138c4adde
+INFO:__main__:Generating AI response for session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:26] "POST /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:27] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:29] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:32] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:34] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:39] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:44] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:49] "GET /static/debug_stt_tts.html HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:49] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:54] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:47:59] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:00] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 2bc7209f-673d-4132-92de-9dc5a7aebe0c
+INFO:__main__:Generating AI response for session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:00] "POST /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/add_message HTTP/1.1" 200 -
+INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 83 chars, voice: EXAVITQu4vr4xnSDxMaL
+ERROR:__main__:Error forwarding to TTS service: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /text_to_speech (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111f06e90>: Failed to establish a new connection: [Errno 61] Connection refused'))
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:04] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:04] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:09] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 83 chars, voice: AZnzlk1XvdvUeBnXmlld
+ERROR:__main__:Error forwarding to TTS service: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /text_to_speech (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x111edd220>: Failed to establish a new connection: [Errno 61] Connection refused'))
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:10] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message e160ee03-3dd7-418e-a87d-32071237c7b2
+INFO:__main__:Generating AI response for session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:11] "POST /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:14] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:19] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:24] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:29] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:34] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:39] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:44] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:49] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:52] "GET /static/debug_interview_flow.html?port=5050 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:54] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:48:59] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:00] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:01] "[36mGET /static/debug_interview_flow.html?port=5050 HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:04] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:09] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:14] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:19] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:24] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:29] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:34] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:37] "GET /interview/456f9528-0e3f-4a2e-8c7d-b85e153a6920?remote=true&accepted=true HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:37] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:39] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:42] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:44] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:47] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:49] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message a6062901-511e-423a-ab3f-1d38e6621000
+INFO:__main__:Generating AI response for session 4c0f4b23-4df4-4e89-8c7c-1fe6a467341b
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:51] "POST /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:52] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 8c7e7760-12ad-4d0e-aabf-2d8cc0db0274
+INFO:__main__:Generating AI response for session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:52] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:54] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:57] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:49:59] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:00] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:02] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:04] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:07] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:09] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:12] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:14] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:17] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:19] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:22] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:24] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:25] "[33mGET /apple-touch-icon-precomposed.png HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:25] "[33mGET /apple-touch-icon.png HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:25] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:27] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:29] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:32] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:34] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:37] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:39] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:41] "[36mGET /static/debug_stt_tts.html HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:42] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:44] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:47] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:47] "GET /interview/456f9528-0e3f-4a2e-8c7d-b85e153a6920?remote=true&accepted=true HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:47] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:49] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:52] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:52] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:54] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:56] "GET /interview/456f9528-0e3f-4a2e-8c7d-b85e153a6920?remote=true&accepted=true HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:56] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 5ecd6913-c628-458b-b921-ac908d207739
+INFO:__main__:Generating AI response for session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:56] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:57] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:50:59] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:00] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:01] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:__main__:Rendering monitoring page for session c3b2fbf2-4853-4761-8e2d-8dc7e1057e19
+ERROR:__main__:Error loading monitoring session c3b2fbf2-4853-4761-8e2d-8dc7e1057e19: 'interview' is undefined
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:01] "GET /monitor_interview/c3b2fbf2-4853-4761-8e2d-8dc7e1057e19 HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message abbeaa50-56db-4087-aa0f-6e1de8be2057
+INFO:__main__:Generating AI response for session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:01] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:02] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:04] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:06] "GET /discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:06] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:07] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 4dccfc11-1031-48e6-bb6c-8d5414a3200f
+INFO:__main__:Generating AI response for session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:07] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:08] "GET /discussion_guide/f389643d-18e4-45bc-b82d-21d813819d9d HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:09] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:11] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:12] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:14] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:16] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:17] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Created session 0e5900a3-53da-4b75-93b1-df2b748a1474 for guide f389643d-18e4-45bc-b82d-21d813819d9d
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:17] "POST /api/session/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:17] "GET /session/0e5900a3-53da-4b75-93b1-df2b748a1474 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:19] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:21] "GET /interview/0e5900a3-53da-4b75-93b1-df2b748a1474?remote=true&accepted=true HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:21] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 0e5900a3-53da-4b75-93b1-df2b748a1474
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:21] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:22] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 4adc4bf7-07ef-4e0c-bd17-9a3181062276
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:23] "POST /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:24] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:24] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:26] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:26] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 791cbaef-8264-4774-b0ec-15e9d49f6aa6
+INFO:__main__:Generating AI response for session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:26] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:27] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:29] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:31] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:31] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:32] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:34] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:36] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:36] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:37] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 3dda0e9a-27ad-464b-b528-1c6af6ad7843
+INFO:__main__:Generating AI response for session 456f9528-0e3f-4a2e-8c7d-b85e153a6920
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:38] "POST /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:39] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Added message to session 0e5900a3-53da-4b75-93b1-df2b748a1474
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:41] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:41] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:42] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted new observation for message 29e7e003-e01c-4642-b5d5-6dc9863ddc2b
+INFO:__main__:Generating AI response for session 0e5900a3-53da-4b75-93b1-df2b748a1474
+ERROR:__main__:Error generating AI response: InterviewService.generate_response() got an unexpected keyword argument 'session_data'
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:42] "POST /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:44] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:46] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:46] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:47] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:49] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:51] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:51] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:52] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:54] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:56] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:56] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:57] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:51:59] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:00] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:01] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:01] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:02] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:04] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:06] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:06] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:07] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:09] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:11] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:11] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:12] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:14] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:16] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:16] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:17] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:19] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:21] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:21] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:22] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:24] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:26] "GET /api/session/0e5900a3-53da-4b75-93b1-df2b748a1474/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:26] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:27] "GET /api/session/456f9528-0e3f-4a2e-8c7d-b85e153a6920/messages HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [07/May/2025 16:52:29] "GET /api/session/4c0f4b23-4df4-4e89-8c7c-1fe6a467341b/messages HTTP/1.1" 200 -

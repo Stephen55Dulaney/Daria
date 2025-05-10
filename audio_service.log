@@ -1,0 +1,94 @@
+Traceback (most recent call last):
+  File "/Users/sdulaney/DariaInterviewTool/audio_tools/tts_service.py", line 15, in <module>
+    import elevenlabs
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/elevenlabs/__init__.py", line 3, in <module>
+    from .types import (
+    ...<461 lines>...
+    )
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/elevenlabs/types/__init__.py", line 21, in <module>
+    from .agent_config_api_model_input import AgentConfigApiModelInput
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/elevenlabs/types/agent_config_api_model_input.py", line 4, in <module>
+    from .array_json_schema_property_input import ArrayJsonSchemaPropertyInput
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/elevenlabs/types/array_json_schema_property_input.py", line 26, in <module>
+    from .object_json_schema_property_input import ObjectJsonSchemaPropertyInput  # noqa: E402
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/elevenlabs/types/object_json_schema_property_input.py", line 31, in <module>
+    update_forward_refs(ObjectJsonSchemaPropertyInput)
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/elevenlabs/core/pydantic_utilities.py", line 248, in update_forward_refs
+    model.update_forward_refs(**localns)
+    ~~~~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^
+  File "pydantic/main.py", line 820, in pydantic.main.BaseModel.update_forward_refs
+  File "pydantic/typing.py", line 565, in pydantic.typing.update_model_forward_refs
+  File "pydantic/typing.py", line 531, in pydantic.typing.update_field_forward_refs
+  File "pydantic/typing.py", line 77, in pydantic.typing.evaluate_forwardref
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 1086, in _evaluate
+    self.__forward_value__ = _eval_type(
+                             ~~~~~~~~~~^
+        type_,
+        ^^^^^^
+    ...<3 lines>...
+        recursive_guard=(recursive_guard | {self.__forward_arg__}),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 489, in _eval_type
+    ev_args = tuple(
+        _eval_type(
+    ...<2 lines>...
+        for a in t.__args__
+    )
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 490, in <genexpr>
+    _eval_type(
+    ~~~~~~~~~~^
+        a, globalns, localns, type_params, recursive_guard=recursive_guard
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 489, in _eval_type
+    ev_args = tuple(
+        _eval_type(
+    ...<2 lines>...
+        for a in t.__args__
+    )
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 490, in <genexpr>
+    _eval_type(
+    ~~~~~~~~~~^
+        a, globalns, localns, type_params, recursive_guard=recursive_guard
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 474, in _eval_type
+    return t._evaluate(globalns, localns, type_params, recursive_guard=recursive_guard)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 1086, in _evaluate
+    self.__forward_value__ = _eval_type(
+                             ~~~~~~~~~~^
+        type_,
+        ^^^^^^
+    ...<3 lines>...
+        recursive_guard=(recursive_guard | {self.__forward_arg__}),
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 489, in _eval_type
+    ev_args = tuple(
+        _eval_type(
+    ...<2 lines>...
+        for a in t.__args__
+    )
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 490, in <genexpr>
+    _eval_type(
+    ~~~~~~~~~~^
+        a, globalns, localns, type_params, recursive_guard=recursive_guard
+        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    )
+    ^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 474, in _eval_type
+    return t._evaluate(globalns, localns, type_params, recursive_guard=recursive_guard)
+           ~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/typing.py", line 1081, in _evaluate
+    eval(self.__forward_code__, globalns, localns),
+    ~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "<string>", line 1, in <module>
+NameError: name 'ArrayJsonSchemaPropertyInput' is not defined. Did you mean: 'ObjectJsonSchemaPropertyInput'?

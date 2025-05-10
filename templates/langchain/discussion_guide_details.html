@@ -1,0 +1,495 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Discussion Guide - {{ guide.title }}{% endblock %}
+
+{% block content %}
+<!-- Add this style block right after the block content declaration -->
+<style>
+    .guide-card {
+        border-radius: 10px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    
+    .voice-badge {
+        background-color: #6c5ce7;
+        color: white;
+    }
+    
+    .character-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        font-weight: 500;
+        margin-bottom: 1rem;
+    }
+    
+    .character-odessia {
+        background-color: #654ea3;
+        color: white;
+    }
+    
+    .character-daria {
+        background-color: #3498db;
+        color: white;
+    }
+    
+    .character-skeptica {
+        background-color: #e74c3c;
+        color: white;
+    }
+    
+    .character-askia {
+        background-color: #2ecc71;
+        color: white;
+    }
+    
+    .character-eurekia {
+        background-color: #f39c12;
+        color: white;
+    }
+    
+    .character-thesea {
+        background-color: #1abc9c;
+        color: white;
+    }
+    
+    .session-card {
+        transition: transform 0.2s;
+    }
+    
+    .session-card:hover {
+        transform: translateY(-3px);
+    }
+    
+    .tag {
+        font-size: 0.8rem;
+        padding: 0.2rem 0.6rem;
+        border-radius: 20px;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+        background-color: #f8f9fa;
+        border: 1px solid #e9ecef;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between mb-4">
+        <div>
+            <a href="/discussion_guides" class="text-muted mb-2 d-inline-block">
+                <i class="bi bi-arrow-left"></i> All Discussion Guides
+            </a>
+            <h1 class="h3">{{ guide.title }}</h1>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/session/create?guide_id={{ guide_id }}" class="btn btn-primary">
+                <i class="bi bi-play-fill me-1"></i> Start New Session
+            </a>
+            <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#shareModal">
+                <i class="bi bi-share me-1"></i> Share
+            </button>
+            <div class="dropdown">
+                <button class="btn btn-light dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-three-dots-vertical"></i>
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="actionsDropdown">
+                    <li><a class="dropdown-item" href="/discussion_guide/edit/{{ guide_id }}"><i class="bi bi-pencil me-2"></i> Edit</a></li>
+                    <li><a class="dropdown-item" href="#" data-bs-toggle="modal" data-bs-target="#duplicateModal"><i class="bi bi-files me-2"></i> Duplicate</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item text-danger" href="#" data-bs-toggle="modal" data-bs-target="#archiveModal"><i class="bi bi-archive me-2"></i> Archive</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            <!-- Guide Info -->
+            <div class="card guide-card mb-4">
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h5 class="card-title">AI Character & Voice</h5>
+                        <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
+                            <div class="character-badge character-{{ guide.character_select|default('daria')|lower }}">
+                                <i class="bi bi-robot"></i>
+                                <span>{{ guide.character_select|default('Daria')|title }}</span>
+                            </div>
+                            
+                            <div class="badge voice-badge p-2">
+                                <i class="bi bi-volume-up me-1"></i>
+                                Voice: {{ guide.voice_name|default('Default Voice') }}
+                                <small class="ms-1 opacity-75">({{ guide.voice_id|default('EXAVITQu4vr4xnSDxMaL') }})</small>
+                            </div>
+                        </div>
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i>
+                            <strong>Character:</strong> {{ guide.character_select|default('Daria')|title }} 
+                            <span class="mx-2">|</span>
+                            <strong>Voice:</strong> {{ guide.voice_name|default('Default Voice') }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Project</h5>
+                            <p>{{ guide.project }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted">Interview Type</h5>
+                            <p>{{ guide.interview_type|replace('_', ' ')|title }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="text-muted">Interviewee</h5>
+                        <div class="d-flex gap-2">
+                            {% if guide.interviewee and guide.interviewee.role %}
+                            <span class="tag"><i class="bi bi-briefcase me-1"></i> {{ guide.interviewee.role }}</span>
+                            {% endif %}
+                            
+                            {% if guide.interviewee and guide.interviewee.department %}
+                            <span class="tag"><i class="bi bi-building me-1"></i> {{ guide.interviewee.department }}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5 class="text-muted">Options</h5>
+                        <div class="d-flex flex-wrap gap-2">
+                            <span class="badge {% if guide.options.record_transcript %}bg-success{% else %}bg-secondary{% endif %}">
+                                <i class="bi bi-journal-text me-1"></i> Transcript Recording
+                            </span>
+                            <span class="badge {% if guide.options.analysis %}bg-success{% else %}bg-secondary{% endif %}">
+                                <i class="bi bi-graph-up me-1"></i> AI Analysis
+                            </span>
+                            <span class="badge {% if guide.options.use_tts %}bg-success{% else %}bg-secondary{% endif %}">
+                                <i class="bi bi-volume-up me-1"></i> Text-to-Speech
+                            </span>
+                        </div>
+                    </div>
+                    
+                    {% if guide.custom_questions and guide.custom_questions|length > 0 %}
+                    <div class="mb-4">
+                        <h5 class="text-muted">Custom Questions</h5>
+                        <ul class="list-group list-group-flush">
+                            {% for question in guide.custom_questions %}
+                            <li class="list-group-item px-0">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <div class="mb-1">{{ question.text }}</div>
+                                        <span class="badge bg-{{ 'danger' if question.priority == 'high' else 'warning' if question.priority == 'normal' else 'secondary' }}">
+                                            {{ question.priority|capitalize }} Priority
+                                        </span>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Prompts -->
+            <div class="card guide-card mb-4">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" id="promptTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="interview-tab" data-bs-toggle="tab" data-bs-target="#interview" type="button" role="tab" aria-controls="interview" aria-selected="true">
+                                Interview Prompt
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="false">
+                                Analysis Prompt
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content" id="promptTabsContent">
+                        <!-- Interview Prompt -->
+                        <div class="tab-pane fade show active" id="interview" role="tabpanel" aria-labelledby="interview-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Interview Prompt</h5>
+                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-content="interview-prompt">
+                                    <i class="bi bi-clipboard"></i> Copy
+                                </button>
+                            </div>
+                            <div class="border rounded p-3 bg-light">
+                                <pre class="mb-0" id="interview-prompt">{{ guide.interview_prompt }}</pre>
+                            </div>
+                        </div>
+                        
+                        <!-- Analysis Prompt -->
+                        <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Analysis Prompt</h5>
+                                <button class="btn btn-sm btn-outline-secondary copy-btn" data-content="analysis-prompt">
+                                    <i class="bi bi-clipboard"></i> Copy
+                                </button>
+                            </div>
+                            <div class="border rounded p-3 bg-light">
+                                <pre class="mb-0" id="analysis-prompt">{{ guide.analysis_prompt }}</pre>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- Sessions -->
+            <div class="card guide-card mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">Sessions</h5>
+                    <a href="/session/create?guide_id={{ guide_id }}" class="btn btn-sm btn-primary">
+                        <i class="bi bi-plus"></i> New Session
+                    </a>
+                </div>
+                <div class="card-body">
+                    {% if sessions|length > 0 %}
+                    <div class="list-group">
+                        {% for session in sessions %}
+                        <a href="/session/{{ session.id }}" class="list-group-item list-group-item-action session-card">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h6 class="mb-1">{{ session.interviewee.name if session.interviewee and session.interviewee.name else "Participant " ~ loop.index }}</h6>
+                                    <div class="small text-muted">
+                                        {{ session.created_at|default("No date") }}
+                                    </div>
+                                </div>
+                                <div>
+                                    <span class="badge {% if session.status == 'completed' %}bg-success{% elif session.status == 'in_progress' %}bg-warning{% else %}bg-secondary{% endif %}">
+                                        {{ session.status|replace("_", " ")|title }}
+                                    </span>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                    {% else %}
+                    <div class="text-center py-4">
+                        <div class="mb-3">
+                            <i class="bi bi-people text-muted" style="font-size: 2rem;"></i>
+                        </div>
+                        <p class="text-muted">No sessions yet</p>
+                        <a href="/session/create?guide_id={{ guide_id }}" class="btn btn-primary">Start New Session</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <!-- Share Links -->
+            <div class="card guide-card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">Quick Links</h5>
+                </div>
+                <div class="card-body">
+                    <div class="list-group">
+                        <a href="/monitor_interview" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="bi bi-broadcast me-3 text-danger"></i>
+                            <div>
+                                <div class="fw-medium">Monitor Sessions</div>
+                                <div class="small text-muted">View live sessions and interact</div>
+                            </div>
+                        </a>
+                        <a href="/interview_archive" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="bi bi-archive me-3 text-secondary"></i>
+                            <div>
+                                <div class="fw-medium">Interview Archive</div>
+                                <div class="small text-muted">View past interviews and results</div>
+                            </div>
+                        </a>
+                        <a href="/discussion_guide/edit/{{ guide_id }}" class="list-group-item list-group-item-action d-flex align-items-center">
+                            <i class="bi bi-pencil-square me-3 text-primary"></i>
+                            <div>
+                                <div class="fw-medium">Edit This Guide</div>
+                                <div class="small text-muted">Modify prompts and settings</div>
+                            </div>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modal fade" id="shareModal" tabindex="-1" aria-labelledby="shareModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="shareModalLabel">Share Discussion Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Share this discussion guide with other researchers:</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="share-link" value="{{ request.host_url }}discussion_guide/{{ guide_id }}" readonly>
+                    <button class="btn btn-outline-secondary" type="button" id="copy-share-link">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+                <p class="mt-4">Create a new interview session link:</p>
+                <div class="input-group mb-3">
+                    <input type="text" class="form-control" id="interview-link" value="{{ request.host_url }}interview/new?guide_id={{ guide_id }}" readonly>
+                    <button class="btn btn-outline-secondary" type="button" id="copy-interview-link">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Archive Modal -->
+<div class="modal fade" id="archiveModal" tabindex="-1" aria-labelledby="archiveModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="archiveModalLabel">Archive Discussion Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to archive this discussion guide?</p>
+                <p class="text-muted">Archived guides won't be shown in the main list but can still be accessed from the archive.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-archive-btn">Archive Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Duplicate Modal -->
+<div class="modal fade" id="duplicateModal" tabindex="-1" aria-labelledby="duplicateModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="duplicateModalLabel">Duplicate Discussion Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Create a copy of this discussion guide with a new title:</p>
+                <div class="mb-3">
+                    <label for="duplicate-title" class="form-label">Title for the copy</label>
+                    <input type="text" class="form-control" id="duplicate-title" value="Copy of {{ guide.title }}">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirm-duplicate-btn">Duplicate</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Copy functionality for prompts
+        document.querySelectorAll('.copy-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const contentId = this.getAttribute('data-content');
+                const contentElement = document.getElementById(contentId);
+                
+                // Copy text to clipboard
+                const text = contentElement.textContent;
+                navigator.clipboard.writeText(text)
+                    .then(() => {
+                        const originalText = this.innerHTML;
+                        this.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                        
+                        // Reset button text after 2 seconds
+                        setTimeout(() => {
+                            this.innerHTML = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Error copying text: ', err);
+                    });
+            });
+        });
+        
+        // Copy functionality for share links
+        document.getElementById('copy-share-link').addEventListener('click', function() {
+            const link = document.getElementById('share-link');
+            navigator.clipboard.writeText(link.value)
+                .then(() => {
+                    this.innerHTML = '<i class="bi bi-check"></i>';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="bi bi-clipboard"></i>';
+                    }, 2000);
+                });
+        });
+        
+        document.getElementById('copy-interview-link').addEventListener('click', function() {
+            const link = document.getElementById('interview-link');
+            navigator.clipboard.writeText(link.value)
+                .then(() => {
+                    this.innerHTML = '<i class="bi bi-check"></i>';
+                    setTimeout(() => {
+                        this.innerHTML = '<i class="bi bi-clipboard"></i>';
+                    }, 2000);
+                });
+        });
+        
+        // Archive functionality
+        document.getElementById('confirm-archive-btn').addEventListener('click', function() {
+            fetch('/api/discussion_guide/{{ guide_id }}/archive', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/discussion_guides';
+                } else {
+                    alert('Error archiving guide: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error archiving guide: ' + error);
+            });
+        });
+        
+        // Duplicate functionality
+        document.getElementById('confirm-duplicate-btn').addEventListener('click', function() {
+            const title = document.getElementById('duplicate-title').value;
+            
+            fetch('/api/discussion_guide/{{ guide_id }}/duplicate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: title
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.guide_id) {
+                    window.location.href = '/discussion_guide/' + data.guide_id;
+                } else {
+                    alert('Error duplicating guide: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error duplicating guide: ' + error);
+            });
+        });
+    });
+</script>
+{% endblock %} 

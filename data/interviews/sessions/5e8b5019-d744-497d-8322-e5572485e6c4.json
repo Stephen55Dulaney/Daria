@@ -1,0 +1,30 @@
+{
+  "id": "5e8b5019-d744-497d-8322-e5572485e6c4",
+  "guide_id": "87909fc2-50eb-4ec9-81ad-d51fb7d6d4bd",
+  "interviewee": {
+    "name": "Ted Stark",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "system",
+      "content": "What is the name of your cat?",
+      "type": "suggestion",
+      "id": "393b303c-f780-48e6-81a3-f9b212a78d0d",
+      "timestamp": "2025-05-08T14:22:39.968069"
+    }
+  ],
+  "transcript": "\n\nParticipant: What is the name of your cat?",
+  "analysis": null,
+  "created_at": "2025-05-08T14:14:48.215848",
+  "updated_at": "2025-05-08T14:22:39.968623"
+}

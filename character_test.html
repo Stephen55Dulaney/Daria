@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Characters API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .status {
+            margin: 15px 0;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+    </style>
+</head>
+<body>
+    <h1>Characters API Test</h1>
+    
+    <div>
+        <p>This page tests if the characters API endpoint is working correctly.</p>
+        <button id="fetchBtn">Fetch Characters</button>
+    </div>
+    
+    <div id="status" class="status"></div>
+    
+    <div>
+        <h3>Raw Response:</h3>
+        <pre id="responseOutput">No response yet</pre>
+    </div>
+    
+    <div>
+        <h3>Characters:</h3>
+        <ul id="charactersList"></ul>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const fetchBtn = document.getElementById('fetchBtn');
+            const status = document.getElementById('status');
+            const responseOutput = document.getElementById('responseOutput');
+            const charactersList = document.getElementById('charactersList');
+            
+            // API URL - change this if needed
+            const API_URL = 'http://localhost:5010';
+            
+            function fetchCharacters() {
+                status.textContent = 'Fetching characters...';
+                status.className = 'status';
+                
+                fetch(`${API_URL}/api/characters`)
+                    .then(response => {
+                        // Save status code and headers
+                        const statusCode = response.status;
+                        const headers = {};
+                        response.headers.forEach((value, name) => {
+                            headers[name] = value;
+                        });
+                        
+                        // Get response body as text first to show raw output
+                        return response.text().then(text => {
+                            return {
+                                statusCode,
+                                headers,
+                                text,
+                                // Try to parse as JSON
+                                json: text ? JSON.parse(text) : null
+                            };
+                        });
+                    })
+                    .then(result => {
+                        // Display raw response
+                        responseOutput.textContent = 
+                            `Status: ${result.statusCode}\n` +
+                            `Headers: ${JSON.stringify(result.headers, null, 2)}\n\n` +
+                            `Body: ${result.text}`;
+                        
+                        // Check if we have valid data
+                        if (result.json && result.json.success && result.json.characters) {
+                            status.textContent = 'Characters fetched successfully';
+                            status.className = 'status success';
+                            
+                            // Display characters
+                            charactersList.innerHTML = '';
+                            result.json.characters.forEach(character => {
+                                const li = document.createElement('li');
+                                li.textContent = `${character.display_name || character.name} - ${character.role || '(No role specified)'}`;
+                                charactersList.appendChild(li);
+                            });
+                        } else {
+                            status.textContent = 'Response received but data format is unexpected';
+                            status.className = 'status error';
+                        }
+                    })
+                    .catch(error => {
+                        status.textContent = `Error: ${error.message}`;
+                        status.className = 'status error';
+                        responseOutput.textContent = `Failed to fetch characters: ${error.message}`;
+                        console.error('Error:', error);
+                    });
+            }
+            
+            fetchBtn.addEventListener('click', fetchCharacters);
+            
+            // Auto-fetch on page load
+            fetchCharacters();
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,11 @@
+Traceback (most recent call last):
+  File "/Users/sdulaney/DariaInterviewTool/audio_tools/debug_tts_service.py", line 24, in <module>
+    logging.FileHandler('logs/debug_tts.log')
+    ~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1218, in __init__
+    StreamHandler.__init__(self, self._open())
+                                 ~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/logging/__init__.py", line 1247, in _open
+    return open_func(self.baseFilename, self.mode,
+                     encoding=self.encoding, errors=self.errors)
+FileNotFoundError: [Errno 2] No such file or directory: '/Users/sdulaney/DariaInterviewTool/audio_tools/logs/debug_tts.log'

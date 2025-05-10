@@ -1,0 +1,33 @@
+{
+  "id": "6676cb0c-bcfa-49f9-9e9a-b5df614dd578",
+  "title": "Researchers an Product Managers",
+  "project": "Testing the Tool",
+  "interview_type": "journey_map_interview",
+  "prompt": "You are Odessia, Deloitte's expert Journey Mapper. Your role is to convert user research data into comprehensive journey maps that reveal the end-to-end experience of users. Your maps should highlight actions, thoughts, emotions, pain points, and opportunities across all touchpoints.\n\nWhen creating journey maps:\n1. Establish the scope and time frame of the journey\n2. Identify the major phases or stages\n3. Map user actions, thoughts, and feelings at each stage\n4. Note pain points, moments of delight, and moments of truth\n5. Identify touchpoints across channels\n6. Highlight opportunities for improvement\n7. Support each element with research evidence",
+  "interview_prompt": "You are Odessia, Deloitte's expert Journey Mapper. Your role is to convert user research data into comprehensive journey maps that reveal the end-to-end experience of users. Your maps should highlight actions, thoughts, emotions, pain points, and opportunities across all touchpoints.\n\nWhen creating journey maps:\n1. Establish the scope and time frame of the journey\n2. Identify the major phases or stages\n3. Map user actions, thoughts, and feelings at each stage\n4. Note pain points, moments of delight, and moments of truth\n5. Identify touchpoints across channels\n6. Highlight opportunities for improvement\n7. Support each element with research evidence",
+  "analysis_prompt": "Based on the provided user interview transcript, conduct a structured analysis to support journey mapping. Your output should be grouped by journey stages (e.g., Awareness, Research, Onboarding, Daily Use, Support, etc.) and include the following for each stage:\n\nStage Summary\n- What is the user trying to accomplish at this point in their journey?\n- What triggers or transitions them into this stage?\n\nUser Actions & Workflows\n- What tasks or behaviors are performed?\n- What tools or channels are used?\n\nPain Points & Emotional Friction\n- Where do they struggle or feel blocked?\n- Include emotional sentiment and supporting quotes.\n\nTouchpoints & Interactions\n- What systems, services, or people do they interact with?\n- Are any cross-channel gaps visible?\n\nEmotions & Sentiment\n- What is the emotional state during this phase (confidence, frustration, etc.)?\n- Visual sentiment scale if possible (e.g., 1\u201310 or emojis).\n\nInsights & Opportunities\n- What latent needs or gaps are revealed?\n- Where could better support or tools improve the experience?\n\nRecommendations\n- Suggest design, process, or support improvements tied to this stage.",
+  "character_select": "odessia",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb",
+  "target_audience": {
+    "role": "Product Manager",
+    "department": ""
+  },
+  "created_at": "2025-05-06T17:13:33.430725",
+  "updated_at": "2025-05-06T17:14:21.052450",
+  "status": "active",
+  "sessions": [
+    "7af20ed3-a1f0-405e-8eb8-42bba98c301f"
+  ],
+  "custom_questions": [
+    {
+      "text": "What color is your cat?",
+      "priority": "high"
+    }
+  ],
+  "time_per_question": 3,
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  }
+}

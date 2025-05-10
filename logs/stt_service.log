@@ -1,0 +1,8 @@
+Starting Mock STT Service on port 5016
+Health check endpoint: http://127.0.0.1:5016/health
+API endpoint: http://127.0.0.1:5016/speech_to_text
+Temporary files will be stored in: /var/folders/_n/91xrch5x5wqg20rqghglh4tw0000gn/T/tmpibun0cay
+ * Serving Flask app 'mock_stt'
+ * Debug mode: on
+Address already in use
+Port 5016 is in use by another program. Either identify and stop that program, or start the server with a different port.
