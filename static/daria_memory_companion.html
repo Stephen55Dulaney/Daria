@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA - Your Project Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            background-color: white;
+            padding: 1rem;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background-color: #e9ecef;
+            margin-left: auto;
+        }
+        
+        .daria-message {
+            background-color: #d4edda;
+        }
+        
+        .memory-panel {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            background-color: white;
+            padding: 1rem;
+        }
+        
+        .memory-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .memory-section h5 {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .boot-sequence {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            color: #d4edda;
+            font-family: monospace;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .cursor-blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #6c757d;
+        }
+        
+        .timeline-item:after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 12px;
+            height: calc(100% + 10px);
+            border-left: 2px solid #6c757d;
+        }
+        
+        .timeline-item:last-child:after {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Boot Sequence Screen -->
+    <div id="bootSequence" class="boot-sequence">
+        <div id="bootContent"></div>
+        <div id="bootCursor" class="cursor-blink">_</div>
+    </div>
+
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="display-5 fw-bold text-center">DARIA <small class="text-muted">Your Project Companion</small></h1>
+                <p class="text-center lead">The research assistant that remembers your project journey across sessions</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Chat Interface -->
+            <div class="col-lg-7">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">Conversation</h4>
+                            <button id="resetButton" class="btn btn-sm btn-outline-secondary">New Day Simulation</button>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="chatContainer" class="chat-container mb-3"></div>
+                        <div class="input-group">
+                            <input type="text" id="userInput" class="form-control" placeholder="Ask Daria about your project...">
+                            <button id="sendButton" class="btn btn-primary">Send</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Memory Journal -->
+            <div class="col-lg-5">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">Memory Journal</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="memory-panel">
+                            <div class="memory-section">
+                                <h5>Project Overview</h5>
+                                <p id="projectOverview">Interview Tool with AI capabilities for UX Research</p>
+                            </div>
+                            
+                            <div class="memory-section">
+                                <h5>Current Sprint</h5>
+                                <p id="currentSprint">Implementing database structure and AWS deployment</p>
+                            </div>
+                            
+                            <div class="memory-section">
+                                <h5>Timeline</h5>
+                                <div id="timelineContainer">
+                                    <!-- Timeline items will be added dynamically -->
+                                </div>
+                            </div>
+                            
+                            <div class="memory-section">
+                                <h5>Opportunities</h5>
+                                <ul id="opportunitiesList" class="list-group list-group-flush">
+                                    <!-- Opportunities will be added dynamically -->
+                                </ul>
+                            </div>
+                            
+                            <div class="memory-section">
+                                <h5>Cursor Prompt Draft</h5>
+                                <div class="p-2 bg-light rounded">
+                                    <pre id="cursorPrompt" class="mb-0" style="white-space: pre-wrap;">// Draft will appear here as sprint progresses</pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Project Data - This represents the persistent memory that would be stored server-side
+        const projectData = {
+            name: "Daria Interview Tool",
+            overview: "An AI-powered research interviewing platform with text-to-speech and speech-to-text capabilities for conducting and analyzing user interviews.",
+            currentSprint: "Database Implementation and AWS Deployment (Phase 2)",
+            timeline: [
+                { date: "May 6, 2025", event: "Released RC2 with improved interview flow and LangChain integration" },
+                { date: "May 8, 2025", event: "Created project journal system for continuity between sessions" },
+                { date: "May 10, 2025", event: "Started database schema implementation for core tables" },
+                { date: "May 12, 2025", event: "Began testing AWS deployment with simple components" }
+            ],
+            opportunities: [
+                { id: "OPP-001", title: "Persistent Database for Interview Data", priority: "High", description: "Implement structured database to replace JSON file storage" },
+                { id: "OPP-002", title: "AWS Deployment Strategy", priority: "Medium", description: "Create deployment process for AWS with proper security and scaling" },
+                { id: "OPP-003", title: "Memory Companion Feature", priority: "Medium", description: "Implement Daria as project companion with persistent memory" },
+                { id: "OPP-004", title: "Sprint Engine Capabilities", priority: "Low", description: "Add full agile artifact generation for UX research sprints" }
+            ],
+            cursorPrompt: `// DRAFT: Daria Memory Companion Feature
+/**
+ * @feature Memory Companion
+ * @description A system that allows Daria to maintain context between sessions
+ * @sprint Phase 2 - Database Implementation
+ */
+
+Implementation Requirements:
+1. Create a persistent memory journal stored in database
+2. Implement "boot sequence" to read memory journal on startup
+3. Add API endpoints for recording interaction history
+4. Create UI for reviewing project timeline
+5. Build opportunity tracking system`
+        };
+
+        // DOM elements
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const resetButton = document.getElementById('resetButton');
+        const bootSequence = document.getElementById('bootSequence');
+        const bootContent = document.getElementById('bootContent');
+        const projectOverview = document.getElementById('projectOverview');
+        const currentSprint = document.getElementById('currentSprint');
+        const timelineContainer = document.getElementById('timelineContainer');
+        const opportunitiesList = document.getElementById('opportunitiesList');
+        const cursorPrompt = document.getElementById('cursorPrompt');
+
+        // Initialize memory journal content
+        function initializeMemoryJournal() {
+            projectOverview.textContent = projectData.overview;
+            currentSprint.textContent = projectData.currentSprint;
+            
+            // Clear existing content
+            timelineContainer.innerHTML = '';
+            opportunitiesList.innerHTML = '';
+            
+            // Add timeline items
+            projectData.timeline.forEach(item => {
+                const timelineItem = document.createElement('div');
+                timelineItem.classList.add('timeline-item');
+                timelineItem.innerHTML = `<strong>${item.date}</strong>: ${item.event}`;
+                timelineContainer.appendChild(timelineItem);
+            });
+            
+            // Add opportunities
+            projectData.opportunities.forEach(opp => {
+                const li = document.createElement('li');
+                li.classList.add('list-group-item');
+                li.innerHTML = `<strong>${opp.id}: ${opp.title}</strong> <span class="badge bg-${getPriorityColor(opp.priority)}">${opp.priority}</span><p class="mb-0 small text-muted">${opp.description}</p>`;
+                opportunitiesList.appendChild(li);
+            });
+            
+            // Set cursor prompt
+            cursorPrompt.textContent = projectData.cursorPrompt;
+        }
+
+        // Helper function to get color for priority badge
+        function getPriorityColor(priority) {
+            switch(priority.toLowerCase()) {
+                case 'high': return 'danger';
+                case 'medium': return 'warning';
+                case 'low': return 'info';
+                default: return 'secondary';
+            }
+        }
+
+        // Function to add a message to the chat
+        function addMessage(text, sender) {
+            const message = document.createElement('div');
+            message.classList.add('message');
+            message.classList.add(sender === 'user' ? 'user-message' : 'daria-message');
+            message.textContent = text;
+            chatContainer.appendChild(message);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Function to simulate Daria's boot sequence
+        function runBootSequence() {
+            bootSequence.style.display = 'block';
+            bootContent.innerHTML = '';
+            
+            const bootLines = [
+                "Initializing DARIA Memory System...",
+                "Loading project data...",
+                "Project: " + projectData.name,
+                "Reading memory journal...",
+                "Last session: " + projectData.timeline[projectData.timeline.length - 1].date,
+                "Current sprint: " + projectData.currentSprint,
+                "Opportunities identified: " + projectData.opportunities.length,
+                "Preparing conversation interface...",
+                "Memory restoration complete.",
+                "Hello! I'm Daria, your project companion."
+            ];
+            
+            let lineIndex = 0;
+            const typeInterval = setInterval(() => {
+                if (lineIndex < bootLines.length) {
+                    bootContent.innerHTML += bootLines[lineIndex] + "<br>";
+                    bootContent.scrollTop = bootContent.scrollHeight;
+                    lineIndex++;
+                } else {
+                    clearInterval(typeInterval);
+                    setTimeout(() => {
+                        bootSequence.style.display = 'none';
+                        
+                        // Add Daria's greeting message
+                        const greeting = `Good morning! According to my memory journal, we've been working on ${projectData.currentSprint}. Yesterday, we ${projectData.timeline[projectData.timeline.length - 1].event.toLowerCase()}. Would you like to continue working on that, or focus on one of our identified opportunities today?`;
+                        addMessage(greeting, 'daria');
+                    }, 1500);
+                }
+            }, 500);
+        }
+
+        // Process user message and generate Daria's response
+        function processMessage(message) {
+            if (!message.trim()) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            
+            // Clear input field
+            userInput.value = '';
+            
+            // Generate Daria's response based on user input
+            let response = '';
+            
+            if (message.toLowerCase().includes('what did we do')) {
+                response = `Based on my memory journal, here's what we've been working on:\n\n`;
+                projectData.timeline.slice(-3).forEach(item => {
+                    response += `• ${item.date}: ${item.event}\n`;
+                });
+            } 
+            else if (message.toLowerCase().includes('what should i work on') || message.toLowerCase().includes('what next')) {
+                const highPriorityOpps = projectData.opportunities.filter(opp => opp.priority.toLowerCase() === 'high');
+                if (highPriorityOpps.length > 0) {
+                    response = `I recommend focusing on our high-priority opportunity: "${highPriorityOpps[0].title}" (${highPriorityOpps[0].id}). Based on our progress, this is the most critical next step for the project.`;
+                } else {
+                    response = `You could continue working on ${projectData.currentSprint}. We've made good progress, but there are still some aspects to refine.`;
+                }
+            }
+            else if (message.toLowerCase().includes('cursor prompt') || message.toLowerCase().includes('generate prompt')) {
+                response = `I've prepared a draft Cursor prompt based on our current sprint:\n\n\`\`\`\n${projectData.cursorPrompt}\n\`\`\`\n\nWould you like me to refine this prompt further?`;
+            }
+            else if (message.toLowerCase().includes('opportunities') || message.toLowerCase().includes('opportunity')) {
+                response = `Here are the opportunities we've identified so far:\n\n`;
+                projectData.opportunities.forEach(opp => {
+                    response += `• ${opp.id}: ${opp.title} (${opp.priority} Priority)\n`;
+                });
+                response += `\nWhich opportunity would you like to focus on today?`;
+            }
+            else if (message.toLowerCase().includes('sprint') || message.toLowerCase().includes('progress')) {
+                response = `We're currently in ${projectData.currentSprint}. We've completed the initial stabilization phase and are now focusing on implementing the database structure and preparing for AWS deployment. The core interview functionality is working well, and we're now enhancing the data persistence layer.`;
+            }
+            else {
+                response = `I understand you're asking about "${message}". Based on my project memory, we should focus on implementing the database structure as our next step. Would you like me to provide more details about our current sprint goals or the opportunities we've identified?`;
+            }
+            
+            // Simulate typing delay
+            setTimeout(() => {
+                addMessage(response, 'daria');
+            }, 1000);
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', () => {
+            processMessage(userInput.value);
+        });
+
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                processMessage(userInput.value);
+            }
+        });
+
+        resetButton.addEventListener('click', () => {
+            // Clear chat
+            chatContainer.innerHTML = '';
+            
+            // Run boot sequence again
+            runBootSequence();
+        });
+
+        // Initialize the page
+        window.addEventListener('DOMContentLoaded', () => {
+            initializeMemoryJournal();
+            runBootSequence();
+        });
+    </script>
+</body>
+</html> 
