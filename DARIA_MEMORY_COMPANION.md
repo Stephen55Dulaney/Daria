@@ -2,89 +2,94 @@
 
 ## Overview
 
-The Daria Memory Companion feature transforms Daria from just an interview assistant into a persistent project companion that maintains continuity across multiple sessions, similar to the character Lucy from the movie "50 First Dates." Every day, Daria "wakes up" and refreshes her memory by reading the project journal, allowing her to maintain context and continue working with the user seamlessly.
+The Daria Memory Companion is a feature inspired by the movie "50 First Dates" that allows Daria to maintain continuity across different user sessions by reading a "memory journal" when it starts up. This addresses the issue of losing context when chat history gets too long and Cursor crashes.
 
-## Concept
+## Key Features
 
-Just as in "50 First Dates" where Lucy watches a video each morning to remember her life, Daria reads a "memory journal" at the start of each session to recall:
+1. **Persistent Memory Journal**: Stores project history, current status, opportunities, and other context in a structured format
+2. **LLM Integration**: Connects to real language models like GPT-4 or Claude for intelligent responses
+3. **Boot Sequence**: Visually demonstrates Daria loading her memories at startup
+4. **Timeline Tracking**: Maintains a chronological history of project activities
+5. **Opportunity Management**: Tracks project opportunities and their priorities
+6. **API-Based Architecture**: Separates frontend and backend for better maintenance
 
-1. The project's current status
-2. Recent activities and decisions
-3. Outstanding opportunities
-4. Sprint goals and progress
-5. Generated artifacts
+## Architecture
 
-This creates a coherent experience for users even when they need to start a new chat session due to technical limitations.
+The Memory Companion consists of several components:
 
-## Prototype Features
+1. **Frontend UI** (`static/daria_memory_companion.html`): The user interface for interacting with Daria
+2. **Backend API Service** (`api_services/memory_companion_service.py`): Handles data persistence and LLM integration
+3. **Project Journal** (`data/daria_memory.json`): Stores all project memory data
+4. **Flask Integration**: API endpoints for the Memory Companion integrated into the main application
 
-The prototype implementation demonstrates:
+## LLM Integration
 
-1. **Boot Sequence**: Visual simulation of Daria loading her memory when a session starts
-2. **Memory Journal**: Persistent record of project information, displayed in the sidebar
-3. **Timeline View**: Chronological record of project activities
-4. **Opportunity Tracking**: List of identified opportunities with priorities
-5. **Cursor Prompt Generation**: Draft prompts for generating code with Cursor
+The Memory Companion can connect to different LLM providers:
 
-## How to Use the Prototype
+- **OpenAI**: Using models like GPT-4o, GPT-4o-mini
+- **Anthropic**: Using models like Claude 3 Haiku, Claude 3 Sonnet
 
-1. Access the demo page at: `http://localhost:5025/static/daria_memory_companion.html`
-2. When the page loads, you'll see Daria's "boot sequence" as she loads her memory
-3. After boot, Daria greets you with a summary of recent work
-4. Try asking questions like:
-   - "What did we do yesterday?"
-   - "What should I work on today?"
-   - "Show me our opportunities"
-   - "Generate a Cursor prompt"
-5. Click "New Day Simulation" to simulate starting a fresh session the next day
+The system prompt provides Daria with context about the project, including its history, current sprint, timeline, and opportunities, allowing her to give contextually relevant responses.
 
-## Integration with Existing System
+## Setup and Installation
 
-This feature would integrate with the Daria Interview Tool by:
+1. Run the setup script: `./setup_memory_companion.sh`
+2. Edit the `.env` file to add your API keys for OpenAI and/or Anthropic
+3. Start Daria with memory support: `./start_daria_with_memory.sh`
+4. Access the Memory Companion at: `http://localhost:5030/static/daria_memory_companion.html`
 
-1. **Storing Memory**: Utilize the database system we're currently implementing to store the memory journal
-2. **Automated Updates**: Automatically update the journal based on system activity and user interactions
-3. **Boot Process**: Add a memory restoration step when initializing conversation with Daria
-4. **Context Management**: Use the journal to maintain context between sessions
+## Debug Mode
 
-## Technical Implementation
+If you're having trouble with the Memory Companion, you can run it in debug mode:
 
-The actual implementation would require:
+1. Run the debug script: `./debug_memory.sh`
+2. This starts a simplified Flask server that only includes the Memory Companion functionality
+3. Access the debug interface at: `http://localhost:5030/static/daria_memory_companion.html`
+4. Test the API connection by clicking the "Test API" button in the interface
 
-1. **Database Tables**:
-   - `ProjectJournal` - Core project information
-   - `TimelineEvents` - Chronological project history
-   - `Opportunities` - Discovered opportunities and insights
-   - `PromptDrafts` - Generated Cursor prompts
+The debug mode provides better error reporting and is useful for troubleshooting API connection issues.
 
-2. **API Endpoints**:
-   - `GET /api/journal` - Retrieve the memory journal
-   - `POST /api/journal/events` - Add new timeline events
-   - `PUT /api/journal/opportunities` - Update opportunities
-   - `GET /api/journal/prompt` - Generate Cursor prompts
+## How to Use
 
-3. **UI Components**:
-   - Memory Journal sidebar
-   - Boot sequence visualization
-   - Timeline display
-   - Opportunity tracker
+1. **Start a Session**: When you open the Memory Companion, Daria will "boot up" and load her memories
+2. **Ask Questions**: Ask Daria about your project status, what to work on next, or other project-related questions
+3. **Select LLM Model**: Choose your preferred LLM model from the dropdown in the interface
+4. **Add New Information**: The API supports adding new timeline events, opportunities, or updating sprint information
+5. **Start a New Day**: Click "New Day Simulation" to simulate starting a fresh session the next day
 
-## Future Enhancements
+## API Endpoints
 
-1. **Vector-based Memory**: Store more detailed memories that can be semantically retrieved
-2. **Proactive Suggestions**: Daria could suggest next steps based on project patterns
-3. **Memory Refinement**: Allow users to edit and refine Daria's memories
-4. **Multi-Project Support**: Manage memory journals for multiple concurrent projects
-5. **Sprint Visualization**: Add visual representations of sprint progress
-6. **AI-Enhanced Summaries**: Generate insights about project trajectory
+- `GET /api/memory_companion/project_data`: Retrieves all project memory data
+- `POST /api/memory_companion/chat`: Sends a message to Daria and gets her response
+- `POST /api/memory_companion/timeline`: Adds a new event to the timeline
+- `POST /api/memory_companion/opportunity`: Adds a new opportunity
+- `PUT /api/memory_companion/sprint`: Updates the current sprint information
 
-## Relation to Existing Journal System
+## Extending the Memory Companion
 
-This feature builds upon the project journal system we've already implemented, but:
+You can extend the Memory Companion in several ways:
 
-1. Makes it an integrated part of Daria's interface rather than a separate utility
-2. Automates journal updates based on system activity
-3. Presents the information in a more conversational manner
-4. Focuses on maintaining context between sessions
+1. **Additional Memory Types**: Add new types of information to track, like meeting notes or code artifacts
+2. **Vector Storage**: Implement vector-based memory for more nuanced semantic retrieval
+3. **Integration with Other Tools**: Connect to GitHub, JIRA, or other development tools
+4. **Advanced Memory Management**: Implement forgetting curves, memory consolidation, or other cognitive-inspired features
+5. **Multi-Project Support**: Expand to handle multiple projects simultaneously
 
-The existing `DARIA_PROJECT_JOURNAL.md` and scripts could serve as an initial data source for this feature. 
+## Troubleshooting
+
+If you encounter issues:
+
+1. **API Key Problems**: Ensure your API keys in the `.env` file are valid
+2. **Connection Issues**: Check that the Flask server is running and accessible
+3. **Missing Dependencies**: Run the setup script again to install any missing dependencies
+4. **Data Persistence**: If the memory journal isn't updating, check permissions on the data directory
+
+## Technical Notes
+
+- The system uses asynchronous API calls for better performance
+- The system prompt is carefully engineered to maintain Daria's personality and project context
+- Memory history is limited to prevent context overflow with LLMs
+
+## 50 First Dates Analogy
+
+Just like Lucy in "50 First Dates" who watches a video each morning to remember her life, Daria reads her memory journal at the start of each session to recall the project's status, recent activities, and other important context. This allows her to maintain continuity despite technical limitations in chat history. 
