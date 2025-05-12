@@ -1151,11 +1151,15 @@ def create_interview():
         save_interview(session_id, interview_data)
         logger.info(f"Created new interview with ID: {session_id}")
         
+        # All interview types should be treated as discussion guides for consistency
+        # This provides a unified experience regardless of interview type
+        redirect_url = f"/discussion_guide/{session_id}"
+        
         # Return success response with session ID and redirect URL
         return jsonify({
             'status': 'success',
             'session_id': session_id,
-            'redirect_url': f"/interview_details/{session_id}"
+            'redirect_url': redirect_url
         })
     except Exception as e:
         logger.error(f"Error creating interview: {str(e)}")
@@ -1965,19 +1969,26 @@ def api_add_session_message(session_id):
             logger.error(f"Message content missing for session {session_id}")
             return jsonify({'success': False, 'error': 'Message content required'}), 400
         
+        # Create message object
+        message = {
+            'content': content,
+            'role': role,
+            'id': str(uuid.uuid4()),
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        
         # Add the user message
-        message_id = discussion_service.add_message(session_id, content, role)
+        success = discussion_service.add_message(session_id, message)
+        if not success:
+            return jsonify({'success': False, 'error': 'Failed to add message'}), 500
+            
+        message_id = message['id']
         
         # If using SocketIO, emit the message to the monitoring room
         try:
             socketio.emit('new_message', {
                 'session_id': session_id,
-                'message': {
-                    'content': content,
-                    'role': role,
-                    'id': message_id,
-                    'timestamp': datetime.datetime.now().isoformat()
-                }
+                'message': message
             }, room=f"monitor_{session_id}")
             
             logger.info(f"Added message {message_id} to session {session_id} via WebSocket: {socketio is not None}")
@@ -1987,23 +1998,43 @@ def api_add_session_message(session_id):
         # Generate AI response if this is a user message
         if role == 'user' and interview_service:
             try:
+                # Get the session to retrieve guide ID and character
+                session = discussion_service.get_session(session_id)
+                guide_id = session.get('guide_id') if session else None
+                
+                # Get character information if available
+                character_info = {}
+                if guide_id and discussion_service:
+                    character_info = discussion_service.get_character_info(guide_id)
+                
                 # Generate response using LangChain
                 logger.info(f"Generating AI response for session {session_id}")
-                ai_message = interview_service.generate_response(session_id, content)
+                ai_message_content = interview_service.generate_response(
+                    session_id, 
+                    prompt=character_info.get('prompt', ''),
+                    character=character_info.get('name', '')
+                )
+                
+                # Create AI message object
+                ai_message = {
+                    'content': ai_message_content,
+                    'role': 'assistant',
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat()
+                }
                 
                 # Add AI response to the session
-                ai_message_id = discussion_service.add_message(session_id, ai_message, 'assistant')
+                ai_success = discussion_service.add_message(session_id, ai_message)
+                if not ai_success:
+                    return jsonify({'success': False, 'error': 'Failed to add AI response'}), 500
+                    
+                ai_message_id = ai_message['id']
                 
                 # Also emit the AI response to monitoring room
                 try:
                     socketio.emit('new_message', {
                         'session_id': session_id,
-                        'message': {
-                            'content': ai_message,
-                            'role': 'assistant',
-                            'id': ai_message_id,
-                            'timestamp': datetime.datetime.now().isoformat()
-                        }
+                        'message': ai_message
                     }, room=f"monitor_{session_id}")
                 except Exception as e:
                     logger.error(f"Socket.io error emitting AI response for session {session_id}: {str(e)}")
@@ -2011,7 +2042,7 @@ def api_add_session_message(session_id):
                 return jsonify({
                     'success': True,
                     'message': {
-                        'content': ai_message,
+                        'content': ai_message_content,
                         'role': 'assistant',
                         'id': ai_message_id
                     }
