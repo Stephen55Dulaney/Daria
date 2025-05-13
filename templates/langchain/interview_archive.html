@@ -1,0 +1,270 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Interview Archive{% endblock %}
+
+{% block extra_css %}
+<style>
+    .archive-container {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .interview-list {
+        margin-bottom: 2rem;
+    }
+    
+    .archive-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .search-container {
+        max-width: 400px;
+    }
+    
+    .interview-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .interview-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+    }
+    
+    .status-completed {
+        background-color: #198754;
+        color: white;
+    }
+    
+    .status-in_progress {
+        background-color: #ffc107;
+        color: black;
+    }
+    
+    .status-active {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .status-analyzed {
+        background-color: #6f42c1;
+        color: white;
+    }
+    
+    .status-unknown {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .status-orphaned {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .tabs-container {
+        margin-top: 1rem;
+    }
+    
+    .tab-content {
+        padding: 1.5rem;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-top: none;
+        border-bottom-left-radius: 0.5rem;
+        border-bottom-right-radius: 0.5rem;
+    }
+    
+    .right-sidebar {
+        background-color: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="archive-header">
+        <div>
+            <h1 class="h3">Interview Archive</h1>
+            <p class="text-muted">View and analyze completed interviews</p>
+        </div>
+        <div class="d-flex">
+            <a href="{{ url_for('upload_transcript_page') }}" class="btn btn-primary me-2">
+                <i class="bi bi-cloud-upload"></i> Upload Transcript
+            </a>
+            <div class="search-container">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search interviews...">
+                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if interviews %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="interview-list">
+                {% for interview in interviews %}
+                <div class="interview-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ interview.title or "Untitled Interview" }}</h5>
+                        <span class="status-badge status-{{ interview.status or 'unknown' }}">{{ interview.status|capitalize or "Unknown" }}</span>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Project:</strong> {{ interview.project or "Not specified" }}</p>
+                                <p class="mb-1"><strong>Date:</strong> 
+                                {% if interview.updated_at %}
+                                    {% if interview.updated_at is string %}
+                                        {{ interview.updated_at.split('T')[0] }}
+                                    {% else %}
+                                        {{ interview.updated_at.strftime('%b %d, %Y') }}
+                                    {% endif %}
+                                {% else %}
+                                    Unknown
+                                {% endif %}
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Participant:</strong> 
+                                {% if interview.interviewee and interview.interviewee.get('name') %}
+                                    {{ interview.interviewee.get('name') }}
+                                {% else %}
+                                    Anonymous
+                                {% endif %}
+                                </p>
+                                <p class="mb-1"><strong>Role:</strong> 
+                                {% if interview.interviewee and interview.interviewee.get('role') %}
+                                    {{ interview.interviewee.get('role') }}
+                                {% else %}
+                                    Not specified
+                                {% endif %}
+                                </p>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <a href="/interview_details/{{ interview.session_id }}" class="btn btn-primary">View Details</a>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="right-sidebar">
+                <h4>Quick Stats</h4>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Interviews</span>
+                        <span class="badge bg-primary">{{ interviews|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Completed</span>
+                        <span class="badge bg-success">{{ interviews|selectattr('status', 'equalto', 'completed')|list|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>In Progress</span>
+                        <span class="badge bg-warning">{{ interviews|selectattr('status', 'equalto', 'in_progress')|list|count }}</span>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Actions</h4>
+                <div class="d-grid gap-2">
+                    <a href="/interview_setup" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle me-2"></i>New Interview
+                    </a>
+                    <button class="btn btn-outline-secondary" id="exportDataBtn">
+                        <i class="bi bi-download me-2"></i>Export Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-archive fs-1 text-muted mb-3"></i>
+        <h4>No Completed Interviews Yet</h4>
+        <p class="text-muted">Start conducting interviews to see them here</p>
+        <a href="/interview_setup" class="btn btn-primary mt-2">Create Interview</a>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const interviewCards = document.querySelectorAll('.interview-card');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        
+        // Search functionality
+        function performSearch() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            interviewCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                if (cardText.includes(searchTerm)) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Export data functionality (placeholder)
+        if (exportDataBtn) {
+            exportDataBtn.addEventListener('click', function() {
+                alert('Export functionality would go here');
+            });
+        }
+    });
+</script>
+{% endblock %} 

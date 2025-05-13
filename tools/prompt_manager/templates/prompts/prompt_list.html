@@ -1,0 +1,65 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Prompt Manager - DARIA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>AI Agent Prompt Manager</h1>
+        <a href="{{ url_for('prompts.new_prompt') }}" class="btn btn-primary">
+            <i class="fas fa-plus-circle me-2"></i> Create New Prompt
+        </a>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <p>Manage and optimize prompts for the DARIA research assistant agents. Each prompt template controls how the agent behaves during interviews and analysis.</p>
+        </div>
+    </div>
+
+    <div class="row">
+        {% for agent in agents %}
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="card-title mb-0">{{ agent.name }}</h5>
+                    <span class="badge bg-info">v{{ agent.version }}</span>
+                </div>
+                <div class="card-body">
+                    <h6 class="text-muted">{{ agent.role }}</h6>
+                    <p>{{ agent.description | truncate(150) }}</p>
+                    
+                    {% if agent.average_score is not none %}
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <span>Performance:</span>
+                        <div class="progress" style="width: 60%;">
+                            <div class="progress-bar" role="progressbar" 
+                                 style="width: {{ (agent.average_score/5)*100 }}%;"
+                                 aria-valuenow="{{ agent.average_score }}" 
+                                 aria-valuemin="0" 
+                                 aria-valuemax="5">
+                                {{ agent.average_score }}/5
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between align-items-center mt-2">
+                        <span>Sessions:</span>
+                        <span>{{ agent.total_sessions }}</span>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-secondary mt-3">
+                        No performance data available yet
+                    </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <a href="{{ url_for('prompts.view_prompt', agent=agent.name) }}" class="btn btn-outline-primary">
+                        View & Edit
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 

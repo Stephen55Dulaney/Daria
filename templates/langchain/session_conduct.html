@@ -1,0 +1,698 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Conduct Research Session{% endblock %}
+
+{% block extra_css %}
+<style>
+    .message {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .message-moderator {
+        background-color: #f0f4f8;
+        border-left: 3px solid #4f46e5;
+    }
+    
+    .message-participant {
+        background-color: #f8f9fa;
+        border-left: 3px solid #0ea5e9;
+    }
+    
+    .message-header {
+        margin-bottom: 5px;
+        color: #6b7280;
+    }
+    
+    .message-content {
+        white-space: pre-line;
+    }
+    
+    .transcript-container {
+        height: 400px;
+        overflow-y: auto;
+        border: 1px solid #e5e7eb;
+        border-radius: 0.5rem;
+        padding: 1rem;
+    }
+    
+    .session-controls {
+        position: sticky;
+        bottom: 0;
+        background: white;
+        border-top: 1px solid #e5e7eb;
+        padding-top: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3 mb-0">Research Session</h1>
+            <p class="text-muted">{{ guide.title if guide else "Research Study" }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="/discussion_guide/{{ session.guide_id }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Guide
+            </a>
+            <button class="btn btn-primary" id="share-link-btn">
+                <i class="bi bi-share me-1"></i> Share Session Link
+            </button>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- Left panel: Session information -->
+        <div class="col-md-4">
+            <!-- Session Information -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Session Information</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-1">Status</h5>
+                            <p><span class="badge bg-success">{{ session.status|capitalize }}</span></p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-1">Guide</h5>
+                            <p>{{ guide.title if guide and guide.title else "Custom Interview" }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-1">AI Character</h5>
+                            <p>{{ guide.character_select|title if guide and guide.character_select else character_name|title if character_name else "Standard Interviewer" }}</p>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="text-muted mb-1">Date</h5>
+                            <p>{{ current_date }}</p>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Participant</label>
+                        <p class="mb-0">{{ session.interviewee.name if session.interviewee and session.interviewee.name else "Not joined yet" }}</p>
+                        {% if session.interviewee and session.interviewee.email %}
+                        <p class="small text-muted mb-0">{{ session.interviewee.email }}</p>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Session URL</label>
+                        <div class="input-group">
+                            <input type="text" class="form-control" id="session-url" value="{{ request.url_root }}interview/{{ session_id }}?remote=true" readonly>
+                            <button class="btn btn-outline-secondary" type="button" id="copy-url-btn">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                        <div class="mt-2">
+                            <a href="#" id="email-link-btn" class="btn btn-sm btn-outline-primary">
+                                <i class="bi bi-envelope me-1"></i> Email Link
+                            </a>
+                            <button id="create-new-session-btn" class="btn btn-sm btn-outline-success ms-2">
+                                <i class="bi bi-plus-circle me-1"></i> Create New Session Link
+                            </button>
+                            <button id="qr-code-btn" class="btn btn-sm btn-outline-secondary ms-2">
+                                <i class="bi bi-qr-code me-1"></i> QR Code
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Session Controls</label>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-outline-danger" id="end-session-btn" {{ 'disabled' if session.status != 'active' }}>
+                                <i class="bi bi-stop-circle me-1"></i> End Session
+                            </button>
+                            
+                            {% if session.status == 'completed' and not session.analysis %}
+                            <button class="btn btn-outline-primary" id="analyze-btn">
+                                <i class="bi bi-graph-up me-1"></i> Generate Analysis
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Prompts Panel -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0">Research Guide</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label class="form-label text-muted">Discussion Prompt</label>
+                        <div class="p-3 bg-light rounded">
+                            <pre class="mb-0" style="white-space: pre-wrap; font-size: 0.875rem;">{{ guide.interview_prompt if guide else "No prompt available" }}</pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right panel: Transcript and analysis -->
+        <div class="col-md-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="transcript-tab" data-bs-toggle="tab" data-bs-target="#transcript" type="button" role="tab" aria-controls="transcript" aria-selected="true">Live Transcript</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="false">Analysis</button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <!-- Transcript Tab -->
+                        <div class="tab-pane fade show active" id="transcript" role="tabpanel" aria-labelledby="transcript-tab">
+                            <div class="transcript-container" id="transcript-messages">
+                                {% if session.messages and session.messages|length > 0 %}
+                                    {% for message in session.messages %}
+                                    <div class="message {{ 'message-moderator' if message.role == 'assistant' else 'message-participant' }}">
+                                        <div class="message-header">
+                                            <strong>{{ 'Moderator' if message.role == 'assistant' else 'Participant' }}</strong>
+                                            {% if message.timestamp %}
+                                            <span class="ms-2 small">
+                                                {{ message.timestamp.split('T')[1].split('.')[0] if message.timestamp is string else message.timestamp.strftime('%H:%M:%S') }}
+                                            </span>
+                                            {% endif %}
+                                        </div>
+                                        <div class="message-content">{{ message.content }}</div>
+                                    </div>
+                                    {% endfor %}
+                                {% else %}
+                                    <div class="text-center text-muted p-5">
+                                        <i class="bi bi-chat-dots fs-1 mb-3"></i>
+                                        <p>No messages yet. The transcript will appear here once the session begins.</p>
+                                    </div>
+                                {% endif %}
+                            </div>
+                            
+                            <div class="session-controls mt-3">
+                                <div class="d-flex align-items-center">
+                                    <button class="btn btn-outline-primary me-2" id="refresh-transcript-btn">
+                                        <i class="bi bi-arrow-clockwise me-1"></i> Refresh
+                                    </button>
+                                    
+                                    <div class="form-check ms-3">
+                                        <input class="form-check-input" type="checkbox" id="auto-refresh" checked>
+                                        <label class="form-check-label" for="auto-refresh">
+                                            Auto-refresh
+                                        </label>
+                                    </div>
+                                    
+                                    <button class="btn btn-outline-secondary ms-auto" id="export-transcript-btn">
+                                        <i class="bi bi-download me-1"></i> Export
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Analysis Tab -->
+                        <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+                            {% if session.analysis %}
+                                <div class="analysis-container">
+                                    <h5 class="mb-3">Research Insights</h5>
+                                    <div class="p-3 bg-light rounded mb-4">
+                                        <pre style="white-space: pre-wrap;">{{ session.analysis.content }}</pre>
+                                    </div>
+                                    
+                                    <div class="text-muted small">
+                                        Analysis generated on 
+                                        {% if session.analysis.generated_at %}
+                                            {% if session.analysis.generated_at is string %}
+                                                {{ session.analysis.generated_at.split('T')[0] }} at {{ session.analysis.generated_at.split('T')[1].split('.')[0] }}
+                                            {% else %}
+                                                {{ session.analysis.generated_at.strftime('%b %d, %Y at %H:%M') }}
+                                            {% endif %}
+                                        {% else %}
+                                            unknown date
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="mt-3">
+                                        <button class="btn btn-outline-primary" id="regenerate-analysis-btn">
+                                            <i class="bi bi-arrow-clockwise me-1"></i> Regenerate Analysis
+                                        </button>
+                                        <button class="btn btn-outline-secondary ms-2" id="export-analysis-btn">
+                                            <i class="bi bi-download me-1"></i> Export
+                                        </button>
+                                    </div>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-5">
+                                    <i class="bi bi-graph-up fs-1 text-muted mb-3"></i>
+                                    <h4>No Analysis Available</h4>
+                                    
+                                    {% if session.status == 'active' %}
+                                    <p class="text-muted mb-4">Analysis will be available once the session is completed.</p>
+                                    {% else %}
+                                    <p class="text-muted mb-4">Generate an analysis to extract insights from this session.</p>
+                                    <button class="btn btn-primary" id="generate-analysis-btn">
+                                        <i class="bi bi-magic me-1"></i> Generate Analysis
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- QR Code Modal -->
+<div class="modal fade" id="qr-code-modal" tabindex="-1" aria-labelledby="qr-code-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="qr-code-modal-label">Session QR Code</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div id="qr-code-container" class="p-3"></div>
+                <p class="mt-3 mb-0">Scan this QR code to join the session</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End Session Confirmation Modal -->
+<div class="modal fade" id="end-session-modal" tabindex="-1" aria-labelledby="end-session-modal-label" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="end-session-modal-label">End Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to end this session? This will finalize the transcript and allow analysis to be generated.</p>
+                <p>The participant will no longer be able to contribute to this session.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-end-session-btn">End Session</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/qrcode.js@1.0.0/qrcode.min.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const sessionId = '{{ session_id }}';
+    const sessionUrl = document.getElementById('session-url').value;
+    const copyUrlBtn = document.getElementById('copy-url-btn');
+    const emailLinkBtn = document.getElementById('email-link-btn');
+    const qrCodeBtn = document.getElementById('qr-code-btn');
+    const endSessionBtn = document.getElementById('end-session-btn');
+    const confirmEndSessionBtn = document.getElementById('confirm-end-session-btn');
+    const refreshTranscriptBtn = document.getElementById('refresh-transcript-btn');
+    const autoRefreshCheckbox = document.getElementById('auto-refresh');
+    const exportTranscriptBtn = document.getElementById('export-transcript-btn');
+    const generateAnalysisBtn = document.getElementById('generate-analysis-btn');
+    const regenerateAnalysisBtn = document.getElementById('regenerate-analysis-btn');
+    const exportAnalysisBtn = document.getElementById('export-analysis-btn');
+    const createNewSessionBtn = document.getElementById('create-new-session-btn');
+    
+    let refreshInterval;
+    
+    // Copy session URL to clipboard
+    copyUrlBtn.addEventListener('click', function() {
+        const sessionUrl = document.getElementById('session-url');
+        sessionUrl.select();
+        document.execCommand('copy');
+        
+        // Show feedback
+        this.innerHTML = '<i class="bi bi-check"></i>';
+        setTimeout(() => {
+            this.innerHTML = '<i class="bi bi-clipboard"></i>';
+        }, 1500);
+    });
+    
+    // Create a new session from the current guide
+    createNewSessionBtn.addEventListener('click', function() {
+        // Get guide ID from the session
+        const guideId = "{{ guide.id if guide else '' }}";
+        const sessionId = "{{ session_id }}";
+        
+        if (!guideId && !sessionId) {
+            alert("Error: Neither Guide ID nor Session ID found");
+            return;
+        }
+        
+        // Show loading state
+        const originalText = this.innerHTML;
+        this.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Creating...';
+        this.disabled = true;
+        
+        // Create a new session using the dedicated sharing API
+        fetch('/api/interview/share_link', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                guide_id: guideId,
+                session_id: sessionId,
+                interviewee: {
+                    name: "New Participant",
+                    email: ""
+                }
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            this.innerHTML = originalText;
+            this.disabled = false;
+            
+            if (data.success && data.sharing_url) {
+                // Update the URL with the new session sharing URL
+                document.getElementById('session-url').value = data.sharing_url;
+                
+                // Trigger copy
+                document.getElementById('copy-url-btn').click();
+                
+                // Show success message
+                alert("New session created! The URL has been copied to your clipboard.");
+            } else {
+                alert("Error creating new session: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error creating session:", error);
+            this.innerHTML = originalText;
+            this.disabled = false;
+            alert("Error creating new session. Please try again.");
+        });
+    });
+    
+    // Email link
+    emailLinkBtn.addEventListener('click', function() {
+        // Create a new session first, then email the link
+        const guideId = "{{ guide.id if guide else '' }}";
+        const sessionId = "{{ session_id }}";
+        
+        if (!guideId && !sessionId) {
+            alert("Error: Neither Guide ID nor Session ID found");
+            return;
+        }
+        
+        // Show loading state
+        const originalText = this.innerHTML;
+        this.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Creating...';
+        this.disabled = true;
+        
+        // Create a new session using the dedicated sharing API
+        fetch('/api/interview/share_link', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                guide_id: guideId,
+                session_id: sessionId,
+                interviewee: {
+                    name: "Email Participant",
+                    email: ""
+                }
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            this.innerHTML = originalText;
+            this.disabled = false;
+            
+            if (data.success && data.sharing_url) {
+                // Use the new session ID for the email
+                const sessionLink = data.sharing_url;
+                const subject = "Invitation to participate in research session";
+                const body = `Hello,\n\nYou're invited to participate in a research session: {{ guide.title if guide else "Research Study" }}.\n\nTo join, please click on the following link:\n\n${sessionLink}\n\nThank you!`;
+                
+                window.location.href = `mailto:?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+            } else {
+                alert("Error creating new session: " + (data.error || "Unknown error"));
+            }
+        })
+        .catch(error => {
+            console.error("Error creating session:", error);
+            this.innerHTML = originalText;
+            this.disabled = false;
+            alert("Error creating new session. Please try again.");
+        });
+    });
+    
+    // Generate QR code
+    qrCodeBtn.addEventListener('click', function() {
+        const qrCodeContainer = document.getElementById('qr-code-container');
+        qrCodeContainer.innerHTML = '';
+        
+        QRCode.toCanvas(qrCodeContainer, sessionUrl, {
+            width: 250,
+            margin: 1
+        }, function(error) {
+            if (error) console.error(error);
+        });
+        
+        new bootstrap.Modal(document.getElementById('qr-code-modal')).show();
+    });
+    
+    // End session
+    endSessionBtn.addEventListener('click', function() {
+        new bootstrap.Modal(document.getElementById('end-session-modal')).show();
+    });
+    
+    confirmEndSessionBtn.addEventListener('click', function() {
+        confirmEndSessionBtn.disabled = true;
+        confirmEndSessionBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+        
+        fetch(`/api/session/${sessionId}/complete`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Error ending session: ' + data.error);
+                confirmEndSessionBtn.disabled = false;
+                confirmEndSessionBtn.innerHTML = 'End Session';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+            confirmEndSessionBtn.disabled = false;
+            confirmEndSessionBtn.innerHTML = 'End Session';
+        });
+    });
+    
+    // Refresh transcript
+    function refreshTranscript() {
+        fetch(`/api/session/${sessionId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const session = data.session;
+                    const transcriptContainer = document.getElementById('transcript-messages');
+                    
+                    // Only update if there are messages
+                    if (session.messages && session.messages.length > 0) {
+                        transcriptContainer.innerHTML = '';
+                        
+                        session.messages.forEach(message => {
+                            const messageDiv = document.createElement('div');
+                            messageDiv.className = `message ${message.role === 'assistant' ? 'message-moderator' : 'message-participant'}`;
+                            
+                            const headerDiv = document.createElement('div');
+                            headerDiv.className = 'message-header';
+                            
+                            const nameSpan = document.createElement('strong');
+                            nameSpan.textContent = message.role === 'assistant' ? 'Moderator' : 'Participant';
+                            headerDiv.appendChild(nameSpan);
+                            
+                            if (message.timestamp) {
+                                const timeSpan = document.createElement('span');
+                                timeSpan.className = 'ms-2 small';
+                                
+                                const timestamp = typeof message.timestamp === 'string' 
+                                    ? message.timestamp.split('T')[1].split('.')[0]
+                                    : new Date(message.timestamp).toTimeString().split(' ')[0];
+                                
+                                timeSpan.textContent = timestamp;
+                                headerDiv.appendChild(timeSpan);
+                            }
+                            
+                            const contentDiv = document.createElement('div');
+                            contentDiv.className = 'message-content';
+                            contentDiv.textContent = message.content;
+                            
+                            messageDiv.appendChild(headerDiv);
+                            messageDiv.appendChild(contentDiv);
+                            transcriptContainer.appendChild(messageDiv);
+                        });
+                        
+                        // Scroll to bottom
+                        transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+                    }
+                } else {
+                    console.error('Error refreshing transcript:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    
+    refreshTranscriptBtn.addEventListener('click', refreshTranscript);
+    
+    // Auto-refresh toggle
+    autoRefreshCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            refreshInterval = setInterval(refreshTranscript, 5000);
+        } else {
+            clearInterval(refreshInterval);
+        }
+    });
+    
+    // Set up auto-refresh if checked
+    if (autoRefreshCheckbox.checked) {
+        refreshInterval = setInterval(refreshTranscript, 5000);
+    }
+    
+    // Export transcript
+    exportTranscriptBtn.addEventListener('click', function() {
+        fetch(`/api/session/${sessionId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const session = data.session;
+                    let transcriptText = '';
+                    
+                    if (session.messages && session.messages.length > 0) {
+                        session.messages.forEach(message => {
+                            const role = message.role === 'assistant' ? 'Moderator' : 'Participant';
+                            const timestamp = message.timestamp ? 
+                                (typeof message.timestamp === 'string' ? 
+                                    message.timestamp.split('T')[1].split('.')[0] : 
+                                    new Date(message.timestamp).toTimeString().split(' ')[0]) : 
+                                '';
+                            
+                            transcriptText += `[${timestamp}] ${role}: ${message.content}\n\n`;
+                        });
+                    } else {
+                        transcriptText = session.transcript || 'No transcript available';
+                    }
+                    
+                    // Create and download file
+                    const blob = new Blob([transcriptText], { type: 'text/plain' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `transcript_${sessionId}.txt`;
+                    a.click();
+                    URL.revokeObjectURL(url);
+                } else {
+                    alert('Error exporting transcript: ' + data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred. Please try again.');
+            });
+    });
+    
+    // Generate/regenerate analysis
+    function generateAnalysis(button) {
+        if (!button) return;
+        
+        button.disabled = true;
+        button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Processing...';
+        
+        fetch(`/api/session/${sessionId}/analyze`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.reload();
+            } else {
+                alert('Error generating analysis: ' + data.error);
+                button.disabled = false;
+                button.innerHTML = button === regenerateAnalysisBtn ? 
+                    '<i class="bi bi-arrow-clockwise me-1"></i> Regenerate Analysis' : 
+                    '<i class="bi bi-magic me-1"></i> Generate Analysis';
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('An error occurred. Please try again.');
+            button.disabled = false;
+            button.innerHTML = button === regenerateAnalysisBtn ? 
+                '<i class="bi bi-arrow-clockwise me-1"></i> Regenerate Analysis' : 
+                '<i class="bi bi-magic me-1"></i> Generate Analysis';
+        });
+    }
+    
+    if (generateAnalysisBtn) {
+        generateAnalysisBtn.addEventListener('click', function() {
+            generateAnalysis(this);
+        });
+    }
+    
+    if (regenerateAnalysisBtn) {
+        regenerateAnalysisBtn.addEventListener('click', function() {
+            generateAnalysis(this);
+        });
+    }
+    
+    // Export analysis
+    if (exportAnalysisBtn) {
+        exportAnalysisBtn.addEventListener('click', function() {
+            fetch(`/api/session/${sessionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.session.analysis) {
+                        const analysisText = data.session.analysis.content;
+                        
+                        // Create and download file
+                        const blob = new Blob([analysisText], { type: 'text/plain' });
+                        const url = URL.createObjectURL(blob);
+                        const a = document.createElement('a');
+                        a.href = url;
+                        a.download = `analysis_${sessionId}.txt`;
+                        a.click();
+                        URL.revokeObjectURL(url);
+                    } else {
+                        alert('Error exporting analysis: No analysis available');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again.');
+                });
+        });
+    }
+});
+</script>
+{% endblock %} 

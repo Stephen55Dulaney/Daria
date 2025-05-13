@@ -1,0 +1,33 @@
+{
+  "id": "debug_guide_001",
+  "title": "Debug Interview Guide",
+  "project": "Debug Testing",
+  "interview_type": "debug_test",
+  "prompt": "This is a debug guide for testing the interview flow.",
+  "interview_prompt": "You are a helpful AI assistant conducting an interview to debug the system. Ask simple questions and provide clear responses.",
+  "analysis_prompt": "Analyze the conversation for any technical issues or anomalies.",
+  "character_select": "interviewer",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL",
+  "target_audience": {
+    "name": "Debug User",
+    "role": "Tester",
+    "department": "QA"
+  },
+  "created_at": "2023-05-07T16:00:00.000Z",
+  "updated_at": "2023-05-07T16:00:00.000Z",
+  "status": "active",
+  "sessions": [],
+  "custom_questions": [
+    "How is the system working for you?",
+    "Are you experiencing any technical issues?",
+    "Is the audio quality acceptable?",
+    "How responsive is the interface?",
+    "Are the AI responses relevant and helpful?"
+  ],
+  "time_per_question": 2,
+  "options": {
+    "show_transcript": true,
+    "auto_advance": false,
+    "record_audio": true
+  }
+} 

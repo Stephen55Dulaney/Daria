@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Research Session | Join</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #0ea5e9;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --light-bg: #f9fafb;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .terms-container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            color: var(--primary-color);
+        }
+        
+        .card {
+            border-radius: 0.75rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            border: none;
+        }
+        
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid var(--border-color);
+            border-top-left-radius: 0.75rem !important;
+            border-top-right-radius: 0.75rem !important;
+            padding: 1.5rem 1.5rem 1rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .terms-box {
+            max-height: 300px;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: var(--light-bg);
+            border-radius: 0.5rem;
+            border: 1px solid var(--border-color);
+            margin-bottom: 1.5rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        footer {
+            margin-top: auto;
+            padding: 1.5rem 0;
+            text-align: center;
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="terms-container">
+        <div class="text-center mb-4">
+            <div class="logo">Daria Research</div>
+        </div>
+        
+        <div class="card">
+            <div class="card-header">
+                <h1 class="h3 mb-1">Research Session</h1>
+                <p class="text-muted mb-0">Join the research session: {{ guide.title if guide else "Research Study" }}</p>
+            </div>
+            
+            <div class="card-body">
+                <div class="mb-4">
+                    <h2 class="h5 mb-3">What to Expect</h2>
+                    <p>
+                        You're about to join a research session facilitated by an AI interviewer. 
+                        This session will explore your experiences and feedback related to 
+                        <strong>{{ guide.project if guide and guide.project else "our research project" }}</strong>.
+                    </p>
+                    <p>
+                        The AI interviewer will ask you questions, and your responses will help us gather valuable insights.
+                        You can speak naturally as you would in a normal conversation.
+                    </p>
+                </div>
+                
+                <div class="mb-4">
+                    <h2 class="h5 mb-3">Terms & Privacy</h2>
+                    <div class="terms-box">
+                        <p><strong>Research Participation Agreement</strong></p>
+                        <p>By proceeding, you agree to voluntarily participate in this research session.</p>
+                        
+                        <p><strong>Data Collection & Privacy</strong></p>
+                        <p>During this session, we will collect:</p>
+                        <ul>
+                            <li>Your responses to questions</li>
+                            <li>Audio from your microphone (to analyze your responses)</li>
+                            <li>Basic demographic information if you choose to provide it</li>
+                        </ul>
+                        
+                        <p>This data will be used for research purposes only and will be handled according to our privacy policy. Your information will not be sold to third parties.</p>
+                        
+                        <p><strong>Anonymization & Confidentiality</strong></p>
+                        <p>Your responses may be summarized and shared with our research team, but your personal identity will remain confidential unless you explicitly consent to be identified.</p>
+                        
+                        <p><strong>Right to Withdraw</strong></p>
+                        <p>You can exit the session at any time by closing your browser window. If you wish to have your data removed after completion, please contact the research team using the email provided at the end of the session.</p>
+                    </div>
+                </div>
+                
+                <form id="session-form" class="mb-4">
+                    <h2 class="h5 mb-3">Your Information</h2>
+                    <p class="text-muted small mb-3">This information helps us categorize responses but is optional.</p>
+                    
+                    <div class="row g-3">
+                        <div class="col-md-6">
+                            <label for="name" class="form-label">Your Name</label>
+                            <input type="text" class="form-control" id="name" name="name" value="{{ name }}" placeholder="Enter your name">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="email" class="form-label">Email Address</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ email }}" placeholder="Enter your email">
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <label for="role" class="form-label">Your Role</label>
+                            <input type="text" class="form-control" id="role" name="role" placeholder="e.g., Designer, Manager, etc.">
+                        </div>
+                        <div class="col-md-6">
+                            <label for="department" class="form-label">Department/Team</label>
+                            <input type="text" class="form-control" id="department" name="department" placeholder="Your department or team">
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="mb-3 form-check">
+                    <input type="checkbox" class="form-check-input" id="termsCheck" required>
+                    <label class="form-check-label" for="termsCheck">
+                        I have read and agree to the terms of this research session
+                    </label>
+                </div>
+                
+                <div class="d-grid gap-2">
+                    <button type="button" id="joinButton" class="btn btn-primary" disabled>
+                        Join Research Session
+                    </button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="window.close()">
+                        Cancel
+                    </button>
+                </div>
+                
+                <div class="mt-4">
+                    <p class="text-muted small mb-1">Technical Requirements:</p>
+                    <ul class="text-muted small mb-0">
+                        <li>A working microphone is required</li>
+                        <li>Please use Chrome, Edge, or Safari for best compatibility</li>
+                        <li>Ensure you are in a quiet environment for best results</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <footer>
+        <div class="container">
+            <p class="mb-0">Powered by Daria Research | &copy; 2023</p>
+        </div>
+    </footer>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const termsCheck = document.getElementById('termsCheck');
+            const joinButton = document.getElementById('joinButton');
+            const sessionForm = document.getElementById('session-form');
+            
+            // Enable/disable join button based on checkbox
+            termsCheck.addEventListener('change', function() {
+                joinButton.disabled = !this.checked;
+            });
+            
+            // Handle join button click
+            joinButton.addEventListener('click', function() {
+                // Get form data
+                const formData = new FormData(sessionForm);
+                const name = document.getElementById('name').value;
+                const email = document.getElementById('email').value;
+                const role = document.getElementById('role').value;
+                const department = document.getElementById('department').value;
+                
+                // Build the URL with parameters
+                let url = '/interview/{{ session_id }}?remote=true&accepted=true&voice_id={{ voice_id }}';
+                
+                if (name) url += `&name=${encodeURIComponent(name)}`;
+                if (email) url += `&email=${encodeURIComponent(email)}`;
+                if (role) url += `&role=${encodeURIComponent(role)}`;
+                if (department) url += `&department=${encodeURIComponent(department)}`;
+                
+                // Navigate to the session
+                window.location.href = url;
+            });
+        });
+    </script>
+</body>
+</html> 

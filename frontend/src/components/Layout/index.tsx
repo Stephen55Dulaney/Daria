@@ -81,7 +81,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       children: [
         {
           key: '/personas',
-          label: <Link to="/personas">Personas</Link>,
+          label: <Link to="/personas">Persona Archive</Link>,
         },
         {
           key: '/persona-generator',
@@ -90,9 +90,19 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
       ],
     },
     {
-      key: '/journey-map',
+      key: 'journey-map',
       icon: <RocketOutlined />,
-      label: <Link to="/journey-map">Journey Map</Link>,
+      label: 'Journey Map',
+      children: [
+        {
+          key: '/journey-maps',
+          label: <Link to="/journey-maps">Journey Map Archive</Link>,
+        },
+        {
+          key: '/journey-map',
+          label: <Link to="/journey-map">Generate Journey Map</Link>,
+        },
+      ],
     },
   ];
 

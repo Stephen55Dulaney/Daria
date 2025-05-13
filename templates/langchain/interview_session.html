@@ -1,0 +1,386 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Interview Session - {{ interview.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid vh-100 d-flex flex-column">
+    <div class="row flex-grow-1">
+        <div class="col-12 py-3">
+            <div class="bg-white rounded-3 shadow-sm p-3 h-100 d-flex flex-column">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <h2 class="h5 mb-0">{{ interview.title }}</h2>
+                    <div>
+                        <button id="endInterviewBtn" class="btn btn-outline-danger btn-sm" onclick="endInterview()">
+                            <i class="bi bi-stop-circle me-1"></i> End Interview
+                        </button>
+                    </div>
+                </div>
+                <!-- Main chat interface -->
+                <div id="chat-container" class="flex-grow-1 d-flex flex-column mb-3">
+                    <div id="chat-messages" class="flex-grow-1 overflow-auto p-3"></div>
+                    <div class="typing-indicator d-none" id="typingIndicator">
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                        <div class="dot"></div>
+                    </div>
+                </div>
+                <!-- User input area -->
+                <div id="user-input-container" class="mt-auto">
+                    <div class="input-group">
+                        <textarea id="userText" class="form-control" placeholder="Type your response..." rows="2"></textarea>
+                        <button id="sendBtn" class="btn btn-primary" onclick="sendMessage()">
+                            <i class="bi bi-send"></i>
+                        </button>
+                        <button id="micBtn" class="btn btn-outline-primary" onclick="toggleRecording()">
+                            <i class="bi bi-mic"></i>
+                        </button>
+                    </div>
+                    <div class="text-muted small mt-1" id="status-text">Ready</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thank You Modal -->
+<div class="modal fade" id="thankYouModal" tabindex="-1" aria-labelledby="thankYouModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="thankYouModalLabel">Interview Complete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="py-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                    <h3 class="mt-4">Thank You!</h3>
+                    <p class="text-muted">Your interview has been successfully completed and recorded.</p>
+                    <p>We appreciate your participation and valuable insights.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeWindow()">Close Window</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Get session ID from the URL or template variable
+        const sessionId = document.getElementById('sessionId').value;
+        console.log('Session ID:', sessionId);
+        
+        // DOM elements
+        const chatMessages = document.querySelector('.chat-messages');
+        const micButton = document.getElementById('mic-button');
+        const sendButton = document.getElementById('send-button');
+        const statusText = document.getElementById('status-text');
+        const statusIndicator = document.querySelector('.status-indicator');
+        const typingIndicator = document.querySelector('.typing-indicator');
+        const userTextInput = document.getElementById('userTextInput');
+        const endInterviewBtn = document.getElementById('end-interview-btn');
+        
+        // State variables
+        let isRecording = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        
+        // Add click event listeners
+        micButton.addEventListener('click', toggleRecording);
+        sendButton.addEventListener('click', sendMessage);
+        endInterviewBtn.addEventListener('click', endInterview);
+        
+        // Handle enter key in textarea
+        userTextInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Start the interview
+        startInterview();
+        
+        // Function to start the interview
+        function startInterview() {
+            // Show loading state
+            addTypingIndicator();
+            
+            // Call the API to start the interview
+            fetch('/api/interview/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ session_id: sessionId })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                removeTypingIndicator();
+                
+                if (data.response) {
+                    // Add the AI's first question
+                    addMessage(data.response, 'ai');
+                    
+                    // Use text-to-speech for the first question
+                    speakText(data.response);
+                } else {
+                    console.error('Error starting interview:', data.error);
+                    addMessage('Error starting interview: ' + (data.error || 'Unknown error'), 'ai');
+                }
+            })
+            .catch(error => {
+                console.error('Error starting interview:', error);
+                removeTypingIndicator();
+                addMessage('Error starting interview: ' + error.message, 'ai');
+            });
+        }
+        
+        // Function to send a message
+        function sendMessage() {
+            const text = userTextInput.value.trim();
+            if (!text) return;
+            
+            // Add the user's message to the chat
+            addMessage(text, 'user');
+            
+            // Clear the input
+            userTextInput.value = '';
+            
+            // Show typing indicator
+            addTypingIndicator();
+            
+            // Call the API to process the user's message
+            fetch('/api/interview/respond', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    user_input: text,
+                    session_id: sessionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                removeTypingIndicator();
+                
+                if (data.response) {
+                    // Add the AI's response
+                    addMessage(data.response, 'ai');
+                    
+                    // Use text-to-speech for the response
+                    speakText(data.response);
+                } else {
+                    console.error('Error getting response:', data.error);
+                    addMessage('Error: ' + (data.error || 'Unknown error'), 'ai');
+                }
+            })
+            .catch(error => {
+                console.error('Error getting response:', error);
+                removeTypingIndicator();
+                addMessage('Error: ' + error.message, 'ai');
+            });
+        }
+        
+        // Function to toggle recording
+        function toggleRecording() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        }
+        
+        // Function to start recording audio
+        function startRecording() {
+            if (isRecording) return;
+            
+            console.log('Starting recording...');
+            isRecording = true;
+            audioChunks = [];
+            
+            // Visual indication recording is active
+            micButton.classList.add('listening');
+            statusText.textContent = 'Listening...';
+            
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    mediaRecorder = new MediaRecorder(stream);
+                    
+                    mediaRecorder.ondataavailable = event => {
+                        if (event.data.size > 0) {
+                            audioChunks.push(event.data);
+                        }
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+                        processAudio(audioBlob);
+                    };
+                    
+                    mediaRecorder.start();
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    isRecording = false;
+                    micButton.classList.remove('listening');
+                    statusText.textContent = 'Microphone error: ' + error.message;
+                });
+        }
+        
+        // Function to stop recording
+        function stopRecording() {
+            if (!isRecording || !mediaRecorder) return;
+            
+            console.log('Stopping recording...');
+            isRecording = false;
+            micButton.classList.remove('listening');
+            statusText.textContent = 'Processing audio...';
+            
+            mediaRecorder.stop();
+        }
+        
+        // Function to process the recorded audio
+        function processAudio(audioBlob) {
+            // Create form data for the API request
+            const formData = new FormData();
+            formData.append('audio', audioBlob);
+            formData.append('session_id', sessionId);
+            
+            fetch('/api/speech_to_text', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.text) {
+                    console.log('Speech-to-text result:', data.text);
+                    statusText.textContent = 'Ready';
+                    
+                    // Add the transcribed text to the input
+                    userTextInput.value = data.text;
+                    
+                    // Optionally, send the message automatically
+                    sendMessage();
+                } else {
+                    console.error('Speech-to-text error:', data.error);
+                    statusText.textContent = 'Error: ' + (data.error || 'Unknown error');
+                }
+            })
+            .catch(error => {
+                console.error('Speech-to-text error:', error);
+                statusText.textContent = 'Error: ' + error.message;
+            });
+        }
+        
+        // Function to convert text to speech
+        function speakText(text) {
+            // Call the API to convert text to speech
+            fetch('/api/text_to_speech', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    session_id: sessionId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.blob();
+            })
+            .then(audioBlob => {
+                // Create an audio element and play the speech
+                const audioUrl = URL.createObjectURL(audioBlob);
+                const audioElement = new Audio(audioUrl);
+                audioElement.play();
+            })
+            .catch(error => {
+                console.error('Text-to-speech error:', error);
+                // Fallback to browser's speech synthesis
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    window.speechSynthesis.speak(utterance);
+                }
+            });
+        }
+        
+        // Function to end the interview
+        function endInterview() {
+            if (confirm('Are you sure you want to end this interview?')) {
+                fetch('/api/interview/end', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ session_id: sessionId })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Show thank you modal instead of redirect
+                        const thankYouModal = new bootstrap.Modal(document.getElementById('thankYouModal'));
+                        thankYouModal.show();
+                        
+                        // For interviewers who want to see details, redirect after modal close
+                        if (window.opener) {
+                            document.getElementById('thankYouModal').addEventListener('hidden.bs.modal', function() {
+                                window.close();
+                            });
+                        }
+                    } else {
+                        console.error('Error ending interview:', data.error);
+                        alert('Error ending interview: ' + (data.error || 'Unknown error'));
+                    }
+                })
+                .catch(error => {
+                    console.error('Error ending interview:', error);
+                    alert('Error ending interview: ' + error.message);
+                });
+            }
+        }
+        
+        // Function to add a message to the chat
+        function addMessage(text, sender) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'message message-' + (sender === 'user' ? 'user' : 'ai');
+            messageDiv.textContent = text;
+            
+            chatMessages.appendChild(messageDiv);
+            
+            // Scroll to the bottom of the chat
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Function to add typing indicator
+        function addTypingIndicator() {
+            typingIndicator.classList.remove('d-none');
+            chatMessages.appendChild(typingIndicator);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Function to remove typing indicator
+        function removeTypingIndicator() {
+            typingIndicator.classList.add('d-none');
+        }
+        
+        // Function to close the browser window
+        function closeWindow() {
+            window.close();
+        }
+        
+        // Make function available globally
+        window.endInterview = endInterview;
+        window.closeWindow = closeWindow;
+    });
+</script>
+{% endblock %} 

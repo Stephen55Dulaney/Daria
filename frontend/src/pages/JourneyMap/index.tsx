@@ -1,139 +1,156 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import axios from 'axios';
 import { Link } from 'react-router-dom';
-import { Card, Select, Button, Spin, Popover, Checkbox } from 'antd';
-
-interface Interview {
-  id: string;
-  title: string;
-  date: string;
-  type: string;
-  preview?: string;
-  transcript?: string;
-}
-
-interface Project {
-  id: string;
-  name: string;
-}
+import { Card, Select, Button, Spin, message } from 'antd';
+import JourneyMapDisplay from './JourneyMapDisplay';
+import InterviewSearchSelect from '../../components/InterviewSearchSelect/index';
+import ActionButtons from '../../components/common/ActionButtons';
+import { exportToFigma } from '../../utils/export';
+import { JourneyMapPage } from '../../components/JourneyMap/JourneyMapPage';
 
 const JourneyMap: React.FC = () => {
-  const [projects, setProjects] = useState<Project[]>([]);
-  const [selectedProject, setSelectedProject] = useState<string>('');
-  const [interviews, setInterviews] = useState<Interview[]>([]);
   const [selectedInterviews, setSelectedInterviews] = useState<string[]>([]);
   const [selectedModel, setSelectedModel] = useState<string>('gpt-4');
-  const [loading, setLoading] = useState<boolean>(false);
+  const [generatingJourneyMap, setGeneratingJourneyMap] = useState<boolean>(false);
   const [generatedJourneyMap, setGeneratedJourneyMap] = useState<any>(null);
+  const [savedJourneyMapId, setSavedJourneyMapId] = useState<string | null>(null);
 
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  const fetchProjects = async () => {
-    try {
-      const response = await axios.get('/api/projects');
-      setProjects(response.data);
-    } catch (error) {
-      console.error('Error fetching projects:', error);
-    }
-  };
-
-  const fetchInterviews = async (projectId: string) => {
-    try {
-      const response = await axios.get(`/api/projects/${projectId}/interviews`);
-      setInterviews(response.data);
-    } catch (error) {
-      console.error('Error fetching interviews:', error);
-    }
-  };
-
-  const handleProjectChange = (value: string) => {
-    setSelectedProject(value);
-    setSelectedInterviews([]);
-    if (value) {
-      fetchInterviews(value);
-    } else {
-      setInterviews([]);
-    }
+  const handleInterviewSelectionChange = (selectedIds: string[]) => {
+    setSelectedInterviews(selectedIds);
   };
 
   const handleGenerateJourneyMap = async () => {
-    if (!selectedProject || selectedInterviews.length === 0) {
+    if (selectedInterviews.length === 0) {
+      message.warning('Please select at least one interview.');
       return;
     }
-    setLoading(true);
+    setGeneratingJourneyMap(true);
+    setGeneratedJourneyMap(null);
+    setSavedJourneyMapId(null);
+    
     try {
+      // Updated API call to specify we want structured JSON data
       const response = await axios.post('/api/journey-map', {
-        project_id: selectedProject,
         interview_ids: selectedInterviews,
-        model: selectedModel
+        model: selectedModel,
+        format: 'structured_json'
       });
+      console.log('Received data from /api/journey-map:', response.data);
       setGeneratedJourneyMap(response.data);
-      console.log('Generated journey map JSON:', response.data);
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error generating journey map:', error);
+      message.error(`Error generating journey map: ${error.response?.data?.error || error.message}`);
+      setGeneratedJourneyMap(null);
     } finally {
-      setLoading(false);
+      setGeneratingJourneyMap(false);
+    }
+  };
+  
+  const handleSaveJourneyMap = async (name: string, description: string) => {
+    try {
+      // Make sure we have a properly structured journey map data
+      const journeyMapData = {
+        title: name,
+        description,
+        // Include original HTML for backward compatibility
+        html: generatedJourneyMap.html,
+        // Include structured data
+        stages: generatedJourneyMap.stages || [],
+        touchpoints: generatedJourneyMap.touchpoints || [],
+        emotions: generatedJourneyMap.emotions || [],
+        pain_points: generatedJourneyMap.pain_points || [],
+        opportunities: generatedJourneyMap.opportunities || []
+      };
+      
+      const response = await axios.post('/api/save-journey-map', {
+        project_name: name,
+        journey_map_data: journeyMapData
+      });
+      
+      console.log('Save journey map response:', response.data);
+      
+      // The backend returns id in the response
+      if (response.data.id) {
+        setSavedJourneyMapId(response.data.id);
+      } else {
+        // Check the console for the actual response structure
+        message.warning('Journey map saved, but sharing might not work. Check console for details.');
+      }
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error saving journey map:', error);
+      throw error;
+    }
+  };
+  
+  const handleExportToFigma = () => {
+    if (generatedJourneyMap) {
+      // Extract structured data for Figma export
+      const journeyMapData = {
+        journeyTitle: generatedJourneyMap.title || "User Journey",
+        stages: generatedJourneyMap.stages || [],
+        // Add other sections as needed for Figma export
+      };
+      
+      exportToFigma(journeyMapData, 'journey-map');
     }
   };
 
-  const renderInterviewCard = (interview: Interview) => {
-    const isSelected = selectedInterviews.includes(interview.id);
-    const preview = interview.preview || interview.transcript?.slice(0, 120) || 'No preview available';
-    const previewContent = (
-      <div className="space-y-2">
-        <div className="font-semibold text-base">{interview.title}</div>
-        <div className="text-xs text-gray-500">{interview.type}</div>
-        <div className="text-xs text-gray-400">{interview.date}</div>
-        <div className="text-xs text-gray-700 mt-2 line-clamp-3">{preview}</div>
-      </div>
-    );
+  const renderJourneyMapTemplate = () => {
+    if (generatingJourneyMap) {
+      return (
+        <div className="mt-8 text-center">
+          <div className="bg-white p-8 rounded-lg shadow-sm">
+            <Spin size="large">
+              <div className="h-8" />
+              <div className="text-gray-600 mt-3">Generating Journey Map...</div>
+            </Spin>
+          </div>
+        </div>
+      );
+    }
+    
+    if (!generatedJourneyMap || typeof generatedJourneyMap !== 'object') {
+      const errorMessage = generatedJourneyMap?.error;
+      return (
+        <div className="mt-8 text-center text-gray-500">
+          {errorMessage 
+            ? `Journey Map Generation Failed: ${errorMessage}` 
+            : "Select interviews and click Generate Journey Map."
+          }
+        </div>
+      );
+    }
+    
     return (
-      <Popover content={previewContent} title="Metadata Preview" placement="bottom" key={interview.id}>
-        <Card
-          key={interview.id}
-          className={`transition-all flex flex-col justify-between items-start ${isSelected ? 'border-blue-500 shadow-md' : ''}`}
-          style={{ cursor: 'pointer', width: 220, height: 220, minWidth: 220, minHeight: 220, maxWidth: 220, maxHeight: 220, margin: '0 auto' }}
-          onClick={() => {
-            if (isSelected) {
-              setSelectedInterviews(selectedInterviews.filter(id => id !== interview.id));
-            } else {
-              setSelectedInterviews([...selectedInterviews, interview.id]);
-            }
-          }}
-        >
-          <div className="flex items-center justify-between w-full mb-2">
-            <Checkbox checked={isSelected} onChange={e => {
-              e.stopPropagation();
-              if (isSelected) {
-                setSelectedInterviews(selectedInterviews.filter(id => id !== interview.id));
-              } else {
-                setSelectedInterviews([...selectedInterviews, interview.id]);
-              }
-            }} />
-            <div className="flex-1 ml-2">
-              <div className="font-semibold text-base truncate w-36">{interview.title}</div>
-              <div className="text-xs text-gray-500 truncate">{interview.type}</div>
-              <div className="text-xs text-gray-400">{interview.date}</div>
-            </div>
-          </div>
-          <div className="flex gap-2 mt-2 text-xs text-blue-600">
-            <Link to={`/transcript/${interview.id}`}>Transcript</Link>
-            <Link to={`/analysis/${interview.id}`}>Analysis</Link>
-            <Link to={`/metadata/${interview.id}`}>Metadata</Link>
-          </div>
-          <div className="mt-4 text-xs text-gray-700 line-clamp-3">{preview}</div>
-        </Card>
-      </Popover>
+      <div className="mt-8">
+        <div className="flex justify-end mb-4">
+          <ActionButtons 
+            type="journey-map"
+            data={generatedJourneyMap}
+            onSave={handleSaveJourneyMap}
+            exportToFigma={handleExportToFigma}
+            shareUrl={savedJourneyMapId ? `${window.location.origin}/view-journey-map/${savedJourneyMapId}` : undefined}
+            disabled={!generatedJourneyMap}
+          />
+        </div>
+        {/* Use the new JourneyMapPage component for better display */}
+        <JourneyMapPage journeyMap={generatedJourneyMap} />
+      </div>
     );
   };
 
   return (
     <div className="max-w-4xl mx-auto px-4 py-8 relative">
-      {loading && (
-        <div className="fixed inset-0 bg-gray-200 bg-opacity-80 z-[9999] flex items-center justify-center">
-          <Spin size="large" tip="Generating journey map..." />
+      {generatingJourneyMap && (
+        <div className="fixed inset-0 bg-gray-200 bg-opacity-70 z-[9999] flex items-center justify-center">
+          <div className="bg-white p-8 rounded-lg shadow-lg">
+            <Spin size="large">
+              <div className="h-8" />
+              <div className="text-gray-600 mt-3">Generating journey map...</div>
+            </Spin>
+          </div>
         </div>
       )}
       <div className="flex justify-between items-center mb-8">
@@ -142,37 +159,15 @@ const JourneyMap: React.FC = () => {
           View All Journey Maps
         </Link>
       </div>
+
       <div className="mb-8">
-        <Card title="Configuration" className="mb-6">
+        <InterviewSearchSelect 
+          onSelectionChange={handleInterviewSelectionChange} 
+          selectedInterviewIds={selectedInterviews}
+        />
+
+        <Card title="Generate Journey Map" className="mb-6">
           <div className="space-y-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Select Project
-              </label>
-              <Select
-                className="w-full"
-                placeholder="Choose a project"
-                value={selectedProject}
-                onChange={handleProjectChange}
-              >
-                {projects.map(project => (
-                  <Select.Option key={project.id} value={project.id}>
-                    {project.name}
-                  </Select.Option>
-                ))}
-              </Select>
-            </div>
-            <div className="bg-gray-50 rounded-lg p-4">
-              <h2 className="text-base font-semibold mb-2">Transcript Preview</h2>
-              <div className="grid grid-cols-3 gap-4">
-                {interviews.slice(0, 9).map(interview => renderInterviewCard(interview))}
-                {interviews.length === 0 && (
-                  <p className="text-gray-500 text-center py-4 col-span-3">
-                    {selectedProject ? 'No interviews available for this project' : 'Select a project to view interviews'}
-                  </p>
-                )}
-              </div>
-            </div>
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">
                 Select Model
@@ -182,64 +177,26 @@ const JourneyMap: React.FC = () => {
                 value={selectedModel}
                 onChange={value => setSelectedModel(value)}
               >
+                <Select.Option value="gpt-4-turbo">GPT-4 Turbo (Recommended)</Select.Option>
                 <Select.Option value="gpt-4">GPT-4</Select.Option>
-                <Select.Option value="claude-3.7-sonnet">Claude 3.7 Sonnet</Select.Option>
-                <Select.Option value="gpt-3.5-turbo">GPT-3.5 Turbo</Select.Option>
+                <Select.Option value="claude-3.7-sonnet">Claude 3.7 Sonnet (Experimental)</Select.Option>
               </Select>
             </div>
+
             <Button
               type="primary"
               className="w-full"
               onClick={handleGenerateJourneyMap}
-              disabled={!selectedProject || selectedInterviews.length === 0 || loading}
+              disabled={selectedInterviews.length === 0 || generatingJourneyMap}
+              loading={generatingJourneyMap}
             >
-              {loading ? <Spin size="small" /> : 'Generate Journey Map'}
+              Generate Journey Map from {selectedInterviews.length} Selected Interview{selectedInterviews.length !== 1 ? 's' : ''}
             </Button>
           </div>
         </Card>
-        <Card title="Selected Interviews">
-          <p className="text-sm text-gray-500 mb-2">
-            {selectedInterviews.length} interview(s) selected
-          </p>
-          {selectedInterviews.length > 0 ? (
-            <ul className="list-disc list-inside">
-              {selectedInterviews.map(id => {
-                const interview = interviews.find(i => i.id === id);
-                return interview ? (
-                  <li key={id} className="text-sm text-gray-600">
-                    {interview.title}
-                  </li>
-                ) : null;
-              })}
-            </ul>
-          ) : (
-            <p className="text-sm text-gray-500">No interviews selected</p>
-          )}
-        </Card>
       </div>
-      {/* Journey map JSON dump for debugging */}
-      {generatedJourneyMap && (
-        <div className="mt-8 p-4 bg-gray-100 rounded-lg">
-          <h2 className="text-xl font-bold mb-2">Raw Journey Map Object</h2>
-          <pre className="whitespace-pre-wrap text-xs bg-white p-2 rounded border overflow-x-auto">
-            {JSON.stringify(generatedJourneyMap, null, 2)}
-          </pre>
-          <div className="mt-4 space-y-4">
-            {Object.entries(generatedJourneyMap).map(([key, value]) => (
-              <div key={key} className="bg-white p-2 rounded border">
-                <div className="font-semibold text-indigo-700 mb-1">{key}</div>
-                <div className="text-xs text-gray-800">
-                  {typeof value === 'object' ? (
-                    <pre className="whitespace-pre-wrap">{JSON.stringify(value, null, 2)}</pre>
-                  ) : (
-                    String(value)
-                  )}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
+
+      {renderJourneyMapTemplate()}
     </div>
   );
 };

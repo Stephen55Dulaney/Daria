@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Error{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-6 offset-md-3">
+      <div class="card shadow">
+        <div class="card-header bg-danger text-white">
+          <h3 class="card-title mb-0">Error Accessing Interview</h3>
+        </div>
+        <div class="card-body text-center">
+          <i class="fas fa-exclamation-triangle text-danger" style="font-size: 4rem;"></i>
+          
+          <h4 class="mt-4">Access Error</h4>
+          <p class="lead">{{ error }}</p>
+          
+          <div class="alert alert-info mt-4">
+            <p class="mb-0">
+              This could be due to several reasons:
+            </p>
+            <ul class="text-start mt-2 mb-0">
+              <li>The interview link has expired</li>
+              <li>The interview has been deleted</li>
+              <li>The authentication token is invalid</li>
+              <li>You do not have permission to access this interview</li>
+            </ul>
+          </div>
+          
+          <div class="mt-4">
+            <p>If you believe this is an error, please contact the interview organizer.</p>
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="text-center">
+            <a href="{{ url_for('langchain_index') }}" class="btn btn-primary">
+              <i class="fas fa-home"></i> Return to Home
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} 

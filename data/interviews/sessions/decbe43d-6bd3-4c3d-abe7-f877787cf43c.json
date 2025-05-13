@@ -1,0 +1,38 @@
+{
+  "id": "decbe43d-6bd3-4c3d-abe7-f877787cf43c",
+  "guide_id": "ebd0083e-9e48-48c0-ba3e-e4274315aace",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "I just want to check in and see if you're doing okay",
+      "role": "user",
+      "id": "e29ef694-0f60-4deb-8537-4b316f0d3ce3",
+      "timestamp": "2025-05-11T08:59:49.508539"
+    },
+    {
+      "content": "Great! To continue shaping the discovery plan effectively, could you please provide more details about the project goals, scope, and any existing knowledge or research that has been conducted so far? This information will help in structuring the upcoming phases and activities for the discovery process.",
+      "role": "assistant",
+      "id": "2891cf5a-713c-488d-a4e1-59a4b7d99023",
+      "timestamp": "2025-05-11T08:59:51.018684"
+    },
+    {
+      "content": "okay I go is to create an internet  assistant and research assistant for  for researchers we have talked to 10 researchers so far we have those transcripts and we've created for sodas and journey Maps we go is to conduct 10 more of those hours on interviews and add those to our repository in transcripts and then from there we will look at the features and kind of start to play on any value of the research base",
+      "role": "user",
+      "id": "39fe0881-86e5-43c2-bffa-e786554a06b7",
+      "timestamp": "2025-05-11T09:00:44.328374"
+    },
+    {
+      "content": "To proceed effectively with the discovery phase of the project, let's delve into the specifics. Could you provide more details about the project goals, the scope of work, and any existing knowledge or research that has already been conducted? Understanding these aspects will help in structuring a thorough discovery plan to uncover user needs and business requirements effectively.",
+      "role": "assistant",
+      "id": "e6d11ac4-6c82-4959-b9ff-8d2ef50ec1f7",
+      "timestamp": "2025-05-11T09:00:45.089790"
+    }
+  ],
+  "transcript": "\n\nParticipant: I just want to check in and see if you're doing okay\n\nModerator: Great! To continue shaping the discovery plan effectively, could you please provide more details about the project goals, scope, and any existing knowledge or research that has been conducted so far? This information will help in structuring the upcoming phases and activities for the discovery process.\n\nParticipant: okay I go is to create an internet  assistant and research assistant for  for researchers we have talked to 10 researchers so far we have those transcripts and we've created for sodas and journey Maps we go is to conduct 10 more of those hours on interviews and add those to our repository in transcripts and then from there we will look at the features and kind of start to play on any value of the research base\n\nModerator: To proceed effectively with the discovery phase of the project, let's delve into the specifics. Could you provide more details about the project goals, the scope of work, and any existing knowledge or research that has already been conducted? Understanding these aspects will help in structuring a thorough discovery plan to uncover user needs and business requirements effectively.",
+  "analysis": null,
+  "created_at": "2025-05-11T08:59:39.336644",
+  "updated_at": "2025-05-11T09:00:45.090136"
+}

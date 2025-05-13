@@ -1,0 +1,41 @@
+{
+  "id": "f2a170d4-d14d-4c4c-8aa6-8e578e6e291f",
+  "guide_id": "3e0c3c1d-78ed-4ff5-bd5a-8703b18c5770",
+  "interviewee": {
+    "name": "Synthia Sue",
+    "email": "sdulaney@deloitte.com",
+    "role": "UX Researcher",
+    "department": "User Research",
+    "company": "Deloitte",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "Hello and welcome to this research session. I'll be asking you some questions about your experiences. Feel free to respond naturally. Shall we begin?",
+      "id": "9871d184-66e0-41ea-aa35-3257b14a5d10",
+      "timestamp": "2025-05-06T15:38:34.146872"
+    },
+    {
+      "role": "user",
+      "content": "Hi the Stt is not working",
+      "id": "e4c9e99d-7c7c-46ed-9423-2e5cb9c85dd0",
+      "timestamp": "2025-05-06T15:39:40.684621"
+    },
+    {
+      "role": "assistant",
+      "content": "Certainly! I'm sorry to hear that the Stt is not working for you. To better understand the issue, could you please provide more details about what specifically isn't working with the Stt feature? This information will help us pinpoint the problem and find a solution.",
+      "id": "1d23f46b-cdd4-4406-98c7-8c6765437f25",
+      "timestamp": "2025-05-06T15:39:44.066684"
+    }
+  ],
+  "transcript": "\n\nModerator: Hello and welcome to this research session. I'll be asking you some questions about your experiences. Feel free to respond naturally. Shall we begin?\n\nParticipant: Hi the Stt is not working\n\nModerator: Certainly! I'm sorry to hear that the Stt is not working for you. To better understand the issue, could you please provide more details about what specifically isn't working with the Stt feature? This information will help us pinpoint the problem and find a solution.",
+  "analysis": null,
+  "created_at": "2025-05-06T15:37:59.234177",
+  "updated_at": "2025-05-06T15:39:44.067062"
+}

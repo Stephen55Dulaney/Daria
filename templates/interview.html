@@ -209,42 +209,48 @@
 
         // Function to reset the interview state
         async function resetInterviewState(fullReset = false) {
-            console.log('Resetting interview state', fullReset ? '(full reset)' : '(partial reset)');
-            isInterviewStarted = false;
-            shouldStopInterview = false;
-            startButton.disabled = false;
-            stopButton.classList.add('hidden');
-            status.textContent = 'Interview stopped';
-            
-            // Stop any ongoing recording and cleanup
-            await cleanup();
-            
-            // Force stop any ongoing speech
-            if (window.speechSynthesis) {
-                window.speechSynthesis.cancel();
-            }
-            
-            // Force stop any ongoing audio recording
-            if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {
-                window.mediaRecorder.stop();
-            }
-            
-            if (fullReset) {
-                // Reset the chat container to initial state only on full reset
-                chatContainer.innerHTML = `
-                    <div class="message daria-message">
-                        <strong>Daria:</strong> Hello! I'm Daria, a UX researcher. Click "Start Interview" when you're ready to begin.
-                    </div>
-                `;
+            try {
+                console.log('Resetting interview state', fullReset ? '(full reset)' : '(partial reset)');
+                isInterviewStarted = false;
+                shouldStopInterview = false;
+                startButton.disabled = false;
+                stopButton.classList.add('hidden');
+                status.textContent = 'Interview stopped';
                 
-                // Hide the report container if it's visible
-                const reportContainer = document.getElementById('reportContainer');
-                if (reportContainer) {
-                    reportContainer.classList.add('hidden');
+                // Stop any ongoing recording and cleanup
+                await cleanup();
+                
+                // Force stop any ongoing speech
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
                 }
                 
-                // Reset button text
-                startButton.textContent = 'Start Interview';
+                // Force stop any ongoing audio recording
+                if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {
+                    window.mediaRecorder.stop();
+                }
+                
+                if (fullReset) {
+                    // Reset the chat container to initial state only on full reset
+                    chatContainer.innerHTML = `
+                        <div class="message daria-message">
+                            <strong>Daria:</strong> Hello! I'm Daria, a UX researcher. Click "Start Interview" when you're ready to begin.
+                        </div>
+                    `;
+                    
+                    // Hide the report container if it's visible
+                    const reportContainer = document.getElementById('reportContainer');
+                    if (reportContainer) {
+                        reportContainer.classList.add('hidden');
+                    }
+                    
+                    // Reset button text
+                    startButton.textContent = 'Start Interview';
+                }
+                return true;
+            } catch (error) {
+                console.error('Error in resetInterviewState:', error);
+                return false;
             }
         }
 
@@ -583,77 +589,4 @@
                         reportContainer.innerHTML = `
                             <h2 class="text-2xl font-bold mb-4">Interview Analysis</h2>
                             <div class="report-content whitespace-pre-wrap">${finalAnalysisData.analysis}</div>
-                        `;
-                        
-                        // Add a thank you message to the chat
-                        addMessage('Thank you for your time. The interview analysis has been generated.', 'daria');
-                        await speak('Thank you for your time. The interview analysis has been generated.');
-                        
-                        // Update UI state but don't reset
-                        status.textContent = 'Interview complete';
-                        startButton.disabled = false;
-                        startButton.textContent = 'Start New Interview';
-                        stopButton.classList.add('hidden');
-                        isInterviewStarted = false;
-                        
-                    } else {
-                        throw new Error(finalAnalysisData.error);
-                    }
-                    
-                } catch (error) {
-                    console.error('Error generating analysis:', error);
-                    addMessage("I apologize, but I couldn't generate the final analysis.", 'error');
-                }
-                
-            } catch (error) {
-                console.error("Error in interview process:", error);
-                addMessage(error.message, 'error');
-            } finally {
-                resetInterviewState();
-            }
-        }
-
-        // Start button click handler
-        startButton.addEventListener('click', async () => {
-            console.log('Start button clicked');
-            if (!isInterviewStarted) {
-                // Only do a full reset if starting a new interview (button text indicates this)
-                const fullReset = startButton.textContent === 'Start New Interview';
-                await resetInterviewState(fullReset);
-                
-                isInterviewStarted = true;
-                startButton.disabled = true;
-                stopButton.classList.remove('hidden');
-                status.textContent = 'Starting interview...';
-                try {
-                    await conductInterview();
-                } catch (error) {
-                    console.error('Error in interview process:', error);
-                    addMessage('An error occurred while starting the interview. Please try again.', 'error');
-                    await resetInterviewState(true);
-                }
-            }
-        });
-
-        // Handle socket events for real-time updates
-        const socket = io();
-        socket.on('transcription_progress', (data) => {
-            if (!shouldStopInterview) {
-                status.textContent = `Processing: ${data.progress}%`;
-            }
-        });
-
-        // Add error handling for script loading
-        window.onerror = function(msg, url, lineNo, columnNo, error) {
-            console.error('Window error:', { msg, url, lineNo, columnNo, error });
-            resetInterviewState();
-            return false;
-        };
-
-        // Add cleanup on page unload
-        window.addEventListener('beforeunload', () => {
-            cleanup();
-        });
-    </script>
-</body>
-</html> 
+                        `

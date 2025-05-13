@@ -1,0 +1,324 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Upload Transcript{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-4">
+    <div class="flex items-center mb-4">
+        <a href="{{ url_for('interview_archive') }}" class="text-blue-600 hover:text-blue-800 mr-3">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Interviews
+        </a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-md p-4 mb-4">
+        <h1 class="text-xl font-bold mb-4">Upload Interview Transcript</h1>
+        
+        <div id="errorMessage" class="bg-red-100 border border-red-400 text-red-700 px-4 py-2 rounded mb-4 hidden">
+            <strong class="font-bold">Error:</strong>
+            <span id="errorText"></span>
+        </div>
+        
+        <div id="successMessage" class="bg-green-100 border border-green-400 text-green-700 px-4 py-2 rounded mb-4 hidden">
+            <strong class="font-bold">Success:</strong>
+            <span id="successText"></span>
+        </div>
+        
+        <form id="uploadForm" class="space-y-4">
+            <!-- Interview Information -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div>
+                    <label for="title" class="block text-sm font-medium text-gray-700 mb-1">Interview Title <span class="text-red-500">*</span></label>
+                    <input type="text" id="title" name="title" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter title" required>
+                </div>
+                
+                <div>
+                    <label for="project" class="block text-sm font-medium text-gray-700 mb-1">Project Name</label>
+                    <input type="text" id="project" name="project" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter project name">
+                </div>
+                
+                <div>
+                    <label for="interview_type" class="block text-sm font-medium text-gray-700 mb-1">Interview Type <span class="text-red-500">*</span></label>
+                    <select id="interview_type" name="interview_type" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" required>
+                        <option value="">Select interview type</option>
+                        <option value="persona_interview">Persona Interview</option>
+                        <option value="journey_map_interview">Journey Map Interview</option>
+                        <option value="application_interview">Application Interview</option>
+                        <option value="custom_interview">Custom Interview</option>
+                    </select>
+                </div>
+                
+                <div class="md:col-span-2">
+                    <label for="description" class="block text-sm font-medium text-gray-700 mb-1">Interview Description</label>
+                    <textarea id="description" name="description" rows="2" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter description"></textarea>
+                </div>
+            </div>
+            
+            <!-- Researcher Information -->
+            <div class="border-t border-gray-200 pt-4">
+                <h2 class="text-base font-semibold mb-3">Researcher Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="researcher_name" class="block text-sm font-medium text-gray-700 mb-1">Researcher Name</label>
+                        <input type="text" id="researcher_name" name="researcher_name" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter researcher name">
+                    </div>
+                    
+                    <div>
+                        <label for="researcher_email" class="block text-sm font-medium text-gray-700 mb-1">Researcher Email</label>
+                        <input type="email" id="researcher_email" name="researcher_email" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter researcher email">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Participant Information -->
+            <div class="border-t border-gray-200 pt-4">
+                <h2 class="text-base font-semibold mb-3">Participant Information</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div>
+                        <label for="participant_name" class="block text-sm font-medium text-gray-700 mb-1">Participant Name <span class="text-red-500">*</span></label>
+                        <input type="text" id="participant_name" name="participant_name" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter participant name" required>
+                    </div>
+                    
+                    <div>
+                        <label for="participant_email" class="block text-sm font-medium text-gray-700 mb-1">Participant Email</label>
+                        <input type="email" id="participant_email" name="participant_email" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter participant email">
+                    </div>
+                    
+                    <div>
+                        <label for="participant_role" class="block text-sm font-medium text-gray-700 mb-1">Participant Role</label>
+                        <input type="text" id="participant_role" name="participant_role" class="w-full px-3 py-1.5 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500" placeholder="Enter participant role">
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Transcript Upload -->
+            <div class="border-t border-gray-200 pt-4">
+                <h2 class="text-base font-semibold mb-3">Upload Transcript File <span class="text-red-500">*</span></h2>
+                
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-4" id="dropZone">
+                    <div class="text-center" id="dropZoneContent">
+                        <svg class="mx-auto h-6 w-6 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                            <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <div class="mt-2 flex text-sm text-gray-600 justify-center">
+                            <label for="transcript_file" class="relative cursor-pointer bg-white rounded-md font-medium text-blue-600 hover:text-blue-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-blue-500">
+                                <span>Upload a file</span>
+                                <input id="transcript_file" name="transcript_file" type="file" class="sr-only" accept=".txt,.doc,.docx">
+                            </label>
+                            <p class="pl-1">or drag and drop</p>
+                        </div>
+                        <p class="text-xs text-gray-500 mt-1">TXT, DOC, DOCX files up to 10MB</p>
+                    </div>
+                    
+                    <div id="filePreview" class="mt-2 hidden">
+                        <div class="flex items-center justify-between p-2 bg-gray-50 rounded-md">
+                            <div class="flex items-center">
+                                <svg class="w-4 h-4 text-gray-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                                </svg>
+                                <span id="fileName" class="text-sm text-gray-700"></span>
+                            </div>
+                            <button type="button" id="removeFile" class="text-red-500 hover:text-red-700">
+                                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <p class="mt-2 text-sm text-gray-500">
+                    The system will attempt to detect speakers in your transcript. Standard formats include "Speaker Name: Text" lines.
+                </p>
+            </div>
+            
+            <div class="flex justify-end space-x-3 border-t border-gray-200 pt-4 mt-4">
+                <a href="{{ url_for('interview_archive') }}" class="inline-flex justify-center py-1.5 px-3 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Cancel
+                </a>
+                <button type="submit" class="inline-flex justify-center py-1.5 px-3 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                    Upload Transcript
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const form = document.getElementById('uploadForm');
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('transcript_file');
+        const dropZoneContent = document.getElementById('dropZoneContent');
+        const filePreview = document.getElementById('filePreview');
+        const fileName = document.getElementById('fileName');
+        const removeFile = document.getElementById('removeFile');
+        const errorMessage = document.getElementById('errorMessage');
+        const errorText = document.getElementById('errorText');
+        const successMessage = document.getElementById('successMessage');
+        const successText = document.getElementById('successText');
+        
+        // Prevent default drag behaviors
+        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, preventDefaults, false);
+        });
+        
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+        
+        // Highlight drop zone when dragging over it
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, highlight, false);
+        });
+        
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, unhighlight, false);
+        });
+        
+        function highlight() {
+            dropZone.classList.add('border-blue-500', 'bg-blue-50');
+        }
+        
+        function unhighlight() {
+            dropZone.classList.remove('border-blue-500', 'bg-blue-50');
+        }
+        
+        // Handle dropped files
+        dropZone.addEventListener('drop', handleDrop, false);
+        
+        function handleDrop(e) {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length) {
+                fileInput.files = files;
+                updateFilePreview(files[0]);
+            }
+        }
+        
+        // Handle file input change
+        fileInput.addEventListener('change', function() {
+            if (this.files.length) {
+                updateFilePreview(this.files[0]);
+            }
+        });
+        
+        // Update file preview
+        function updateFilePreview(file) {
+            // Check file type
+            const fileType = file.name.split('.').pop().toLowerCase();
+            if (!['txt', 'doc', 'docx'].includes(fileType)) {
+                showError('Please upload a TXT, DOC, or DOCX file');
+                fileInput.value = '';
+                return;
+            }
+            
+            // Check file size (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                showError('File size exceeds the 10MB limit');
+                fileInput.value = '';
+                return;
+            }
+            
+            // Show preview
+            fileName.textContent = file.name;
+            dropZoneContent.classList.add('hidden');
+            filePreview.classList.remove('hidden');
+        }
+        
+        // Remove file
+        removeFile.addEventListener('click', function() {
+            fileInput.value = '';
+            dropZoneContent.classList.remove('hidden');
+            filePreview.classList.add('hidden');
+        });
+        
+        // Form submission
+        form.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Reset messages
+            hideError();
+            hideSuccess();
+            
+            // Validate form
+            if (!validateForm()) {
+                return;
+            }
+            
+            // Submit via AJAX
+            const formData = new FormData(form);
+            
+            fetch('/api/upload_transcript', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    showSuccess(data.message || 'Transcript uploaded successfully!');
+                    
+                    // Redirect after a short delay
+                    if (data.redirect_url) {
+                        setTimeout(() => {
+                            window.location.href = data.redirect_url;
+                        }, 1500);
+                    }
+                } else {
+                    showError(data.error || 'An error occurred while uploading the transcript.');
+                }
+            })
+            .catch(error => {
+                showError('An error occurred while uploading the transcript: ' + error.message);
+            });
+        });
+        
+        // Validation function
+        function validateForm() {
+            // Check required fields
+            const requiredFields = form.querySelectorAll('[required]');
+            for (const field of requiredFields) {
+                if (!field.value.trim()) {
+                    showError(`Please fill in all required fields`);
+                    field.focus();
+                    return false;
+                }
+            }
+            
+            // Check file upload
+            if (!fileInput.files.length) {
+                showError('Please upload a transcript file');
+                return false;
+            }
+            
+            return true;
+        }
+        
+        // Show/hide error messages
+        function showError(message) {
+            errorText.textContent = message;
+            errorMessage.classList.remove('hidden');
+            successMessage.classList.add('hidden');
+        }
+        
+        function hideError() {
+            errorMessage.classList.add('hidden');
+        }
+        
+        function showSuccess(message) {
+            successText.textContent = message;
+            successMessage.classList.remove('hidden');
+            errorMessage.classList.add('hidden');
+        }
+        
+        function hideSuccess() {
+            successMessage.classList.add('hidden');
+        }
+    });
+</script>
+{% endblock %} 

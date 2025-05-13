@@ -1,0 +1,44 @@
+{
+  "id": "21a7d503-c4ef-458d-9fa6-7b78b97805a3",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "to do a quick test plan execution of three questions",
+      "role": "user",
+      "timestamp": "2025-05-13T10:41:27.538186"
+    },
+    {
+      "content": "Can you walk me through the specific steps you take when executing this quick test plan with three questions? I'm interested in understanding your process in more detail.",
+      "role": "assistant",
+      "timestamp": "2025-05-13T10:41:28.624293"
+    },
+    {
+      "content": "okay well the first step is to try to open the test plan and verify that the speech to text is working and the text-to-speech is working that's been happening",
+      "role": "user",
+      "timestamp": "2025-05-13T10:41:52.472641"
+    },
+    {
+      "content": "Could you tell me more about how you typically verify that the speech to text and text-to-speech functionalities are working as expected in your test plan execution process? What specific actions do you take to ensure their proper functioning?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T10:41:53.358881"
+    },
+    {
+      "content": "the page opens I can hear the first question so that verifies that text to speech is working then it's pauses and I see the record indicator show up in the browser and I start talking and I can see your response populates with my words that verifies that speech to text is working next I stop talking long enough for the entry to be added to the transcript and wait for the AI next question",
+      "role": "user",
+      "timestamp": "2025-05-13T10:42:38.398689"
+    },
+    {
+      "content": "It sounds like you have a well-defined process for verifying the speech to text and text-to-speech functionalities in your test plan execution. When you encounter any issues during this verification process, how do you typically troubleshoot or address them to ensure the functionalities are working correctly?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T10:42:39.597002"
+    }
+  ],
+  "transcript": "\n\nParticipant: to do a quick test plan execution of three questions\n\nModerator: Can you walk me through the specific steps you take when executing this quick test plan with three questions? I'm interested in understanding your process in more detail.\n\nParticipant: okay well the first step is to try to open the test plan and verify that the speech to text is working and the text-to-speech is working that's been happening\n\nModerator: Could you tell me more about how you typically verify that the speech to text and text-to-speech functionalities are working as expected in your test plan execution process? What specific actions do you take to ensure their proper functioning?\n\nParticipant: the page opens I can hear the first question so that verifies that text to speech is working then it's pauses and I see the record indicator show up in the browser and I start talking and I can see your response populates with my words that verifies that speech to text is working next I stop talking long enough for the entry to be added to the transcript and wait for the AI next question\n\nModerator: It sounds like you have a well-defined process for verifying the speech to text and text-to-speech functionalities in your test plan execution. When you encounter any issues during this verification process, how do you typically troubleshoot or address them to ensure the functionalities are working correctly?",
+  "analysis": null,
+  "created_at": "2025-05-13T10:41:15.846681",
+  "updated_at": "2025-05-13T10:42:39.597243"
+}

@@ -1,0 +1,379 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/new_interview.css') }}">
+<style>
+.required::after {
+    content: " *";
+    color: red;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">New Interview</h1>
+    
+    <div class="row">
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Project Information</h5>
+                    <div id="errorAlert" class="alert alert-danger d-none" role="alert"></div>
+                    <form id="interviewForm" novalidate>
+                        <div class="mb-3">
+                            <label for="projectName" class="form-label required">Project Name</label>
+                            <input type="text" class="form-control" id="projectName" placeholder="Enter project name" required>
+                            <div class="invalid-feedback">Please enter a project name</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="interviewType" class="form-label required">Interview Type</label>
+                            <select class="form-select" id="interviewType" required>
+                                <option value="">Select an interview type</option>
+                                <option value="Application Interview">Application Interview</option>
+                                <option value="Persona Interview">Persona Interview</option>
+                                <option value="Journey Map Interview">Journey Map Interview</option>
+                            </select>
+                            <div class="invalid-feedback">Please select an interview type</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="projectDescription" class="form-label required">Project Description</label>
+                            <textarea class="form-control" id="projectDescription" rows="3" placeholder="Describe the project and its goals" required></textarea>
+                            <div class="invalid-feedback">Please enter a project description</div>
+                        </div>
+
+                        <h5 class="mt-4">Participant Information</h5>
+                        <div class="mb-3">
+                            <label for="participantName" class="form-label">Participant Name</label>
+                            <input type="text" class="form-control" id="participantName" placeholder="Enter participant name">
+                        </div>
+                        <div class="mb-3">
+                            <label for="participantRole" class="form-label">Role</label>
+                            <input type="text" class="form-control" id="participantRole" placeholder="e.g., Product Manager, Developer">
+                        </div>
+                        <div class="mb-3">
+                            <label for="experienceLevel" class="form-label">Experience Level</label>
+                            <select class="form-select" id="experienceLevel">
+                                <option value="">Select experience level</option>
+                                <option value="Junior">Junior</option>
+                                <option value="Mid-Level">Mid-Level</option>
+                                <option value="Senior">Senior</option>
+                                <option value="Lead">Lead</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <input type="text" class="form-control" id="department" placeholder="e.g., Engineering, Design">
+                        </div>
+
+                        <h5 class="mt-4">Interview Metadata</h5>
+                        <div class="mb-3">
+                            <label for="tags" class="form-label">Tags</label>
+                            <input type="text" class="form-control" id="tags" placeholder="Enter tags separated by commas">
+                            <small class="text-muted">e.g., usability, mobile, performance</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="emotion" class="form-label">Primary Emotion</label>
+                            <select class="form-select" id="emotion">
+                                <option value="">Select primary emotion</option>
+                                <option value="Satisfied">Satisfied</option>
+                                <option value="Frustrated">Frustrated</option>
+                                <option value="Confused">Confused</option>
+                                <option value="Neutral">Neutral</option>
+                                <option value="Angry">Angry</option>
+                                <option value="Happy">Happy</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Interview Status</label>
+                            <select class="form-select" id="status">
+                                <option value="Draft">Draft</option>
+                                <option value="In Progress">In Progress</option>
+                                <option value="Completed">Completed</option>
+                                <option value="Validated">Validated</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="author" class="form-label">Interviewer Name</label>
+                            <input type="text" class="form-control" id="author" placeholder="Your name">
+                        </div>
+
+                        <button type="submit" class="btn btn-primary">
+                            <span class="button-text">Start Interview</span>
+                            <div class="spinner-border spinner-border-sm d-none" role="status">
+                                <span class="visually-hidden">Loading...</span>
+                            </div>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6">
+            <div class="card mb-4">
+                <div class="card-body">
+                    <h5 class="card-title">Interview Guidelines</h5>
+                    <div id="guidelineContent" class="guidelines-content">
+                        <p>Select an interview type to see specific guidelines.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Analysis Template</h5>
+                    <div class="mb-3">
+                        <p>Your analysis will be structured with the following sections:</p>
+                        <pre class="bg-light p-3 rounded">
+# Interview Analysis
+
+## Key Pain Points
+- List major issues and challenges
+- Include specific examples
+
+## User Needs
+- Core requirements
+- Desired improvements
+- Feature requests
+
+## Recommendations
+1. Actionable suggestions
+2. Potential solutions
+3. Priority items
+
+## Additional Insights
+- Notable quotes
+- Unexpected findings
+- Context details</pre>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Debug logging function
+function debugLog(message, data = null) {
+    const timestamp = new Date().toISOString();
+    console.log(`[${timestamp}] ${message}`);
+    if (data) {
+        console.log('Data:', data);
+    }
+}
+
+// Function to show error message
+function showError(message, missingFields = []) {
+    const errorAlert = document.getElementById('errorAlert');
+    if (missingFields && missingFields.length > 0) {
+        const fieldNames = missingFields.map(field => {
+            // Use exact HTML element IDs for matching
+            switch(field) {
+                case 'projectName': return 'Project Name';
+                case 'projectDescription': return 'Project Description';
+                case 'interviewType': return 'Interview Type';
+                default: return field;
+            }
+        });
+        message = `${message}<br>Missing required fields: ${fieldNames.join(', ')}`;
+    }
+    errorAlert.innerHTML = message;
+    errorAlert.classList.remove('d-none');
+}
+
+// Function to hide error message
+function hideError() {
+    const errorAlert = document.getElementById('errorAlert');
+    errorAlert.classList.add('d-none');
+}
+
+// Function to validate form fields
+function validateForm() {
+    debugLog('Starting form validation');
+    const result = {
+        valid: true,
+        error: '',
+        missingFields: []
+    };
+
+    // Check required fields - using exact IDs from HTML
+    const projectName = document.getElementById('projectName').value.trim();
+    const interviewType = document.getElementById('interviewType').value;
+    const projectDescription = document.getElementById('projectDescription').value.trim();
+
+    debugLog('Checking required fields', {
+        projectName,
+        interviewType,
+        projectDescription
+    });
+
+    // Check each required field individually
+    if (!projectName) {
+        result.missingFields.push('projectName');
+    } else if (projectName.length < 3) {
+        result.valid = false;
+        result.error = 'Project Name must be at least 3 characters long';
+        return result;
+    }
+
+    if (!interviewType) {
+        result.missingFields.push('interviewType');
+    }
+
+    if (!projectDescription) {
+        result.missingFields.push('projectDescription');
+    } else if (projectDescription.length < 10) {
+        result.valid = false;
+        result.error = 'Project Description must be at least 10 characters long';
+        return result;
+    }
+
+    if (result.missingFields.length > 0) {
+        result.valid = false;
+        result.error = 'Please fill in all required fields (marked with *)';
+        debugLog('Validation failed - missing fields:', result.missingFields);
+        return result;
+    }
+
+    debugLog('Form validation passed');
+    return result;
+}
+
+// Function to collect form data
+function collectFormData() {
+    debugLog('Collecting form data');
+    const formData = {
+        // Match server-side expected field names
+        project_name: document.getElementById('projectName').value.trim(),
+        interview_type: document.getElementById('interviewType').value,
+        project_description: document.getElementById('projectDescription').value.trim(),
+        participant_name: document.getElementById('participantName')?.value?.trim() || 'Anonymous',
+        role: document.getElementById('participantRole')?.value?.trim() || '',
+        experience_level: document.getElementById('experienceLevel')?.value || '',
+        department: document.getElementById('department')?.value?.trim() || '',
+        tags: document.getElementById('tags')?.value?.trim().split(',').map(tag => tag.trim()).filter(tag => tag) || [],
+        emotion: document.getElementById('emotion')?.value || 'Neutral',
+        status: document.getElementById('status')?.value || 'Draft',
+        interviewer_name: document.getElementById('author')?.value?.trim() || ''
+    };
+
+    debugLog('Form data collected:', formData);
+    return formData;
+}
+
+// Function to handle form submission
+async function handleSubmit(event) {
+    event.preventDefault();
+    debugLog('Form submission started');
+
+    // Hide any existing errors
+    hideError();
+
+    // Validate form
+    const validationResult = validateForm();
+    if (!validationResult.valid) {
+        showError(validationResult.error);
+        debugLog('Validation failed:', validationResult);
+        return;
+    }
+
+    // Collect form data
+    const formData = collectFormData();
+    debugLog('Sending form data:', formData);
+
+    try {
+        const response = await fetch('/save_interview', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData)
+        });
+
+        debugLog('Response status:', response.status);
+        const data = await response.json();
+        debugLog('Response data:', data);
+
+        if (!response.ok) {
+            throw new Error(data.error || 'Failed to save interview');
+        }
+
+        // Redirect to the interview page
+        if (data.redirect_url) {
+            window.location.href = data.redirect_url;
+        } else {
+            showError('Server response missing redirect URL');
+        }
+    } catch (error) {
+        debugLog('Error during submission:', error);
+        showError(error.message || 'Failed to save interview. Please try again.');
+    }
+}
+
+document.getElementById('interviewType').addEventListener('change', function() {
+    const guidelines = {
+        'Application Interview': `
+            <h6>Application Interview Guidelines:</h6>
+            <ul>
+                <li>Focus on understanding how users interact with the application</li>
+                <li>Gather information about key tasks and workflows</li>
+                <li>Identify pain points and areas for improvement</li>
+                <li>Collect feedback on specific features and functionality</li>
+                <li>Understand user satisfaction and needs</li>
+            </ul>
+        `,
+        'Persona Interview': `
+            <h6>Persona Interview Guidelines:</h6>
+            <ul>
+                <li>Focus on understanding the user's background and characteristics</li>
+                <li>Gather information about goals and motivations</li>
+                <li>Identify behaviors and habits</li>
+                <li>Understand pain points and challenges</li>
+                <li>Collect information about preferences and needs</li>
+            </ul>
+        `,
+        'Journey Map Interview': `
+            <h6>Journey Map Interview Guidelines:</h6>
+            <ul>
+                <li>Focus on understanding the user's journey through different stages</li>
+                <li>Identify key touchpoints and interactions</li>
+                <li>Track emotional states throughout the journey</li>
+                <li>Document pain points at each stage</li>
+                <li>Collect information about positive experiences</li>
+            </ul>
+        `
+    };
+    
+    document.getElementById('guidelineContent').innerHTML = guidelines[this.value];
+    hideError(); // Hide any existing error when interview type changes
+});
+
+// Function to set form loading state
+function setFormLoadingState(isLoading) {
+    const form = document.getElementById('interviewForm');
+    const submitBtn = form.querySelector('button[type="submit"]');
+    const buttonText = submitBtn.querySelector('.button-text');
+    const spinner = submitBtn.querySelector('.spinner-border');
+    
+    if (isLoading) {
+        form.classList.add('form-loading');
+        submitBtn.disabled = true;
+        buttonText.classList.add('d-none');
+        spinner.classList.remove('d-none');
+    } else {
+        form.classList.remove('form-loading');
+        submitBtn.disabled = false;
+        buttonText.classList.remove('d-none');
+        spinner.classList.add('d-none');
+    }
+}
+
+// Add form submit event listener
+document.getElementById('interviewForm').addEventListener('submit', handleSubmit);
+
+// Add input event listeners to clear error when user starts typing
+['projectName', 'projectDescription'].forEach(fieldId => {
+    document.getElementById(fieldId).addEventListener('input', hideError);
+});
+</script>
+{% endblock %} 

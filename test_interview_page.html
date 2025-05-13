@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Skeptica Interview Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .container {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .messages {
+            height: 400px;
+            overflow-y: auto;
+            border: 1px solid #ddd;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .user {
+            background-color: #e3f2fd;
+            text-align: right;
+            margin-left: 20%;
+        }
+        .assistant {
+            background-color: #f1f8e9;
+            margin-right: 20%;
+        }
+        .controls {
+            display: flex;
+            margin-bottom: 20px;
+        }
+        input, select, button {
+            padding: 10px;
+            margin-right: 10px;
+        }
+        input[type="text"] {
+            flex-grow: 1;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .debug {
+            font-family: monospace;
+            white-space: pre-wrap;
+            font-size: 12px;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border: 1px solid #ddd;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+    </style>
+</head>
+<body>
+    <h1>Skeptica Interview Test</h1>
+    
+    <div class="container">
+        <h2>Interview Setup</h2>
+        <div class="controls">
+            <select id="characterSelect" onchange="updateDescription()">
+                <option value="skeptica">Skeptica</option>
+                <option value="eurekia">Eurekia</option>
+                <option value="thesea">Thesea</option>
+                <option value="daria">Daria</option>
+                <option value="odessia">Odessia</option>
+                <option value="askia">Askia</option>
+                <option value="interviewer">Generic Interviewer</option>
+            </select>
+            <input type="text" id="serverUrl" value="http://127.0.0.1:5010" placeholder="Server URL">
+            <button onclick="startInterview()">Start Interview</button>
+        </div>
+        <div class="controls">
+            <input type="checkbox" id="remoteOption" checked>
+            <label for="remoteOption">Use remote interview mode</label>
+        </div>
+        <p id="characterDescription">
+            <strong>Skeptica</strong>: Deloitte's Assumption Buster who challenges assumptions and identifies potential biases.
+        </p>
+    </div>
+    
+    <div class="container">
+        <h2>Interview</h2>
+        <div id="messages" class="messages">
+            <!-- Messages will appear here -->
+        </div>
+        <div class="controls">
+            <input type="text" id="userInput" placeholder="Type your message here..." onkeypress="checkEnter(event)">
+            <button onclick="sendMessage()">Send</button>
+        </div>
+    </div>
+    
+    <div class="container">
+        <h2>Debug Information</h2>
+        <div id="debug" class="debug">
+            <!-- Debug information will appear here -->
+        </div>
+        <div class="controls">
+            <input type="text" id="testSessionId" placeholder="Override session ID (for testing)">
+            <button onclick="setSessionId()">Use this session ID</button>
+        </div>
+    </div>
+    
+    <script>
+        // Store session information
+        let sessionId = null;
+        let characterName = 'skeptica';
+        let messages = [];
+        
+        // Character descriptions
+        const descriptions = {
+            'skeptica': '<strong>Skeptica</strong>: Deloitte\'s Assumption Buster who challenges assumptions and identifies potential biases.',
+            'eurekia': '<strong>Eurekia</strong>: Your insight synthesizer who helps identify patterns and insights in research.',
+            'thesea': '<strong>Thesea</strong>: Your journey mapping guide who helps map user experiences.',
+            'daria': '<strong>Daria</strong>: Deloitte\'s Advanced Research & Interview Assistant.',
+            'odessia': '<strong>Odessia</strong>: Your opportunity discoverer who helps uncover possibilities.',
+            'askia': '<strong>Askia</strong>: Your question expert who uses strategic questioning techniques.',
+            'interviewer': '<strong>Generic Interviewer</strong>: A basic interviewer with no specific character traits.'
+        };
+        
+        // Set session ID manually (for testing)
+        function setSessionId() {
+            const inputId = document.getElementById('testSessionId').value.trim();
+            if (inputId) {
+                sessionId = inputId;
+                logDebug(`Manually set session ID to: ${sessionId}`);
+            }
+        }
+        
+        // Update the character description when the selection changes
+        function updateDescription() {
+            characterName = document.getElementById('characterSelect').value;
+            document.getElementById('characterDescription').innerHTML = descriptions[characterName] || '';
+        }
+        
+        // Start a new interview
+        function startInterview() {
+            const serverUrl = document.getElementById('serverUrl').value.trim();
+            if (!serverUrl) {
+                alert('Please enter a server URL');
+                return;
+            }
+            
+            // Clear messages
+            document.getElementById('messages').innerHTML = '';
+            messages = [];
+            
+            // Create a new session ID
+            sessionId = generateUUID();
+            
+            // Check if remote option is selected
+            const isRemote = document.getElementById('remoteOption').checked;
+            
+            // Get character name and ensure it's lowercase
+            characterName = document.getElementById('characterSelect').value.toLowerCase();
+            
+            // Log debug info
+            logDebug(`Starting interview with ${characterName} (Session ID: ${sessionId}, Remote: ${isRemote})`);
+            logDebug(`Using server URL: ${serverUrl}`);
+            
+            // Send request to the API
+            fetch(`${serverUrl}/api/interview/start`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                mode: 'cors',
+                body: JSON.stringify({
+                    character: characterName,
+                    session_id: sessionId,
+                    title: `Test Interview with ${capitalizeFirstLetter(characterName)}`,
+                    description: "Test of character introduction and behavior",
+                    remote: isRemote
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    logDebug(`HTTP error! Status: ${response.status}`);
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! Status: ${response.status}, Body: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                logDebug('Response from /api/interview/start:', data);
+                
+                if (data.success) {
+                    // Add the assistant's greeting message
+                    addMessage('assistant', data.message);
+                    
+                    // Create and display the interview link
+                    const voiceId = 'EXAVITQu4vr4xnSDxMaL'; // Default voice ID
+                    const interviewLink = `${serverUrl}/interview/session/${sessionId}?voice_id=${voiceId}&remote=true&character=${characterName}`;
+                    logDebug(`Interview link: ${interviewLink}`);
+                    
+                    // Add link to messages
+                    const messagesContainer = document.getElementById('messages');
+                    const linkElement = document.createElement('div');
+                    linkElement.className = 'message system';
+                    linkElement.innerHTML = `<strong>Interview Link:</strong> <a href="${interviewLink}" target="_blank">${interviewLink}</a>`;
+                    messagesContainer.appendChild(linkElement);
+                } else {
+                    logDebug('Error starting interview:', data.error);
+                    alert(`Error starting interview: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                logDebug('Error connecting to server:', error);
+                alert(`Error connecting to server: ${error.message}`);
+            });
+        }
+        
+        // Send a message to the interviewer
+        function sendMessage() {
+            const userInput = document.getElementById('userInput').value.trim();
+            if (!userInput) return;
+            
+            if (!sessionId) {
+                alert('Please start an interview first');
+                return;
+            }
+            
+            // Add user message to the chat
+            addMessage('user', userInput);
+            
+            // Clear the input field
+            document.getElementById('userInput').value = '';
+            
+            // Get the server URL
+            const serverUrl = document.getElementById('serverUrl').value.trim();
+            
+            // Check if remote option is selected
+            const isRemote = document.getElementById('remoteOption').checked;
+            
+            // Send request to the API
+            logDebug(`Sending message to ${characterName} (Session ID: ${sessionId}, Remote: ${isRemote})`);
+            
+            fetch(`${serverUrl}/api/interview/respond`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                mode: 'cors',
+                body: JSON.stringify({
+                    character: characterName,
+                    session_id: sessionId,
+                    message: userInput,
+                    is_remote: isRemote
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    logDebug(`HTTP error! Status: ${response.status}`);
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! Status: ${response.status}, Body: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                logDebug('Response from /api/interview/respond:', data);
+                
+                if (data.success) {
+                    // Add the assistant's response
+                    addMessage('assistant', data.message);
+                } else {
+                    logDebug('Error sending message:', data.error);
+                    alert(`Error: ${data.error}`);
+                }
+            })
+            .catch(error => {
+                logDebug('Error connecting to server:', error);
+                alert(`Error connecting to server: ${error.message}`);
+            });
+        }
+        
+        // Add a message to the chat
+        function addMessage(role, content) {
+            const messagesContainer = document.getElementById('messages');
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${role}`;
+            messageElement.textContent = content;
+            messagesContainer.appendChild(messageElement);
+            
+            // Scroll to bottom
+            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            
+            // Store the message
+            messages.push({ role, content });
+        }
+        
+        // Log debug information
+        function logDebug(message, data) {
+            const debugElement = document.getElementById('debug');
+            const now = new Date().toLocaleTimeString();
+            
+            let logMessage = `[${now}] ${message}\n`;
+            if (data) {
+                logMessage += JSON.stringify(data, null, 2) + '\n';
+            }
+            
+            debugElement.textContent = logMessage + debugElement.textContent;
+        }
+        
+        // Check if Enter key was pressed to send message
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            }
+        }
+        
+        // Utility functions
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                var r = Math.random() * 16 | 0, v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        
+        function capitalizeFirstLetter(string) {
+            return string.charAt(0).toUpperCase() + string.slice(1);
+        }
+    </script>
+</body>
+</html> 

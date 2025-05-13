@@ -1,0 +1,155 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container mt-3">
+    <a href="{{ url_for('advanced_search') }}" class="text-decoration-none text-dark">
+        <div class="d-flex align-items-center mb-4">
+            <i class="bi bi-arrow-left me-2"></i>
+            <span>Back to Advanced Search</span>
+        </div>
+    </a>
+
+    <div class="card">
+        <div class="card-body">
+            <h2 class="card-title mb-4">Annotated Transcript</h2>
+            
+            <!-- Interview Metadata -->
+            <div class="mb-4">
+                <div class="d-flex justify-content-between align-items-start">
+                    <div>
+                        <h3>{{ interview.participant_name }} <small class="text-muted">{{ interview.timestamp }}</small></h3>
+                        <div>Age: {{ interview.age_range }}</div>
+                        <div>Location: {{ interview.location }}</div>
+                        <div>Occupation: {{ interview.occupation }}</div>
+                        <div>Industry: {{ interview.industry }}</div>
+                    </div>
+                    <div class="text-end">
+                        <div>{{ interview.researcher_name }}</div>
+                        <div>{{ interview.researcher_role }}</div>
+                        <div>{{ interview.researcher_email }}</div>
+                        <div>Date: {{ interview.date }}</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pagination Controls -->
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <div>
+                    Page {{ current_page }} of {{ total_pages }}
+                </div>
+                <div>
+                    {% if current_page > 1 %}
+                    <a href="{{ url_for('view_annotated_transcript', interview_id=interview.id, page=current_page-1) }}" class="btn btn-outline-primary me-2">Previous</a>
+                    {% endif %}
+                    {% if current_page < total_pages %}
+                    <a href="{{ url_for('view_annotated_transcript', interview_id=interview.id, page=current_page+1) }}" class="btn btn-outline-primary">Next</a>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Transcript Content -->
+            {% for chunk in chunks %}
+            <div id="entry-{{ chunk.timestamp|replace(':', '-') }}" class="transcript-chunk mb-4 p-3 border rounded">
+                <!-- Speaker and Timestamp -->
+                <div class="d-flex justify-content-between mb-2">
+                    <strong>{{ chunk.speaker }}</strong>
+                    <div class="text-muted">{{ chunk.timestamp }}</div>
+                    {% if chunk.speaker == interview.researcher_name %}
+                    <button class="btn btn-sm btn-outline-secondary">Edit</button>
+                    {% endif %}
+                </div>
+
+                <!-- Message Content -->
+                <p class="mb-3">{{ chunk.text }}</p>
+
+                <!-- Annotations -->
+                <div class="annotations">
+                    {% if chunk.emotion %}
+                    <div class="mb-2">
+                        <strong>Emotion:</strong>
+                        <span class="badge bg-light text-dark border">{{ chunk.emotion }}</span>
+                    </div>
+                    {% endif %}
+
+                    {% if chunk.themes %}
+                    <div class="mb-2">
+                        <strong>Themes:</strong>
+                        {% for theme in chunk.themes %}
+                        <span class="badge bg-light text-dark border">{{ theme }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+
+                    {% if chunk.insight_tags %}
+                    <div>
+                        <strong>Insight Tags:</strong>
+                        {% for tag in chunk.insight_tags %}
+                        <span class="badge bg-light text-dark border">{{ tag }}</span>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+
+            <!-- Bottom Pagination Controls -->
+            <div class="d-flex justify-content-between align-items-center mt-3">
+                <div>
+                    Page {{ current_page }} of {{ total_pages }}
+                </div>
+                <div>
+                    {% if current_page > 1 %}
+                    <a href="{{ url_for('view_annotated_transcript', interview_id=interview.id, page=current_page-1) }}" class="btn btn-outline-primary me-2">Previous</a>
+                    {% endif %}
+                    {% if current_page < total_pages %}
+                    <a href="{{ url_for('view_annotated_transcript', interview_id=interview.id, page=current_page+1) }}" class="btn btn-outline-primary">Next</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.transcript-chunk {
+    background-color: #f8f9fa;
+    transition: background-color 0.3s ease;
+}
+.transcript-chunk.highlighted {
+    background-color: #fff3cd;
+    border-color: #ffeeba;
+}
+.annotations {
+    border-top: 1px solid #dee2e6;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
+}
+.badge {
+    margin-right: 0.25rem;
+}
+</style>
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Get the timestamp from URL query parameter
+    const urlParams = new URLSearchParams(window.location.search);
+    const timestamp = urlParams.get('timestamp');
+    
+    if (timestamp) {
+        // Convert timestamp to the format used in IDs (replace : with -)
+        const elementId = 'entry-' + timestamp.replace(/:/g, '-');
+        const element = document.getElementById(elementId);
+        
+        if (element) {
+            // Add highlighting class
+            element.classList.add('highlighted');
+            // Scroll the element into view
+            element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    }
+});
+</script>
+{% endblock %}
+
+{% endblock %} 

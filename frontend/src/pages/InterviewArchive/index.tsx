@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
+import { Tag } from 'antd';
 
 interface Interview {
   id: string;
@@ -70,45 +71,53 @@ const InterviewArchive: React.FC = () => {
     alert('Delete feature not implemented yet.');
   };
 
-  const renderCard = (interview: Interview) => (
-    <div key={interview.id} className="bg-white rounded-lg shadow p-6 flex flex-col justify-between min-h-[220px] transition-all duration-200 hover:shadow-lg">
-      <div>
-        <div className="flex items-center gap-2 mb-2">
-          <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-semibold">{interview.project_name}</span>
-          <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">{interview.status}</span>
+  const renderCard = (interview: Interview) => {
+    // Get top 1-2 emotions for display
+    const topEmotions = interview.emotions?.slice(0, 2).map(e => e.name) || [];
+    const allTags = [...(interview.themes || []), ...(interview.insights || []), ...topEmotions];
+
+    return (
+      <div key={interview.id} className="bg-white rounded-lg shadow p-6 flex flex-col justify-between min-h-[250px] transition-all duration-200 hover:shadow-lg">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+            <span className="px-2 py-1 bg-purple-100 text-purple-800 rounded text-xs font-semibold">{interview.project_name}</span>
+            <span className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs">{interview.status}</span>
+          </div>
+          <h3 className="text-lg font-bold mb-1">{interview.project_name}</h3>
+          <div className="text-sm text-gray-500 mb-1">{interview.type}</div>
+          <div className="text-xs text-gray-400 mb-1">{interview.created_at.split('T')[0]}</div>
+          <div className="text-gray-700 text-sm mb-3 line-clamp-3">{interview.preview}</div>
+          
+          {/* Semantic Tags Section */}
+          <div className="flex flex-wrap gap-1 mb-3">
+            {allTags.slice(0, 5).map((tag, index) => ( // Limit displayed tags
+              <Tag key={`${tag}-${index}`} color="blue">{tag}</Tag>
+            ))}
+            {allTags.length > 5 && <Tag>...</Tag>}
+          </div>
         </div>
-        <h3 className="text-lg font-bold mb-1">{interview.project_name}</h3>
-        <div className="text-sm text-gray-500 mb-1">{interview.type}</div>
-        <div className="text-xs text-gray-400 mb-1">{interview.created_at.split('T')[0]}</div>
-        <div className="text-gray-700 text-sm mb-2 line-clamp-3">{interview.preview}</div>
+        
+        {/* Action Icons */}
+        <div className="flex gap-4 mt-auto border-t pt-3 text-gray-500 text-xl justify-between">
+          <Link to={`/transcript/${interview.id}`} title="View Full Interview" className="hover:text-indigo-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-7.5A2.25 2.25 0 0017.25 4.5h-10.5A2.25 2.25 0 004.5 6.75v10.5A2.25 2.25 0 006.75 19.5h7.5" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 17.25L21 21.75M21 21.75L16.5 26.25M21 21.75H9" /></svg>
+          </Link>
+          <button title="View Analysis (not implemented)" className="hover:text-indigo-600 transition-colors" disabled>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3v18h18" /><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 15.75V12m3 3.75V9m3 6.75V6" /></svg>
+          </button>
+          <Link to={`/annotated-transcript/${interview.id}`} title="View Annotated Transcript" className="hover:text-indigo-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6v-1.5A2.25 2.25 0 0013.5 2.25h-3A2.25 2.25 0 008.25 4.5V6m7.5 0v1.5m0-1.5h-7.5m7.5 0h1.5A2.25 2.25 0 0121 8.25v11.25A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6h1.5m0 0V4.5A2.25 2.25 0 018.25 2.25h3A2.25 2.25 0 0113.5 4.5V6" /></svg>
+          </Link>
+          <button title="Copy Link" onClick={() => handleCopyLink(interview.id)} className="hover:text-indigo-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6m-7.5 3.75A2.25 2.25 0 006.75 21h10.5A2.25 2.25 0 0019.5 18.75V8.25A2.25 2.25 0 0017.25 6H6.75A2.25 2.25 0 004.5 8.25v10.5z" /></svg>
+          </button>
+          <button title="Delete (not implemented)" onClick={() => handleDelete(interview.id)} className="hover:text-red-600 transition-colors">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
       </div>
-      <div className="flex flex-wrap gap-2 mt-2">
-        {interview.themes && interview.themes.map(theme => (
-          <span key={theme} className="px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs">{theme}</span>
-        ))}
-        {interview.insights && interview.insights.map(insight => (
-          <span key={insight} className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">{insight}</span>
-        ))}
-      </div>
-      <div className="flex gap-4 mt-4 border-t pt-3 text-gray-500 text-xl justify-between">
-        <Link to={`/transcript/${interview.id}`} title="View Full Interview" className="hover:text-indigo-600 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M19.5 14.25v-7.5A2.25 2.25 0 0017.25 4.5h-10.5A2.25 2.25 0 004.5 6.75v10.5A2.25 2.25 0 006.75 19.5h7.5" /><path strokeLinecap="round" strokeLinejoin="round" d="M16.5 17.25L21 21.75M21 21.75L16.5 26.25M21 21.75H9" /></svg>
-        </Link>
-        <button title="View Analysis (not implemented)" className="hover:text-indigo-600 transition-colors" disabled>
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M3 3v18h18" /><path strokeLinecap="round" strokeLinejoin="round" d="M7.5 15.75V12m3 3.75V9m3 6.75V6" /></svg>
-        </button>
-        <Link to={`/annotated-transcript/${interview.id}`} title="View Annotated Transcript" className="hover:text-indigo-600 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6v-1.5A2.25 2.25 0 0013.5 2.25h-3A2.25 2.25 0 008.25 4.5V6m7.5 0v1.5m0-1.5h-7.5m7.5 0h1.5A2.25 2.25 0 0121 8.25v11.25A2.25 2.25 0 0118.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6h1.5m0 0V4.5A2.25 2.25 0 018.25 2.25h3A2.25 2.25 0 0113.5 4.5V6" /></svg>
-        </Link>
-        <button title="Copy Link" onClick={() => handleCopyLink(interview.id)} className="hover:text-indigo-600 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-3-3v6m-7.5 3.75A2.25 2.25 0 006.75 21h10.5A2.25 2.25 0 0019.5 18.75V8.25A2.25 2.25 0 0017.25 6H6.75A2.25 2.25 0 004.5 8.25v10.5z" /></svg>
-        </button>
-        <button title="Delete (not implemented)" onClick={() => handleDelete(interview.id)} className="hover:text-red-600 transition-colors">
-          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6"><path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" /></svg>
-        </button>
-      </div>
-    </div>
-  );
+    );
+  };
 
   return (
     <div className="max-w-7xl mx-auto p-6">

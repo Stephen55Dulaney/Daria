@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA Debug Tool - STT/TTS Testing</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2 {
+            color: #1a1a1a;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .debug-panel {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0069bd;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .log-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.8em;
+        }
+        .tts-log {
+            color: #0078d4;
+        }
+        .stt-log {
+            color: #107c10;
+        }
+        .error-log {
+            color: #d83b01;
+        }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-active {
+            background-color: #107c10;
+        }
+        .status-inactive {
+            background-color: #d83b01;
+        }
+        footer {
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.8em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>DARIA Debug Tool - STT/TTS Testing</h1>
+    <p>Use this tool to test Speech-to-Text (STT) and Text-to-Speech (TTS) components in isolation to ensure they don't interfere with each other.</p>
+    
+    <div class="container">
+        <div class="debug-panel">
+            <h2>Speech-to-Text (STT) Testing</h2>
+            <div class="control-panel">
+                <button id="stt-start">Start Recording</button>
+                <button id="stt-stop" disabled>Stop Recording</button>
+                <button id="stt-clear">Clear Results</button>
+                <select id="stt-lang">
+                    <option value="en-US">English (US)</option>
+                    <option value="en-GB">English (UK)</option>
+                    <option value="es-ES">Spanish</option>
+                    <option value="fr-FR">French</option>
+                    <option value="de-DE">German</option>
+                </select>
+                <div>
+                    <span class="status-indicator" id="stt-status"></span>
+                    <span id="stt-status-text">Ready</span>
+                </div>
+            </div>
+            <div>
+                <h3>Speech Recognition Results:</h3>
+                <textarea id="stt-results" readonly placeholder="Spoken text will appear here..."></textarea>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h2>Text-to-Speech (TTS) Testing</h2>
+            <div class="control-panel">
+                <button id="tts-play">Play Speech</button>
+                <button id="tts-stop">Stop Speech</button>
+                <button id="tts-use-api">Use ElevenLabs API</button>
+                <button id="tts-use-browser">Use Browser TTS</button>
+                <div>
+                    <span class="status-indicator" id="tts-status"></span>
+                    <span id="tts-status-text">Ready</span>
+                </div>
+            </div>
+            <div>
+                <h3>Voice Selection:</h3>
+                <select id="tts-voice">
+                    <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
+                    <option value="21m00Tcm4TlvDq8ikWAM">Adam (Male)</option>
+                    <option value="AZnzlk1XvdvUeBnXmlld">Domi (Female)</option>
+                    <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
+                    <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Male)</option>
+                    <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Male)</option>
+                </select>
+            </div>
+            <div>
+                <h3>Text to Speak:</h3>
+                <textarea id="tts-text" placeholder="Enter text to be spoken...">Hello, I'm DARIA, the interview assistant. I'll be asking you some questions today.</textarea>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h2>Debug Log</h2>
+            <button id="clear-log">Clear Log</button>
+            <div class="log-container" id="log-container"></div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>DARIA Interview Tool Debug Component - <a href="https://github.com/yourusername/DariaInterviewTool" target="_blank">View on GitHub</a></p>
+    </footer>
+
+    <script>
+        // Audio elements
+        const ttsAudio = new Audio();
+        let audioContext;
+        let mediaRecorder;
+        let audioChunks = [];
+        let useBrowserTTS = false;
+        
+        // DOM elements
+        const sttStartBtn = document.getElementById('stt-start');
+        const sttStopBtn = document.getElementById('stt-stop');
+        const sttClearBtn = document.getElementById('stt-clear');
+        const sttResults = document.getElementById('stt-results');
+        const sttLang = document.getElementById('stt-lang');
+        const sttStatus = document.getElementById('stt-status');
+        const sttStatusText = document.getElementById('stt-status-text');
+        
+        const ttsPlayBtn = document.getElementById('tts-play');
+        const ttsStopBtn = document.getElementById('tts-stop');
+        const ttsUseApiBtn = document.getElementById('tts-use-api');
+        const ttsUseBrowserBtn = document.getElementById('tts-use-browser');
+        const ttsText = document.getElementById('tts-text');
+        const ttsVoice = document.getElementById('tts-voice');
+        const ttsStatus = document.getElementById('tts-status');
+        const ttsStatusText = document.getElementById('tts-status-text');
+        
+        const clearLogBtn = document.getElementById('clear-log');
+        const logContainer = document.getElementById('log-container');
+        
+        // Initialize status indicators
+        sttStatus.classList.add('status-inactive');
+        ttsStatus.classList.add('status-inactive');
+        
+        // Logging function
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const timestamp = document.createElement('span');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = new Date().toLocaleTimeString() + ' - ';
+            
+            const content = document.createElement('span');
+            content.className = type + '-log';
+            content.textContent = message;
+            
+            entry.appendChild(timestamp);
+            entry.appendChild(content);
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // Speech Recognition
+        let recognition;
+        
+        function setupSpeechRecognition() {
+            try {
+                window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                recognition.lang = sttLang.value;
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                
+                recognition.onstart = function() {
+                    sttStatus.classList.remove('status-inactive');
+                    sttStatus.classList.add('status-active');
+                    sttStatusText.textContent = 'Listening...';
+                    sttStartBtn.disabled = true;
+                    sttStopBtn.disabled = false;
+                    log('Speech recognition started', 'stt');
+                };
+                
+                recognition.onresult = function(event) {
+                    const result = event.results[event.results.length - 1];
+                    const transcript = result[0].transcript;
+                    
+                    if (result.isFinal) {
+                        sttResults.value += transcript + '\n';
+                        log(`Speech recognized: ${transcript}`, 'stt');
+                    }
+                };
+                
+                recognition.onerror = function(event) {
+                    log(`Speech recognition error: ${event.error}`, 'error');
+                    sttStatus.classList.remove('status-active');
+                    sttStatus.classList.add('status-inactive');
+                    sttStatusText.textContent = `Error: ${event.error}`;
+                    sttStartBtn.disabled = false;
+                    sttStopBtn.disabled = true;
+                };
+                
+                recognition.onend = function() {
+                    sttStatus.classList.remove('status-active');
+                    sttStatus.classList.add('status-inactive');
+                    sttStatusText.textContent = 'Ready';
+                    sttStartBtn.disabled = false;
+                    sttStopBtn.disabled = true;
+                    log('Speech recognition ended', 'stt');
+                };
+                
+                log('Speech recognition initialized successfully', 'stt');
+            } catch (error) {
+                log(`Error initializing speech recognition: ${error.message}`, 'error');
+                sttStartBtn.disabled = true;
+                sttStatusText.textContent = 'Not supported in this browser';
+            }
+        }
+        
+        // Text-to-Speech
+        function playTTS() {
+            const text = ttsText.value.trim();
+            if (!text) {
+                log('No text entered for TTS', 'error');
+                return;
+            }
+            
+            ttsStatus.classList.remove('status-inactive');
+            ttsStatus.classList.add('status-active');
+            ttsStatusText.textContent = 'Speaking...';
+            
+            if (useBrowserTTS) {
+                playBrowserTTS(text);
+            } else {
+                playElevenLabsTTS(text);
+            }
+        }
+        
+        function playBrowserTTS(text) {
+            try {
+                if ('speechSynthesis' in window) {
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    // Find a matching voice if possible
+                    const voices = window.speechSynthesis.getVoices();
+                    let selectedVoice = voices.find(voice => voice.name.includes('Female')) || voices[0];
+                    utterance.voice = selectedVoice;
+                    
+                    utterance.onstart = function() {
+                        log('Browser TTS started', 'tts');
+                    };
+                    
+                    utterance.onend = function() {
+                        ttsStatus.classList.remove('status-active');
+                        ttsStatus.classList.add('status-inactive');
+                        ttsStatusText.textContent = 'Ready';
+                        log('Browser TTS finished', 'tts');
+                    };
+                    
+                    utterance.onerror = function(event) {
+                        ttsStatus.classList.remove('status-active');
+                        ttsStatus.classList.add('status-inactive');
+                        ttsStatusText.textContent = 'Error';
+                        log(`Browser TTS error: ${event.error}`, 'error');
+                    };
+                    
+                    window.speechSynthesis.speak(utterance);
+                } else {
+                    throw new Error('Speech synthesis not supported');
+                }
+            } catch (error) {
+                ttsStatus.classList.remove('status-active');
+                ttsStatus.classList.add('status-inactive');
+                ttsStatusText.textContent = 'Error';
+                log(`Browser TTS error: ${error.message}`, 'error');
+            }
+        }
+        
+        function playElevenLabsTTS(text) {
+            const voiceId = ttsVoice.value;
+            const url = '/api/text_to_speech_elevenlabs';
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(`API error: ${err.error || 'Unknown error'}`);
+                    });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                ttsAudio.src = url;
+                ttsAudio.onplay = () => {
+                    log('ElevenLabs TTS playing', 'tts');
+                };
+                ttsAudio.onended = () => {
+                    ttsStatus.classList.remove('status-active');
+                    ttsStatus.classList.add('status-inactive');
+                    ttsStatusText.textContent = 'Ready';
+                    log('ElevenLabs TTS finished', 'tts');
+                };
+                ttsAudio.onerror = (e) => {
+                    ttsStatus.classList.remove('status-active');
+                    ttsStatus.classList.add('status-inactive');
+                    ttsStatusText.textContent = 'Error';
+                    log(`ElevenLabs TTS error: ${e.error || 'Audio playback error'}`, 'error');
+                };
+                ttsAudio.play();
+            })
+            .catch(error => {
+                ttsStatus.classList.remove('status-active');
+                ttsStatus.classList.add('status-inactive');
+                ttsStatusText.textContent = 'Error';
+                log(`ElevenLabs TTS error: ${error.message}`, 'error');
+            });
+        }
+        
+        function stopTTS() {
+            if (useBrowserTTS) {
+                window.speechSynthesis.cancel();
+            } else {
+                ttsAudio.pause();
+                ttsAudio.currentTime = 0;
+            }
+            
+            ttsStatus.classList.remove('status-active');
+            ttsStatus.classList.add('status-inactive');
+            ttsStatusText.textContent = 'Ready';
+            log('TTS stopped', 'tts');
+        }
+        
+        // Event Listeners
+        sttStartBtn.addEventListener('click', () => {
+            recognition.start();
+        });
+        
+        sttStopBtn.addEventListener('click', () => {
+            recognition.stop();
+        });
+        
+        sttClearBtn.addEventListener('click', () => {
+            sttResults.value = '';
+            log('STT results cleared', 'stt');
+        });
+        
+        sttLang.addEventListener('change', () => {
+            recognition.lang = sttLang.value;
+            log(`Speech recognition language changed to ${sttLang.value}`, 'stt');
+        });
+        
+        ttsPlayBtn.addEventListener('click', playTTS);
+        ttsStopBtn.addEventListener('click', stopTTS);
+        
+        ttsUseApiBtn.addEventListener('click', () => {
+            useBrowserTTS = false;
+            ttsUseApiBtn.disabled = true;
+            ttsUseBrowserBtn.disabled = false;
+            log('Switched to ElevenLabs TTS API', 'tts');
+        });
+        
+        ttsUseBrowserBtn.addEventListener('click', () => {
+            useBrowserTTS = true;
+            ttsUseApiBtn.disabled = false;
+            ttsUseBrowserBtn.disabled = true;
+            log('Switched to Browser TTS', 'tts');
+        });
+        
+        clearLogBtn.addEventListener('click', () => {
+            logContainer.innerHTML = '';
+            log('Log cleared', 'info');
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            setupSpeechRecognition();
+            
+            // Disable the active method button
+            ttsUseApiBtn.disabled = true;
+            
+            log('Debug tool initialized', 'info');
+            log('TTS mode: ElevenLabs API', 'tts');
+        });
+    </script>
+</body>
+</html> 

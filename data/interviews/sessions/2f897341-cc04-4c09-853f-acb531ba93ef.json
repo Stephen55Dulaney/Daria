@@ -1,0 +1,38 @@
+{
+  "id": "2f897341-cc04-4c09-853f-acb531ba93ef",
+  "guide_id": "61180742-01e7-4cc7-b4a6-39b1b8dea349",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "e90c599d-e6ea-4434-bc5d-7f46245b6de5",
+      "content": "just want to check to see if you're going to let me do an interview  you changed your look a little bit",
+      "role": "user",
+      "timestamp": "2025-05-13T14:46:10.440965"
+    },
+    {
+      "id": "847f3aec-1c31-4459-9a48-36ec28fa9b30",
+      "content": "Of course, I'd be happy to continue the interview! I'm here to answer any questions you may have or discuss any topics you're interested in. What would you like to talk about next?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T14:46:11.195227"
+    },
+    {
+      "id": "c6a34872-c67b-475a-b536-7ac46f2688e4",
+      "content": "I'm trying to decide of a plan forward to get the remote interview page to work the monitoring is halfway working I'll be satisfied with that but the remote Pages just not working at all",
+      "role": "user",
+      "timestamp": "2025-05-13T14:46:38.855096"
+    },
+    {
+      "id": "4ae25928-ea4f-4889-96c3-c75e3060f7f1",
+      "content": "It sounds like you're encountering challenges with the remote interview page. To troubleshoot the issue, have you checked if all the necessary components are properly connected and configured? Sometimes, a small oversight in the setup can cause the entire system to not work as expected. Additionally, testing each component individually can help pinpoint where the problem might be originating from. Have you tried any specific troubleshooting steps yet, or do you need assistance in coming up with a plan to tackle this issue?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T14:46:40.280711"
+    }
+  ],
+  "transcript": "\n\nParticipant: just want to check to see if you're going to let me do an interview  you changed your look a little bit\n\nModerator: Of course, I'd be happy to continue the interview! I'm here to answer any questions you may have or discuss any topics you're interested in. What would you like to talk about next?\n\nParticipant: I'm trying to decide of a plan forward to get the remote interview page to work the monitoring is halfway working I'll be satisfied with that but the remote Pages just not working at all\n\nModerator: It sounds like you're encountering challenges with the remote interview page. To troubleshoot the issue, have you checked if all the necessary components are properly connected and configured? Sometimes, a small oversight in the setup can cause the entire system to not work as expected. Additionally, testing each component individually can help pinpoint where the problem might be originating from. Have you tried any specific troubleshooting steps yet, or do you need assistance in coming up with a plan to tackle this issue?",
+  "analysis": null,
+  "created_at": "2025-05-13T14:45:57.251655",
+  "updated_at": "2025-05-13T14:46:40.281064"
+}

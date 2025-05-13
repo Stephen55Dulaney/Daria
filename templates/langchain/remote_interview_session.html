@@ -1,0 +1,1111 @@
+{% extends "langchain/remote_interview_base.html" %}
+
+{% block title %}Remote Interview - {{ interview.title }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="welcome-message bg-light p-3 mb-4 rounded">
+            <h2 class="h5">Welcome to this remote interview session</h2>
+            <p>Thank you for agreeing to speak with us today. This interview will help us gather valuable insights.</p>
+            <p>Please respond naturally to the questions asked. You can type your answers or use the microphone button to speak.</p>
+        </div>
+        
+        <div class="bg-white rounded-3 shadow-sm p-3 d-flex flex-column" style="min-height: 70vh;">
+            <!-- Hidden input to store session ID -->
+            <input type="hidden" id="sessionId" value="{{ session_id }}">
+            <input type="hidden" id="voiceId" value="{{ voice_id|default('EXAVITQu4vr4xnSDxMaL') }}">
+            
+            <!-- Main chat interface -->
+            <div id="chat-container" class="flex-grow-1 d-flex flex-column mb-3">
+                <div id="chat-messages" class="flex-grow-1 overflow-auto p-3"></div>
+                <div class="typing-indicator d-none" id="typingIndicator">
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                    <div class="dot"></div>
+                </div>
+            </div>
+            
+            <!-- User input area -->
+            <div id="user-input-container" class="mt-auto">
+                <div class="input-group">
+                    <textarea id="userText" class="form-control" placeholder="Type your response..." rows="2"></textarea>
+                    <button id="sendBtn" class="btn btn-primary" onclick="sendMessage()">
+                        <i class="bi bi-send"></i>
+                    </button>
+                    <button id="micBtn" class="btn btn-outline-primary" onclick="toggleRecording()">
+                        <i class="bi bi-mic"></i>
+                    </button>
+                </div>
+                <div class="text-muted small mt-1" id="status-text">Ready</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Thank You Modal -->
+<div class="modal fade" id="thankYouModal" tabindex="-1" aria-labelledby="thankYouModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="thankYouModalLabel">Interview Complete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body text-center">
+                <div class="py-4">
+                    <i class="bi bi-check-circle-fill text-success" style="font-size: 3rem;"></i>
+                    <h3 class="mt-4">Thank You!</h3>
+                    <p class="text-muted">Your interview has been successfully completed and recorded.</p>
+                    <p>We appreciate your participation and valuable insights.</p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" onclick="closeWindow()">Close Window</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Global variables
+        let sessionId = document.getElementById('sessionId').value;
+        let voiceId = document.getElementById('voiceId').value;
+        let isRecording = false;
+        let isWaitingForResponse = false;
+        let mediaRecorder = null;
+        let audioChunks = [];
+        let isSpeaking = false; // Track if TTS is active
+        let recognition = null;
+        let recordingTimeout = null;
+        let currentTranscript = ''; // Store current transcript
+        let silenceStart = null; // For silence detection
+        let silenceTimer = null; // Timer for silence detection
+        let silenceTimerText = null; // Display for silence timer
+        
+        // Create visualizer elements if they don't exist
+        let visualizerActive = document.getElementById('active-visualizer');
+        let visualizerInactive = document.getElementById('inactive-visualizer');
+        
+        // If visualizer elements don't exist, create dummy objects with required methods
+        if (!visualizerActive) {
+            visualizerActive = {
+                classList: {
+                    add: function() {},
+                    remove: function() {}
+                }
+            };
+        }
+        
+        if (!visualizerInactive) {
+            visualizerInactive = {
+                classList: {
+                    add: function() {},
+                    remove: function() {}
+                }
+            };
+        }
+        
+        // DOM elements
+        const chatMessages = document.getElementById('chat-messages');
+        const userText = document.getElementById('userText');
+        const sendBtn = document.getElementById('sendBtn');
+        const micBtn = document.getElementById('micBtn');
+        const statusText = document.getElementById('status-text');
+        const typingIndicator = document.getElementById('typingIndicator');
+        
+        // Helper function to get session ID from URL if not already set
+        function getSessionId() {
+            if (sessionId) return sessionId;
+            
+            // Extract from URL (e.g., /interview/abc123?remote=true)
+            const pathSegments = window.location.pathname.split('/');
+            for (let i = 0; i < pathSegments.length; i++) {
+                if (pathSegments[i] === 'interview' && i + 1 < pathSegments.length) {
+                    return pathSegments[i + 1].split('?')[0]; // Remove query parameters
+                }
+            }
+            return null;
+        }
+        
+        // Ensure sessionId is set
+        if (!sessionId) {
+            sessionId = getSessionId();
+            console.log("Session ID set from URL:", sessionId);
+        }
+        
+        // Check if Web Speech API is supported
+        const isSpeechRecognitionSupported = 'SpeechRecognition' in window || 'webkitSpeechRecognition' in window;
+        
+        if (!isSpeechRecognitionSupported) {
+            console.warn('Speech recognition not supported in this browser');
+            statusText.innerText = 'Speech recognition not supported in this browser';
+            micBtn.disabled = true;
+        }
+        
+        // Set up WebSocket connection for monitoring
+        function initializeWebSocket() {
+            if (typeof io === 'undefined') {
+                console.log('Loading Socket.IO library for monitoring');
+                const script = document.createElement('script');
+                script.src = '/socket.io/socket.io.js';
+                script.onload = function() {
+                    setupSocketConnection();
+                };
+                document.head.appendChild(script);
+            } else {
+                setupSocketConnection();
+            }
+        }
+        
+        // Setup WebSocket connection
+        function setupSocketConnection(message) {
+            const localSessionId = sessionId || getSessionId();
+            
+            if (!window.socket) {
+                window.socket = io();
+                
+                window.socket.on('connect', function() {
+                    console.log('Socket connected for monitoring');
+                    if (message) emitUserMessage(message);
+                });
+                
+                window.socket.on('error', function(error) {
+                    console.error('Socket error:', error);
+                });
+            } else if (window.socket.connected && message) {
+                emitUserMessage(message);
+            }
+        }
+        
+        // Emit user message via WebSocket
+        function emitUserMessage(message) {
+            const localSessionId = sessionId || getSessionId();
+            
+            if (window.socket && window.socket.connected) {
+                try {
+                    const userMessageObj = {
+                        session_id: localSessionId,
+                        message: {
+                            content: message,
+                            role: 'user',
+                            id: generateUUID(),
+                            timestamp: new Date().toISOString()
+                        }
+                    };
+                    
+                    window.socket.emit('new_message', userMessageObj);
+                    console.log('Emitted user message to monitor via WebSocket');
+                } catch (error) {
+                    console.error('Error emitting message via WebSocket:', error);
+                }
+            } else {
+                console.log('WebSocket not connected, cannot emit user message');
+            }
+        }
+        
+        // Generate a UUID for message IDs
+        function generateUUID() {
+            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+                const r = Math.random() * 16 | 0;
+                const v = c === 'x' ? r : (r & 0x3 | 0x8);
+                return v.toString(16);
+            });
+        }
+        
+        // Event listeners
+        sendBtn.addEventListener('click', sendMessage);
+        micBtn.addEventListener('click', toggleRecording);
+        
+        // Enter key handling for the text input
+        userText.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Start the interview when the page loads
+        startInterview();
+        
+        // Function to start the interview
+        function startInterview() {
+            // Initialize WebSocket for monitoring
+            initializeWebSocket();
+            
+            // First check if there are existing messages
+            fetchLatestMessages();
+            
+            // Show typing indicator
+            showTypingIndicator();
+            statusText.innerText = 'Starting interview...';
+            
+            // Skip API call if we see messages are already loaded
+            if (chatMessages.children.length > 0) {
+                console.log("Messages already present, not sending welcome message");
+                hideTypingIndicator();
+                return;
+            }
+            
+            // Call the API to start the interview
+            fetch('/api/interview/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId || getSessionId(),
+                    voice_id: voiceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                if (data.success) {
+                    console.log("Received greeting message:", data.message);
+                    
+                    // Add the AI's greeting
+                    addMessage(data.message, 'ai');
+                    
+                    // Use text-to-speech for the greeting after a short delay
+                    setTimeout(() => {
+                        console.log("Playing greeting with TTS");
+                        speakText(data.message).then(() => {
+                            // After greeting is spoken, start listening
+                            if (!isRecording) {
+                                startRecording();
+                            }
+                        });
+                    }, 500);
+                } else {
+                    console.error('Error starting interview:', data.error);
+                    addMessage('Error starting interview. Please refresh the page or contact support.', 'ai');
+                }
+            })
+            .catch(error => {
+                console.error('Error starting interview:', error);
+                hideTypingIndicator();
+                addMessage('Error starting interview. Please refresh the page or contact support.', 'ai');
+            });
+        }
+        
+        // Function to fetch latest messages
+        function fetchLatestMessages() {
+            const localSessionId = sessionId || getSessionId();
+            
+            console.log(`Fetching latest messages for session ${localSessionId}`);
+            
+            return fetch(`/api/session/${localSessionId}/messages`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.messages && data.messages.length > 0) {
+                    console.log(`Showing ${data.messages.length} existing messages`);
+                    
+                    // Clear any existing messages
+                    chatMessages.innerHTML = '';
+                    
+                    // Add each message to the UI
+                    data.messages.forEach(msg => {
+                        const sender = msg.role === 'assistant' ? 'ai' : 'user';
+                        addMessage(msg.content, sender);
+                    });
+                    
+                    // If the last message was from the assistant, play it with TTS
+                    const lastMsg = data.messages[data.messages.length - 1];
+                    if (lastMsg && lastMsg.role === 'assistant' && lastMsg.content) {
+                        // Use TTS for the last AI message
+                        setTimeout(() => {
+                            // Make sure TTS returns a valid Promise
+                            const ttsPromise = speakText(lastMsg.content || '');
+                            
+                            // Chain the promise properly to handle STT initialization
+                            ttsPromise.then(() => {
+                                // After message is spoken, start listening
+                                if (!isRecording) {
+                                    startRecording();
+                                }
+                            }).catch(err => {
+                                console.error("TTS error:", err);
+                                // Still start STT even if TTS fails
+                                if (!isRecording) {
+                                    startRecording();
+                                }
+                            });
+                        }, 500);
+                    } else {
+                        // No AI message to speak, start listening immediately
+                        setTimeout(() => {
+                            if (!isRecording) {
+                                startRecording();
+                            }
+                        }, 500);
+                    }
+                    
+                    // Hide typing indicator
+                    hideTypingIndicator();
+                } else {
+                    console.log("No existing messages found");
+                    
+                    // If no messages, start interview normally
+                    startNewSession();
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching messages:', error);
+                
+                // If fetching fails, start interview anyway
+                startNewSession();
+            });
+        }
+        
+        // Function to start a brand new session
+        function startNewSession() {
+            console.log("New session detected, sending welcome message");
+            
+            // Call the API to start the interview with welcome message
+            fetch('/api/interview/start', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId || getSessionId(),
+                    voice_id: voiceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                hideTypingIndicator();
+                
+                if (data.success) {
+                    console.log("Received greeting message:", data.message);
+                    
+                    // Add the AI's greeting
+                    addMessage(data.message, 'ai');
+                    
+                    // Use text-to-speech for the greeting
+                    speakText(data.message).then(() => {
+                        // After greeting is spoken, start listening
+                        if (!isRecording) {
+                            startRecording();
+                        }
+                    });
+                } else {
+                    console.error('Error starting interview:', data.error);
+                    addMessage('Error starting interview. Please refresh the page or contact support.', 'ai');
+                }
+            })
+            .catch(error => {
+                console.error('Error starting interview:', error);
+                hideTypingIndicator();
+                addMessage('Error starting interview. Please refresh the page or contact support.', 'ai');
+            });
+        }
+        
+        // Function to send a message
+        window.sendMessage = function() {
+            const text = userText.value.trim();
+            if (!text || isWaitingForResponse) return;
+            
+            // Stop recording if active
+            if (isRecording) {
+                stopRecording();
+            }
+            
+            // Add the user's message to the chat
+            addMessage(text, 'user');
+            
+            // Clear the input
+            userText.value = '';
+            currentTranscript = '';
+            
+            // Emit message to monitoring via WebSocket
+            emitUserMessage(text);
+            
+            // Show typing indicator
+            showTypingIndicator();
+            isWaitingForResponse = true;
+            
+            // Call the API to process the user's message
+            fetch('/api/interview/respond', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId || getSessionId(),
+                    message: text,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Hide typing indicator
+                hideTypingIndicator();
+                isWaitingForResponse = false;
+                
+                if (data.success) {
+                    console.log("Received AI response:", data.message);
+                    
+                    // Add the AI's response
+                    addMessage(data.message, 'ai');
+                    
+                    // Use text-to-speech for the response
+                    speakText(data.message).then(() => {
+                        // After the AI finishes speaking, resume listening
+                        if (!isRecording) {
+                            startRecording();
+                        }
+                    });
+                    
+                    // Check if this is the end of the interview
+                    if (data.end_interview) {
+                        console.log("Interview end detected in response");
+                        setTimeout(() => {
+                            endInterview();
+                        }, 5000); // Wait 5 seconds before ending
+                    }
+                } else {
+                    console.error('Error getting response:', data.error);
+                    addMessage('Sorry, there was an error processing your response. Please try again.', 'ai');
+                    
+                    // Resume listening
+                    if (!isRecording) {
+                        startRecording();
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error getting response:', error);
+                hideTypingIndicator();
+                isWaitingForResponse = false;
+                addMessage('Sorry, there was an error processing your response. Please try again.', 'ai');
+                
+                // Resume listening
+                if (!isRecording) {
+                    startRecording();
+                }
+            });
+        };
+        
+        // Function to toggle recording
+        window.toggleRecording = function() {
+            if (isRecording) {
+                stopRecording();
+            } else {
+                startRecording();
+            }
+        };
+        
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            // Only initialize if it's not already initialized
+            if (recognition) return;
+            
+            try {
+                // Initialize Web Speech API
+                window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                // Configure recognition
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+                
+                console.log("Speech recognition initialized");
+            } catch (e) {
+                console.error("Failed to initialize speech recognition:", e);
+                statusText.innerText = "Speech recognition not available";
+                micBtn.disabled = true;
+            }
+        }
+        
+        // Function to start recording using Web Speech API
+        function startRecording() {
+            // Clear any previous recognition
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) { /* Ignore if already stopped */ }
+                recognition = null;
+            }
+
+            // Initialize the speech recognition API
+            initSpeechRecognition();
+            
+            // Update UI
+            isRecording = true;
+            micBtn.classList.add('btn-danger');
+            micBtn.classList.remove('btn-outline-primary');
+            micBtn.innerHTML = '<i class="bi bi-stop-fill"></i>';
+            statusText.innerText = 'Listening...';
+            
+            // Show active visualizer if it exists
+            if (visualizerActive && visualizerActive.classList) {
+                visualizerActive.classList.remove('d-none');
+            }
+            if (visualizerInactive && visualizerInactive.classList) {
+                visualizerInactive.classList.add('d-none');
+            }
+            
+            try {
+                // Initialize Web Speech API
+                window.SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+                recognition = new SpeechRecognition();
+                
+                // Configure recognition
+                recognition.continuous = true;
+                recognition.interimResults = true;
+                recognition.lang = 'en-US';
+                
+                // Handle results
+                recognition.onresult = function(event) {
+                    let interimTranscript = '';
+                    let finalTranscript = '';
+                    
+                    for (let i = event.resultIndex; i < event.results.length; i++) {
+                        const transcript = event.results[i][0].transcript;
+                        if (event.results[i].isFinal) {
+                            finalTranscript += transcript;
+                        } else {
+                            interimTranscript += transcript;
+                        }
+                    }
+                    
+                    // Show interim results
+                    if (interimTranscript) {
+                        currentTranscript = interimTranscript;
+                        statusText.innerText = 'Hearing: ' + interimTranscript;
+                    }
+                    
+                    // Process final results
+                    if (finalTranscript) {
+                        currentTranscript = finalTranscript;
+                        userText.value = finalTranscript;
+                        statusText.innerText = 'Processing: ' + finalTranscript;
+                        
+                        // Auto-send the message after a short delay
+                        setTimeout(() => {
+                            if (finalTranscript.trim()) {
+                                sendMessage();
+                            }
+                        }, 500);
+                    }
+                };
+                
+                // Handle recognition errors
+                recognition.onerror = function(event) {
+                    console.log("Speech recognition error", event.error);
+                    
+                    // If we have a partial transcript when no-speech error occurs, use it
+                    if (event.error === 'no-speech' && currentTranscript && currentTranscript.trim().length > 0) {
+                        userText.value = currentTranscript.trim();
+                        statusText.innerText = 'Using partial transcript: ' + currentTranscript.trim();
+                        setTimeout(() => {
+                            if (currentTranscript.trim()) {
+                                sendMessage();
+                            }
+                        }, 500);
+                    } else if (event.error === 'not-allowed') {
+                        statusText.innerText = 'Microphone access denied. Check browser permissions.';
+                        console.log("Microphone permissions error. Attempting fallback...");
+                        fallbackToMediaRecorder();
+                    } else if (event.error === 'no-speech') {
+                        statusText.innerText = 'No speech detected. Try again.';
+                    } else {
+                        statusText.innerText = 'Error: ' + event.error;
+                    }
+                };
+                
+                // Handle recognition end
+                recognition.onend = function() {
+                    console.log("Speech recognition ended");
+                    
+                    // Hide visualization
+                    if (visualizerActive && visualizerActive.classList) {
+                        visualizerActive.classList.add('d-none');
+                    }
+                    if (visualizerInactive && visualizerInactive.classList) {
+                        visualizerInactive.classList.remove('d-none');
+                    }
+                    
+                    // If TTS is active, don't restart automatically
+                    if (isSpeaking) {
+                        console.log("Not restarting STT because TTS is still active");
+                        return;
+                    }
+                    
+                    // Restart if recording is still active (unless we're sending a message)
+                    if (isRecording && !isWaitingForResponse) {
+                        console.log("Restarted speech recognition automatically");
+                        try {
+                            setTimeout(() => {
+                                recognition.start();
+                            }, 300);
+                        } catch (e) {
+                            console.error("Failed to restart recognition after error:", e);
+                        }
+                    } else {
+                        // If we're no longer recording, reset the state
+                        resetRecordingState();
+                    }
+                };
+                
+                // Start recognition
+                recognition.start();
+                console.log('Speech recognition started');
+                
+            } catch (error) {
+                console.error('Failed to start speech recognition:', error);
+                resetRecordingState();
+                statusText.innerText = 'Speech recognition failed. Trying backup method...';
+                
+                // Fall back to MediaRecorder as backup
+                fallbackToMediaRecorder();
+            }
+        }
+        
+        // Reset recording state
+        function resetRecordingState() {
+            isRecording = false;
+            micBtn.classList.remove('btn-danger');
+            micBtn.classList.add('btn-outline-primary');
+            micBtn.innerHTML = '<i class="bi bi-mic"></i>';
+            clearTimeout(recordingTimeout);
+        }
+        
+        // Function to stop recording
+        function stopRecording() {
+            console.log("Stopping recording");
+            isRecording = false;
+            
+            // Reset the microphone button
+            micBtn.classList.remove('btn-danger');
+            micBtn.classList.add('btn-outline-primary');
+            micBtn.innerHTML = '<i class="bi bi-mic"></i>';
+            
+            // Hide active visualizer
+            if (visualizerActive && visualizerActive.classList) {
+                visualizerActive.classList.add('d-none');
+            }
+            if (visualizerInactive && visualizerInactive.classList) {
+                visualizerInactive.classList.remove('d-none');
+            }
+            
+            // Stop Web Speech API if active
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) {
+                    console.error("Error stopping recognition:", e);
+                }
+            }
+            
+            // Stop MediaRecorder if active
+            if (mediaRecorder && mediaRecorder.state === 'recording') {
+                mediaRecorder.stop();
+            }
+            
+            // If we have a current transcript, use it
+            if (currentTranscript && currentTranscript.trim()) {
+                userText.value = currentTranscript.trim();
+                currentTranscript = ''; // Clear it
+            }
+            
+            statusText.innerText = 'Recording stopped';
+        }
+        
+        // Fallback to MediaRecorder if Web Speech API fails
+        function fallbackToMediaRecorder() {
+            console.log("Using MediaRecorder fallback for speech recognition");
+            
+            // Check if microphone access is available
+            navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(stream => {
+                    isRecording = true;
+                    micBtn.classList.add('btn-danger');
+                    micBtn.classList.remove('btn-outline-primary');
+                    micBtn.innerHTML = '<i class="bi bi-stop-fill"></i>';
+                    statusText.innerText = 'Recording (fallback mode)...';
+                    
+                    audioChunks = [];
+                    mediaRecorder = new MediaRecorder(stream);
+                    
+                    mediaRecorder.ondataavailable = (e) => {
+                        audioChunks.push(e.data);
+                    };
+                    
+                    mediaRecorder.onstop = () => {
+                        console.log("MediaRecorder stopped, processing recording");
+                        processRecording(stream);
+                    };
+                    
+                    mediaRecorder.start();
+                    console.log("MediaRecorder started as fallback");
+                    
+                    // Auto-stop after 10 seconds
+                    clearTimeout(recordingTimeout);
+                    recordingTimeout = setTimeout(() => {
+                        if (mediaRecorder && mediaRecorder.state === 'recording') {
+                            console.log("Auto-stopping MediaRecorder after timeout");
+                            mediaRecorder.stop();
+                        }
+                    }, 10000);
+                })
+                .catch(error => {
+                    console.error('Error accessing microphone:', error);
+                    statusText.innerText = 'Error: Could not access microphone. Check browser permissions.';
+                    resetRecordingState();
+                });
+        }
+        
+        // Process recording and send to speech-to-text (fallback method)
+        function processRecording(stream) {
+            // Stop all tracks to release the microphone
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+            
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            
+            const formData = new FormData();
+            formData.append('audio', audioBlob);
+            formData.append('session_id', sessionId);
+            
+            statusText.innerText = 'Processing audio...';
+            
+            fetch('/api/speech_to_text', {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success && data.text) {
+                    userText.value = data.text;
+                    statusText.innerText = 'Speech processed successfully!';
+                    
+                    // Auto-send the message
+                    setTimeout(() => {
+                        if (data.text.trim()) {
+                            sendMessage();
+                        } else {
+                            statusText.innerText = 'No speech detected. Try again.';
+                        }
+                    }, 500);
+                } else {
+                    statusText.innerText = 'Error processing speech. Please try again.';
+                    console.error('Speech-to-text error:', data.error || 'No text recognized');
+                }
+            })
+            .catch(error => {
+                statusText.innerText = 'Error processing speech. Please try again.';
+                console.error('Speech-to-text error:', error);
+            });
+        }
+        
+        // Function to speak text using TTS
+        function speakText(text) {
+            // Check for empty text
+            if (!text || typeof text !== 'string' || text.trim() === '') {
+                console.warn("TTS called with empty or invalid text");
+                return Promise.resolve(); // Return a resolved promise so .then() works
+            }
+            
+            // First stop any speech recognition that might be active
+            if (recognition) {
+                try {
+                    recognition.stop();
+                } catch (e) { /* Ignore if already stopped */ }
+            }
+            
+            // Set speaking flag
+            isSpeaking = true;
+            console.log("TTS playing");
+            
+            return new Promise((resolve, reject) => {
+                fetch('/api/text_to_speech_elevenlabs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        voice_id: voiceId,
+                        session_id: sessionId || getSessionId()
+                    })
+                })
+                .then(response => {
+                    if (response.ok) {
+                        return response.blob();
+                    }
+                    throw new Error('TTS request failed');
+                })
+                .then(audioBlob => {
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audio = new Audio();
+                    
+                    // Set audio source after attaching event listeners
+                    audio.onloadedmetadata = () => {
+                        console.log("ElevenLabs audio metadata loaded");
+                    };
+                    
+                    audio.oncanplaythrough = () => {
+                        console.log("ElevenLabs audio ready to play");
+                    };
+                    
+                    // Save reference to allow stopping
+                    window.currentTTSAudio = audio;
+                    
+                    // Set event handlers
+                    audio.onplay = () => {
+                        console.log("ElevenLabs playback started successfully");
+                        statusText.innerText = 'Speaking...';
+                    };
+                    
+                    audio.onended = () => {
+                        console.log("TTS finished");
+                        isSpeaking = false;
+                        statusText.innerText = 'Ready';
+                        URL.revokeObjectURL(audioUrl); // Clean up
+                        window.currentTTSAudio = null;
+                        
+                        // Restart speech recognition after TTS completes with a small delay
+                        if (isRecording) {
+                            console.log("Will start STT in 300ms");
+                            setTimeout(() => {
+                                console.log("Starting speech recognition");
+                                startRecording();
+                            }, 300);
+                        }
+                        
+                        resolve();
+                    };
+                    
+                    audio.onerror = (e) => {
+                        console.error("TTS audio error:", e);
+                        isSpeaking = false;
+                        statusText.innerText = 'TTS error. Please try again.';
+                        URL.revokeObjectURL(audioUrl); // Clean up
+                        window.currentTTSAudio = null;
+                        reject(e);
+                    };
+                    
+                    // Set source and load the audio
+                    audio.src = audioUrl;
+                    console.log("Attempting to play ElevenLabs audio");
+                    
+                    // Play the audio
+                    audio.play().catch(err => {
+                        console.error("Error playing TTS audio:", err);
+                        isSpeaking = false;
+                        statusText.innerText = 'Ready';
+                        window.currentTTSAudio = null;
+                        reject(err);
+                    });
+                })
+                .catch(error => {
+                    console.error('Text-to-speech error:', error);
+                    isSpeaking = false;
+                    statusText.innerText = 'TTS error. Using browser fallback.';
+                    
+                    // Use browser's TTS as fallback
+                    if ('speechSynthesis' in window) {
+                        console.log("Using browser TTS as fallback");
+                        const utterance = new SpeechSynthesisUtterance(text);
+                        
+                        utterance.onend = () => {
+                            console.log("Browser TTS finished");
+                            isSpeaking = false;
+                            statusText.innerText = 'Ready';
+                            
+                            // Restart speech recognition after TTS completes
+                            if (isRecording) {
+                                setTimeout(() => {
+                                    startRecording();
+                                }, 300);
+                            }
+                            
+                            resolve();
+                        };
+                        
+                        utterance.onerror = (e) => {
+                            console.error("Browser TTS error:", e);
+                            isSpeaking = false;
+                            statusText.innerText = 'Ready';
+                            reject(e);
+                        };
+                        
+                        speechSynthesis.speak(utterance);
+                    } else {
+                        statusText.innerText = 'Ready';
+                        reject(new Error('No TTS available'));
+                    }
+                });
+            });
+        }
+        
+        // Function to add a message to the chat
+        function addMessage(text, sender) {
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message', sender);
+            messageElement.textContent = text;
+            
+            chatMessages.appendChild(messageElement);
+            chatMessages.scrollTop = chatMessages.scrollHeight;
+        }
+        
+        // Function to show typing indicator
+        function showTypingIndicator() {
+            typingIndicator.classList.remove('d-none');
+        }
+        
+        // Function to hide typing indicator
+        function hideTypingIndicator() {
+            typingIndicator.classList.add('d-none');
+        }
+        
+        // Function to end the interview
+        window.endInterview = function() {
+            fetch('/api/interview/end', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show thank you modal
+                    const thankYouModal = new bootstrap.Modal(document.getElementById('thankYouModal'));
+                    thankYouModal.show();
+                    
+                    // Try to update status if element exists
+                    const statusElement = document.getElementById('interviewStatus');
+                    if (statusElement) {
+                        statusElement.innerText = 'Completed';
+                        statusElement.classList.add('bg-success');
+                    }
+                } else {
+                    console.error('Error ending interview:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error ending interview:', error);
+            });
+        };
+        
+        // Function to close the window
+        window.closeWindow = function() {
+            window.close();
+            
+            // If window.close() doesn't work (which is common in many browsers)
+            // Show a message asking the user to close the tab
+            setTimeout(() => {
+                document.body.innerHTML = `
+                    <div class="container text-center py-5">
+                        <h1>Thank you for your participation!</h1>
+                        <p>You may now close this browser tab.</p>
+                    </div>
+                `;
+            }, 300);
+        };
+        
+        // Function to load initial messages and handle TTS playback
+        function loadInitialMessages() {
+            console.log("Loading initial messages");
+            const url = `/api/session/${sessionId}/messages`;
+            
+            return fetch(url)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`HTTP error ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!data || !Array.isArray(data.messages) || data.messages.length === 0) {
+                        console.log("No initial messages found");
+                        // If no initial messages, start recording with a delay
+                        setTimeout(() => {
+                            startRecording();
+                        }, 1000);
+                        return [];
+                    }
+                    
+                    console.log(`Loaded ${data.messages.length} messages`);
+                    
+                    // Clear existing messages
+                    chatMessages.innerHTML = '';
+                    
+                    // Add each message to the UI
+                    let lastAssistantMessage = null;
+                    data.messages.forEach(msg => {
+                        const sender = msg.role === 'assistant' ? 'ai' : 'user';
+                        addMessage(msg.content, sender);
+                        if (msg.role === 'assistant') {
+                            lastAssistantMessage = msg.content;
+                        }
+                    });
+                    
+                    // Play TTS for the last assistant message if available
+                    if (lastAssistantMessage) {
+                        console.log("Playing TTS for initial assistant message");
+                        try {
+                            return speakText(lastAssistantMessage)
+                                .then(() => {
+                                    console.log("Initial TTS completed, starting recording");
+                                    // Start recording after TTS completes
+                                    startRecording();
+                                    return data.messages;
+                                })
+                                .catch(error => {
+                                    console.error("Error in initial TTS playback:", error);
+                                    // Start recording even if TTS fails
+                                    startRecording();
+                                    return data.messages;
+                                });
+                        } catch (error) {
+                            console.error("Exception in TTS playback:", error);
+                            // Start recording even if TTS throws an exception
+                            setTimeout(() => {
+                                startRecording();
+                            }, 500);
+                            return data.messages;
+                        }
+                    } else {
+                        // No assistant message to play, just start recording
+                        setTimeout(() => {
+                            startRecording();
+                        }, 1000);
+                        return data.messages;
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading initial messages:", error);
+                    // Start recording even if loading messages fails
+                    setTimeout(() => {
+                        startRecording();
+                    }, 1000);
+                    return [];
+                });
+        }
+        
+        // Initialize on page load
+        fetchLatestMessages();
+        loadInitialMessages();
+    });
+</script>
+{% endblock %} 

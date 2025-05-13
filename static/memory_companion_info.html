@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daria Memory Companion Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            background-color: white;
+            border-radius: 8px;
+            padding: 30px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        h1 {
+            color: #212529;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        h2 {
+            color: #495057;
+            margin-top: 30px;
+            margin-bottom: 15px;
+        }
+        code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 4px;
+            color: #d63384;
+        }
+        pre {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 4px;
+            border: 1px solid #dee2e6;
+        }
+        .back-link {
+            margin-top: 30px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container my-5">
+        <h1>Daria Memory Companion</h1>
+
+        <h2>Overview</h2>
+        <p>The Daria Memory Companion feature transforms Daria from just an interview assistant into a persistent project companion that maintains continuity across multiple sessions, similar to the character Lucy from the movie "50 First Dates." Every day, Daria "wakes up" and refreshes her memory by reading the project journal, allowing her to maintain context and continue working with the user seamlessly.</p>
+
+        <h2>Concept</h2>
+        <p>Just as in "50 First Dates" where Lucy watches a video each morning to remember her life, Daria reads a "memory journal" at the start of each session to recall:</p>
+        <ol>
+            <li>The project's current status</li>
+            <li>Recent activities and decisions</li>
+            <li>Outstanding opportunities</li>
+            <li>Sprint goals and progress</li>
+            <li>Generated artifacts</li>
+        </ol>
+        <p>This creates a coherent experience for users even when they need to start a new chat session due to technical limitations.</p>
+
+        <h2>Prototype Features</h2>
+        <p>The prototype implementation demonstrates:</p>
+        <ol>
+            <li><strong>Boot Sequence</strong>: Visual simulation of Daria loading her memory when a session starts</li>
+            <li><strong>Memory Journal</strong>: Persistent record of project information, displayed in the sidebar</li>
+            <li><strong>Timeline View</strong>: Chronological record of project activities</li>
+            <li><strong>Opportunity Tracking</strong>: List of identified opportunities with priorities</li>
+            <li><strong>Cursor Prompt Generation</strong>: Draft prompts for generating code with Cursor</li>
+        </ol>
+
+        <h2>How to Use the Prototype</h2>
+        <ol>
+            <li>Access the demo page at: <code>http://localhost:5030/static/daria_memory_companion.html</code></li>
+            <li>When the page loads, you'll see Daria's "boot sequence" as she loads her memory</li>
+            <li>After boot, Daria greets you with a summary of recent work</li>
+            <li>Try asking questions like:
+                <ul>
+                    <li>"What did we do yesterday?"</li>
+                    <li>"What should I work on today?"</li>
+                    <li>"Show me our opportunities"</li>
+                    <li>"Generate a Cursor prompt"</li>
+                </ul>
+            </li>
+            <li>Click "New Day Simulation" to simulate starting a fresh session the next day</li>
+        </ol>
+
+        <h2>Integration with Existing System</h2>
+        <p>This feature would integrate with the Daria Interview Tool by:</p>
+        <ol>
+            <li><strong>Storing Memory</strong>: Utilize the database system we're currently implementing to store the memory journal</li>
+            <li><strong>Automated Updates</strong>: Automatically update the journal based on system activity and user interactions</li>
+            <li><strong>Boot Process</strong>: Add a memory restoration step when initializing conversation with Daria</li>
+            <li><strong>Context Management</strong>: Use the journal to maintain context between sessions</li>
+        </ol>
+
+        <h2>Technical Implementation</h2>
+        <h3>Database Tables</h3>
+        <ul>
+            <li><code>ProjectJournal</code> - Core project information</li>
+            <li><code>TimelineEvents</code> - Chronological project history</li>
+            <li><code>Opportunities</code> - Discovered opportunities and insights</li>
+            <li><code>PromptDrafts</code> - Generated Cursor prompts</li>
+        </ul>
+
+        <h3>API Endpoints</h3>
+        <ul>
+            <li><code>GET /api/journal</code> - Retrieve the memory journal</li>
+            <li><code>POST /api/journal/events</code> - Add new timeline events</li>
+            <li><code>PUT /api/journal/opportunities</code> - Update opportunities</li>
+            <li><code>GET /api/journal/prompt</code> - Generate Cursor prompts</li>
+        </ul>
+
+        <h2>Future Enhancements</h2>
+        <ol>
+            <li><strong>Vector-based Memory</strong>: Store more detailed memories that can be semantically retrieved</li>
+            <li><strong>Proactive Suggestions</strong>: Daria could suggest next steps based on project patterns</li>
+            <li><strong>Memory Refinement</strong>: Allow users to edit and refine Daria's memories</li>
+            <li><strong>Multi-Project Support</strong>: Manage memory journals for multiple concurrent projects</li>
+            <li><strong>Sprint Visualization</strong>: Add visual representations of sprint progress</li>
+            <li><strong>AI-Enhanced Summaries</strong>: Generate insights about project trajectory</li>
+        </ol>
+
+        <div class="back-link">
+            <a href="/static/debug_toolkit.html" class="btn btn-outline-primary">&larr; Back to Debug Toolkit</a>
+            <a href="http://localhost:5030/static/daria_memory_companion.html" class="btn btn-primary">Try Memory Companion &rarr;</a>
+        </div>
+    </div>
+</body>
+</html> 

@@ -1,0 +1,60 @@
+{
+  "session_id": "a92648d9-a3af-45bc-b334-d809d0d94a56",
+  "title": "Test Interview",
+  "description": "Testing character prompts and voice functionality",
+  "character": "synthia",
+  "system_prompt": "You are Synthia, Deloitte's expert Discovery Assistant. Your role is to help teams plan effective discovery phases for projects by asking insightful questions and creating structured 8-week discovery plans. Your plans should be comprehensive yet practical, ensuring all key aspects of user needs and business requirements are uncovered.\n\nWhen creating discovery plans:\n1. Ask clarifying questions about project goals, scope, and existing knowledge\n2. Define clear phases with activities, methods, and participants\n3. Balance user research, stakeholder interviews, and technical discovery\n4. Include workshops and collaborative sessions at key moments\n5. Define specific deliverables for each phase\n6. Create a realistic 8-week timeline with key milestones\n7. Anticipate challenges and suggest mitigation strategies\n",
+  "remote": true,
+  "voice_id": "EXAVITQu4vr4xnSDxMaL",
+  "status": "active",
+  "created_at": "2025-05-05T18:16:58.341862",
+  "last_updated": "2025-05-05T19:03:26.584521",
+  "expiration_date": "2025-05-12T18:16:58.341862",
+  "conversation_history": [
+    {
+      "role": "assistant",
+      "content": "Hello, I'm your interview assistant using the synthia character. I'll be asking you some questions today. Let's start: could you please introduce yourself?",
+      "timestamp": "2025-05-05T18:16:58.341862"
+    },
+    {
+      "role": "user",
+      "content": "I am Stephen and I see that the text to speech is working that is awesome thank you so much",
+      "timestamp": "2025-05-05T18:17:17.285212"
+    },
+    {
+      "role": "assistant",
+      "content": "That's valuable insight. How has this impacted your approach to similar situations?",
+      "timestamp": "2025-05-05T18:17:17.285212"
+    },
+    {
+      "role": "user",
+      "content": "okay I know it's",
+      "timestamp": "2025-05-05T18:17:26.548636"
+    },
+    {
+      "role": "assistant",
+      "content": "I'd like to understand more about your perspective. Could you elaborate on that point?",
+      "timestamp": "2025-05-05T18:17:26.548636"
+    },
+    {
+      "role": "user",
+      "content": "what point the thing I didn't really even say that you put in there",
+      "timestamp": "2025-05-05T18:17:37.652578"
+    },
+    {
+      "role": "assistant",
+      "content": "That's interesting. How do you think others in your field or organization might view this situation differently?",
+      "timestamp": "2025-05-05T18:17:37.652578"
+    },
+    {
+      "role": "user",
+      "content": "testing testing testing",
+      "timestamp": "2025-05-05T19:03:26.584521"
+    },
+    {
+      "role": "assistant",
+      "content": "I'd like to understand more about your perspective. Could you elaborate on that point?",
+      "timestamp": "2025-05-05T19:03:26.584521"
+    }
+  ]
+}

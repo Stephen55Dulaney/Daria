@@ -1,0 +1,816 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Interview Details - {{ interview.title }}{% endblock %}
+
+{% block content %}
+<!-- Add this style block right after the block content declaration -->
+<style>
+    /* Message styling */
+    .message {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .message-interviewer {
+        background-color: #f0f4f8;
+        border-left: 3px solid #4f46e5;
+    }
+    
+    .message-participant {
+        background-color: #f8f9fa;
+        border-left: 3px solid #0ea5e9;
+    }
+    
+    .message-header {
+        margin-bottom: 5px;
+        color: #6b7280;
+    }
+    
+    .message-content {
+        white-space: pre-line;
+    }
+    
+    /* Analysis styling */
+    .analysis-container .border-bottom {
+        border-bottom-color: #e5e7eb !important;
+    }
+    
+    .analysis-container h5 {
+        color: #4f46e5;
+        font-weight: 600;
+    }
+    
+    .analysis-container .list-group-item {
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    /* Tab styling */
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6b7280;
+        padding: 0.5rem 1rem;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #4f46e5;
+        font-weight: 600;
+        border-bottom: 2px solid #4f46e5;
+        background: transparent;
+    }
+    
+    /* Make the transcript scrollable if it's too long */
+    .interview-transcript {
+        max-height: 600px;
+        overflow-y: auto;
+        padding-right: 10px;
+    }
+    
+    /* Live status indicator */
+    .live-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        margin-right: 8px;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(0.8);
+            opacity: 0.7;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(0.8);
+            opacity: 0.7;
+        }
+    }
+    
+    .live-badge {
+        background-color: #dc3545;
+        animation: fade 1.5s infinite;
+    }
+    
+    @keyframes fade {
+        0% { opacity: 0.7; }
+        50% { opacity: 1; }
+        100% { opacity: 0.7; }
+    }
+    
+    .monitor-card {
+        border: 1px solid rgba(220, 53, 69, 0.3);
+        background-color: rgba(220, 53, 69, 0.05);
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between mb-4">
+        <h1 class="h3">Interview Details</h1>
+        <div class="d-flex gap-2">
+            <a href="/dashboard" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Dashboard
+            </a>
+        </div>
+    </div>
+    
+    {% set is_active = interview.status|default('active')|lower == 'active' and (interview.transcript is defined and interview.transcript or interview.conversation_history is defined and interview.conversation_history) %}
+    
+    {% if is_active %}
+    <!-- Monitor Card for Active Interviews -->
+    <div class="card mb-4 monitor-card">
+        <div class="card-body d-flex justify-content-between align-items-center">
+            <div>
+                <h4><span class="live-indicator"></span> Interview In Progress</h4>
+                <p class="mb-0">This interview has active participants. Monitor it live to observe responses and provide feedback.</p>
+            </div>
+            <a href="/monitor_interview/{{ session_id }}" class="btn btn-danger btn-lg">
+                <i class="bi bi-broadcast me-1"></i> Monitor Live Interview
+            </a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="mb-4">
+                <h2 class="h4">{{ interview.title }}</h2>
+                <div class="d-flex align-items-center mt-2">
+                    <span class="badge {% if is_active %}bg-danger live-badge{% else %}bg-success{% endif %} me-2">
+                        {% if is_active %}Live{% else %}{{ interview.status|default('Active')|capitalize }}{% endif %}
+                    </span>
+                    <span class="text-muted small">Created: 
+                    {% if interview.created_at is defined %}
+                        {% if interview.created_at is string %}
+                            {{ interview.created_at }}
+                        {% else %}
+                            {{ interview.created_at.strftime('%b %d, %Y %H:%M') }}
+                        {% endif %}
+                    {% else %}
+                        {{ interview.creation_date if interview.creation_date is defined else "Unknown date" }}
+                    {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 class="text-muted">Project</h5>
+                    <p>{{ interview.project if interview.project is defined else "Not specified" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-muted">Evaluation</h5>
+                    <p class="mt-1">
+                        <span class="badge bg-success">
+                            {% if interview.options is defined and interview.options.get('analysis', True) %}
+                            AI Analysis Enabled
+                            {% else %}
+                            AI Analysis Disabled
+                            {% endif %}
+                        </span>
+                    </p>
+                </div>
+            </div>
+            
+            <!-- Interview Link Section -->
+            <div class="mb-4">
+                <h3 class="h5 mb-3">Interview Link</h3>
+                <p class="small text-muted mb-2">Share this link with candidates to start interviews:</p>
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control" value="{{ request.host_url }}interview/{{ session_id }}?voice_id={{ interview.voice_id|default('EXAVITQu4vr4xnSDxMaL') }}&remote=true" readonly id="interview-link">
+                    <button class="btn btn-outline-secondary" type="button" id="copy-link-btn">
+                        <i class="bi bi-clipboard"></i>
+                    </button>
+                </div>
+                <div class="mb-3">
+                    <a href="{{ request.host_url }}interview/{{ session_id }}?voice_id={{ interview.voice_id|default('EXAVITQu4vr4xnSDxMaL') }}&remote=true" target="_blank" class="btn btn-sm btn-outline-secondary">
+                        <i class="bi bi-box-arrow-up-right me-1"></i> Open Link
+                    </a>
+                </div>
+                <div id="copy-status" class="small text-success mt-2" style="display: none;">Link copied to clipboard!</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Interview Sessions -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Interview Sessions
+        </div>
+        <div class="card-body">
+            {% if interview.transcript is defined and interview.transcript %}
+                <!-- Sessions exist -->
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Participant</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td>
+                                {% if interview.updated_at is defined %}
+                                    {% if interview.updated_at is string %}
+                                        {{ interview.updated_at }}
+                                    {% else %}
+                                        {{ interview.updated_at.strftime('%b %d, %Y %H:%M') }}
+                                    {% endif %}
+                                {% elif interview.created_at is defined %}
+                                    {% if interview.created_at is string %}
+                                        {{ interview.created_at }}
+                                    {% else %}
+                                        {{ interview.created_at.strftime('%b %d, %Y %H:%M') }}
+                                    {% endif %}
+                                {% else %}
+                                    {{ interview.creation_date if interview.creation_date is defined else "Unknown date" }}
+                                {% endif %}
+                                </td>
+                                <td>{% if interview.interviewee is defined and interview.interviewee is mapping %}{{ interview.interviewee.get('name', 'Anonymous') }}{% else %}Anonymous{% endif %}</td>
+                                <td>
+                                    <span class="badge {% if is_active %}bg-danger live-badge{% else %}{% if interview.status == 'completed' %}bg-primary{% else %}bg-warning{% endif %}{% endif %}">
+                                        {% if is_active %}<span class="live-indicator"></span> Live{% else %}{{ interview.status|capitalize }}{% endif %}
+                                    </span>
+                                </td>
+                                <td>
+                                    <a href="/monitor_interview/{{ session_id }}" class="btn btn-sm {% if is_active %}btn-danger{% else %}btn-outline-primary{% endif %}">
+                                        <i class="bi bi-{% if is_active %}broadcast{% else %}eye{% endif %} me-1"></i> {% if is_active %}Monitor Now{% else %}View{% endif %}
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <!-- No sessions yet -->
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="bi bi-people fs-1 text-muted"></i>
+                    </div>
+                    <p class="text-muted">No sessions yet. Share the interview link with candidates to get started.</p>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Interview Settings -->
+    <div class="card mb-4">
+        <div class="card-header">
+            Interview Settings
+        </div>
+        <div class="card-body">
+            <form id="interview-settings-form">
+                <input type="hidden" name="session_id" value="{{ session_id }}">
+                
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div class="d-flex align-items-center">
+                        <strong class="me-2">Status</strong>
+                    </div>
+                    <div class="form-check form-switch">
+                        <input class="form-check-input" type="checkbox" id="toggle-status" 
+                               name="is_active" checked
+                               onchange="updateInterviewStatus(this.checked)">
+                        <label class="form-check-label" for="toggle-status" id="status-label">
+                            Active
+                        </label>
+                    </div>
+                </div>
+                <div class="small text-muted mb-4">Toggle to enable or disable this interview</div>
+                
+                <div class="mb-3">
+                    <label class="form-label">Expiration</label>
+                    <div class="input-group">
+                        <input type="date" class="form-control" id="expiration-date" name="expiration_date" 
+                               value="{% if interview.expiration_date is defined %}{% if interview.expiration_date is string %}{{ interview.expiration_date }}{% else %}{{ interview.expiration_date.strftime('%Y-%m-%d') }}{% endif %}{% endif %}"
+                               onchange="updateExpirationDate(this.value)">
+                        <button class="btn btn-outline-secondary" type="button" id="save-expiration">
+                            <i class="bi bi-calendar"></i>
+                        </button>
+                    </div>
+                    <div class="small text-muted mt-1">Set your preferred expiry date (optional)</div>
+                </div>
+            </form>
+            <div id="settings-status" class="alert alert-success mt-3" style="display: none;"></div>
+        </div>
+    </div>
+    
+    <!-- Add this right after the card with interview-settings-form -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span>Interview Content</span>
+            <ul class="nav nav-tabs card-header-tabs" id="contentTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="transcript-tab" data-bs-toggle="tab" data-bs-target="#transcript" type="button" role="tab" aria-controls="transcript" aria-selected="true">Transcript</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="false">Analysis</button>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            <div class="tab-content" id="contentTabsContent">
+                <!-- Transcript Tab -->
+                <div class="tab-pane fade show active" id="transcript" role="tabpanel" aria-labelledby="transcript-tab">
+                    {% if interview.conversation_history %}
+                        <div class="interview-transcript">
+                            {% for message in interview.conversation_history %}
+                                <div class="message {% if message.role == 'assistant' %}message-interviewer{% else %}message-participant{% endif %} mb-3">
+                                    <div class="message-header">
+                                        <strong>{{ "Interviewer" if message.role == "assistant" else "Participant" }}</strong>
+                                        <span class="text-muted small ms-2">
+                                            {% if message.timestamp %}
+                                                {{ message.timestamp }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="message-content">
+                                        {{ message.content }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% elif interview.transcript %}
+                        <div class="interview-transcript">
+                            {% for entry in interview.transcript %}
+                                <div class="message {% if entry.speaker == 'Interviewer' %}message-interviewer{% else %}message-participant{% endif %} mb-3">
+                                    <div class="message-header">
+                                        <strong>{{ entry.speaker_name }}</strong>
+                                        <span class="text-muted small ms-2">
+                                            {% if entry.timestamp %}
+                                                {{ entry.timestamp }}
+                                            {% endif %}
+                                        </span>
+                                    </div>
+                                    <div class="message-content">
+                                        {{ entry.content }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <p class="text-muted">No transcript available</p>
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <!-- Analysis Tab -->
+                <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+                    {% if interview.analysis %}
+                        <div class="analysis-container">
+                            <!-- Summary Section -->
+                            <div class="mb-4">
+                                <h5 class="border-bottom pb-2">Summary</h5>
+                                <p>{{ interview.analysis.summary }}</p>
+                            </div>
+                            
+                            <!-- User Needs Section -->
+                            {% if interview.analysis.user_needs %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">User Needs</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for need in interview.analysis.user_needs %}
+                                            <li class="list-group-item px-0">{{ need }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Goals Section -->
+                            {% if interview.analysis.goals %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Goals</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for goal in interview.analysis.goals %}
+                                            <li class="list-group-item px-0">{{ goal }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Pain Points Section -->
+                            {% if interview.analysis.pain_points %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Pain Points</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for pain in interview.analysis.pain_points %}
+                                            <li class="list-group-item px-0">{{ pain }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Opportunities Section -->
+                            {% if interview.analysis.opportunities %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Opportunities</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for opportunity in interview.analysis.opportunities %}
+                                            <li class="list-group-item px-0">{{ opportunity }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Recommendations Section -->
+                            {% if interview.analysis.recommendations %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Recommendations</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for rec in interview.analysis.recommendations %}
+                                            <li class="list-group-item px-0">{{ rec }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Key Quotes Section -->
+                            {% if interview.analysis.key_quotes %}
+                                <div class="mb-4">
+                                    <h5 class="border-bottom pb-2">Key Quotes</h5>
+                                    <ul class="list-group list-group-flush">
+                                        {% for quote in interview.analysis.key_quotes %}
+                                            <li class="list-group-item px-0"><em>"{{ quote }}"</em></li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                            
+                            <!-- Analysis Metadata -->
+                            <div class="card bg-light mt-4">
+                                <div class="card-body">
+                                    <p class="text-muted mb-0 small">
+                                        Analysis performed: {{ interview.analysis.performed_at }}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="text-center py-5">
+                            <p class="text-muted mb-3">No analysis available for this interview</p>
+                            {% if interview.status == 'completed' %}
+                                <button class="btn btn-primary" id="generate-analysis-btn">
+                                    <i class="bi bi-magic me-2"></i> Generate Analysis
+                                </button>
+                                <div class="spinner-border text-primary d-none mt-3" id="analysis-spinner" role="status">
+                                    <span class="visually-hidden">Loading...</span>
+                                </div>
+                                <div class="alert alert-danger mt-3 d-none" id="analysis-error"></div>
+                            {% else %}
+                                <div class="alert alert-warning">
+                                    Interview must be completed before analysis can be generated.
+                                </div>
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Action Buttons -->
+    <div class="d-flex justify-content-between">
+        <button class="btn btn-outline-primary">
+            <i class="bi bi-files me-1"></i> Duplicate
+        </button>
+        <button class="btn btn-outline-danger" id="delete-interview-btn">
+            <i class="bi bi-trash me-1"></i> Delete
+        </button>
+    </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this interview? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyLink() {
+    const linkInput = document.getElementById('interview-link');
+    linkInput.select();
+    document.execCommand('copy');
+    
+    // Show feedback
+    const copyStatus = document.getElementById('copy-status');
+    copyStatus.style.display = 'block';
+    
+    // Hide after 3 seconds
+    setTimeout(() => {
+        copyStatus.style.display = 'none';
+    }, 3000);
+}
+
+function copyMonitorLink() {
+    // Create a temporary input to copy from
+    const tempInput = document.createElement('input');
+    const monitorUrl = window.location.origin + '/monitor_interview/{{ session_id }}';
+    tempInput.value = monitorUrl;
+    document.body.appendChild(tempInput);
+    tempInput.select();
+    document.execCommand('copy');
+    document.body.removeChild(tempInput);
+    
+    // Show toast or alert
+    alert('Monitor link copied to clipboard: ' + monitorUrl);
+}
+
+function sendEmailWithLink() {
+    const link = document.getElementById('interview-link').value;
+    const subject = encodeURIComponent("Remote Interview Invitation - {{ interview.title }}");
+    
+    // Get recipient email if available
+    const recipient = "{{ interview.interviewee.get('email') if interview.interviewee is defined and interview.interviewee is mapping else '' }}";
+    
+    const body = encodeURIComponent(`Hello,
+
+You have been invited to participate in a remote interview session: "{{ interview.title }}".
+
+To start the interview, please click on the following link:
+${link}
+
+Thank you for your participation!
+
+Best regards,
+The Research Team`);
+    
+    window.open(`mailto:${recipient}?subject=${subject}&body=${body}`, '_blank');
+}
+
+function updateInterviewStatus(isActive) {
+    const statusLabel = document.getElementById('status-label');
+    const settingsStatus = document.getElementById('settings-status');
+    const sessionId = '{{ session_id }}';
+    
+    statusLabel.textContent = isActive ? 'Active' : 'Inactive';
+    
+    // Send status update to server
+    fetch('/langchain/api/interview/update-status', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            session_id: sessionId,
+            is_active: isActive
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            settingsStatus.textContent = 'Interview status updated successfully';
+            settingsStatus.classList.remove('alert-danger');
+            settingsStatus.classList.add('alert-success');
+        } else {
+            settingsStatus.textContent = 'Error updating interview status: ' + data.error;
+            settingsStatus.classList.remove('alert-success');
+            settingsStatus.classList.add('alert-danger');
+        }
+        settingsStatus.style.display = 'block';
+        setTimeout(() => {
+            settingsStatus.style.display = 'none';
+        }, 3000);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        settingsStatus.textContent = 'Error updating interview status';
+        settingsStatus.classList.remove('alert-success');
+        settingsStatus.classList.add('alert-danger');
+        settingsStatus.style.display = 'block';
+    });
+}
+
+function updateExpirationDate(date) {
+    const settingsStatus = document.getElementById('settings-status');
+    const sessionId = '{{ session_id }}';
+    
+    // Send expiration date update to server
+    fetch('/langchain/api/interview/update-expiration', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            session_id: sessionId,
+            expiration_date: date
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            settingsStatus.textContent = 'Expiration date updated successfully';
+            settingsStatus.classList.remove('alert-danger');
+            settingsStatus.classList.add('alert-success');
+        } else {
+            settingsStatus.textContent = 'Error updating expiration date: ' + data.error;
+            settingsStatus.classList.remove('alert-success');
+            settingsStatus.classList.add('alert-danger');
+        }
+        settingsStatus.style.display = 'block';
+        setTimeout(() => {
+            settingsStatus.style.display = 'none';
+        }, 3000);
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        settingsStatus.textContent = 'Error updating expiration date';
+        settingsStatus.classList.remove('alert-success');
+        settingsStatus.classList.add('alert-danger');
+        settingsStatus.style.display = 'block';
+    });
+}
+
+// Function to delete the interview
+function deleteInterview() {
+    const sessionId = '{{ session_id }}';
+    
+    // Show loading state
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+    }
+    
+    // Call the API to delete the interview
+    fetch(`/api/interview/delete/${sessionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect to dashboard
+            window.location.href = '/dashboard';
+        } else {
+            // Show error
+            alert(`Error deleting interview: ${data.error}`);
+            
+            // Reset button
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.innerHTML = 'Delete';
+            }
+            
+            // Hide modal
+            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+            if (deleteModal) {
+                deleteModal.hide();
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the interview. Please try again.');
+        
+        // Reset button
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.innerHTML = 'Delete';
+        }
+        
+        // Hide modal
+        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+        if (deleteModal) {
+            deleteModal.hide();
+        }
+    });
+}
+
+// Add event listener for save expiration button
+document.addEventListener('DOMContentLoaded', function() {
+    const saveExpirationBtn = document.getElementById('save-expiration');
+    if (saveExpirationBtn) {
+        saveExpirationBtn.addEventListener('click', function() {
+            const expirationDate = document.getElementById('expiration-date').value;
+            updateExpirationDate(expirationDate);
+        });
+    }
+    
+    // Add event listener for copy link button
+    const copyLinkBtn = document.getElementById('copy-link-btn');
+    if (copyLinkBtn) {
+        copyLinkBtn.addEventListener('click', copyLink);
+    }
+    
+    // Add monitor link to the monitor button if the interview is active
+    {% if is_active %}
+    const monitorBtns = document.querySelectorAll('a[href="/monitor_interview/{{ session_id }}"]');
+    monitorBtns.forEach(function(btn) {
+        // Add a copy link button next to each monitor button
+        const copyBtn = document.createElement('button');
+        copyBtn.className = 'btn btn-sm btn-outline-secondary ms-2';
+        copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+        copyBtn.title = 'Copy monitor link';
+        copyBtn.onclick = function(e) {
+            e.preventDefault();
+            copyMonitorLink();
+        };
+        
+        // Insert after each monitor button
+        btn.parentNode.insertBefore(copyBtn, btn.nextSibling);
+    });
+    {% endif %}
+    
+    // Add event listener for the delete button
+    const deleteBtn = document.getElementById('delete-interview-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            // Show the confirmation modal
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            deleteModal.show();
+        });
+    }
+    
+    // Add event listener for the confirm delete button in the modal
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            deleteInterview();
+        });
+    }
+    
+    // Add event listener for the generate analysis button
+    const generateAnalysisButton = document.getElementById('generate-analysis-btn');
+    if (generateAnalysisButton) {
+        generateAnalysisButton.addEventListener('click', generateAnalysis);
+    }
+});
+
+function generateAnalysis() {
+    // Show spinner, hide button
+    const button = document.getElementById('generate-analysis-btn');
+    const spinner = document.getElementById('analysis-spinner');
+    const errorElement = document.getElementById('analysis-error');
+    
+    if (button) button.classList.add('d-none');
+    if (spinner) spinner.classList.remove('d-none');
+    if (errorElement) {
+        errorElement.classList.add('d-none');
+        errorElement.textContent = '';
+    }
+    
+    // Call the analyze endpoint
+    fetch(`/api/interview/analyze/{{ session_id }}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({})
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Reload the page to show the analysis
+            window.location.reload();
+        } else {
+            // Show error
+            if (errorElement) {
+                errorElement.textContent = data.error || 'An error occurred while generating the analysis';
+                errorElement.classList.remove('d-none');
+            }
+            // Hide spinner, show button
+            if (spinner) spinner.classList.add('d-none');
+            if (button) button.classList.remove('d-none');
+        }
+    })
+    .catch(error => {
+        // Show error
+        console.error('Error:', error);
+        if (errorElement) {
+            errorElement.textContent = 'Network error occurred while generating analysis';
+            errorElement.classList.remove('d-none');
+        }
+        // Hide spinner, show button
+        if (spinner) spinner.classList.add('d-none');
+        if (button) button.classList.remove('d-none');
+    });
+}
+</script>
+{% endblock %} 

@@ -345,9 +345,11 @@ async function listen() {
                     // Handle should_stop_interview flag
                     if (result.should_stop_interview) {
                         console.log('Interview should stop');
-                        // Reset the interview state
-                        await resetInterviewState(true);
-                        return result.transcription || 'No speech detected';
+                        // Reset the interview state (don't use await here)
+                        resetInterviewState(true).catch(err => console.error('Error resetting interview state:', err));
+                        // Make sure to resolve the promise with the transcription
+                        resolve(result.transcription || 'No speech detected');
+                        return;
                     }
                     
                     resolve(result.transcription || 'No speech detected');

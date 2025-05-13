@@ -1,0 +1,43 @@
+{
+  "id": "dfc0b5da-8326-41c9-b6c8-4aed8611e439",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Synthia Sue",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "I'll be asking you some questions about your experiences feel free to respond naturally Shall We Begin yes we shall begin",
+      "role": "user",
+      "timestamp": "2025-05-12T18:58:22.707485"
+    },
+    {
+      "content": "That sounds great! To dive deeper into your experiences with end-to-end testing, can you share a specific example of a challenge you faced during an end-to-end testing process in a project? How did you overcome it, and what did you learn from that experience?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T18:58:24.261050"
+    },
+    {
+      "content": "are you going to send a question to the llm",
+      "role": "user",
+      "timestamp": "2025-05-12T18:59:08.786230"
+    },
+    {
+      "content": "It seems like there might have been a miscommunication. Let's refocus on our discussion about your experiences with end-to-end testing. Could you share another challenge you encountered during an end-to-end testing process? How did you approach solving this challenge, and what insights did you gain from overcoming it?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T18:59:10.120824"
+    }
+  ],
+  "transcript": "\n\nParticipant: I'll be asking you some questions about your experiences feel free to respond naturally Shall We Begin yes we shall begin\n\nModerator: That sounds great! To dive deeper into your experiences with end-to-end testing, can you share a specific example of a challenge you faced during an end-to-end testing process in a project? How did you overcome it, and what did you learn from that experience?\n\nParticipant: are you going to send a question to the llm\n\nModerator: It seems like there might have been a miscommunication. Let's refocus on our discussion about your experiences with end-to-end testing. Could you share another challenge you encountered during an end-to-end testing process? How did you approach solving this challenge, and what insights did you gain from overcoming it?",
+  "analysis": null,
+  "created_at": "2025-05-12T18:57:55.636897",
+  "updated_at": "2025-05-12T18:59:10.121695"
+}

@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA API Test</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        pre {
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow-x: auto;
+        }
+        button {
+            padding: 10px 15px;
+            margin: 5px;
+            background-color: #4f46e5;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        h2 {
+            margin-top: 30px;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <h1>DARIA API Test</h1>
+    
+    <div class="test-section">
+        <h2>1. Character Loading Test</h2>
+        <p>This test checks if the characters can be loaded from the API.</p>
+        <button id="testCharactersBtn">Test Characters API</button>
+        <h3>Results:</h3>
+        <pre id="charactersResult">Click the button to test...</pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>2. Character Details Test</h2>
+        <p>This test checks if a specific character's details can be loaded.</p>
+        <select id="characterSelect">
+            <option value="daria">Daria</option>
+            <option value="skeptica">Skeptica</option>
+            <option value="eurekia">Eurekia</option>
+            <option value="thesea">Thesea</option>
+            <option value="askia">Askia</option>
+            <option value="odessia">Odessia</option>
+            <option value="synthia">Synthia</option>
+        </select>
+        <button id="testCharacterBtn">Test Character API</button>
+        <h3>Results:</h3>
+        <pre id="characterResult">Select a character and click the button to test...</pre>
+    </div>
+    
+    <div class="test-section">
+        <h2>3. ElevenLabs Text-to-Speech Test</h2>
+        <p>This test checks if the ElevenLabs TTS API is working.</p>
+        <select id="voiceSelect">
+            <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Default)</option>
+            <option value="21m00Tcm4TlvDq8ikWAM">Adam</option>
+            <option value="AZnzlk1XvdvUeBnXmlld">Domi</option>
+            <option value="MF3mGyEYCl7XYWbV9V6O">Elli</option>
+            <option value="TxGEqnHWrfWFTfGW9XjX">Josh</option>
+            <option value="yoZ06aMxZJJ28mfd3POQ">Sam</option>
+        </select>
+        <button id="testTTSBtn">Test TTS API</button>
+        <h3>Results:</h3>
+        <pre id="ttsResult">Select a voice and click the button to test...</pre>
+        <audio id="audioPlayer" controls style="display: none;"></audio>
+    </div>
+    
+    <div class="test-section">
+        <h2>4. Check Services</h2>
+        <p>This test checks which services are running.</p>
+        <button id="checkServicesBtn">Check Services</button>
+        <h3>Results:</h3>
+        <pre id="servicesResult">Click the button to check services...</pre>
+    </div>
+
+    <script>
+        // Test Characters API
+        document.getElementById('testCharactersBtn').addEventListener('click', async function() {
+            const resultElement = document.getElementById('charactersResult');
+            resultElement.textContent = 'Loading...';
+            
+            try {
+                const response = await fetch('http://localhost:5010/api/characters');
+                const data = await response.json();
+                resultElement.textContent = JSON.stringify(data, null, 2);
+                
+                // Populate the character select dropdown
+                if (data.success && data.characters) {
+                    const select = document.getElementById('characterSelect');
+                    select.innerHTML = '';
+                    
+                    data.characters.forEach(character => {
+                        const option = document.createElement('option');
+                        option.value = character.name;
+                        option.textContent = character.display_name || character.name;
+                        select.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                resultElement.textContent = `Error: ${error.message}`;
+                console.error('Error fetching characters:', error);
+            }
+        });
+        
+        // Test Character API
+        document.getElementById('testCharacterBtn').addEventListener('click', async function() {
+            const resultElement = document.getElementById('characterResult');
+            const characterName = document.getElementById('characterSelect').value;
+            resultElement.textContent = `Loading details for ${characterName}...`;
+            
+            try {
+                const response = await fetch(`http://localhost:5010/api/character/${characterName}`);
+                const data = await response.json();
+                resultElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultElement.textContent = `Error: ${error.message}`;
+                console.error(`Error fetching character ${characterName}:`, error);
+            }
+        });
+        
+        // Test ElevenLabs TTS API
+        document.getElementById('testTTSBtn').addEventListener('click', async function() {
+            const resultElement = document.getElementById('ttsResult');
+            const voiceId = document.getElementById('voiceSelect').value;
+            const testText = "Hello, I'm testing the ElevenLabs text-to-speech service. How does my voice sound?";
+            
+            resultElement.textContent = `Requesting TTS with voice ID: ${voiceId}...`;
+            
+            try {
+                const response = await fetch('http://localhost:5010/api/text_to_speech_elevenlabs', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: testText,
+                        voice_id: voiceId
+                    })
+                });
+                
+                if (response.ok) {
+                    resultElement.textContent = 'TTS API call successful! Playing audio...';
+                    const audioBlob = await response.blob();
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    const audioPlayer = document.getElementById('audioPlayer');
+                    audioPlayer.src = audioUrl;
+                    audioPlayer.style.display = 'block';
+                    audioPlayer.play();
+                } else {
+                    let errorData;
+                    try {
+                        errorData = await response.json();
+                    } catch (e) {
+                        errorData = { error: await response.text() };
+                    }
+                    resultElement.textContent = `Error: ${response.status} - ${JSON.stringify(errorData)}`;
+                }
+            } catch (error) {
+                resultElement.textContent = `Network error: ${error.message}`;
+                console.error('Error calling TTS API:', error);
+            }
+        });
+        
+        // Check Services
+        document.getElementById('checkServicesBtn').addEventListener('click', async function() {
+            const resultElement = document.getElementById('servicesResult');
+            resultElement.textContent = 'Checking services...';
+            
+            try {
+                const response = await fetch('http://localhost:5010/api/check_services');
+                const data = await response.json();
+                resultElement.textContent = JSON.stringify(data, null, 2);
+            } catch (error) {
+                resultElement.textContent = `Error: ${error.message}`;
+                console.error('Error checking services:', error);
+            }
+        });
+    </script>
+</body>
+</html> 

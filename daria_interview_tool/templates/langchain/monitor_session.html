@@ -1,0 +1,729 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Monitor Interview: {{ title }}{% endblock %}
+
+{% block extra_css %}
+<style>
+    .transcript-container {
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        overflow-y: auto;
+        margin-right: 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 2;
+    }
+    .controls-container {
+        width: 350px;
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        flex: 1;
+    }
+    .status-indicator {
+        height: 10px;
+        width: 10px;
+        border-radius: 50%;
+        background-color: #6c757d;
+        margin-right: 5px;
+    }
+    .status-indicator.active {
+        background-color: #28a745;
+    }
+    .transcript-content {
+        flex: 1;
+        white-space: pre-wrap;
+        font-family: 'Inter', Tahoma, Geneva, Verdana, sans-serif;
+        line-height: 1.6;
+        height: 65vh;
+        overflow-y: auto;
+    }
+    .interviewer-message {
+        color: #4f46e5;
+        font-weight: 500;
+        margin-bottom: 10px;
+    }
+    .participant-message {
+        color: #212529;
+        margin-bottom: 20px;
+    }
+    .control-label {
+        font-weight: 500;
+        margin-bottom: 5px;
+    }
+    .emotion-chart {
+        height: 200px;
+        margin-bottom: 20px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+    }
+    .sentiment-indicator {
+        height: 25px;
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        border: 1px solid #dee2e6;
+        position: relative;
+        overflow: hidden;
+        margin-bottom: 20px;
+    }
+    .sentiment-level {
+        position: absolute;
+        height: 100%;
+        background: linear-gradient(to right, #dc3545, #ffc107, #28a745);
+        width: 100%;
+    }
+    .sentiment-marker {
+        position: absolute;
+        height: 25px;
+        width: 3px;
+        background-color: black;
+        top: 0;
+        z-index: 1;
+    }
+    .interview-stats {
+        list-style: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+    .interview-stats li {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 0.9rem;
+    }
+    .interview-stats .value {
+        font-weight: 500;
+    }
+    .suggestion-box {
+        background-color: #f8f9fa;
+        border-radius: 5px;
+        padding: 10px;
+        margin-bottom: 20px;
+        font-size: 0.9rem;
+    }
+    .live-indicator {
+        display: inline-flex;
+        align-items: center;
+        padding: 5px 10px;
+        background-color: rgba(220, 53, 69, 0.1);
+        border-radius: 20px;
+        color: #dc3545;
+        font-size: 0.8rem;
+        font-weight: 500;
+    }
+    .live-indicator .dot {
+        height: 8px;
+        width: 8px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        margin-right: 5px;
+        animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+        0% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.3;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+    .topic-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-bottom: 20px;
+    }
+    .topic-tag {
+        background-color: #e9ecef;
+        padding: 3px 8px;
+        border-radius: 15px;
+        font-size: 0.8rem;
+    }
+    .btn-toolbar {
+        margin-top: auto;
+    }
+    .monitor-container {
+        display: flex;
+        gap: 20px;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+            <h1 class="h3">Monitoring: {{ title }}</h1>
+            <div class="text-muted small">Session ID: {{ session_id }}</div>
+        </div>
+        <div class="d-flex align-items-center">
+            <div class="live-indicator me-3">
+                <div class="dot"></div>
+                <span>LIVE</span>
+            </div>
+            <button class="btn btn-outline-primary btn-sm me-2" id="suggestQuestionBtn">
+                <i class="bi bi-lightbulb"></i> Suggest Question
+            </button>
+            <a href="{{ url_for('langchain_features.interview_details', session_id=session_id) }}" class="btn btn-outline-secondary btn-sm me-2">
+                <i class="bi bi-info-circle"></i> Interview Details
+            </a>
+            <button class="btn btn-outline-danger btn-sm" id="endSessionBtn">
+                <i class="bi bi-stop-circle"></i> End Session
+            </button>
+        </div>
+    </div>
+
+    <div class="monitor-container">
+        <div class="transcript-container">
+            <div class="d-flex justify-content-between align-items-center mb-3">
+                <h2 class="h5 mb-0">Live Transcript</h2>
+                <button class="btn btn-sm btn-outline-secondary" id="copyTranscriptBtn">
+                    <i class="bi bi-clipboard"></i> Copy Transcript
+                </button>
+            </div>
+            <div class="transcript-content" id="transcriptContent">
+                {{ transcript }}
+            </div>
+        </div>
+        <div class="controls-container">
+            <h3 class="h5 mb-3">Interview Analytics</h3>
+            
+            <div class="control-label">Sentiment Tracking</div>
+            <div class="sentiment-indicator mb-1">
+                <div class="sentiment-level"></div>
+                <div class="sentiment-marker" style="left: 50%;"></div>
+            </div>
+            <div class="d-flex justify-content-between mb-3 small text-muted">
+                <span>Negative</span>
+                <span>Neutral</span>
+                <span>Positive</span>
+            </div>
+            
+            <div class="control-label">Key Topics Mentioned</div>
+            <div class="topic-list" id="topicList">
+                <span class="topic-tag">Product Features</span>
+                <span class="topic-tag">User Experience</span>
+                <span class="topic-tag">Interface Design</span>
+                <span class="topic-tag">Customer Support</span>
+                <span class="topic-tag">Documentation</span>
+            </div>
+            
+            <div class="control-label">Interview Stats</div>
+            <ul class="interview-stats">
+                <li>
+                    <span class="label">Duration</span>
+                    <span class="value" id="durationValue">00:05:32</span>
+                </li>
+                <li>
+                    <span class="label">Questions Asked</span>
+                    <span class="value" id="questionsValue">6</span>
+                </li>
+                <li>
+                    <span class="label">Avg. Response Time</span>
+                    <span class="value" id="responseTimeValue">12.4 sec</span>
+                </li>
+                <li>
+                    <span class="label">Interviewer Talk Time</span>
+                    <span class="value" id="interviewerTimeValue">35%</span>
+                </li>
+                <li>
+                    <span class="label">Participant Talk Time</span>
+                    <span class="value" id="participantTimeValue">65%</span>
+                </li>
+            </ul>
+            
+            <div class="control-label">AI Suggestions</div>
+            <div class="suggestion-box" id="suggestionBox">
+                Consider asking about their specific pain points with the current process. The participant has mentioned challenges but hasn't specified details.
+            </div>
+            
+            <div class="btn-toolbar">
+                <button class="btn btn-outline-secondary me-2" id="refreshBtn">
+                    <i class="bi bi-arrow-clockwise"></i> Refresh Data
+                </button>
+                <button class="btn btn-primary" id="downloadReportBtn">
+                    <i class="bi bi-download"></i> Download Report
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Suggest Question Modal -->
+<div class="modal fade" id="suggestQuestionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Suggest Follow-up Question</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="mb-3">
+                    <label for="suggestedQuestion" class="form-label">Question Suggestion</label>
+                    <select class="form-select mb-3" id="suggestedQuestion">
+                        <option value="1">Could you elaborate on the challenges you mentioned with the user interface?</option>
+                        <option value="2">How does this compare to other similar products you've used before?</option>
+                        <option value="3">What would be your ideal solution to the issues you've described?</option>
+                        <option value="4">Could you walk me through a specific example where you encountered this problem?</option>
+                    </select>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="customQuestionCheck">
+                        <label class="form-check-label" for="customQuestionCheck">
+                            Write a custom question
+                        </label>
+                    </div>
+                </div>
+                <div class="mb-3" id="customQuestionContainer" style="display: none;">
+                    <label for="customQuestion" class="form-label">Custom Question</label>
+                    <textarea class="form-control" id="customQuestion" rows="3" placeholder="Type your question here..."></textarea>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="sendQuestionBtn">Send to Interviewer</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- End Session Modal -->
+<div class="modal fade" id="endSessionModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">End Interview Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to end this interview session? This will signal to Daria to wrap up the interview.</p>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="generateAnalysisCheck" checked>
+                    <label class="form-check-label" for="generateAnalysisCheck">
+                        Generate comprehensive analysis report
+                    </label>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmEndSession">End Session</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Analysis Modal -->
+<div class="modal fade" id="analysisModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Interview Analysis</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="text-center mb-4" id="analysisLoading">
+                    <div class="spinner-border text-primary mb-3" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Generating analysis...</p>
+                </div>
+                <div id="analysisContent" style="display: none;">
+                    <h4 class="mb-3">Key Insights</h4>
+                    <div id="analysisText" class="mb-4"></div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary" id="downloadAnalysisBtn">Download</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Main elements
+        const sessionId = '{{ session_id }}';
+        const transcriptContent = document.getElementById('transcriptContent');
+        const copyTranscriptBtn = document.getElementById('copyTranscriptBtn');
+        const suggestQuestionBtn = document.getElementById('suggestQuestionBtn');
+        const endSessionBtn = document.getElementById('endSessionBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const downloadReportBtn = document.getElementById('downloadReportBtn');
+        
+        // Modals
+        const suggestQuestionModal = new bootstrap.Modal(document.getElementById('suggestQuestionModal'));
+        const endSessionModal = new bootstrap.Modal(document.getElementById('endSessionModal'));
+        const analysisModal = new bootstrap.Modal(document.getElementById('analysisModal'));
+        
+        // Form elements
+        const customQuestionCheck = document.getElementById('customQuestionCheck');
+        const customQuestionContainer = document.getElementById('customQuestionContainer');
+        const sendQuestionBtn = document.getElementById('sendQuestionBtn');
+        const confirmEndSessionBtn = document.getElementById('confirmEndSession');
+        
+        // Analysis elements
+        const analysisLoading = document.getElementById('analysisLoading');
+        const analysisContent = document.getElementById('analysisContent');
+        const analysisText = document.getElementById('analysisText');
+        const downloadAnalysisBtn = document.getElementById('downloadAnalysisBtn');
+        
+        // Status tracking variables
+        let isInterviewEnded = false;
+        let checkStatusInterval = null;
+        let pollInterval = null;
+        
+        // Function to check interview status
+        const checkInterviewStatus = () => {
+            fetch(`/langchain/api/interview/transcript?session_id=${sessionId}`)
+                .then(response => response.json())
+                .then(data => {
+                    // Check if the interview is completed
+                    if (data.transcript && 
+                        (data.transcript.includes("The interview has been completed") || 
+                         data.transcript.includes("I'll end the interview now") ||
+                         data.transcript.includes("Thank you for your time and valuable insights"))) {
+                        
+                        if (!isInterviewEnded) {
+                            isInterviewEnded = true;
+                            handleInterviewEnded();
+                        }
+                    }
+                })
+                .catch(error => console.error('Error checking status:', error));
+        };
+        
+        // Handle when interview is ended
+        const handleInterviewEnded = () => {
+            console.log('Interview has ended');
+            
+            // Clear intervals
+            if (checkStatusInterval) {
+                clearInterval(checkStatusInterval);
+            }
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+            
+            // Show notification to researcher
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-info alert-dismissible fade show';
+            notification.innerHTML = `
+                <strong>Interview Completed!</strong> The interview has been ended and the interviewee has been thanked.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.querySelector('.container-fluid').prepend(notification);
+            
+            // Disable controls
+            if (endSessionBtn) endSessionBtn.disabled = true;
+            if (suggestQuestionBtn) suggestQuestionBtn.disabled = true;
+            
+            // Add completed label to the title
+            const statusBadge = document.createElement('span');
+            statusBadge.className = 'badge bg-success ms-2';
+            statusBadge.textContent = 'Completed';
+            document.querySelector('h1').appendChild(statusBadge);
+            
+            // Change live indicator
+            document.querySelector('.live-indicator').innerHTML = '<span class="text-success">COMPLETED</span>';
+            
+            // Add view analysis button
+            const actionButtonsContainer = document.querySelector('.d-flex.align-items-center');
+            if (actionButtonsContainer) {
+                const analysisBtn = document.createElement('button');
+                analysisBtn.className = 'btn btn-primary btn-sm ms-2';
+                analysisBtn.innerHTML = '<i class="bi bi-graph-up"></i> View Analysis';
+                analysisBtn.addEventListener('click', () => {
+                    window.location.href = `/langchain/interview/view/${sessionId}`;
+                });
+                actionButtonsContainer.appendChild(analysisBtn);
+            }
+        };
+        
+        // Update sentiment marker position (simulation)
+        function updateSentiment(value) {
+            // value should be between -1 (negative) and 1 (positive)
+            // Convert to percentage for positioning (0% to 100%)
+            const percentage = ((value + 1) / 2) * 100;
+            document.querySelector('.sentiment-marker').style.left = `${percentage}%`;
+        }
+        
+        // Simulate random sentiment between -0.3 and 0.7 (slightly positive bias)
+        updateSentiment(Math.random() * 1.0 - 0.3);
+        
+        // Poll for transcript updates
+        function pollTranscript() {
+            fetch(`/langchain/api/interview/transcript?session_id=${sessionId}`, {
+                method: 'GET'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // Update the transcript
+                    transcriptContent.textContent = data.transcript;
+                    transcriptContent.scrollTop = transcriptContent.scrollHeight;
+                    
+                    // Update stats (simulation)
+                    updateMonitoringStats();
+                    
+                    // Check interview status
+                    checkInterviewStatus();
+                }
+            })
+            .catch(error => {
+                console.error('Error polling transcript:', error);
+            });
+        }
+        
+        // Simulate updating monitoring stats
+        function updateMonitoringStats() {
+            // Update duration
+            const startTime = new Date(Date.now() - Math.floor(Math.random() * 3600000));
+            const duration = new Date(Date.now() - startTime);
+            const minutes = String(duration.getMinutes()).padStart(2, '0');
+            const seconds = String(duration.getSeconds()).padStart(2, '0');
+            document.getElementById('durationValue').textContent = `00:${minutes}:${seconds}`;
+            
+            // Update other stats
+            const questionCount = Math.floor(Math.random() * 10) + 5;
+            document.getElementById('questionsValue').textContent = questionCount;
+            
+            const avgResponseTime = (Math.random() * 15 + 5).toFixed(1);
+            document.getElementById('responseTimeValue').textContent = `${avgResponseTime} sec`;
+            
+            const interviewerTime = Math.floor(Math.random() * 20) + 25;
+            document.getElementById('interviewerTimeValue').textContent = `${interviewerTime}%`;
+            
+            const participantTime = 100 - interviewerTime;
+            document.getElementById('participantTimeValue').textContent = `${participantTime}%`;
+            
+            // Update sentiment randomly
+            if (Math.random() > 0.7) {
+                updateSentiment(Math.random() * 1.0 - 0.3);
+            }
+        }
+        
+        // Event listeners
+        copyTranscriptBtn.addEventListener('click', () => {
+            navigator.clipboard.writeText(transcriptContent.textContent)
+                .then(() => {
+                    alert('Transcript copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Could not copy text: ', err);
+                });
+        });
+        
+        customQuestionCheck.addEventListener('change', () => {
+            customQuestionContainer.style.display = customQuestionCheck.checked ? 'block' : 'none';
+        });
+        
+        suggestQuestionBtn.addEventListener('click', () => {
+            suggestQuestionModal.show();
+        });
+        
+        endSessionBtn.addEventListener('click', () => {
+            endSessionModal.show();
+        });
+        
+        sendQuestionBtn.addEventListener('click', () => {
+            let question;
+            
+            if (customQuestionCheck.checked) {
+                question = document.getElementById('customQuestion').value.trim();
+                if (!question) {
+                    alert('Please enter a custom question');
+                    return;
+                }
+            } else {
+                const select = document.getElementById('suggestedQuestion');
+                question = select.options[select.selectedIndex].text;
+            }
+            
+            // Send the suggested question to the interviewer
+            fetch('/langchain/api/interview/suggest-question', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    question: question
+                })
+            })
+            .then(response => {
+                // First check if the response is ok before trying to parse JSON
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    alert('Question suggestion sent to the interviewer');
+                } else {
+                    alert('Error sending suggestion: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error sending suggestion: ' + error);
+            });
+            
+            suggestQuestionModal.hide();
+        });
+        
+        confirmEndSessionBtn.addEventListener('click', () => {
+            const generateAnalysis = document.getElementById('generateAnalysisCheck').checked;
+            
+            // Show the loading indicator if generating analysis
+            if (generateAnalysis) {
+                analysisLoading.style.display = 'block';
+                analysisContent.style.display = 'none';
+            }
+            
+            // Send the end session request
+            fetch('/langchain/api/interview/end', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    session_id: sessionId,
+                    generate_analysis: generateAnalysis
+                })
+            })
+            .then(response => {
+                // First check if the response is ok before trying to parse JSON
+                if (!response.ok) {
+                    throw new Error(`Server responded with status ${response.status}`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.status === 'success') {
+                    // Close the end session modal
+                    endSessionModal.hide();
+                    
+                    // Mark interview as ended
+                    isInterviewEnded = true;
+                    handleInterviewEnded();
+                    
+                    // If analysis was generated, show it
+                    if (generateAnalysis && data.analysis) {
+                        analysisLoading.style.display = 'none';
+                        analysisContent.style.display = 'block';
+                        analysisText.innerHTML = data.analysis.replace(/\n/g, '<br>');
+                        analysisModal.show();
+                    } else {
+                        alert('Interview session ended successfully');
+                    }
+                } else {
+                    alert('Error ending session: ' + (data.error || 'Unknown error'));
+                    endSessionModal.hide();
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error ending session: ' + error);
+                endSessionModal.hide();
+            });
+        });
+        
+        refreshBtn.addEventListener('click', () => {
+            pollTranscript();
+        });
+        
+        downloadReportBtn.addEventListener('click', () => {
+            // Create report content
+            const reportContent = `# Interview Monitoring Report
+Session ID: ${sessionId}
+Date: ${new Date().toLocaleString()}
+
+## Transcript
+${transcriptContent.textContent}
+
+## Statistics
+- Duration: ${document.getElementById('durationValue').textContent}
+- Questions Asked: ${document.getElementById('questionsValue').textContent}
+- Avg. Response Time: ${document.getElementById('responseTimeValue').textContent}
+- Interviewer Talk Time: ${document.getElementById('interviewerTimeValue').textContent}
+- Participant Talk Time: ${document.getElementById('participantTimeValue').textContent}
+
+## Key Topics
+${Array.from(document.querySelectorAll('.topic-tag')).map(tag => '- ' + tag.textContent).join('\n')}
+
+## AI Suggestions
+${document.getElementById('suggestionBox').textContent}
+`;
+
+            // Create and download the file
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `interview_report_${sessionId}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        downloadAnalysisBtn.addEventListener('click', () => {
+            // Create report content with analysis
+            const analysisContent = analysisText.innerText || '';
+            const reportContent = `# Interview Analysis Report
+Session ID: ${sessionId}
+Date: ${new Date().toLocaleString()}
+
+## Analysis
+${analysisContent}
+
+## Transcript
+${transcriptContent.textContent}
+
+## Statistics
+- Duration: ${document.getElementById('durationValue').textContent}
+- Questions Asked: ${document.getElementById('questionsValue').textContent}
+- Avg. Response Time: ${document.getElementById('responseTimeValue').textContent}
+- Interviewer Talk Time: ${document.getElementById('interviewerTimeValue').textContent}
+- Participant Talk Time: ${document.getElementById('participantTimeValue').textContent}
+
+## Key Topics
+${Array.from(document.querySelectorAll('.topic-tag')).map(tag => '- ' + tag.textContent).join('\n')}
+
+## AI Suggestions
+${document.getElementById('suggestionBox').textContent}
+`;
+
+            // Create and download the file
+            const blob = new Blob([reportContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `interview_analysis_${sessionId}.md`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+        
+        // Start polling and status checking
+        pollInterval = setInterval(pollTranscript, 5000);
+        checkStatusInterval = setInterval(checkInterviewStatus, 5000);
+        
+        // Initialize the page
+        pollTranscript();
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,329 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Interview Setup - DARIA{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="header">
+        <h1>Interview Setup</h1>
+        <p class="lead">Configure a new interview session</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card">
+                <div class="card-header">
+                    <h5>New Interview Configuration</h5>
+                </div>
+                <div class="card-body">
+                    <form id="interviewSetupForm">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Interview Title</label>
+                            <input type="text" class="form-control" id="title" placeholder="Enter a descriptive title for this interview">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" rows="2" placeholder="Brief description of the interview purpose"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="promptSelect" class="form-label">Select Prompt</label>
+                            <select class="form-select" id="promptSelect" required>
+                                <option value="" selected disabled>Choose a prompt agent...</option>
+                                {% if characters %}
+                                    {% for character in characters %}
+                                        <option value="{{ character.name }}">{{ character.name }} ({{ character.role }})</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option disabled>No prompts available</option>
+                                {% endif %}
+                            </select>
+                            <div class="form-text">The interviewer agent that will conduct this interview</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="character_select" class="form-label">Custom Character</label>
+                            <select id="character_select" name="character_select" class="form-select">
+                                <option value="">Custom (No Character)</option>
+                                {% if characters and characters|length > 0 %}
+                                    <!-- Characters found: {{ characters|length }} -->
+                                    {% for character in characters %}
+                                    <option value="{{ character.name }}">{{ character.name }} ({{ character.role }})</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <!-- No characters found -->
+                                    <option value="" disabled>No characters available</option>
+                                {% endif %}
+                            </select>
+                            <div class="form-text">Choose a pre-built interview character with specialized capabilities</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label for="voiceSelect" class="form-label">Voice</label>
+                            <select class="form-select" id="voiceSelect">
+                                {% if voices %}
+                                    {% for voice in voices %}
+                                        <option value="{{ voice.id }}" {% if voice.id == 'EXAVITQu4vr4xnSDxMaL' %}selected{% endif %}>{{ voice.name }}</option>
+                                    {% endfor %}
+                                {% else %}
+                                    <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
+                                    <option value="ErXwobaYiN019PkySvjV">Antoni (Male)</option>
+                                {% endif %}
+                            </select>
+                            <div class="form-text">The voice that will be used for text-to-speech</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="topicInput" class="form-label">Interview Topic</label>
+                            <input type="text" class="form-control" id="topicInput" placeholder="e.g., UX Research, Product Feedback, User Experience">
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="goalsTextarea" class="form-label">Interview Goals</label>
+                            <textarea class="form-control" id="goalsTextarea" rows="3" placeholder="List the main objectives of this interview"></textarea>
+                            <div class="form-text">Each line will be treated as a separate goal</div>
+                        </div>
+                    </form>
+                </div>
+                <div class="card-footer text-end">
+                    <button type="button" class="btn btn-outline-secondary me-2" id="resetBtn">Reset</button>
+                    <button type="button" class="btn btn-primary" id="createBtn">Create Interview</button>
+                </div>
+            </div>
+            
+            <div class="card mt-4" id="promptPreviewCard" style="display: none;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Prompt Preview</h5>
+                    <span class="badge bg-secondary" id="promptVersion">v1.0</span>
+                </div>
+                <div class="card-body">
+                    <div id="promptPreviewContent">
+                        <!-- Prompt preview will be displayed here -->
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <span class="badge bg-success me-2" id="promptPerformanceBadge">4.5/5</span>
+                            <span class="text-muted small" id="promptFeedbackCount">Based on 12 feedback entries</span>
+                        </div>
+                        <a href="#" id="viewPromptLink" class="btn btn-sm btn-outline-primary">View Full Prompt</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title" id="successModalLabel">Interview Created</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Your interview has been created successfully!</p>
+                <div class="mb-3">
+                    <label for="sessionIdInput" class="form-label">Session ID</label>
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="sessionIdInput" readonly>
+                        <button class="btn btn-outline-secondary" type="button" id="copySessionIdBtn">
+                            <i class="fas fa-copy"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <a href="#" class="btn btn-primary" id="goToInterviewBtn">Go to Interview</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // DOM elements
+    const promptSelect = document.getElementById('promptSelect');
+    const characterSelect = document.getElementById('character_select');
+    const resetBtn = document.getElementById('resetBtn');
+    const createBtn = document.getElementById('createBtn');
+    const promptPreviewCard = document.getElementById('promptPreviewCard');
+    const promptPreviewContent = document.getElementById('promptPreviewContent');
+    const promptVersion = document.getElementById('promptVersion');
+    const promptPerformanceBadge = document.getElementById('promptPerformanceBadge');
+    const promptFeedbackCount = document.getElementById('promptFeedbackCount');
+    const viewPromptLink = document.getElementById('viewPromptLink');
+    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+    const sessionIdInput = document.getElementById('sessionIdInput');
+    const copySessionIdBtn = document.getElementById('copySessionIdBtn');
+    const goToInterviewBtn = document.getElementById('goToInterviewBtn');
+    
+    // Event listeners
+    promptSelect.addEventListener('change', onPromptSelect);
+    characterSelect.addEventListener('change', onCharacterSelect);
+    resetBtn.addEventListener('click', resetForm);
+    createBtn.addEventListener('click', createInterview);
+    copySessionIdBtn.addEventListener('click', copySessionId);
+    
+    // Functions
+    function onPromptSelect() {
+        const selectedPrompt = promptSelect.value;
+        if (!selectedPrompt) {
+            promptPreviewCard.style.display = 'none';
+            return;
+        }
+        
+        // Fetch prompt details when a prompt is selected
+        fetchPromptDetails(selectedPrompt);
+    }
+
+    function onCharacterSelect() {
+        const selectedCharacter = characterSelect.value;
+        if (selectedCharacter) {
+            // If a character is selected, fetch its details
+            fetchPromptDetails(selectedCharacter);
+        } else {
+            // If "Use prompt agent as character" is selected, fetch the prompt details
+            const selectedPrompt = promptSelect.value;
+            if (selectedPrompt) {
+                fetchPromptDetails(selectedPrompt);
+            }
+        }
+    }
+    
+    function fetchPromptDetails(promptName) {
+        // Show loading state
+        promptPreviewCard.style.display = 'block';
+        promptPreviewContent.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div><p>Loading prompt details...</p></div>';
+        
+        // Fetch character data from the API
+        fetch(`/api/character/${promptName}`)
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Failed to fetch character data');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    // Display character details in the preview card
+                    promptPreviewContent.innerHTML = `
+                        <div class="mb-3">
+                            <h6>Name</h6>
+                            <p>${data.name || promptName}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Role</h6>
+                            <p>${data.role || 'Not specified'}</p>
+                        </div>
+                        <div class="mb-3">
+                            <h6>Description</h6>
+                            <p>${data.description || 'No description available'}</p>
+                        </div>
+                    `;
+                    
+                    // Update metadata
+                    promptVersion.textContent = data.version || 'v1.0';
+                    viewPromptLink.href = `/prompts/view/${promptName}`;
+                } else {
+                    // Show error message
+                    promptPreviewContent.innerHTML = `<div class="alert alert-warning">Could not load details for ${promptName}</div>`;
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching character details:', error);
+                promptPreviewContent.innerHTML = `<div class="alert alert-danger">Error loading details: ${error.message}</div>`;
+            });
+    }
+    
+    function resetForm() {
+        // Reset form inputs
+        document.getElementById('interviewSetupForm').reset();
+        
+        // Hide prompt preview
+        promptPreviewCard.style.display = 'none';
+    }
+    
+    function createInterview() {
+        const title = document.getElementById('title').value.trim();
+        const description = document.getElementById('description').value.trim();
+        const promptName = promptSelect.value;
+        const characterName = document.getElementById('character_select').value || promptName; // Use prompt as character if not specified
+        const voiceId = document.getElementById('voiceSelect').value;
+        const topic = document.getElementById('topicInput').value.trim();
+        const goals = document.getElementById('goalsTextarea').value.trim();
+        
+        if (!title || !promptName) {
+            alert('Please provide at least a title and select a prompt.');
+            return;
+        }
+        
+        // In a real implementation, this would make an API call
+        // For demonstration, we'll simulate it
+        createBtn.disabled = true;
+        createBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...';
+        
+        // Prepare form data for API call
+        const formData = {
+            title: title,
+            description: description,
+            prompt: promptName,
+            character_select: characterName,
+            voice_id: voiceId,
+            topic: topic,
+            goals: goals ? goals.split('\n').filter(g => g.trim()) : []
+        };
+        
+        // Send the data to the API
+        fetch('/api/interview/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Reset button state
+            createBtn.disabled = false;
+            createBtn.innerHTML = 'Create Interview';
+            
+            if (data.status === 'success') {
+                // Show success modal
+                sessionIdInput.value = data.session_id;
+                goToInterviewBtn.href = `/interview_session/${data.session_id}`;
+                successModal.show();
+                
+                // Reset the form
+                resetForm();
+            } else {
+                // Show error
+                alert(`Failed to create interview: ${data.error || 'Unknown error'}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error creating interview:', error);
+            createBtn.disabled = false;
+            createBtn.innerHTML = 'Create Interview';
+            alert('An error occurred while creating the interview. Please try again.');
+        });
+    }
+    
+    function copySessionId() {
+        sessionIdInput.select();
+        document.execCommand('copy');
+        
+        // Show copy feedback
+        const originalText = copySessionIdBtn.innerHTML;
+        copySessionIdBtn.innerHTML = '<i class="fas fa-check"></i>';
+        setTimeout(() => {
+            copySessionIdBtn.innerHTML = originalText;
+        }, 1500);
+    }
+</script>
+{% endblock %} 

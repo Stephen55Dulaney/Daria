@@ -1,0 +1,19 @@
+127.0.0.1 - - [07/May/2025 15:23:42] "GET /audio_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/May/2025 15:23:42] code 404, message File not found
+127.0.0.1 - - [07/May/2025 15:23:42] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [07/May/2025 15:23:45] code 404, message File not found
+127.0.0.1 - - [07/May/2025 15:23:45] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [07/May/2025 15:25:59] "GET /audio_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/May/2025 15:26:48] "GET /audio_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/May/2025 15:26:59] code 404, message File not found
+127.0.0.1 - - [07/May/2025 15:26:59] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [07/May/2025 15:27:51] "GET /audio_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/May/2025 15:27:52] "GET /audio_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/May/2025 15:28:07] "GET /audio_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/May/2025 15:28:12] code 404, message File not found
+127.0.0.1 - - [07/May/2025 15:28:12] "GET /favicon.ico HTTP/1.1" 404 -
+127.0.0.1 - - [07/May/2025 15:47:45] "GET /audio_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/May/2025 15:48:11] "GET /audio_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/May/2025 16:05:35] "GET /audio_test.html HTTP/1.1" 200 -
+127.0.0.1 - - [07/May/2025 16:05:42] code 404, message File not found
+127.0.0.1 - - [07/May/2025 16:05:42] "GET /favicon.ico HTTP/1.1" 404 -

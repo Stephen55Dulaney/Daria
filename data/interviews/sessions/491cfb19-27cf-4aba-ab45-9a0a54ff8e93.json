@@ -1,0 +1,58 @@
+{
+  "id": "491cfb19-27cf-4aba-ab45-9a0a54ff8e93",
+  "guide_id": "c7fb1d41-1b1c-407e-83cb-c4926beb3b44",
+  "interviewee": {
+    "name": "Synthia Sue",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "system",
+      "content": "Ask why",
+      "type": "suggestion",
+      "id": "e3c49453-c942-49c5-93e4-720598ff5bcb",
+      "timestamp": "2025-05-09T09:06:49.695112"
+    },
+    {
+      "role": "assistant",
+      "content": "Take a brief pause and then continue with the interview.",
+      "id": "2d9f18d8-3091-4c97-a94e-fcca4918fb97",
+      "timestamp": "2025-05-09T09:07:13.343690",
+      "researcher_generated": true
+    },
+    {
+      "role": "system",
+      "content": "Provide an example",
+      "type": "suggestion",
+      "id": "e5f2aebf-6d6d-468c-b9b2-e2d6c0e8a013",
+      "timestamp": "2025-05-09T09:07:16.985408"
+    },
+    {
+      "role": "system",
+      "content": "How does that make you feel?",
+      "type": "suggestion",
+      "id": "87816ff3-947b-4a3f-a8e7-6671849bc041",
+      "timestamp": "2025-05-09T09:08:28.280712"
+    },
+    {
+      "role": "system",
+      "content": "Provide an example",
+      "type": "suggestion",
+      "id": "aee8ef4f-cf01-4e85-974e-28858feec15d",
+      "timestamp": "2025-05-09T11:57:28.352017"
+    }
+  ],
+  "transcript": "\n\nParticipant: Ask why\n\nModerator: Take a brief pause and then continue with the interview.\n\nParticipant: Provide an example\n\nParticipant: How does that make you feel?\n\nParticipant: Provide an example",
+  "analysis": null,
+  "created_at": "2025-05-09T09:05:50.395615",
+  "updated_at": "2025-05-09T11:57:28.352302"
+}

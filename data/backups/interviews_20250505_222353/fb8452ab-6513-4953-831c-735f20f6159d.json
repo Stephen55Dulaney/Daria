@@ -1,0 +1,71 @@
+{
+  "session_id": "fb8452ab-6513-4953-831c-735f20f6159d",
+  "title": "Untitled Interview",
+  "description": "",
+  "character": "interviewer",
+  "remote": false,
+  "status": "active",
+  "created_at": "2025-05-05T14:48:28.255313",
+  "last_updated": "2025-05-05T14:49:00.946986",
+  "expiration_date": "2025-05-12T14:48:28.255313",
+  "conversation_history": [
+    {
+      "role": "assistant",
+      "content": "Hello! I'm Interviewer. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?",
+      "timestamp": "2025-05-05T14:48:28.255313"
+    },
+    {
+      "role": "user",
+      "content": "start",
+      "timestamp": "2025-05-05T14:48:40.674183"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T14:48:40.674183"
+    },
+    {
+      "role": "user",
+      "content": "End the interview",
+      "timestamp": "2025-05-05T14:49:00.946986"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T14:49:00.946986"
+    }
+  ],
+  "analysis": null,
+  "transcript": [
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Hello! I'm Interviewer. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?",
+      "timestamp": "2025-05-05T14:48:28.255313"
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "start",
+      "timestamp": "2025-05-05T14:48:40.674183"
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T14:48:40.674183"
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "End the interview",
+      "timestamp": "2025-05-05T14:49:00.946986"
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T14:49:00.946986"
+    }
+  ]
+}

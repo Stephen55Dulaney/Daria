@@ -1,0 +1,104 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Edit Prompt: {{ agent }} - DARIA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Edit Prompt: {{ agent }}</h1>
+        <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Back to Prompt
+        </a>
+    </div>
+
+    <form method="POST" action="{{ url_for('prompts.edit_prompt', agent=agent) }}">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Basic Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="role" class="form-label">Role</label>
+                    <input type="text" class="form-control" id="role" name="role" value="{{ config.role }}" required>
+                    <div class="form-text">The functional role of this agent in the research process</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="description" class="form-label">Description</label>
+                    <textarea class="form-control" id="description" name="description" rows="3" required>{{ config.description }}</textarea>
+                    <div class="form-text">A detailed description of what this agent does</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="tone" class="form-label">Tone</label>
+                    <input type="text" class="form-control" id="tone" name="tone" value="{{ config.tone }}" required>
+                    <div class="form-text">Communication style (e.g., "Professional, empathetic, curious")</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Core Objectives</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="core_objectives" class="form-label">Core Objectives</label>
+                    <textarea class="form-control" id="core_objectives" name="core_objectives" rows="6" required>{% for objective in config.core_objectives %}{{ objective }}
+{% endfor %}</textarea>
+                    <div class="form-text">Enter each objective on a new line</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Instructions & Prompting</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="contextual_instructions" class="form-label">Contextual Instructions</label>
+                    <textarea class="form-control" id="contextual_instructions" name="contextual_instructions" rows="8" required>{{ config.contextual_instructions }}</textarea>
+                    <div class="form-text">Detailed instructions about how the agent should operate</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="dynamic_prompt_prefix" class="form-label">Dynamic Prompt Prefix</label>
+                    <textarea class="form-control" id="dynamic_prompt_prefix" name="dynamic_prompt_prefix" rows="10" required>{{ config.dynamic_prompt_prefix }}</textarea>
+                    <div class="form-text">The LangChain prompt prefix used to guide agent behavior</div>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="analysis_prompt" class="form-label">Analysis Prompt</label>
+                    <textarea class="form-control" id="analysis_prompt" name="analysis_prompt" rows="10">{{ config.analysis_prompt }}</textarea>
+                    <div class="form-text">The prompt used for analyzing interview transcripts</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5>Versioning & Notes</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <label for="evaluation_note" class="form-label">Evaluation Note</label>
+                    <textarea class="form-control" id="evaluation_note" name="evaluation_note" rows="3"></textarea>
+                    <div class="form-text">A note explaining the changes made in this version</div>
+                </div>
+                
+                <div class="form-check mb-3">
+                    <input class="form-check-input" type="checkbox" id="create_version" name="create_version" value="1" checked>
+                    <label class="form-check-label" for="create_version">Create new version</label>
+                    <div class="form-text">Save the previous version in history</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between mb-4">
+            <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">Cancel</a>
+            <button type="submit" class="btn btn-primary">Save Changes</button>
+        </div>
+    </form>
+</div>
+{% endblock %} 

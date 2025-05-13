@@ -1,0 +1,50 @@
+{
+  "id": "c0ba2fd9-04e8-4bfa-a659-0350c5009fec",
+  "guide_id": "f389643d-18e4-45bc-b82d-21d813819d9d",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "user",
+      "content": "I would like for you to record my voice and put it on the screen",
+      "id": "2b9d637b-7367-4c1f-8ff4-9be8b6effcc8",
+      "timestamp": "2025-05-07T18:11:01.935679"
+    },
+    {
+      "role": "assistant",
+      "content": "That's an interesting request. Can you tell me more about why you specifically want your voice recorded and displayed on the screen? What do you hope to achieve or convey through this feature?",
+      "id": "70dde1fb-7b48-43d0-b262-0b9d4e68be22",
+      "timestamp": "2025-05-07T18:11:04.441964"
+    },
+    {
+      "role": "user",
+      "content": "We are successfully testing the tool which is called the static debug interview flow on port 50025 and Safari and the permission seems to be working and you don't a great job keep going",
+      "id": "0926a280-4d5c-4002-bef0-ed225ed2672f",
+      "timestamp": "2025-05-07T18:11:34.989674"
+    },
+    {
+      "role": "assistant",
+      "content": "It sounds like you are having a positive experience with testing the tool. Can you share more about what specifically is working well for you during this testing phase? What aspects of the tool do you find most beneficial or effective in your workflow?",
+      "id": "d5ab6839-9a43-4d66-bef5-21dee825c117",
+      "timestamp": "2025-05-07T18:11:38.560451"
+    },
+    {
+      "role": "user",
+      "content": "Well first of all the speech to text is finally working again and I'm getting real responses from the large language mono and it seems to be having the correct voice and the correct prompt so that is awesome",
+      "id": "9102d5e7-3d25-4bc1-b29f-6a8b669b2645",
+      "timestamp": "2025-05-07T18:12:11.166687"
+    },
+    {
+      "role": "assistant",
+      "content": "That's great to hear that the speech-to-text feature is working well for you now. Can you elaborate on how this improved functionality has impacted your experience with the tool? How has it made your workflow easier or more efficient compared to when it wasn't working correctly?",
+      "id": "f1a3e963-51be-4eff-98e2-55b5d899d571",
+      "timestamp": "2025-05-07T18:12:15.910704"
+    }
+  ],
+  "transcript": "\n\nParticipant: I would like for you to record my voice and put it on the screen\n\nModerator: That's an interesting request. Can you tell me more about why you specifically want your voice recorded and displayed on the screen? What do you hope to achieve or convey through this feature?\n\nParticipant: We are successfully testing the tool which is called the static debug interview flow on port 50025 and Safari and the permission seems to be working and you don't a great job keep going\n\nModerator: It sounds like you are having a positive experience with testing the tool. Can you share more about what specifically is working well for you during this testing phase? What aspects of the tool do you find most beneficial or effective in your workflow?\n\nParticipant: Well first of all the speech to text is finally working again and I'm getting real responses from the large language mono and it seems to be having the correct voice and the correct prompt so that is awesome\n\nModerator: That's great to hear that the speech-to-text feature is working well for you now. Can you elaborate on how this improved functionality has impacted your experience with the tool? How has it made your workflow easier or more efficient compared to when it wasn't working correctly?",
+  "analysis": null,
+  "created_at": "2025-05-07T18:10:47.296845",
+  "updated_at": "2025-05-07T18:12:15.910978"
+}

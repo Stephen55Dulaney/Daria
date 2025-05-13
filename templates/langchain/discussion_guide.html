@@ -1,0 +1,735 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Discussion Guide: {{ guide.title }}{% endblock %}
+
+{% block content %}
+<!-- Add this style block right after the block content declaration -->
+<style>
+    /* Message styling */
+    .message {
+        padding: 12px 15px;
+        border-radius: 8px;
+        margin-bottom: 15px;
+    }
+    
+    .message-moderator {
+        background-color: #f0f4f8;
+        border-left: 3px solid #4f46e5;
+    }
+    
+    .message-participant {
+        background-color: #f8f9fa;
+        border-left: 3px solid #0ea5e9;
+    }
+    
+    .message-header {
+        margin-bottom: 5px;
+        color: #6b7280;
+    }
+    
+    .message-content {
+        white-space: pre-line;
+    }
+    
+    /* Analysis styling */
+    .analysis-container .border-bottom {
+        border-bottom-color: #e5e7eb !important;
+    }
+    
+    .analysis-container h5 {
+        color: #4f46e5;
+        font-weight: 600;
+    }
+    
+    .analysis-container .list-group-item {
+        border-top: none;
+        border-left: none;
+        border-right: none;
+        padding-left: 0;
+        padding-right: 0;
+    }
+    
+    /* Tab styling */
+    .nav-tabs .nav-link {
+        border: none;
+        color: #6b7280;
+        padding: 0.5rem 1rem;
+    }
+    
+    .nav-tabs .nav-link.active {
+        color: #4f46e5;
+        font-weight: 600;
+        border-bottom: 2px solid #4f46e5;
+        background: transparent;
+    }
+    
+    /* Session card styling */
+    .session-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        margin-bottom: 1rem;
+        transition: transform 0.15s, box-shadow 0.15s;
+    }
+    
+    .session-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .session-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #dee2e6;
+        background-color: #f8f9fa;
+    }
+    
+    .badge-active {
+        background-color: #4f46e5;
+    }
+    
+    .badge-completed {
+        background-color: #059669;
+    }
+    
+    .badge-analyzed {
+        background-color: #0284c7;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between mb-4">
+        <h1 class="h3">Discussion Guide Details</h1>
+        <div class="d-flex gap-2">
+            <a href="/discussion_guides" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Back to Guides
+            </a>
+            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteGuideModal">
+                <i class="bi bi-trash me-1"></i> Delete Guide
+            </button>
+        </div>
+    </div>
+    
+    <div class="card mb-4">
+        <div class="card-body">
+            <div class="mb-4">
+                <h2 class="h4">{{ guide.title }}</h2>
+                <div class="d-flex align-items-center mt-2">
+                    <span class="badge bg-{{ 'success' if guide.status == 'active' else 'secondary' }} me-2">{{ guide.status|capitalize }}</span>
+                    <span class="text-muted small">Created: 
+                    {% if guide.created_at is defined %}
+                        {% if guide.created_at is string %}
+                            {{ guide.created_at.split('T')[0] }}
+                        {% else %}
+                            {{ guide.created_at.strftime('%b %d, %Y %H:%M') }}
+                        {% endif %}
+                    {% else %}
+                        Unknown date
+                    {% endif %}
+                    </span>
+                </div>
+            </div>
+            
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <h5 class="text-muted">Project</h5>
+                    <p>{{ guide.project if guide.project is defined else "Not specified" }}</p>
+                </div>
+                <div class="col-md-6">
+                    <h5 class="text-muted">Type</h5>
+                    <p>{{ guide.interview_type|replace('_', ' ')|title if guide.interview_type is defined else "Not specified" }}</p>
+                </div>
+            </div>
+            
+            <!-- New Session Button -->
+            <div class="mb-4">
+                <h3 class="h5 mb-3">New Research Session</h3>
+                <p class="small text-muted mb-2">Create a new interview session with this discussion guide.</p>
+                <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newSessionModal">
+                    <i class="bi bi-plus-circle me-1"></i> Start New Session
+                </button>
+            </div>
+            
+            <!-- Character Information -->
+            {% if guide.character_select %}
+            <div class="mb-4">
+                <h3 class="h5 mb-3">AI Character</h3>
+                <p>This guide uses the <strong>{{ guide.character_select }}</strong> character for moderation.</p>
+            </div>
+            {% endif %}
+            
+            <!-- Target Audience -->
+            {% if guide.target_audience and (guide.target_audience.role or guide.target_audience.department) %}
+            <div class="mb-4">
+                <h3 class="h5 mb-3">Target Audience</h3>
+                <div class="row">
+                    {% if guide.target_audience.role %}
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Role:</strong> {{ guide.target_audience.role }}</p>
+                    </div>
+                    {% endif %}
+                    {% if guide.target_audience.department %}
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>Department:</strong> {{ guide.target_audience.department }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Session Management -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="h5 mb-0">Research Sessions</h3>
+        </div>
+        <div class="card-body">
+            {% if sessions and sessions|length > 0 %}
+                <div class="list-group">
+                    {% for session in sessions %}
+                    <div class="session-card">
+                        <div class="session-header">
+                            <div>
+                                <h5 class="mb-0">
+                                    Session: {{ session.interviewee.name if session.interviewee and session.interviewee.name else "Anonymous Participant" }}
+                                </h5>
+                                <span class="text-muted small">
+                                    {% if session.created_at %}
+                                        {% if session.created_at is string %}
+                                            {{ session.created_at.split('T')[0] }}
+                                        {% else %}
+                                            {{ session.created_at.strftime('%b %d, %Y') }}
+                                        {% endif %}
+                                    {% endif %}
+                                </span>
+                            </div>
+                            <div>
+                                <span class="badge badge-{{ session.status }}">{{ session.status|capitalize }}</span>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                {% if session.interviewee %}
+                                <div class="col-md-6">
+                                    {% if session.interviewee.role %}
+                                    <p class="mb-1"><strong>Role:</strong> {{ session.interviewee.role }}</p>
+                                    {% endif %}
+                                    {% if session.interviewee.department %}
+                                    <p class="mb-1"><strong>Department:</strong> {{ session.interviewee.department }}</p>
+                                    {% endif %}
+                                </div>
+                                {% endif %}
+                                
+                                <div class="col-md-6">
+                                    <p class="mb-1">
+                                        <strong>Transcript:</strong> 
+                                        {% if session.transcript %}
+                                            {{ (session.transcript|string|length / 1000)|round(1) }}k characters
+                                        {% else %}
+                                            No transcript
+                                        {% endif %}
+                                    </p>
+                                    <p class="mb-1">
+                                        <strong>Analysis:</strong>
+                                        {% if session.analysis %}
+                                            <span class="text-success">Complete</span>
+                                        {% else %}
+                                            <span class="text-secondary">Not available</span>
+                                        {% endif %}
+                                    </p>
+                                </div>
+                            </div>
+                            
+                            <div class="d-flex justify-content-end">
+                                <a href="/session/{{ session.id }}" class="btn btn-primary">View Session</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="alert alert-info">
+                    No sessions have been conducted with this discussion guide yet. 
+                    Click "Start New Session" to begin your first research session.
+                </div>
+            {% endif %}
+        </div>
+    </div>
+    
+    <!-- Guide Settings -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h3 class="h5 mb-0">Guide Configuration</h3>
+            <button class="btn btn-sm btn-outline-primary" id="editGuideBtn">
+                <i class="bi bi-pencil me-1"></i> Edit
+            </button>
+        </div>
+        <div class="card-body">
+            <ul class="nav nav-tabs mb-4" id="guideTabs" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link active" id="prompt-tab" data-bs-toggle="tab" data-bs-target="#prompt" type="button" role="tab" aria-controls="prompt" aria-selected="true">Discussion Prompt</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="false">Analysis Prompt</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="questions-tab" data-bs-toggle="tab" data-bs-target="#questions" type="button" role="tab" aria-controls="questions" aria-selected="false">Custom Questions</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link" id="settings-tab" data-bs-toggle="tab" data-bs-target="#settings" type="button" role="tab" aria-controls="settings" aria-selected="false">Settings</button>
+                </li>
+            </ul>
+            
+            <div class="tab-content" id="guideTabContent">
+                <!-- Prompt tab -->
+                <div class="tab-pane fade show active" id="prompt" role="tabpanel" aria-labelledby="prompt-tab">
+                    <div class="form-group">
+                        <label class="form-label text-muted mb-2">Discussion Prompt</label>
+                        <div class="p-3 bg-light rounded">
+                            <pre class="mb-0" style="white-space: pre-wrap;">{{ guide.interview_prompt }}</pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Analysis prompt tab -->
+                <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+                    <div class="form-group">
+                        <label class="form-label text-muted mb-2">Analysis Prompt</label>
+                        <div class="p-3 bg-light rounded">
+                            <pre class="mb-0" style="white-space: pre-wrap;">{{ guide.analysis_prompt }}</pre>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Custom questions tab -->
+                <div class="tab-pane fade" id="questions" role="tabpanel" aria-labelledby="questions-tab">
+                    {% if guide.custom_questions and guide.custom_questions|length > 0 %}
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>Question</th>
+                                    <th>Priority</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for question in guide.custom_questions %}
+                                <tr>
+                                    <td>{{ question.text if question is mapping and question.text is defined else question }}</td>
+                                    <td>
+                                        {% if question is mapping and question.priority is defined %}
+                                        <span class="badge bg-{{ 'danger' if question.priority == 'high' else 'warning' if question.priority == 'medium' else 'info' }}">
+                                            {{ question.priority|title }}
+                                        </span>
+                                        {% else %}
+                                        <span class="badge bg-info">Normal</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">No custom questions have been configured for this guide.</div>
+                    {% endif %}
+                </div>
+                
+                <!-- Settings tab -->
+                <div class="tab-pane fade" id="settings" role="tabpanel" aria-labelledby="settings-tab">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Voice ID</label>
+                            <p>{{ guide.voice_id }}</p>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label text-muted">Time Per Question</label>
+                            <p>{{ guide.time_per_question }} minutes</p>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-12">
+                            <label class="form-label text-muted">Options</label>
+                            <ul class="list-group list-group-flush">
+                                <li class="list-group-item">
+                                    <i class="bi {{ 'bi-check-circle-fill text-success' if guide.options and guide.options.get('record_transcript', False) else 'bi-x-circle-fill text-danger' }} me-2"></i>
+                                    Record Transcript
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi {{ 'bi-check-circle-fill text-success' if guide.options and guide.options.get('analysis', False) else 'bi-x-circle-fill text-danger' }} me-2"></i>
+                                    Automatic Analysis
+                                </li>
+                                <li class="list-group-item">
+                                    <i class="bi {{ 'bi-check-circle-fill text-success' if guide.options and guide.options.get('use_tts', False) else 'bi-x-circle-fill text-danger' }} me-2"></i>
+                                    Use Text-to-Speech
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <button class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#archiveGuideModal">
+                                <i class="bi bi-archive me-1"></i> Archive Guide
+                            </button>
+                            {% if guide.status == 'archived' %}
+                            <button class="btn btn-outline-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteGuideModal">
+                                <i class="bi bi-trash me-1"></i> Delete Permanently
+                            </button>
+                            {% endif %}
+                        </div>
+                        <button class="btn btn-outline-primary" data-bs-toggle="modal" data-bs-target="#duplicateGuideModal">
+                            <i class="bi bi-files me-1"></i> Duplicate Guide
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- New Session Modal -->
+<div class="modal fade" id="newSessionModal" tabindex="-1" aria-labelledby="newSessionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="newSessionModalLabel">Start New Research Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newSessionForm">
+                    <!-- Required Participant Information -->
+                    <h6 class="mb-3">Participant Information</h6>
+                    <div class="mb-3">
+                        <label for="participant_name" class="form-label">Participant Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="participant_name" placeholder="Enter participant name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="participant_email" class="form-label">Participant Email</label>
+                        <input type="email" class="form-control" id="participant_email" placeholder="Enter participant email">
+                    </div>
+                    
+                    <!-- Professional Information -->
+                    <h6 class="mb-3 mt-4">Professional Information</h6>
+                    <div class="mb-3">
+                        <label for="participant_role" class="form-label">Role/Title</label>
+                        <input type="text" class="form-control" id="participant_role" placeholder="Enter participant role">
+                    </div>
+                    <div class="mb-3">
+                        <label for="participant_department" class="form-label">Department</label>
+                        <input type="text" class="form-control" id="participant_department" placeholder="Enter participant department">
+                    </div>
+                    <div class="mb-3">
+                        <label for="participant_company" class="form-label">Company/Organization</label>
+                        <input type="text" class="form-control" id="participant_company" placeholder="Enter company name">
+                    </div>
+                    
+                    <!-- Optional Demographics (collapsed by default) -->
+                    <div class="mb-3">
+                        <a class="d-block mb-2" data-bs-toggle="collapse" href="#demographicsCollapse" role="button" aria-expanded="false" aria-controls="demographicsCollapse">
+                            <i class="bi bi-plus-circle me-1"></i> Add Demographics Information (Optional)
+                        </a>
+                        <div class="collapse" id="demographicsCollapse">
+                            <div class="card card-body bg-light">
+                                <div class="mb-3">
+                                    <label for="participant_age_range" class="form-label">Age Range</label>
+                                    <select class="form-select" id="participant_age_range">
+                                        <option value="">Prefer not to say</option>
+                                        <option value="18-24">18-24</option>
+                                        <option value="25-34">25-34</option>
+                                        <option value="35-44">35-44</option>
+                                        <option value="45-54">45-54</option>
+                                        <option value="55-64">55-64</option>
+                                        <option value="65+">65+</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="participant_gender" class="form-label">Gender</label>
+                                    <select class="form-select" id="participant_gender">
+                                        <option value="">Prefer not to say</option>
+                                        <option value="Male">Male</option>
+                                        <option value="Female">Female</option>
+                                        <option value="Non-binary">Non-binary</option>
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                                <div class="mb-3">
+                                    <label for="participant_location" class="form-label">Location/Region</label>
+                                    <input type="text" class="form-control" id="participant_location" placeholder="Enter location or region">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Privacy Notice -->
+                    <div class="alert alert-info mt-4 mb-2">
+                        <small>
+                            <i class="bi bi-info-circle me-1"></i> <strong>Privacy Notice:</strong> Participant information will only be used for research purposes and will be associated with this session. Demographics are optional and help with research analysis.
+                        </small>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="createSessionBtn">
+                    Create Session & Generate Link
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Archive Guide Modal -->
+<div class="modal fade" id="archiveGuideModal" tabindex="-1" aria-labelledby="archiveGuideModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="archiveGuideModalLabel">Archive Discussion Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to archive this discussion guide? It will no longer be available for new sessions.</p>
+                <p>Existing sessions will still be accessible.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmArchiveBtn">Archive Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Duplicate Guide Modal -->
+<div class="modal fade" id="duplicateGuideModal" tabindex="-1" aria-labelledby="duplicateGuideModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="duplicateGuideModalLabel">Duplicate Discussion Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Create a copy of this discussion guide with a new name:</p>
+                <div class="mb-3">
+                    <label for="duplicate_title" class="form-label">New Guide Title</label>
+                    <input type="text" class="form-control" id="duplicate_title" placeholder="Enter new title" value="{{ guide.title }} - Copy">
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="confirmDuplicateBtn">Duplicate Guide</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Guide Modal -->
+<div class="modal fade" id="deleteGuideModal" tabindex="-1" aria-labelledby="deleteGuideModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteGuideModalLabel">Delete Discussion Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong>{{ guide.title }}</strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. Sessions associated with this guide will be marked as orphaned but will remain accessible.
+                </div>
+                {% if sessions and sessions|length > 0 %}
+                <div class="alert alert-info">
+                    <p><strong>This guide has {{ sessions|length }} session{% if sessions|length != 1 %}s{% endif %}.</strong> All sessions will still be accessible from the sessions archive.</p>
+                </div>
+                {% endif %}
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const createSessionBtn = document.getElementById('createSessionBtn');
+    const confirmArchiveBtn = document.getElementById('confirmArchiveBtn');
+    const confirmDuplicateBtn = document.getElementById('confirmDuplicateBtn');
+    const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+    
+    // Create new session
+    if (createSessionBtn) {
+        createSessionBtn.addEventListener('click', function() {
+            const name = document.getElementById('participant_name').value;
+            
+            // Validate required fields
+            if (!name) {
+                alert('Please enter the participant name.');
+                return;
+            }
+            
+            // Collect basic information
+            const email = document.getElementById('participant_email').value;
+            const role = document.getElementById('participant_role').value;
+            const department = document.getElementById('participant_department').value;
+            const company = document.getElementById('participant_company').value;
+            
+            // Collect optional demographics
+            const ageRange = document.getElementById('participant_age_range').value;
+            const gender = document.getElementById('participant_gender').value;
+            const location = document.getElementById('participant_location').value;
+            
+            const interviewee = {
+                name: name,
+                email: email,
+                role: role,
+                department: department,
+                company: company,
+                demographics: {
+                    age_range: ageRange,
+                    gender: gender,
+                    location: location
+                }
+            };
+            
+            // Disable button to prevent multiple submissions
+            createSessionBtn.disabled = true;
+            createSessionBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...';
+            
+            // Create session
+            fetch('/api/session/create', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    guide_id: '{{ guide_id }}',
+                    interviewee: interviewee
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to the session page
+                    window.location.href = data.redirect_url;
+                } else {
+                    alert('Error creating session: ' + data.error);
+                    createSessionBtn.disabled = false;
+                    createSessionBtn.innerHTML = 'Create Session & Generate Link';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while creating the session. Please try again.');
+                createSessionBtn.disabled = false;
+                createSessionBtn.innerHTML = 'Create Session & Generate Link';
+            });
+        });
+    }
+    
+    // Archive guide
+    if (confirmArchiveBtn) {
+        confirmArchiveBtn.addEventListener('click', function() {
+            confirmArchiveBtn.disabled = true;
+            confirmArchiveBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Archiving...';
+            
+            fetch('/api/discussion_guide/{{ guide_id }}/archive', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.reload();
+                } else {
+                    alert('Error archiving guide: ' + data.error);
+                    confirmArchiveBtn.disabled = false;
+                    confirmArchiveBtn.innerHTML = 'Archive Guide';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while archiving the guide. Please try again.');
+                confirmArchiveBtn.disabled = false;
+                confirmArchiveBtn.innerHTML = 'Archive Guide';
+            });
+        });
+    }
+    
+    // Duplicate guide
+    if (confirmDuplicateBtn) {
+        confirmDuplicateBtn.addEventListener('click', function() {
+            const newTitle = document.getElementById('duplicate_title').value;
+            
+            if (!newTitle) {
+                alert('Please enter a title for the new guide.');
+                return;
+            }
+            
+            confirmDuplicateBtn.disabled = true;
+            confirmDuplicateBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Duplicating...';
+            
+            fetch('/api/discussion_guide/{{ guide_id }}/duplicate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    title: newTitle
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/discussion_guide/' + data.guide_id;
+                } else {
+                    alert('Error duplicating guide: ' + data.error);
+                    confirmDuplicateBtn.disabled = false;
+                    confirmDuplicateBtn.innerHTML = 'Duplicate Guide';
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('An error occurred while duplicating the guide. Please try again.');
+                confirmDuplicateBtn.disabled = false;
+                confirmDuplicateBtn.innerHTML = 'Duplicate Guide';
+            });
+        });
+    }
+    
+    // Delete guide functionality
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            const guideId = "{{ guide_id }}";
+            
+            fetch(`/api/discussion_guide/${guideId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Redirect to the guides list page
+                    window.location.href = '/discussion_guides';
+                } else {
+                    alert(`Error: ${data.error || 'Failed to delete guide'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting guide:', error);
+                alert('An error occurred while deleting the guide. Please try again.');
+            });
+        });
+    }
+});
+</script>
+{% endblock %} 

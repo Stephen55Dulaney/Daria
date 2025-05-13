@@ -1,0 +1,3603 @@
+{
+  "session_id": "5570fd73-967b-4385-8785-d891ce129bfc",
+  "title": "Ted's User Research Transcript",
+  "project": "Daria Research of Researchers",
+  "interview_type": "persona_interview",
+  "created_at": "2025-05-08T13:00:40.580132",
+  "creation_date": "2025-05-08 13:00",
+  "last_updated": "2025-05-08T13:00:40.580132",
+  "expiration_date": "2025-06-07T13:00:40.580132",
+  "status": "completed",
+  "conversation_history": [
+    {
+      "role": "user",
+      "content": "08:00:56 Testing the transcript.",
+      "timestamp": "2025-05-08T13:00:40.579462"
+    },
+    {
+      "role": "user",
+      "content": "08:02:04 Morning, Stephen. How are you?",
+      "timestamp": "2025-05-08T13:00:40.579472"
+    },
+    {
+      "role": "user",
+      "content": "08:02:05 Morning, how are you? Good, good. Thank you for joining today. Do I have your permission to do a transcript and a recording?",
+      "timestamp": "2025-05-08T13:00:40.579475"
+    },
+    {
+      "role": "user",
+      "content": "08:02:14 Sounds great. And I'm fine.",
+      "timestamp": "2025-05-08T13:00:40.579478"
+    },
+    {
+      "role": "user",
+      "content": "08:02:14 Yep.",
+      "timestamp": "2025-05-08T13:00:40.579480"
+    },
+    {
+      "role": "user",
+      "content": "08:02:20 That's no problem. So Ted, tell me a little bit about your background as a user researcher. How did you get into this line of work?",
+      "timestamp": "2025-05-08T13:00:40.579483"
+    },
+    {
+      "role": "user",
+      "content": "08:02:33 That started in school. I hung out with more professors than I did with kids my own age.",
+      "timestamp": "2025-05-08T13:00:40.579485"
+    },
+    {
+      "role": "user",
+      "content": "08:02:41 And so because I hung around the professors i kind of got dragged into helping them out with studies.",
+      "timestamp": "2025-05-08T13:00:40.579487"
+    },
+    {
+      "role": "user",
+      "content": "08:02:51 And that kind of began the journey of me really focused more on research than on design.",
+      "timestamp": "2025-05-08T13:00:40.579489"
+    },
+    {
+      "role": "user",
+      "content": "08:03:02 So I don't know that I ever kind of made a pivot. I've always been on the research and the science side of the spectrum.",
+      "timestamp": "2025-05-08T13:00:40.579491"
+    },
+    {
+      "role": "user",
+      "content": "08:03:09 Now, what school was this and there were any specific mentors that formed your research behavior today?",
+      "timestamp": "2025-05-08T13:00:40.579494"
+    },
+    {
+      "role": "user",
+      "content": "08:03:15 I mean, it's the University of Arizona. There's a handful of them.",
+      "timestamp": "2025-05-08T13:00:40.579496"
+    },
+    {
+      "role": "user",
+      "content": "08:03:21 But I don't know how that's necessarily germane to this conversation.",
+      "timestamp": "2025-05-08T13:00:40.579498"
+    },
+    {
+      "role": "user",
+      "content": "08:03:26 Okay. Tell me with respect to your current role, what is your primary goal?",
+      "timestamp": "2025-05-08T13:00:40.579500"
+    },
+    {
+      "role": "user",
+      "content": "08:03:35 Continuing to build out a research offering here at Deloitte.",
+      "timestamp": "2025-05-08T13:00:40.579502"
+    },
+    {
+      "role": "user",
+      "content": "08:03:41 And with respect to the primary goal, what are some key frustrations that you encounter?",
+      "timestamp": "2025-05-08T13:00:40.579504"
+    },
+    {
+      "role": "user",
+      "content": "08:03:47 A lot of it is just lack of awareness that our research practice exists.",
+      "timestamp": "2025-05-08T13:00:40.579506"
+    },
+    {
+      "role": "user",
+      "content": "08:03:56 A lack of\u2026 people who aren't as far along on their path in either doing research or exploring research um just it's just it looks easier than it actually is.",
+      "timestamp": "2025-05-08T13:00:40.579508"
+    },
+    {
+      "role": "user",
+      "content": "08:04:13 Um so you know the trying to strike that balance both with projects as well as with practitioners in terms of knowing when they need to actually bring in an expert.",
+      "timestamp": "2025-05-08T13:00:40.579510"
+    },
+    {
+      "role": "user",
+      "content": "08:04:28 And far too often it's too late in the process. And it, you know, that's more just in terms of will get brought in or get asked to kind of help or take a look at something after data collection is already done.",
+      "timestamp": "2025-05-08T13:00:40.579512"
+    },
+    {
+      "role": "user",
+      "content": "08:04:45 And they're in the middle of doing analysis or reporting out their findings and You know, just trying to find a way to help them out as well as to give them a little bit of education in terms of If you're going to do this again next time, here's some",
+      "timestamp": "2025-05-08T13:00:40.579514"
+    },
+    {
+      "role": "user",
+      "content": "08:05:02 Some suggestions and a lot of that just comes with you know the the 20 years plus of experience that I have.",
+      "timestamp": "2025-05-08T13:00:40.579516"
+    },
+    {
+      "role": "user",
+      "content": "08:05:08 Okay, that sounds great. So I want you to think back. When did you first arrive at Deloitte and what kind of, what was the state of the research and what were the activities that you performed during a discovery cycle?",
+      "timestamp": "2025-05-08T13:00:40.579518"
+    },
+    {
+      "role": "user",
+      "content": "08:05:21 Almost 11 years ago, June 1st. And there really wasn't a research practice then.",
+      "timestamp": "2025-05-08T13:00:40.579520"
+    },
+    {
+      "role": "user",
+      "content": "08:05:29 There was a bunch of bunch of designers that think that they can do research and some of them could for sure but A lot of when we're doing research really badly.",
+      "timestamp": "2025-05-08T13:00:40.579522"
+    },
+    {
+      "role": "user",
+      "content": "08:05:42 From an approach standpoint, from a policy standpoint, from a methodology standpoint, from a data collection standpoint.",
+      "timestamp": "2025-05-08T13:00:40.579525"
+    },
+    {
+      "role": "user",
+      "content": "08:05:51 And yeah, you know, so just slowly but surely trying to trying to change the way that you know we did research initially here in Denver.",
+      "timestamp": "2025-05-08T13:00:40.579527"
+    },
+    {
+      "role": "user",
+      "content": "08:06:03 Um you know now nationally and internationally. So I don't know if that really answers your question.",
+      "timestamp": "2025-05-08T13:00:40.579529"
+    },
+    {
+      "role": "user",
+      "content": "08:06:09 Okay, so how is the state of the research today? How has it changed and what are your methods and tools that you have available that you didn't back then.",
+      "timestamp": "2025-05-08T13:00:40.579531"
+    },
+    {
+      "role": "user",
+      "content": "08:06:21 I mean, the methods are all the same. The tools change just based on change based on what's out there.",
+      "timestamp": "2025-05-08T13:00:40.579533"
+    },
+    {
+      "role": "user",
+      "content": "08:06:31 The market has seen a considerable consolidation of online platforms and tools.",
+      "timestamp": "2025-05-08T13:00:40.579535"
+    },
+    {
+      "role": "user",
+      "content": "08:06:38 With the 800 pound gorilla in the market being users and user testing.",
+      "timestamp": "2025-05-08T13:00:40.579537"
+    },
+    {
+      "role": "user",
+      "content": "08:06:46 Um but you know the the tools that we use will come and go.",
+      "timestamp": "2025-05-08T13:00:40.579539"
+    },
+    {
+      "role": "user",
+      "content": "08:06:54 But the tool isn't the definition of doing research. It is a you know it is a mechanism to enable a researcher to actually collect data. That's all it is.",
+      "timestamp": "2025-05-08T13:00:40.579541"
+    },
+    {
+      "role": "user",
+      "content": "08:07:07 So\u2026 you know the the state today is we are getting better at research we are putting We're trying to strike that balance between rigor and practicality, which you have to do in any type of industry research setting and even in academia.",
+      "timestamp": "2025-05-08T13:00:40.579543"
+    },
+    {
+      "role": "user",
+      "content": "08:07:25 And we're getting there. We're making some headway. But, you know, we've got a ways to go and The big thing for me in the last, I'd say, five years is really pushing to include even in heavily qualitative research.",
+      "timestamp": "2025-05-08T13:00:40.579545"
+    },
+    {
+      "role": "user",
+      "content": "08:07:44 You still got to use statistics. You still got to use, you know, you can still bring in some quant.",
+      "timestamp": "2025-05-08T13:00:40.579547"
+    },
+    {
+      "role": "user",
+      "content": "08:07:51 And not just cherry pick whole quotes that maybe align with your, you know, with a researcher's bias.",
+      "timestamp": "2025-05-08T13:00:40.579550"
+    },
+    {
+      "role": "user",
+      "content": "08:07:57 Consciously or subconsciously. I hope.",
+      "timestamp": "2025-05-08T13:00:40.579552"
+    },
+    {
+      "role": "user",
+      "content": "08:07:59 Okay, so what would you like to see in the next three years of how you're going to move and evolve the research efforts at Deloitte?",
+      "timestamp": "2025-05-08T13:00:40.579554"
+    },
+    {
+      "role": "user",
+      "content": "08:08:08 More promotion, more operationalization, more scale.",
+      "timestamp": "2025-05-08T13:00:40.579556"
+    },
+    {
+      "role": "user",
+      "content": "08:08:14 Can you tell me a story like that one you talked about?",
+      "timestamp": "2025-05-08T13:00:40.579558"
+    },
+    {
+      "role": "user",
+      "content": "08:08:18 Where you had a project that looked promising and then no matter how hard you tried, it became frustrating and just had more trouble than it should have.",
+      "timestamp": "2025-05-08T13:00:40.579560"
+    },
+    {
+      "role": "user",
+      "content": "08:08:26 I mean, all projects have challenges, right? Any research project is going to have curveballs thrown at you.",
+      "timestamp": "2025-05-08T13:00:40.579562"
+    },
+    {
+      "role": "user",
+      "content": "08:08:33 You know, a researcher job is to adapt to the situation.",
+      "timestamp": "2025-05-08T13:00:40.579564"
+    },
+    {
+      "role": "user",
+      "content": "08:08:41 And given the constraints, find a way to still deliver you know insights, still deliver findings despite the curveballs.",
+      "timestamp": "2025-05-08T13:00:40.579566"
+    },
+    {
+      "role": "user",
+      "content": "08:08:54 Um and you know, I think a lot of that just comes with time You're going to have participants that cancel or you're going to have, you know, a prototype that doesn't work on a particular day. You're going to have",
+      "timestamp": "2025-05-08T13:00:40.579568"
+    },
+    {
+      "role": "user",
+      "content": "08:09:07 A slew of challenges. It's that adaptability. It's that you know realizing what that end goal is.",
+      "timestamp": "2025-05-08T13:00:40.579570"
+    },
+    {
+      "role": "user",
+      "content": "08:09:19 In terms of what we're doing research to or we're doing a study to explore these research questions.",
+      "timestamp": "2025-05-08T13:00:40.579572"
+    },
+    {
+      "role": "user",
+      "content": "08:09:27 Given some of the constraints that have been put in front of us, how do we still achieve that goal?",
+      "timestamp": "2025-05-08T13:00:40.579574"
+    },
+    {
+      "role": "user",
+      "content": "08:09:32 I want you to think of a story that you tell to help spread a message about a past research project.",
+      "timestamp": "2025-05-08T13:00:40.579576"
+    },
+    {
+      "role": "user",
+      "content": "08:09:38 Yeah, I don't use stories for that, Stephen.",
+      "timestamp": "2025-05-08T13:00:40.579578"
+    },
+    {
+      "role": "user",
+      "content": "08:09:40 Okay, that sounds good. That's as good as the answers I needed. Okay, we're going to change task a little bit and I want to talk about like creating a discovery cycle and creating a research effort.",
+      "timestamp": "2025-05-08T13:00:40.579580"
+    },
+    {
+      "role": "user",
+      "content": "08:09:52 How do you go about what's when you have a new project in your awareness and it's maybe just in the, you know, just you just heard about it phase What are some of the activities you do to formalize that and convert it into a discovery project?",
+      "timestamp": "2025-05-08T13:00:40.579583"
+    },
+    {
+      "role": "user",
+      "content": "08:10:05 I mean, does it have to be discovery? Okay. I mean, step one is develop a research plan And the step one of that effort is working with project team to identify what the research questions are. Sometimes projects will come with a method that they want to use, but they don't actually know what the research questions are.",
+      "timestamp": "2025-05-08T13:00:40.579585"
+    },
+    {
+      "role": "user",
+      "content": "08:10:08 No, whatever you like.",
+      "timestamp": "2025-05-08T13:00:40.579587"
+    },
+    {
+      "role": "user",
+      "content": "08:10:31 And it's putting the cart before the horse.",
+      "timestamp": "2025-05-08T13:00:40.579589"
+    },
+    {
+      "role": "user",
+      "content": "08:10:34 So what techniques do you do to identify and solidify the research questions?",
+      "timestamp": "2025-05-08T13:00:40.579591"
+    },
+    {
+      "role": "user",
+      "content": "08:10:39 A lot of it is conversations with the account team. A lot of it is, you know, if we have access to them, the stakeholders.",
+      "timestamp": "2025-05-08T13:00:40.579593"
+    },
+    {
+      "role": "user",
+      "content": "08:10:45 And I don't expect either one of those archetypes to actually say, here's our research questions, go.",
+      "timestamp": "2025-05-08T13:00:40.579595"
+    },
+    {
+      "role": "user",
+      "content": "08:10:53 It's more listening to the areas of whatever whatever ecosystem we're in.",
+      "timestamp": "2025-05-08T13:00:40.579597"
+    },
+    {
+      "role": "user",
+      "content": "08:11:03 What are they curious about what you know Are we trying to investigate or explore why we're seeing a drop off in the sales funnel? Whatever it is.",
+      "timestamp": "2025-05-08T13:00:40.579599"
+    },
+    {
+      "role": "user",
+      "content": "08:11:16 And based on those conversations, and it doesn't have to be long. You just have a quick conversation with some folks.",
+      "timestamp": "2025-05-08T13:00:40.579601"
+    },
+    {
+      "role": "user",
+      "content": "08:11:24 Begin to actually begin to actually formulate research questions.",
+      "timestamp": "2025-05-08T13:00:40.579603"
+    },
+    {
+      "role": "user",
+      "content": "08:11:29 And put those back in front of the accounting, put them back in front of the stakeholders.",
+      "timestamp": "2025-05-08T13:00:40.579605"
+    },
+    {
+      "role": "user",
+      "content": "08:11:36 But you know, but a lot of people will try to do research without actually kind of having those questions in mind and it's just you know it's it's really hard to do good research without kind of that structure in place.",
+      "timestamp": "2025-05-08T13:00:40.579608"
+    },
+    {
+      "role": "user",
+      "content": "08:11:53 Once you have your research questions solidified, what is the next step to activating or planning the research initiative?",
+      "timestamp": "2025-05-08T13:00:40.579610"
+    },
+    {
+      "role": "user",
+      "content": "08:11:59 Yeah, I mean, then you begin experimental design. So now that you have your research questions in place.",
+      "timestamp": "2025-05-08T13:00:40.579612"
+    },
+    {
+      "role": "user",
+      "content": "08:12:08 You begin to formulate an approach as a researcher in terms of what what method or methods are you going to use? What metrics are you going to use?",
+      "timestamp": "2025-05-08T13:00:40.579614"
+    },
+    {
+      "role": "user",
+      "content": "08:12:23 What participant recruitment strategies are you going to use? And in that discussion, you know, further on down the road is what tools might we leverage in order to do this?",
+      "timestamp": "2025-05-08T13:00:40.579616"
+    },
+    {
+      "role": "user",
+      "content": "08:12:36 So if we're doing remote unmoderated we'll need to think about what tools or platforms do we have access to.",
+      "timestamp": "2025-05-08T13:00:40.579618"
+    },
+    {
+      "role": "user",
+      "content": "08:12:47 What does the participant recruitment uh look like for that target population.",
+      "timestamp": "2025-05-08T13:00:40.579620"
+    },
+    {
+      "role": "user",
+      "content": "08:12:54 What does the stimuli look like? So the stimuli being a prototype.",
+      "timestamp": "2025-05-08T13:00:40.579622"
+    },
+    {
+      "role": "user",
+      "content": "08:12:59 Or a design or a design a navigational schema um and you know this this is where researchers actually do design. It's just not doing wireframes.",
+      "timestamp": "2025-05-08T13:00:40.579624"
+    },
+    {
+      "role": "user",
+      "content": "08:13:15 So\u2026 You go through that process and the planning process, generally speaking, should probably twice as long as it's going to take as long as it's going for the time that you're actually doing data collection or you're in the field. So let's say if it's a week.",
+      "timestamp": "2025-05-08T13:00:40.579626"
+    },
+    {
+      "role": "user",
+      "content": "08:13:31 In the field, you should probably plan two weeks for experimental design.",
+      "timestamp": "2025-05-08T13:00:40.579628"
+    },
+    {
+      "role": "user",
+      "content": "08:13:36 The reason for that is you got to make sure that everything is in place. You got to make sure that your data collection methods are correct.",
+      "timestamp": "2025-05-08T13:00:40.579630"
+    },
+    {
+      "role": "user",
+      "content": "08:13:43 You got to make sure that you know people are inherently unpredictable. So you've got to pilot during that phase as well.",
+      "timestamp": "2025-05-08T13:00:40.579633"
+    },
+    {
+      "role": "user",
+      "content": "08:13:52 We've been able to compress the planning down in some cases.",
+      "timestamp": "2025-05-08T13:00:40.579635"
+    },
+    {
+      "role": "user",
+      "content": "08:13:57 But you need time to actually plan a study. And most studies that are executed well are a direct result or a direct correlation to proper planning.",
+      "timestamp": "2025-05-08T13:00:40.579637"
+    },
+    {
+      "role": "user",
+      "content": "08:14:11 Okay, that sounds great. So what\u2026 What is the next challenge after you have your research plan and you're ready to go to the field? What's your next challenge? Are there any between there?",
+      "timestamp": "2025-05-08T13:00:40.579639"
+    },
+    {
+      "role": "user",
+      "content": "08:14:23 I mean, recruitment is always going to be, I don't know that it's a challenge. It's just, it's something you got to deal with.",
+      "timestamp": "2025-05-08T13:00:40.579641"
+    },
+    {
+      "role": "user",
+      "content": "08:14:30 So, you know, making sure that whatever recruitment partner you're working with.",
+      "timestamp": "2025-05-08T13:00:40.579643"
+    },
+    {
+      "role": "user",
+      "content": "08:14:37 Making sure that you're getting quality participants coming through.",
+      "timestamp": "2025-05-08T13:00:40.579645"
+    },
+    {
+      "role": "user",
+      "content": "08:14:44 So user testing, for example, has a well-deserved reputation of having a really.",
+      "timestamp": "2025-05-08T13:00:40.579647"
+    },
+    {
+      "role": "user",
+      "content": "08:14:53 Poorly cultivated pool of research participants. And it's because a lot of people are in their pool solely because they they're looking to earn some money.",
+      "timestamp": "2025-05-08T13:00:40.579649"
+    },
+    {
+      "role": "user",
+      "content": "08:15:07 There's nothing wrong with that You know, one of the things that experienced researchers learn to do as part of their planning phase.",
+      "timestamp": "2025-05-08T13:00:40.579651"
+    },
+    {
+      "role": "user",
+      "content": "08:15:18 Specifically around recruitment. Is a really, really solid screener.",
+      "timestamp": "2025-05-08T13:00:40.579653"
+    },
+    {
+      "role": "user",
+      "content": "08:15:24 And the approach that you take to writing a screener is going to vary based on how you're sourcing participants. For example.",
+      "timestamp": "2025-05-08T13:00:40.579655"
+    },
+    {
+      "role": "user",
+      "content": "08:15:32 And we don't do it at all here at Deloitte, but some companies use Amazon's Mechanical Turk.",
+      "timestamp": "2025-05-08T13:00:40.579657"
+    },
+    {
+      "role": "user",
+      "content": "08:15:39 It's also really, really popular in academia. And you can get a lot of responses really, really quickly. But you got to have a really, really solid screener in place to ensure that the responses you're getting are of quality and also the people that you're getting are",
+      "timestamp": "2025-05-08T13:00:40.579659"
+    },
+    {
+      "role": "user",
+      "content": "08:16:00 Fitting into some sort of recruit criteria so that the data that you collect is actually something that can be generalized to the overall user population.",
+      "timestamp": "2025-05-08T13:00:40.579662"
+    },
+    {
+      "role": "user",
+      "content": "08:16:11 If you're doing a website redesign or app redesign for a senior living community.",
+      "timestamp": "2025-05-08T13:00:40.579664"
+    },
+    {
+      "role": "user",
+      "content": "08:16:20 Doing evaluative research with a bunch of 20-somethings. It's going to get you some data.",
+      "timestamp": "2025-05-08T13:00:40.579666"
+    },
+    {
+      "role": "user",
+      "content": "08:16:26 But how representative that data is to the overall population comes into question.",
+      "timestamp": "2025-05-08T13:00:40.579668"
+    },
+    {
+      "role": "user",
+      "content": "08:16:32 So, um. Always kind of making sure that you're keeping an eye at least, or you have somebody on your team that's keeping an eye on the responses that are coming in.",
+      "timestamp": "2025-05-08T13:00:40.579670"
+    },
+    {
+      "role": "user",
+      "content": "08:16:44 While the study is in flight. A lot of people who aren't as far along on their path with research will try to start doing synthesis and analysis of the recordings as they're coming in.",
+      "timestamp": "2025-05-08T13:00:40.579672"
+    },
+    {
+      "role": "user",
+      "content": "08:16:59 And, you know. There's a reason why we normally wait until we're done.",
+      "timestamp": "2025-05-08T13:00:40.579674"
+    },
+    {
+      "role": "user",
+      "content": "08:17:07 And some of that is you got to wait for your recruiting partner to make sure that you actually have enough responses that are representative.",
+      "timestamp": "2025-05-08T13:00:40.579676"
+    },
+    {
+      "role": "user",
+      "content": "08:17:17 And the reason that I always caution people not to do that is because, you know, kind of doing the analysis in flight is A lot can change.",
+      "timestamp": "2025-05-08T13:00:40.579678"
+    },
+    {
+      "role": "user",
+      "content": "08:17:28 And your percentages can change significantly. If you're, you know, depending on how many participants and how many quality responses are in that in your set of data that you're collecting. So if you're doing a study with 10 participants.",
+      "timestamp": "2025-05-08T13:00:40.579680"
+    },
+    {
+      "role": "user",
+      "content": "08:17:46 And you start off strong with two participants that just absolutely love the app.",
+      "timestamp": "2025-05-08T13:00:40.579682"
+    },
+    {
+      "role": "user",
+      "content": "08:17:50 And then you have three participants that don't love the app, your numbers change very, very quickly.",
+      "timestamp": "2025-05-08T13:00:40.579684"
+    },
+    {
+      "role": "user",
+      "content": "08:17:58 So, you know, that's always a challenge. There's always like when you're in field, there's just things happen.",
+      "timestamp": "2025-05-08T13:00:40.579686"
+    },
+    {
+      "role": "user",
+      "content": "08:18:07 People not showing up, people not having enough time, or it's an hour long session, they join 30 minutes in.",
+      "timestamp": "2025-05-08T13:00:40.579688"
+    },
+    {
+      "role": "user",
+      "content": "08:18:15 And still trying to get the most data that you can You know, given that a lot of it is a lot of it is researchers ability to kind of adapt to to what participants are saying. Not to sound robotic as they're kind of going through a list of questions and make it more conversational than",
+      "timestamp": "2025-05-08T13:00:40.579690"
+    },
+    {
+      "role": "user",
+      "content": "08:18:39 Then, you know, an Inquisition Does that help?",
+      "timestamp": "2025-05-08T13:00:40.579692"
+    },
+    {
+      "role": "user",
+      "content": "08:18:42 Yes, that helps. What types of research activities do you have you found to be most useful? And I also want to explore like How much data does it generate as you're collecting that data?",
+      "timestamp": "2025-05-08T13:00:40.579694"
+    },
+    {
+      "role": "user",
+      "content": "08:18:55 I mean, it's all going to depend.",
+      "timestamp": "2025-05-08T13:00:40.579696"
+    },
+    {
+      "role": "user",
+      "content": "08:18:57 Okay, so let's talk about surveys. How do you feel about surveys?",
+      "timestamp": "2025-05-08T13:00:40.579699"
+    },
+    {
+      "role": "user",
+      "content": "08:19:01 Surveys have a place. I think they are one of the most widely overused, misused.",
+      "timestamp": "2025-05-08T13:00:40.579701"
+    },
+    {
+      "role": "user",
+      "content": "08:19:10 You know tools or quasi methodologies that are out there.",
+      "timestamp": "2025-05-08T13:00:40.579703"
+    },
+    {
+      "role": "user",
+      "content": "08:19:15 Okay.",
+      "timestamp": "2025-05-08T13:00:40.579705"
+    },
+    {
+      "role": "user",
+      "content": "08:19:16 And largely just because largely just because there is a art and a science to having good survey questions.",
+      "timestamp": "2025-05-08T13:00:40.579708"
+    },
+    {
+      "role": "user",
+      "content": "08:19:24 There's an art and a science to having an idea, an approach, a strategy to take the qual and the quant data that you're going to collect from those surveys and turn it into something that can be an insight.",
+      "timestamp": "2025-05-08T13:00:40.579710"
+    },
+    {
+      "role": "user",
+      "content": "08:19:40 What types of entries, video interviews or in-person interviews do you like to conduct?",
+      "timestamp": "2025-05-08T13:00:40.579712"
+    },
+    {
+      "role": "user",
+      "content": "08:19:47 I mean, these are all going to depend on what the research questions are.",
+      "timestamp": "2025-05-08T13:00:40.579714"
+    },
+    {
+      "role": "user",
+      "content": "08:19:51 So, you know, it's It\u2026 trying to figure out if you have a car and you are maybe you're a gearhead. So you're underneath the hood and you're playing around with the engine.",
+      "timestamp": "2025-05-08T13:00:40.579716"
+    },
+    {
+      "role": "user",
+      "content": "08:20:07 And you make a decision to use one type of coupling over another type of coupling.",
+      "timestamp": "2025-05-08T13:00:40.579718"
+    },
+    {
+      "role": "user",
+      "content": "08:20:13 That's you know that's what coupling you use as a gearhead really makes a lot, it's important, right? And maybe you can squeeze performance out of that.",
+      "timestamp": "2025-05-08T13:00:40.579720"
+    },
+    {
+      "role": "user",
+      "content": "08:20:22 But the end result is less about what coupling you used and more about what is that experience? What is the performance of the car?",
+      "timestamp": "2025-05-08T13:00:40.579722"
+    },
+    {
+      "role": "user",
+      "content": "08:20:33 What is the driving experience for the person behind the wheel? What is the experience for the people that are riding in the car?",
+      "timestamp": "2025-05-08T13:00:40.579724"
+    },
+    {
+      "role": "user",
+      "content": "08:20:41 And, you know, so it's like having a debate over what brand of pencil you want to use.",
+      "timestamp": "2025-05-08T13:00:40.579726"
+    },
+    {
+      "role": "user",
+      "content": "08:20:47 Okay, so can you give me two different specific examples of research questions that result in two different research techniques.",
+      "timestamp": "2025-05-08T13:00:40.579728"
+    },
+    {
+      "role": "user",
+      "content": "08:20:56 No, because you get\u2026 You put researchers in a room and ask them to plan a study.",
+      "timestamp": "2025-05-08T13:00:40.579730"
+    },
+    {
+      "role": "user",
+      "content": "08:21:05 And if you're nice enough, you're going to give them the research questions.",
+      "timestamp": "2025-05-08T13:00:40.579732"
+    },
+    {
+      "role": "user",
+      "content": "08:21:10 But they're going to come up with at least 10 different approaches.",
+      "timestamp": "2025-05-08T13:00:40.579734"
+    },
+    {
+      "role": "user",
+      "content": "08:21:14 So it's not this direct correlation that your question is implying.",
+      "timestamp": "2025-05-08T13:00:40.579736"
+    },
+    {
+      "role": "user",
+      "content": "08:21:19 Okay, so\u2026 How do you decide?",
+      "timestamp": "2025-05-08T13:00:40.579738"
+    },
+    {
+      "role": "user",
+      "content": "08:21:24 You decide based on time, based on budget. Based on the constraints that are given to you for that particular project.",
+      "timestamp": "2025-05-08T13:00:40.579741"
+    },
+    {
+      "role": "user",
+      "content": "08:21:32 Okay, so let's move along to collection. How much time do you spend during the actual data collection phase and how much of a burden is that or how much of a pain point is that overall in the research activities?",
+      "timestamp": "2025-05-08T13:00:40.579743"
+    },
+    {
+      "role": "user",
+      "content": "08:21:45 Say that again.",
+      "timestamp": "2025-05-08T13:00:40.579745"
+    },
+    {
+      "role": "user",
+      "content": "08:21:46 I just want to talk about data collection. How much effort do you spend conducting the research?",
+      "timestamp": "2025-05-08T13:00:40.579747"
+    },
+    {
+      "role": "user",
+      "content": "08:21:52 And managing the assets that you generate.",
+      "timestamp": "2025-05-08T13:00:40.579749"
+    },
+    {
+      "role": "user",
+      "content": "08:21:56 I mean\u2026 If you think about this in terms of percentages.",
+      "timestamp": "2025-05-08T13:00:40.579751"
+    },
+    {
+      "role": "user",
+      "content": "08:22:02 Okay. You would spend 50% doing your planning.",
+      "timestamp": "2025-05-08T13:00:40.579753"
+    },
+    {
+      "role": "user",
+      "content": "08:22:09 25% in the field, which is when data collection would be.",
+      "timestamp": "2025-05-08T13:00:40.579755"
+    },
+    {
+      "role": "user",
+      "content": "08:22:14 And the other 25% would be analysis, synthesis, and reporting.",
+      "timestamp": "2025-05-08T13:00:40.579757"
+    },
+    {
+      "role": "user",
+      "content": "08:22:23 The managing of assets is a really, really interesting point. And it's one that we as an overall organization do not do a good job of.",
+      "timestamp": "2025-05-08T13:00:40.579759"
+    },
+    {
+      "role": "user",
+      "content": "08:22:34 And what I mean by that is we don't have any sort of centralized repository.",
+      "timestamp": "2025-05-08T13:00:40.579761"
+    },
+    {
+      "role": "user",
+      "content": "08:22:40 Within a particular project. You know, there are techniques and approaches that we employ here Even as something as simple as giving people a folder structure.",
+      "timestamp": "2025-05-08T13:00:40.579763"
+    },
+    {
+      "role": "user",
+      "content": "08:22:56 So, you know, this is where you put your plan. This is where you put your data. This is where you do your analysis.",
+      "timestamp": "2025-05-08T13:00:40.579765"
+    },
+    {
+      "role": "user",
+      "content": "08:23:01 And at least that way it makes it easier to find crap.",
+      "timestamp": "2025-05-08T13:00:40.579767"
+    },
+    {
+      "role": "user",
+      "content": "08:23:06 But you know, but Generally, I would say 25% of your overall time is when you're in the field and you're collecting the data.",
+      "timestamp": "2025-05-08T13:00:40.579770"
+    },
+    {
+      "role": "user",
+      "content": "08:23:16 Normally, the management of that data gets a little messy when you're doing analysis.",
+      "timestamp": "2025-05-08T13:00:40.579772"
+    },
+    {
+      "role": "user",
+      "content": "08:23:24 And after you've delivered your findings, you then have time to make sure that you clean up the folder that has all of your data in it or clean up the data store that has all of your data in it.",
+      "timestamp": "2025-05-08T13:00:40.579774"
+    },
+    {
+      "role": "user",
+      "content": "08:23:40 At least one of the techniques that we really try to push here is you have a deliverables folder.",
+      "timestamp": "2025-05-08T13:00:40.579776"
+    },
+    {
+      "role": "user",
+      "content": "08:23:46 And in the deliverables for folder, you actually supply the client with the final analysis, the final Excel spreadsheets, the final whatever",
+      "timestamp": "2025-05-08T13:00:40.579778"
+    },
+    {
+      "role": "user",
+      "content": "08:23:59 That practice, even if you don't necessarily deliver that data, even though you should.",
+      "timestamp": "2025-05-08T13:00:40.579780"
+    },
+    {
+      "role": "user",
+      "content": "08:24:06 You know, kind of helps researchers in kind of culling through and finding finding what can be put in archive, what is actually necessary.",
+      "timestamp": "2025-05-08T13:00:40.579782"
+    },
+    {
+      "role": "user",
+      "content": "08:24:16 But we as an organization at Deloitte level, we as an organization within AMNC, DP&I, we don't have a good strategy in place In order to kind of hold on to that and manage that data you know once those projects over.",
+      "timestamp": "2025-05-08T13:00:40.579784"
+    },
+    {
+      "role": "user",
+      "content": "08:24:35 Okay, so we've gone through the process from start to finish, and you've mentioned some, but do you want to have any call out any specific pitfalls or struggles in the process that that you'd like to see worked out.",
+      "timestamp": "2025-05-08T13:00:40.579786"
+    },
+    {
+      "role": "user",
+      "content": "08:24:50 I don't know that they're necessarily pitfalls.",
+      "timestamp": "2025-05-08T13:00:40.579788"
+    },
+    {
+      "role": "user",
+      "content": "08:24:57 There's a lot to be said when you're in the field balancing adaptability with some level of standardization.",
+      "timestamp": "2025-05-08T13:00:40.579790"
+    },
+    {
+      "role": "user",
+      "content": "08:25:10 And what I mean by that is It's important, especially with the type of research we do.",
+      "timestamp": "2025-05-08T13:00:40.579792"
+    },
+    {
+      "role": "user",
+      "content": "08:25:19 To have the, you know, the interview session feel more conversational as opposed to people rattling off questions.",
+      "timestamp": "2025-05-08T13:00:40.579794"
+    },
+    {
+      "role": "user",
+      "content": "08:25:29 And\u2026 That said.",
+      "timestamp": "2025-05-08T13:00:40.579796"
+    },
+    {
+      "role": "user",
+      "content": "08:25:34 You still need to have some level of rigor to ensure that the way that you conducted an interview session a And the way that you conducted an interview session B, you're still getting you know similar levels of data quality",
+      "timestamp": "2025-05-08T13:00:40.579798"
+    },
+    {
+      "role": "user",
+      "content": "08:25:54 Because, you know, when you look at that data in aggregate if you don't have some standardization across the board.",
+      "timestamp": "2025-05-08T13:00:40.579800"
+    },
+    {
+      "role": "user",
+      "content": "08:26:04 It can really call into question the validity of your data.",
+      "timestamp": "2025-05-08T13:00:40.579802"
+    },
+    {
+      "role": "user",
+      "content": "08:26:09 So generally speaking, Stephen, the biggest pitfalls are we don't get enough time to do any of our research.",
+      "timestamp": "2025-05-08T13:00:40.579804"
+    },
+    {
+      "role": "user",
+      "content": "08:26:18 Um and usually the areas that get compressed the most are either in the planning or in the reporting and you know there are examples and stories out there. It's like, okay, well, sweet. You just finished usability testing.",
+      "timestamp": "2025-05-08T13:00:40.579806"
+    },
+    {
+      "role": "user",
+      "content": "08:26:34 You know, an hour later, the stakeholder from the client says, okay, so when can I see the report?",
+      "timestamp": "2025-05-08T13:00:40.579808"
+    },
+    {
+      "role": "user",
+      "content": "08:26:40 Like, well, dude, you just finished data collection of two weeks worth of sessions.",
+      "timestamp": "2025-05-08T13:00:40.579810"
+    },
+    {
+      "role": "user",
+      "content": "08:26:44 You know so And there are definitely ways to counterbalance that or at least manage those expectations but Generally speaking, we don't get enough time to do research.",
+      "timestamp": "2025-05-08T13:00:40.579812"
+    },
+    {
+      "role": "user",
+      "content": "08:27:01 Okay, so I'm going to switch to a new direction right now. This section is a little faster.",
+      "timestamp": "2025-05-08T13:00:40.579814"
+    },
+    {
+      "role": "user",
+      "content": "08:27:05 Can you tell me who on research projects do you work with? Who are your collaborators?",
+      "timestamp": "2025-05-08T13:00:40.579816"
+    },
+    {
+      "role": "user",
+      "content": "08:27:13 Normally for me, it would be PPMDs.",
+      "timestamp": "2025-05-08T13:00:40.579818"
+    },
+    {
+      "role": "user",
+      "content": "08:27:17 And who do you work for?",
+      "timestamp": "2025-05-08T13:00:40.579820"
+    },
+    {
+      "role": "user",
+      "content": "08:27:25 In terms of like Deloitte world, it would be the PPMD or the senior manager that, you know, kind of I interact with but Our work is being done on behalf of the client.",
+      "timestamp": "2025-05-08T13:00:40.579822"
+    },
+    {
+      "role": "user",
+      "content": "08:27:38 And that's So I consider that I'm working for them, but through the lens of Deloitte Digital.",
+      "timestamp": "2025-05-08T13:00:40.579824"
+    },
+    {
+      "role": "user",
+      "content": "08:27:45 Okay, and who benefits most from your work?",
+      "timestamp": "2025-05-08T13:00:40.579826"
+    },
+    {
+      "role": "user",
+      "content": "08:27:49 It depends on the study. Sometimes it can be our internal design team. Sometimes it can be stakeholders. Sometimes it can be both. Sometimes it can be product managers. Sometimes it can be C-suite executives.",
+      "timestamp": "2025-05-08T13:00:40.579828"
+    },
+    {
+      "role": "user",
+      "content": "08:28:04 So, you know. It really is going to depend a lot based on the study, based on the research questions and the research objectives.",
+      "timestamp": "2025-05-08T13:00:40.579830"
+    },
+    {
+      "role": "user",
+      "content": "08:28:12 Okay, so between those three, your collaborators and your clients and your customers.",
+      "timestamp": "2025-05-08T13:00:40.579832"
+    },
+    {
+      "role": "user",
+      "content": "08:28:16 Which one would you rank as most important and which one would you rank next and which one would you rank next?",
+      "timestamp": "2025-05-08T13:00:40.579834"
+    },
+    {
+      "role": "user",
+      "content": "08:28:23 It depends. I can't give you a blanket answer on that one.",
+      "timestamp": "2025-05-08T13:00:40.579837"
+    },
+    {
+      "role": "user",
+      "content": "08:28:26 Okay, what do you consider the victory event?",
+      "timestamp": "2025-05-08T13:00:40.579839"
+    },
+    {
+      "role": "user",
+      "content": "08:28:30 The victory then is presenting quality insights that can help in defining a direction or validating or invalidating designs or an approach or you know Basically.",
+      "timestamp": "2025-05-08T13:00:40.579841"
+    },
+    {
+      "role": "user",
+      "content": "08:28:49 Being able to come back to a group of people, be it them Deloitte employees or be them employees of the company that we're doing work for.",
+      "timestamp": "2025-05-08T13:00:40.579843"
+    },
+    {
+      "role": "user",
+      "content": "08:28:58 And delivering and delivering insights to help them better understand how they need to adapt or tweak their product.",
+      "timestamp": "2025-05-08T13:00:40.579845"
+    },
+    {
+      "role": "user",
+      "content": "08:29:08 Their experience, their strategy. In order to fulfill the idea that technology is there to make people's lives easier, not more difficult.",
+      "timestamp": "2025-05-08T13:00:40.579847"
+    },
+    {
+      "role": "user",
+      "content": "08:29:17 Okay, very good. We're going to switch gears again. And this is part of\u2026 And in our role as user experience practitioners and user research, we have to educate and we have to evangelize.",
+      "timestamp": "2025-05-08T13:00:40.579849"
+    },
+    {
+      "role": "user",
+      "content": "08:29:27 And as part of that process. It's important for us to know how to communicate what we do. So I'd like to start with how you communicate the value of your work to when you're educating and evangelizing.",
+      "timestamp": "2025-05-08T13:00:40.579851"
+    },
+    {
+      "role": "user",
+      "content": "08:29:42 Yeah, and we don't do a very good job of it right now.",
+      "timestamp": "2025-05-08T13:00:40.579853"
+    },
+    {
+      "role": "user",
+      "content": "08:29:47 A lot of the evangelizing within Deloitte is based on qual.",
+      "timestamp": "2025-05-08T13:00:40.579855"
+    },
+    {
+      "role": "user",
+      "content": "08:29:52 So we did this. We got these results. These results may or may not have had some direct or indirect correlation to an overall sales target.",
+      "timestamp": "2025-05-08T13:00:40.579857"
+    },
+    {
+      "role": "user",
+      "content": "08:30:06 And the reason why we struggle at doing that.",
+      "timestamp": "2025-05-08T13:00:40.579859"
+    },
+    {
+      "role": "user",
+      "content": "08:30:12 Is due in large part because Research is not normally on the project.",
+      "timestamp": "2025-05-08T13:00:40.579861"
+    },
+    {
+      "role": "user",
+      "content": "08:30:20 Forts and tired. We get brought on to do generative research. We get brought on to consult. We get brought on to advise a project team.",
+      "timestamp": "2025-05-08T13:00:40.579863"
+    },
+    {
+      "role": "user",
+      "content": "08:30:30 And then we roll off. And we may get brought back to do evaluative research, which is great.",
+      "timestamp": "2025-05-08T13:00:40.579865"
+    },
+    {
+      "role": "user",
+      "content": "08:30:40 With the exception of longer term engagements or things like AORs, agency of records.",
+      "timestamp": "2025-05-08T13:00:40.579867"
+    },
+    {
+      "role": "user",
+      "content": "08:30:47 We aren't always there to see the product actually go all the way through the design and development lifecycle.",
+      "timestamp": "2025-05-08T13:00:40.579869"
+    },
+    {
+      "role": "user",
+      "content": "08:30:55 We're not there to see it when it launches. We're not necessarily there to see it post launch.",
+      "timestamp": "2025-05-08T13:00:40.579871"
+    },
+    {
+      "role": "user",
+      "content": "08:31:03 And so trying to speak with a partner that maybe doesn't know us that well.",
+      "timestamp": "2025-05-08T13:00:40.579873"
+    },
+    {
+      "role": "user",
+      "content": "08:31:11 That becomes a challenge. One of the ways that we try to counterbalance that is in is trying to talk more about the impact to the design.",
+      "timestamp": "2025-05-08T13:00:40.579875"
+    },
+    {
+      "role": "user",
+      "content": "08:31:27 And the challenge with that approach is it doesn't always translate easily into dollars and cents.",
+      "timestamp": "2025-05-08T13:00:40.579877"
+    },
+    {
+      "role": "user",
+      "content": "08:31:35 But um you know a lot of researchers are uncomfortable with this notion of kind of being shameless self-promoters, but especially in a large company Especially within a consultancy we have to be able to shout from the rooftops when we finish a study. We need to be able to",
+      "timestamp": "2025-05-08T13:00:40.579879"
+    },
+    {
+      "role": "user",
+      "content": "08:31:57 Adapt our research, adapt our reporting. To meet the users where they are. And what I mean by that is we may work on an academic paper or an academic style paper.",
+      "timestamp": "2025-05-08T13:00:40.579881"
+    },
+    {
+      "role": "user",
+      "content": "08:32:10 We then have to translate that to make sure that that paper and the insights and the impact of those insights is understandable and relatable to the audience in which we are trying to evangelize to.",
+      "timestamp": "2025-05-08T13:00:40.579883"
+    },
+    {
+      "role": "user",
+      "content": "08:32:25 So some audiences really like slide decks. Some audiences want a TLDR summary in an email.",
+      "timestamp": "2025-05-08T13:00:40.579885"
+    },
+    {
+      "role": "user",
+      "content": "08:32:33 Some people just want it in a teams. Some people like to consume it via a video.",
+      "timestamp": "2025-05-08T13:00:40.579887"
+    },
+    {
+      "role": "user",
+      "content": "08:32:39 Some people want to hear about it in terms of a podcast and being able to adapt your story, being able to adapt your the implications of the research that you finished.",
+      "timestamp": "2025-05-08T13:00:40.579889"
+    },
+    {
+      "role": "user",
+      "content": "08:32:56 To those audiences is one of the approaches that slowly but surely is starting to chip away at some of these preconceived notions, at least here at Deloitte, in terms of what research is and more importantly, what it is not.",
+      "timestamp": "2025-05-08T13:00:40.579891"
+    },
+    {
+      "role": "user",
+      "content": "08:33:10 Okay, so with respect to education and evangelizing, how do you describe what problem you repeatedly solve?",
+      "timestamp": "2025-05-08T13:00:40.579893"
+    },
+    {
+      "role": "user",
+      "content": "08:33:21 I mean, we are trying to make sure that technology is easier to use at its core.",
+      "timestamp": "2025-05-08T13:00:40.579895"
+    },
+    {
+      "role": "user",
+      "content": "08:33:28 That's what all of our research is done for. Be it generative or evaluative or some variation of You know, both of those.",
+      "timestamp": "2025-05-08T13:00:40.579897"
+    },
+    {
+      "role": "user",
+      "content": "08:33:39 So\u2026 trying to dig in to specific areas of the experience or specific challenges a company is facing.",
+      "timestamp": "2025-05-08T13:00:40.579899"
+    },
+    {
+      "role": "user",
+      "content": "08:33:51 And deliver insights as well as sometimes strategies or recommendations on remediation or how to actually fix the experience or optimize the experience or optimize the strategy.",
+      "timestamp": "2025-05-08T13:00:40.579901"
+    },
+    {
+      "role": "user",
+      "content": "08:34:04 That's really at its core what we're doing.",
+      "timestamp": "2025-05-08T13:00:40.579903"
+    },
+    {
+      "role": "user",
+      "content": "08:34:07 Okay, so how do you educate educational people, we kind of talked about that one, but anything specific around educating, what are some of the struggles",
+      "timestamp": "2025-05-08T13:00:40.579905"
+    },
+    {
+      "role": "user",
+      "content": "08:34:18 I mean, attention is always a struggle. Um and trying to figure out that balance between how much information for the audience that you're presenting to is the right fit.",
+      "timestamp": "2025-05-08T13:00:40.579907"
+    },
+    {
+      "role": "user",
+      "content": "08:34:33 You don't want to necessarily go super deep into statistics and the analyses that you may have used in a study if If that's not going to necessarily land for the audience.",
+      "timestamp": "2025-05-08T13:00:40.579909"
+    },
+    {
+      "role": "user",
+      "content": "08:34:49 And it's not an easy endeavor to do. Researchers really like to go super deep um but You got to be able to think about what does that look like for a partner? What does that look like for a chief experience officer. What does that look like for a designer?",
+      "timestamp": "2025-05-08T13:00:40.579911"
+    },
+    {
+      "role": "user",
+      "content": "08:35:07 And how can you basically translate the super technical, the super deep into language and into a story will have the most impact and value for the audience of what you're trying to evangelize to.",
+      "timestamp": "2025-05-08T13:00:40.579913"
+    },
+    {
+      "role": "user",
+      "content": "08:35:25 Okay, what role does the look and feel of your outputs play in your evangelizing and educating?",
+      "timestamp": "2025-05-08T13:00:40.579915"
+    },
+    {
+      "role": "user",
+      "content": "08:35:33 That's a hard question for a researcher to answer. But I would say, you know.",
+      "timestamp": "2025-05-08T13:00:40.579917"
+    },
+    {
+      "role": "user",
+      "content": "08:35:42 Some projects, some partners, some stakeholders put a higher degree of value on a higher value the physical presentation.",
+      "timestamp": "2025-05-08T13:00:40.579919"
+    },
+    {
+      "role": "user",
+      "content": "08:35:53 Those are those typically are stakeholders or projects where they are not as mature in terms of their understanding and use of research.",
+      "timestamp": "2025-05-08T13:00:40.579921"
+    },
+    {
+      "role": "user",
+      "content": "08:36:06 But, you know, but Sometimes if your research has uncovered some interesting things.",
+      "timestamp": "2025-05-08T13:00:40.579923"
+    },
+    {
+      "role": "user",
+      "content": "08:36:13 You might get asked to put together a deck that's going to go to a board of directors and just again trying to find what that balance is in terms of what all the cool things that you did in your approach and how it was so cool and this and that and the other.",
+      "timestamp": "2025-05-08T13:00:40.579925"
+    },
+    {
+      "role": "user",
+      "content": "08:36:32 But, you know, just Sometimes the visual or the appearance has more gravitas than others.",
+      "timestamp": "2025-05-08T13:00:40.579927"
+    },
+    {
+      "role": "user",
+      "content": "08:36:41 Sometimes researchers get to set that direction. It's rare, but sometimes we get to do that.",
+      "timestamp": "2025-05-08T13:00:40.579929"
+    },
+    {
+      "role": "user",
+      "content": "08:36:46 A lot of times it is more just how how much how much of that aesthetic do you actually need to focus time on? And in most cases where it's you need a really, really strong visual aesthetic.",
+      "timestamp": "2025-05-08T13:00:40.579931"
+    },
+    {
+      "role": "user",
+      "content": "08:37:01 That's usually when researchers will reach out to a designer and see if they can help.",
+      "timestamp": "2025-05-08T13:00:40.579933"
+    },
+    {
+      "role": "user",
+      "content": "08:37:06 Okay, and the last category for this evangelizing education about user research is what role do the tools that you use and have available play?",
+      "timestamp": "2025-05-08T13:00:40.579935"
+    },
+    {
+      "role": "user",
+      "content": "08:37:18 People that are on the sidelines love to talk about tools.",
+      "timestamp": "2025-05-08T13:00:40.579937"
+    },
+    {
+      "role": "user",
+      "content": "08:37:23 And they love to talk about the intricacies of one tool versus another tool.",
+      "timestamp": "2025-05-08T13:00:40.579939"
+    },
+    {
+      "role": "user",
+      "content": "08:37:29 At the end of the day. The tools are a facilitation engine.",
+      "timestamp": "2025-05-08T13:00:40.579941"
+    },
+    {
+      "role": "user",
+      "content": "08:37:36 The role that it plays with experienced researchers is less emphasized than people who are brand new.",
+      "timestamp": "2025-05-08T13:00:40.579943"
+    },
+    {
+      "role": "user",
+      "content": "08:37:47 And what I mean by that is like you may use, you know, you may use Qualtrics, you might use users and you might use MUIT, you might use something else but Unless you're trying to evangelize to the stakeholder group.",
+      "timestamp": "2025-05-08T13:00:40.579945"
+    },
+    {
+      "role": "user",
+      "content": "08:38:03 The value of a particular platform. The value that it was able to deliver.",
+      "timestamp": "2025-05-08T13:00:40.579947"
+    },
+    {
+      "role": "user",
+      "content": "08:38:12 The the tool that you use or going back to the car, you know, the coupling that you elect to use in your engine.",
+      "timestamp": "2025-05-08T13:00:40.579949"
+    },
+    {
+      "role": "user",
+      "content": "08:38:23 Is largely something that is reserved for happy hours at research conferences.",
+      "timestamp": "2025-05-08T13:00:40.579951"
+    },
+    {
+      "role": "user",
+      "content": "08:38:30 You know. One brand of tire or over another or one one version of a washer that you use or a lug nut So, um.",
+      "timestamp": "2025-05-08T13:00:40.579953"
+    },
+    {
+      "role": "user",
+      "content": "08:38:41 If you're trying to emphasize, especially internally here at Deloitte, sometimes we have to index heavily on one tool over the other. And largely that's being done Because we are trying to continue to spread the word about either the availability of the tool",
+      "timestamp": "2025-05-08T13:00:40.579955"
+    },
+    {
+      "role": "user",
+      "content": "08:39:00 Or how we as researchers and experienced researchers were able to leverage that tool In order to get to deeper and richer insights in less time.",
+      "timestamp": "2025-05-08T13:00:40.579957"
+    },
+    {
+      "role": "user",
+      "content": "08:39:11 Okay, very good. So in the last section, I just had some kind of wandering questions. If you had a magic wand, what one thing would you change about the user research activities and processes that you used.",
+      "timestamp": "2025-05-08T13:00:40.579959"
+    },
+    {
+      "role": "user",
+      "content": "08:39:25 It's that we would get brought in earlier in the in the planning and the pursuit.",
+      "timestamp": "2025-05-08T13:00:40.579961"
+    },
+    {
+      "role": "user",
+      "content": "08:39:34 Phases.",
+      "timestamp": "2025-05-08T13:00:40.579963"
+    },
+    {
+      "role": "user",
+      "content": "08:39:35 Okay, sounds good and um Are there any thanks during a project that research initiative that keep you up at night?",
+      "timestamp": "2025-05-08T13:00:40.579965"
+    },
+    {
+      "role": "user",
+      "content": "08:39:45 Not really. I mean, you know.",
+      "timestamp": "2025-05-08T13:00:40.579967"
+    },
+    {
+      "role": "user",
+      "content": "08:39:49 There is no study that goes perfectly. And the longer you've been doing this, the more you realize that.",
+      "timestamp": "2025-05-08T13:00:40.579969"
+    },
+    {
+      "role": "user",
+      "content": "08:39:56 So, you know. Given the constraints, given the curveballs that you get thrown at you.",
+      "timestamp": "2025-05-08T13:00:40.579971"
+    },
+    {
+      "role": "user",
+      "content": "08:40:02 How are you going to adapt? So I don't necessarily know that it keeps me up at night, but you have to be able to embrace and accept that it's never going to go exactly as planned.",
+      "timestamp": "2025-05-08T13:00:40.579973"
+    },
+    {
+      "role": "user",
+      "content": "08:40:18 Okay, and the last question, if I talk to one of your collaborators and I say, please describe Ted to me in one word.",
+      "timestamp": "2025-05-08T13:00:40.579975"
+    },
+    {
+      "role": "user",
+      "content": "08:40:25 Which one word would you want them to tell me?",
+      "timestamp": "2025-05-08T13:00:40.579977"
+    },
+    {
+      "role": "user",
+      "content": "08:40:30 Lord. Methodical.",
+      "timestamp": "2025-05-08T13:00:40.579979"
+    },
+    {
+      "role": "user",
+      "content": "08:40:33 Sounds good. Are there any questions that you expected me to ask that I haven't asked so far?",
+      "timestamp": "2025-05-08T13:00:40.579981"
+    },
+    {
+      "role": "user",
+      "content": "08:40:38 No.",
+      "timestamp": "2025-05-08T13:00:40.579983"
+    },
+    {
+      "role": "user",
+      "content": "08:40:39 Okay, that sounds good. That's kind of the end of the question part of the interview. We can either do a little evaluative research, but I actually ended up breaking my tool because after these research questions, I've learned so much",
+      "timestamp": "2025-05-08T13:00:40.579985"
+    },
+    {
+      "role": "user",
+      "content": "08:40:51 I threw everything away and i'm starting to from scratch.",
+      "timestamp": "2025-05-08T13:00:40.579987"
+    },
+    {
+      "role": "user",
+      "content": "08:40:56 I don't know if you want to do that. I can kind of show you two different things we're working on the Sidekick tools, which you upload transcripts to and then it does various forms of animal analysis.",
+      "timestamp": "2025-05-08T13:00:40.579989"
+    },
+    {
+      "role": "user",
+      "content": "08:41:06 And then most recently, I've started to break down interviews into semantic tagging so that it'll go through and kind of take a paragraph of what you say.",
+      "timestamp": "2025-05-08T13:00:40.579991"
+    },
+    {
+      "role": "user",
+      "content": "08:41:16 And add a frustration and add maybe a feature, what you talk about.",
+      "timestamp": "2025-05-08T13:00:40.579993"
+    },
+    {
+      "role": "user",
+      "content": "08:41:20 And so I'm kind of reorganizing the way we analyze transcripts.",
+      "timestamp": "2025-05-08T13:00:40.579995"
+    },
+    {
+      "role": "user",
+      "content": "08:41:24 And that is what broke everything. But it is pretty promising.",
+      "timestamp": "2025-05-08T13:00:40.579997"
+    },
+    {
+      "role": "user",
+      "content": "08:41:28 So how is this different from what Dovetail offers?",
+      "timestamp": "2025-05-08T13:00:40.579999"
+    },
+    {
+      "role": "user",
+      "content": "08:41:28 Any of that?",
+      "timestamp": "2025-05-08T13:00:40.580001"
+    },
+    {
+      "role": "user",
+      "content": "08:41:32 You know. I haven't studied dovetail and I haven't studied uh That's set on purpose because I'm trying not to be influenced, but I do plan with Kinsha to drop all of our interviews videos into Dovetail and go through that phase.",
+      "timestamp": "2025-05-08T13:00:40.580003"
+    },
+    {
+      "role": "user",
+      "content": "08:41:46 This research effort goes through the end of May. And so I'm basically collecting up to 20 interviews with different researchers at this phase. And then I'm kind of building out the tool based on If the question is if you had a digital assistant, a digital research and interview assistant, what would it be?",
+      "timestamp": "2025-05-08T13:00:40.580005"
+    },
+    {
+      "role": "user",
+      "content": "08:42:07 Okay.",
+      "timestamp": "2025-05-08T13:00:40.580007"
+    },
+    {
+      "role": "user",
+      "content": "08:42:08 And so that's kind of where we're\u2026 where we're focusing our time.",
+      "timestamp": "2025-05-08T13:00:40.580009"
+    },
+    {
+      "role": "user",
+      "content": "08:42:14 And then the other initiative that's actually funding this that I kind of need to keep aware of is the The Sidekick Tools team.",
+      "timestamp": "2025-05-08T13:00:40.580011"
+    },
+    {
+      "role": "user",
+      "content": "08:42:25 Yep.",
+      "timestamp": "2025-05-08T13:00:40.580013"
+    },
+    {
+      "role": "user",
+      "content": "08:42:26 Because they're gracious enough to allow me to work with them.",
+      "timestamp": "2025-05-08T13:00:40.580015"
+    },
+    {
+      "role": "user",
+      "content": "08:42:31 And so we're creating a series of Sidekick side.",
+      "timestamp": "2025-05-08T13:00:40.580017"
+    },
+    {
+      "role": "user",
+      "content": "08:42:37 Are based off Daria where you would actually upload a transcript And then that's one. Are you seeing the screen?",
+      "timestamp": "2025-05-08T13:00:40.580019"
+    },
+    {
+      "role": "user",
+      "content": "08:42:46 Yeah. I mean, the one of these quote unquote tools that A lot of people don't necessarily know about a lot of people don't necessarily know about I have found it to be found to be mildly useful is the research assistant.",
+      "timestamp": "2025-05-08T13:00:40.580021"
+    },
+    {
+      "role": "user",
+      "content": "08:42:47 Okay.",
+      "timestamp": "2025-05-08T13:00:40.580023"
+    },
+    {
+      "role": "user",
+      "content": "08:43:04 I don't like I don't like how I can't tell it what areas to go or what types of areas of the web.",
+      "timestamp": "2025-05-08T13:00:40.580025"
+    },
+    {
+      "role": "user",
+      "content": "08:43:05 I used the research assistant. I used it last night.",
+      "timestamp": "2025-05-08T13:00:40.580027"
+    },
+    {
+      "role": "user",
+      "content": "08:43:17 So like if I'm doing UX research, I don't give a shit about Dow Jones.",
+      "timestamp": "2025-05-08T13:00:40.580029"
+    },
+    {
+      "role": "user",
+      "content": "08:43:22 I wanted to hit Google Scholar. I wanted to hit some of the open repos.",
+      "timestamp": "2025-05-08T13:00:40.580031"
+    },
+    {
+      "role": "user",
+      "content": "08:43:29 And, you know. It's nice. It's great that it kind of puts together, you know, it looks really pretty.",
+      "timestamp": "2025-05-08T13:00:40.580033"
+    },
+    {
+      "role": "user",
+      "content": "08:43:39 I like that it gives the references. I wish I could tell it what type of reference or what reference models I want.",
+      "timestamp": "2025-05-08T13:00:40.580035"
+    },
+    {
+      "role": "user",
+      "content": "08:43:47 So do I want this? Formatted for APA? Do I want this formatted for ACM. Do I want this formatted for You know, some of the other common ways But, you know, the The insights are, they're okay.",
+      "timestamp": "2025-05-08T13:00:40.580037"
+    },
+    {
+      "role": "user",
+      "content": "08:44:09 I think that it's a little reaching at times but You know, there's a reason why it's hidden over there on the left-hand side.",
+      "timestamp": "2025-05-08T13:00:40.580039"
+    },
+    {
+      "role": "user",
+      "content": "08:44:20 There are definitely some other tools that are out there outside of Deloitte that are much better at that stuff.",
+      "timestamp": "2025-05-08T13:00:40.580041"
+    },
+    {
+      "role": "user",
+      "content": "08:44:24 Do you use the deep research tool? In OpenAI?",
+      "timestamp": "2025-05-08T13:00:40.580043"
+    },
+    {
+      "role": "user",
+      "content": "08:44:29 Yeah, I think that one's pretty good. Notebook LM in terms of doing some of the more qual heavy analysis I think is\u2026 is on par or better than like Dovetail um Dovetail is interesting because it's really a question when people tell me that they're using Dovetail, I always ask them in what capacity? Are they using it for qual analysis? Because it's really good at that.",
+      "timestamp": "2025-05-08T13:00:40.580045"
+    },
+    {
+      "role": "user",
+      "content": "08:44:58 Or are they using it for more of that research repo? And sometimes it's both, but The research repo is kind of, it's a really, really strong suit of dovetail.",
+      "timestamp": "2025-05-08T13:00:40.580047"
+    },
+    {
+      "role": "user",
+      "content": "08:45:11 And as you're talking about tagging and all this other stuff, Dovetail has all of that stuff baked into its qual analysis, which is why I was asking about it.",
+      "timestamp": "2025-05-08T13:00:40.580049"
+    },
+    {
+      "role": "user",
+      "content": "08:45:19 Yeah. So this basically takes his interview.",
+      "timestamp": "2025-05-08T13:00:40.580051"
+    },
+    {
+      "role": "user",
+      "content": "08:45:22 But you know.",
+      "timestamp": "2025-05-08T13:00:40.580053"
+    },
+    {
+      "role": "user",
+      "content": "08:45:25 And then it takes each little snippet at the beginning and the end. That's what Dovetail does, and then captures that snippet. And then it does its price, it's conviction, and then we kind of fill in these tags as you go.",
+      "timestamp": "2025-05-08T13:00:40.580055"
+    },
+    {
+      "role": "user",
+      "content": "08:45:36 And so, and this is a model I'm playing with because you end up like initially I end up with this kind of transcript out of, and this is straight out of like.",
+      "timestamp": "2025-05-08T13:00:40.580057"
+    },
+    {
+      "role": "user",
+      "content": "08:45:37 Mm-hmm.",
+      "timestamp": "2025-05-08T13:00:40.580059"
+    },
+    {
+      "role": "user",
+      "content": "08:45:44 What we're doing today. So I'll get this from from and then you do basically some sentiment analysis. There are various models I'm learning huggy face, blah, blah, blah. And they have like this one is super atomic.",
+      "timestamp": "2025-05-08T13:00:40.580061"
+    },
+    {
+      "role": "user",
+      "content": "08:45:46 You know",
+      "timestamp": "2025-05-08T13:00:40.580063"
+    },
+    {
+      "role": "user",
+      "content": "08:45:57 This is a question that kind of built Workday that was great and then it breaks that in and starts to give it neutral. So this one is a little too atomic.",
+      "timestamp": "2025-05-08T13:00:40.580065"
+    },
+    {
+      "role": "user",
+      "content": "08:46:08 And then also I lost the speaker. This should say Suzette Whereas the Jesse one is\u2026 It'll take some big paragraphs. If I had this wrapping, it would be, and then it gives you neutral stakeholder planning, research planning type stuff.",
+      "timestamp": "2025-05-08T13:00:40.580067"
+    },
+    {
+      "role": "user",
+      "content": "08:46:22 So this is like having the machine go through and kind of break it up in what it thinks is important. They call it chunking.",
+      "timestamp": "2025-05-08T13:00:40.580069"
+    },
+    {
+      "role": "user",
+      "content": "08:46:28 Mm-hmm.",
+      "timestamp": "2025-05-08T13:00:40.580071"
+    },
+    {
+      "role": "user",
+      "content": "08:46:28 And so I think there's some promise in there. I think in general, the sweet spot is to try to manage the archive and manage the assets And where I am right now is I broke everything. So this is the tool that basically has the archived cards. And these are the five interviews that I have. I took all the green eggs and ham and stuff out because they're done. I passed that phase.",
+      "timestamp": "2025-05-08T13:00:40.580073"
+    },
+    {
+      "role": "user",
+      "content": "08:46:52 So these are actually hour-long interviews similar to what we did today.",
+      "timestamp": "2025-05-08T13:00:40.580075"
+    },
+    {
+      "role": "user",
+      "content": "08:46:56 And then I'm trying to\u2026 This is like your transcript, the raw one. And the raw one's good if you want to throw it to an AI to get like a a persona and there's probably other types of analysis that I'd need to pull.",
+      "timestamp": "2025-05-08T13:00:40.580077"
+    },
+    {
+      "role": "user",
+      "content": "08:47:12 In specific, what type of analysis, you say statistical what kind of statistical report would you like to see out of a group of interviews?",
+      "timestamp": "2025-05-08T13:00:40.580079"
+    },
+    {
+      "role": "user",
+      "content": "08:47:27 Interesting.",
+      "timestamp": "2025-05-08T13:00:40.580081"
+    },
+    {
+      "role": "user",
+      "content": "08:47:29 Because that's all based on the prompting and I need to kind of do best practices and then go through and play with the prompting and then I'll feed it like 10 or 12 interviews and then generate a statistical report and then see if we like it.",
+      "timestamp": "2025-05-08T13:00:40.580083"
+    },
+    {
+      "role": "user",
+      "content": "08:47:40 So the first two that were easy are personas and journey maps. The others are possible. So these little cards, you have the metadata.",
+      "timestamp": "2025-05-08T13:00:40.580085"
+    },
+    {
+      "role": "user",
+      "content": "08:47:47 I probably need to start thinking about the types of demographic data that I want to collect.",
+      "timestamp": "2025-05-08T13:00:40.580087"
+    },
+    {
+      "role": "user",
+      "content": "08:47:54 More seriously. And then you have the analysis. This is the one where you can actually go through. This is the statement from Suzette and I could hit the edit button.",
+      "timestamp": "2025-05-08T13:00:40.580089"
+    },
+    {
+      "role": "user",
+      "content": "08:48:03 And then edit and add the tags. But you can see how long this is because it broke her super tiny, whereas Jesse's, it only gave me nine chunks in an hour interview. And I was like, there's clearly more than nine important things Jesse said in an hour-long interview. So that's where I am. That's the state of the",
+      "timestamp": "2025-05-08T13:00:40.580091"
+    },
+    {
+      "role": "user",
+      "content": "08:48:22 The research right now. But basically, I threw out the homepage because people don't in the The forms are just not, I think of this creating a research study one way. Everyone does their own thing.",
+      "timestamp": "2025-05-08T13:00:40.580093"
+    },
+    {
+      "role": "user",
+      "content": "08:48:34 So I'm leaning right now going to an interview style for setting up a project to let the person Whether it's a discovery project or a research program.",
+      "timestamp": "2025-05-08T13:00:40.580095"
+    },
+    {
+      "role": "user",
+      "content": "08:48:45 And just do a quick interview and capture their thoughts. And then go from there and then focus on capturing transcripts and analyzing transcripts and and storing as a repository transcripts. I think that's one thing Dovetail does nice is you can actually search Dovetail and you can sneak into all the videos from other Deloitte people.",
+      "timestamp": "2025-05-08T13:00:40.580097"
+    },
+    {
+      "role": "user",
+      "content": "08:49:05 I don't know if it's intentional. But I do see, you know, I was able to find pretty good results on financial analyst from interviews I didn't conduct, but were related to financial analysts.",
+      "timestamp": "2025-05-08T13:00:40.580099"
+    },
+    {
+      "role": "user",
+      "content": "08:49:18 That's a bug or a feature, but\u2026 It's an observation right now.",
+      "timestamp": "2025-05-08T13:00:40.580101"
+    },
+    {
+      "role": "user",
+      "content": "08:49:21 I mean, it's because we're all using the same repo instance.",
+      "timestamp": "2025-05-08T13:00:40.580103"
+    },
+    {
+      "role": "user",
+      "content": "08:49:26 Yeah. So I don't really have, you know, I've kind of ended up realizing that the needs are different.",
+      "timestamp": "2025-05-08T13:00:40.580105"
+    },
+    {
+      "role": "user",
+      "content": "08:49:36 And so I'm trying to, like you say, wait till I get some more But I have really found fascinating results.",
+      "timestamp": "2025-05-08T13:00:40.580107"
+    },
+    {
+      "role": "user",
+      "content": "08:49:44 Yeah.",
+      "timestamp": "2025-05-08T13:00:40.580109"
+    },
+    {
+      "role": "user",
+      "content": "08:49:44 And I'll read those out to you. Everyone has a, like we do rely on the art more than we put potentially think. And there's these deep reservoirs of experience that is different and distinct in each researcher.",
+      "timestamp": "2025-05-08T13:00:40.580111"
+    },
+    {
+      "role": "user",
+      "content": "08:49:56 That is the secret to how they've succeeded and been here so long at Deloitte.",
+      "timestamp": "2025-05-08T13:00:40.580113"
+    },
+    {
+      "role": "user",
+      "content": "08:50:01 And you don't know what it is, but you know it when it starts to pop up during the interview. And that's when I try to get quiet and listen.",
+      "timestamp": "2025-05-08T13:00:40.580115"
+    },
+    {
+      "role": "user",
+      "content": "08:50:03 Yeah.",
+      "timestamp": "2025-05-08T13:00:40.580117"
+    },
+    {
+      "role": "user",
+      "content": "08:50:10 Nice. All right, man. I hope this was helpful.",
+      "timestamp": "2025-05-08T13:00:40.580119"
+    },
+    {
+      "role": "user",
+      "content": "08:50:15 Super helpful.",
+      "timestamp": "2025-05-08T13:00:40.580121"
+    },
+    {
+      "role": "user",
+      "content": "08:50:18 Yeah. And please let me know if there's anything else I can do to help. Otherwise, I'm going to hop.",
+      "timestamp": "2025-05-08T13:00:40.580123"
+    },
+    {
+      "role": "user",
+      "content": "08:50:24 You go splash some water on my face before my 8 a.m.",
+      "timestamp": "2025-05-08T13:00:40.580125"
+    },
+    {
+      "role": "user",
+      "content": "08:50:27 Okay, thanks for taking the time to share your story with me. I enjoyed it very much.",
+      "timestamp": "2025-05-08T13:00:40.580127"
+    },
+    {
+      "role": "user",
+      "content": "08:50:31 Yeah, man. All right. Take care, my friend.",
+      "timestamp": "2025-05-08T13:00:40.580129"
+    },
+    {
+      "role": "user",
+      "content": "08:50:32 I'll keep you posted on our progress. Thank you.",
+      "timestamp": "2025-05-08T13:00:40.580131"
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:00:56 Testing the transcript.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:02:04 Morning, Stephen. How are you?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:02:05 Morning, how are you? Good, good. Thank you for joining today. Do I have your permission to do a transcript and a recording?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:02:14 Sounds great. And I'm fine.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:02:14 Yep.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:02:20 That's no problem. So Ted, tell me a little bit about your background as a user researcher. How did you get into this line of work?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:02:33 That started in school. I hung out with more professors than I did with kids my own age.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:02:41 And so because I hung around the professors i kind of got dragged into helping them out with studies.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:02:51 And that kind of began the journey of me really focused more on research than on design.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:03:02 So I don't know that I ever kind of made a pivot. I've always been on the research and the science side of the spectrum.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:03:09 Now, what school was this and there were any specific mentors that formed your research behavior today?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:03:15 I mean, it's the University of Arizona. There's a handful of them.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:03:21 But I don't know how that's necessarily germane to this conversation.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:03:26 Okay. Tell me with respect to your current role, what is your primary goal?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:03:35 Continuing to build out a research offering here at Deloitte.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:03:41 And with respect to the primary goal, what are some key frustrations that you encounter?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:03:47 A lot of it is just lack of awareness that our research practice exists.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:03:56 A lack of\u2026 people who aren't as far along on their path in either doing research or exploring research um just it's just it looks easier than it actually is.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:04:13 Um so you know the trying to strike that balance both with projects as well as with practitioners in terms of knowing when they need to actually bring in an expert.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:04:28 And far too often it's too late in the process. And it, you know, that's more just in terms of will get brought in or get asked to kind of help or take a look at something after data collection is already done.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:04:45 And they're in the middle of doing analysis or reporting out their findings and You know, just trying to find a way to help them out as well as to give them a little bit of education in terms of If you're going to do this again next time, here's some",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:05:02 Some suggestions and a lot of that just comes with you know the the 20 years plus of experience that I have.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:05:08 Okay, that sounds great. So I want you to think back. When did you first arrive at Deloitte and what kind of, what was the state of the research and what were the activities that you performed during a discovery cycle?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:05:21 Almost 11 years ago, June 1st. And there really wasn't a research practice then.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:05:29 There was a bunch of bunch of designers that think that they can do research and some of them could for sure but A lot of when we're doing research really badly.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:05:42 From an approach standpoint, from a policy standpoint, from a methodology standpoint, from a data collection standpoint.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:05:51 And yeah, you know, so just slowly but surely trying to trying to change the way that you know we did research initially here in Denver.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:06:03 Um you know now nationally and internationally. So I don't know if that really answers your question.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:06:09 Okay, so how is the state of the research today? How has it changed and what are your methods and tools that you have available that you didn't back then.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:06:21 I mean, the methods are all the same. The tools change just based on change based on what's out there.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:06:31 The market has seen a considerable consolidation of online platforms and tools.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:06:38 With the 800 pound gorilla in the market being users and user testing.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:06:46 Um but you know the the tools that we use will come and go.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:06:54 But the tool isn't the definition of doing research. It is a you know it is a mechanism to enable a researcher to actually collect data. That's all it is.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:07:07 So\u2026 you know the the state today is we are getting better at research we are putting We're trying to strike that balance between rigor and practicality, which you have to do in any type of industry research setting and even in academia.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:07:25 And we're getting there. We're making some headway. But, you know, we've got a ways to go and The big thing for me in the last, I'd say, five years is really pushing to include even in heavily qualitative research.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:07:44 You still got to use statistics. You still got to use, you know, you can still bring in some quant.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:07:51 And not just cherry pick whole quotes that maybe align with your, you know, with a researcher's bias.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:07:57 Consciously or subconsciously. I hope.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:07:59 Okay, so what would you like to see in the next three years of how you're going to move and evolve the research efforts at Deloitte?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:08:08 More promotion, more operationalization, more scale.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:08:14 Can you tell me a story like that one you talked about?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:08:18 Where you had a project that looked promising and then no matter how hard you tried, it became frustrating and just had more trouble than it should have.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:08:26 I mean, all projects have challenges, right? Any research project is going to have curveballs thrown at you.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:08:33 You know, a researcher job is to adapt to the situation.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:08:41 And given the constraints, find a way to still deliver you know insights, still deliver findings despite the curveballs.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:08:54 Um and you know, I think a lot of that just comes with time You're going to have participants that cancel or you're going to have, you know, a prototype that doesn't work on a particular day. You're going to have",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:09:07 A slew of challenges. It's that adaptability. It's that you know realizing what that end goal is.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:09:19 In terms of what we're doing research to or we're doing a study to explore these research questions.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:09:27 Given some of the constraints that have been put in front of us, how do we still achieve that goal?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:09:32 I want you to think of a story that you tell to help spread a message about a past research project.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:09:38 Yeah, I don't use stories for that, Stephen.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:09:40 Okay, that sounds good. That's as good as the answers I needed. Okay, we're going to change task a little bit and I want to talk about like creating a discovery cycle and creating a research effort.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:09:52 How do you go about what's when you have a new project in your awareness and it's maybe just in the, you know, just you just heard about it phase What are some of the activities you do to formalize that and convert it into a discovery project?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:10:05 I mean, does it have to be discovery? Okay. I mean, step one is develop a research plan And the step one of that effort is working with project team to identify what the research questions are. Sometimes projects will come with a method that they want to use, but they don't actually know what the research questions are.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:10:08 No, whatever you like.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:10:31 And it's putting the cart before the horse.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:10:34 So what techniques do you do to identify and solidify the research questions?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:10:39 A lot of it is conversations with the account team. A lot of it is, you know, if we have access to them, the stakeholders.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:10:45 And I don't expect either one of those archetypes to actually say, here's our research questions, go.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:10:53 It's more listening to the areas of whatever whatever ecosystem we're in.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:11:03 What are they curious about what you know Are we trying to investigate or explore why we're seeing a drop off in the sales funnel? Whatever it is.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:11:16 And based on those conversations, and it doesn't have to be long. You just have a quick conversation with some folks.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:11:24 Begin to actually begin to actually formulate research questions.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:11:29 And put those back in front of the accounting, put them back in front of the stakeholders.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:11:36 But you know, but a lot of people will try to do research without actually kind of having those questions in mind and it's just you know it's it's really hard to do good research without kind of that structure in place.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:11:53 Once you have your research questions solidified, what is the next step to activating or planning the research initiative?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:11:59 Yeah, I mean, then you begin experimental design. So now that you have your research questions in place.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:12:08 You begin to formulate an approach as a researcher in terms of what what method or methods are you going to use? What metrics are you going to use?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:12:23 What participant recruitment strategies are you going to use? And in that discussion, you know, further on down the road is what tools might we leverage in order to do this?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:12:36 So if we're doing remote unmoderated we'll need to think about what tools or platforms do we have access to.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:12:47 What does the participant recruitment uh look like for that target population.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:12:54 What does the stimuli look like? So the stimuli being a prototype.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:12:59 Or a design or a design a navigational schema um and you know this this is where researchers actually do design. It's just not doing wireframes.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:13:15 So\u2026 You go through that process and the planning process, generally speaking, should probably twice as long as it's going to take as long as it's going for the time that you're actually doing data collection or you're in the field. So let's say if it's a week.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:13:31 In the field, you should probably plan two weeks for experimental design.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:13:36 The reason for that is you got to make sure that everything is in place. You got to make sure that your data collection methods are correct.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:13:43 You got to make sure that you know people are inherently unpredictable. So you've got to pilot during that phase as well.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:13:52 We've been able to compress the planning down in some cases.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:13:57 But you need time to actually plan a study. And most studies that are executed well are a direct result or a direct correlation to proper planning.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:14:11 Okay, that sounds great. So what\u2026 What is the next challenge after you have your research plan and you're ready to go to the field? What's your next challenge? Are there any between there?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:14:23 I mean, recruitment is always going to be, I don't know that it's a challenge. It's just, it's something you got to deal with.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:14:30 So, you know, making sure that whatever recruitment partner you're working with.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:14:37 Making sure that you're getting quality participants coming through.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:14:44 So user testing, for example, has a well-deserved reputation of having a really.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:14:53 Poorly cultivated pool of research participants. And it's because a lot of people are in their pool solely because they they're looking to earn some money.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:15:07 There's nothing wrong with that You know, one of the things that experienced researchers learn to do as part of their planning phase.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:15:18 Specifically around recruitment. Is a really, really solid screener.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:15:24 And the approach that you take to writing a screener is going to vary based on how you're sourcing participants. For example.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:15:32 And we don't do it at all here at Deloitte, but some companies use Amazon's Mechanical Turk.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:15:39 It's also really, really popular in academia. And you can get a lot of responses really, really quickly. But you got to have a really, really solid screener in place to ensure that the responses you're getting are of quality and also the people that you're getting are",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:16:00 Fitting into some sort of recruit criteria so that the data that you collect is actually something that can be generalized to the overall user population.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:16:11 If you're doing a website redesign or app redesign for a senior living community.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:16:20 Doing evaluative research with a bunch of 20-somethings. It's going to get you some data.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:16:26 But how representative that data is to the overall population comes into question.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:16:32 So, um. Always kind of making sure that you're keeping an eye at least, or you have somebody on your team that's keeping an eye on the responses that are coming in.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:16:44 While the study is in flight. A lot of people who aren't as far along on their path with research will try to start doing synthesis and analysis of the recordings as they're coming in.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:16:59 And, you know. There's a reason why we normally wait until we're done.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:17:07 And some of that is you got to wait for your recruiting partner to make sure that you actually have enough responses that are representative.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:17:17 And the reason that I always caution people not to do that is because, you know, kind of doing the analysis in flight is A lot can change.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:17:28 And your percentages can change significantly. If you're, you know, depending on how many participants and how many quality responses are in that in your set of data that you're collecting. So if you're doing a study with 10 participants.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:17:46 And you start off strong with two participants that just absolutely love the app.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:17:50 And then you have three participants that don't love the app, your numbers change very, very quickly.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:17:58 So, you know, that's always a challenge. There's always like when you're in field, there's just things happen.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:18:07 People not showing up, people not having enough time, or it's an hour long session, they join 30 minutes in.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:18:15 And still trying to get the most data that you can You know, given that a lot of it is a lot of it is researchers ability to kind of adapt to to what participants are saying. Not to sound robotic as they're kind of going through a list of questions and make it more conversational than",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:18:39 Then, you know, an Inquisition Does that help?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:18:42 Yes, that helps. What types of research activities do you have you found to be most useful? And I also want to explore like How much data does it generate as you're collecting that data?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:18:55 I mean, it's all going to depend.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:18:57 Okay, so let's talk about surveys. How do you feel about surveys?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:19:01 Surveys have a place. I think they are one of the most widely overused, misused.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:19:10 You know tools or quasi methodologies that are out there.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:19:15 Okay.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:19:16 And largely just because largely just because there is a art and a science to having good survey questions.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:19:24 There's an art and a science to having an idea, an approach, a strategy to take the qual and the quant data that you're going to collect from those surveys and turn it into something that can be an insight.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:19:40 What types of entries, video interviews or in-person interviews do you like to conduct?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:19:47 I mean, these are all going to depend on what the research questions are.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:19:51 So, you know, it's It\u2026 trying to figure out if you have a car and you are maybe you're a gearhead. So you're underneath the hood and you're playing around with the engine.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:20:07 And you make a decision to use one type of coupling over another type of coupling.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:20:13 That's you know that's what coupling you use as a gearhead really makes a lot, it's important, right? And maybe you can squeeze performance out of that.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:20:22 But the end result is less about what coupling you used and more about what is that experience? What is the performance of the car?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:20:33 What is the driving experience for the person behind the wheel? What is the experience for the people that are riding in the car?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:20:41 And, you know, so it's like having a debate over what brand of pencil you want to use.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:20:47 Okay, so can you give me two different specific examples of research questions that result in two different research techniques.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:20:56 No, because you get\u2026 You put researchers in a room and ask them to plan a study.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:21:05 And if you're nice enough, you're going to give them the research questions.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:21:10 But they're going to come up with at least 10 different approaches.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:21:14 So it's not this direct correlation that your question is implying.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:21:19 Okay, so\u2026 How do you decide?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:21:24 You decide based on time, based on budget. Based on the constraints that are given to you for that particular project.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:21:32 Okay, so let's move along to collection. How much time do you spend during the actual data collection phase and how much of a burden is that or how much of a pain point is that overall in the research activities?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:21:45 Say that again.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:21:46 I just want to talk about data collection. How much effort do you spend conducting the research?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:21:52 And managing the assets that you generate.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:21:56 I mean\u2026 If you think about this in terms of percentages.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:22:02 Okay. You would spend 50% doing your planning.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:22:09 25% in the field, which is when data collection would be.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:22:14 And the other 25% would be analysis, synthesis, and reporting.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:22:23 The managing of assets is a really, really interesting point. And it's one that we as an overall organization do not do a good job of.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:22:34 And what I mean by that is we don't have any sort of centralized repository.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:22:40 Within a particular project. You know, there are techniques and approaches that we employ here Even as something as simple as giving people a folder structure.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:22:56 So, you know, this is where you put your plan. This is where you put your data. This is where you do your analysis.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:23:01 And at least that way it makes it easier to find crap.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:23:06 But you know, but Generally, I would say 25% of your overall time is when you're in the field and you're collecting the data.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:23:16 Normally, the management of that data gets a little messy when you're doing analysis.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:23:24 And after you've delivered your findings, you then have time to make sure that you clean up the folder that has all of your data in it or clean up the data store that has all of your data in it.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:23:40 At least one of the techniques that we really try to push here is you have a deliverables folder.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:23:46 And in the deliverables for folder, you actually supply the client with the final analysis, the final Excel spreadsheets, the final whatever",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:23:59 That practice, even if you don't necessarily deliver that data, even though you should.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:24:06 You know, kind of helps researchers in kind of culling through and finding finding what can be put in archive, what is actually necessary.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:24:16 But we as an organization at Deloitte level, we as an organization within AMNC, DP&I, we don't have a good strategy in place In order to kind of hold on to that and manage that data you know once those projects over.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:24:35 Okay, so we've gone through the process from start to finish, and you've mentioned some, but do you want to have any call out any specific pitfalls or struggles in the process that that you'd like to see worked out.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:24:50 I don't know that they're necessarily pitfalls.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:24:57 There's a lot to be said when you're in the field balancing adaptability with some level of standardization.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:25:10 And what I mean by that is It's important, especially with the type of research we do.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:25:19 To have the, you know, the interview session feel more conversational as opposed to people rattling off questions.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:25:29 And\u2026 That said.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:25:34 You still need to have some level of rigor to ensure that the way that you conducted an interview session a And the way that you conducted an interview session B, you're still getting you know similar levels of data quality",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:25:54 Because, you know, when you look at that data in aggregate if you don't have some standardization across the board.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:26:04 It can really call into question the validity of your data.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:26:09 So generally speaking, Stephen, the biggest pitfalls are we don't get enough time to do any of our research.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:26:18 Um and usually the areas that get compressed the most are either in the planning or in the reporting and you know there are examples and stories out there. It's like, okay, well, sweet. You just finished usability testing.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:26:34 You know, an hour later, the stakeholder from the client says, okay, so when can I see the report?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:26:40 Like, well, dude, you just finished data collection of two weeks worth of sessions.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:26:44 You know so And there are definitely ways to counterbalance that or at least manage those expectations but Generally speaking, we don't get enough time to do research.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:27:01 Okay, so I'm going to switch to a new direction right now. This section is a little faster.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:27:05 Can you tell me who on research projects do you work with? Who are your collaborators?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:27:13 Normally for me, it would be PPMDs.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:27:17 And who do you work for?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:27:25 In terms of like Deloitte world, it would be the PPMD or the senior manager that, you know, kind of I interact with but Our work is being done on behalf of the client.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:27:38 And that's So I consider that I'm working for them, but through the lens of Deloitte Digital.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:27:45 Okay, and who benefits most from your work?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:27:49 It depends on the study. Sometimes it can be our internal design team. Sometimes it can be stakeholders. Sometimes it can be both. Sometimes it can be product managers. Sometimes it can be C-suite executives.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:28:04 So, you know. It really is going to depend a lot based on the study, based on the research questions and the research objectives.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:28:12 Okay, so between those three, your collaborators and your clients and your customers.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:28:16 Which one would you rank as most important and which one would you rank next and which one would you rank next?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:28:23 It depends. I can't give you a blanket answer on that one.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:28:26 Okay, what do you consider the victory event?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:28:30 The victory then is presenting quality insights that can help in defining a direction or validating or invalidating designs or an approach or you know Basically.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:28:49 Being able to come back to a group of people, be it them Deloitte employees or be them employees of the company that we're doing work for.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:28:58 And delivering and delivering insights to help them better understand how they need to adapt or tweak their product.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:29:08 Their experience, their strategy. In order to fulfill the idea that technology is there to make people's lives easier, not more difficult.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:29:17 Okay, very good. We're going to switch gears again. And this is part of\u2026 And in our role as user experience practitioners and user research, we have to educate and we have to evangelize.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:29:27 And as part of that process. It's important for us to know how to communicate what we do. So I'd like to start with how you communicate the value of your work to when you're educating and evangelizing.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:29:42 Yeah, and we don't do a very good job of it right now.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:29:47 A lot of the evangelizing within Deloitte is based on qual.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:29:52 So we did this. We got these results. These results may or may not have had some direct or indirect correlation to an overall sales target.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:30:06 And the reason why we struggle at doing that.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:30:12 Is due in large part because Research is not normally on the project.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:30:20 Forts and tired. We get brought on to do generative research. We get brought on to consult. We get brought on to advise a project team.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:30:30 And then we roll off. And we may get brought back to do evaluative research, which is great.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:30:40 With the exception of longer term engagements or things like AORs, agency of records.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:30:47 We aren't always there to see the product actually go all the way through the design and development lifecycle.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:30:55 We're not there to see it when it launches. We're not necessarily there to see it post launch.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:31:03 And so trying to speak with a partner that maybe doesn't know us that well.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:31:11 That becomes a challenge. One of the ways that we try to counterbalance that is in is trying to talk more about the impact to the design.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:31:27 And the challenge with that approach is it doesn't always translate easily into dollars and cents.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:31:35 But um you know a lot of researchers are uncomfortable with this notion of kind of being shameless self-promoters, but especially in a large company Especially within a consultancy we have to be able to shout from the rooftops when we finish a study. We need to be able to",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:31:57 Adapt our research, adapt our reporting. To meet the users where they are. And what I mean by that is we may work on an academic paper or an academic style paper.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:32:10 We then have to translate that to make sure that that paper and the insights and the impact of those insights is understandable and relatable to the audience in which we are trying to evangelize to.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:32:25 So some audiences really like slide decks. Some audiences want a TLDR summary in an email.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:32:33 Some people just want it in a teams. Some people like to consume it via a video.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:32:39 Some people want to hear about it in terms of a podcast and being able to adapt your story, being able to adapt your the implications of the research that you finished.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:32:56 To those audiences is one of the approaches that slowly but surely is starting to chip away at some of these preconceived notions, at least here at Deloitte, in terms of what research is and more importantly, what it is not.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:33:10 Okay, so with respect to education and evangelizing, how do you describe what problem you repeatedly solve?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:33:21 I mean, we are trying to make sure that technology is easier to use at its core.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:33:28 That's what all of our research is done for. Be it generative or evaluative or some variation of You know, both of those.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:33:39 So\u2026 trying to dig in to specific areas of the experience or specific challenges a company is facing.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:33:51 And deliver insights as well as sometimes strategies or recommendations on remediation or how to actually fix the experience or optimize the experience or optimize the strategy.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:34:04 That's really at its core what we're doing.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:34:07 Okay, so how do you educate educational people, we kind of talked about that one, but anything specific around educating, what are some of the struggles",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:34:18 I mean, attention is always a struggle. Um and trying to figure out that balance between how much information for the audience that you're presenting to is the right fit.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:34:33 You don't want to necessarily go super deep into statistics and the analyses that you may have used in a study if If that's not going to necessarily land for the audience.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:34:49 And it's not an easy endeavor to do. Researchers really like to go super deep um but You got to be able to think about what does that look like for a partner? What does that look like for a chief experience officer. What does that look like for a designer?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:35:07 And how can you basically translate the super technical, the super deep into language and into a story will have the most impact and value for the audience of what you're trying to evangelize to.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:35:25 Okay, what role does the look and feel of your outputs play in your evangelizing and educating?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:35:33 That's a hard question for a researcher to answer. But I would say, you know.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:35:42 Some projects, some partners, some stakeholders put a higher degree of value on a higher value the physical presentation.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:35:53 Those are those typically are stakeholders or projects where they are not as mature in terms of their understanding and use of research.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:36:06 But, you know, but Sometimes if your research has uncovered some interesting things.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:36:13 You might get asked to put together a deck that's going to go to a board of directors and just again trying to find what that balance is in terms of what all the cool things that you did in your approach and how it was so cool and this and that and the other.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:36:32 But, you know, just Sometimes the visual or the appearance has more gravitas than others.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:36:41 Sometimes researchers get to set that direction. It's rare, but sometimes we get to do that.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:36:46 A lot of times it is more just how how much how much of that aesthetic do you actually need to focus time on? And in most cases where it's you need a really, really strong visual aesthetic.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:37:01 That's usually when researchers will reach out to a designer and see if they can help.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:37:06 Okay, and the last category for this evangelizing education about user research is what role do the tools that you use and have available play?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:37:18 People that are on the sidelines love to talk about tools.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:37:23 And they love to talk about the intricacies of one tool versus another tool.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:37:29 At the end of the day. The tools are a facilitation engine.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:37:36 The role that it plays with experienced researchers is less emphasized than people who are brand new.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:37:47 And what I mean by that is like you may use, you know, you may use Qualtrics, you might use users and you might use MUIT, you might use something else but Unless you're trying to evangelize to the stakeholder group.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:38:03 The value of a particular platform. The value that it was able to deliver.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:38:12 The the tool that you use or going back to the car, you know, the coupling that you elect to use in your engine.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:38:23 Is largely something that is reserved for happy hours at research conferences.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:38:30 You know. One brand of tire or over another or one one version of a washer that you use or a lug nut So, um.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:38:41 If you're trying to emphasize, especially internally here at Deloitte, sometimes we have to index heavily on one tool over the other. And largely that's being done Because we are trying to continue to spread the word about either the availability of the tool",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:39:00 Or how we as researchers and experienced researchers were able to leverage that tool In order to get to deeper and richer insights in less time.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:39:11 Okay, very good. So in the last section, I just had some kind of wandering questions. If you had a magic wand, what one thing would you change about the user research activities and processes that you used.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:39:25 It's that we would get brought in earlier in the in the planning and the pursuit.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:39:34 Phases.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:39:35 Okay, sounds good and um Are there any thanks during a project that research initiative that keep you up at night?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:39:45 Not really. I mean, you know.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:39:49 There is no study that goes perfectly. And the longer you've been doing this, the more you realize that.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:39:56 So, you know. Given the constraints, given the curveballs that you get thrown at you.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:40:02 How are you going to adapt? So I don't necessarily know that it keeps me up at night, but you have to be able to embrace and accept that it's never going to go exactly as planned.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:40:18 Okay, and the last question, if I talk to one of your collaborators and I say, please describe Ted to me in one word.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:40:25 Which one word would you want them to tell me?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:40:30 Lord. Methodical.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:40:33 Sounds good. Are there any questions that you expected me to ask that I haven't asked so far?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:40:38 No.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:40:39 Okay, that sounds good. That's kind of the end of the question part of the interview. We can either do a little evaluative research, but I actually ended up breaking my tool because after these research questions, I've learned so much",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:40:51 I threw everything away and i'm starting to from scratch.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:40:56 I don't know if you want to do that. I can kind of show you two different things we're working on the Sidekick tools, which you upload transcripts to and then it does various forms of animal analysis.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:41:06 And then most recently, I've started to break down interviews into semantic tagging so that it'll go through and kind of take a paragraph of what you say.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:41:16 And add a frustration and add maybe a feature, what you talk about.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:41:20 And so I'm kind of reorganizing the way we analyze transcripts.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:41:24 And that is what broke everything. But it is pretty promising.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:41:28 So how is this different from what Dovetail offers?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:41:28 Any of that?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:41:32 You know. I haven't studied dovetail and I haven't studied uh That's set on purpose because I'm trying not to be influenced, but I do plan with Kinsha to drop all of our interviews videos into Dovetail and go through that phase.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:41:46 This research effort goes through the end of May. And so I'm basically collecting up to 20 interviews with different researchers at this phase. And then I'm kind of building out the tool based on If the question is if you had a digital assistant, a digital research and interview assistant, what would it be?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:42:07 Okay.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:42:08 And so that's kind of where we're\u2026 where we're focusing our time.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:42:14 And then the other initiative that's actually funding this that I kind of need to keep aware of is the The Sidekick Tools team.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:42:25 Yep.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:42:26 Because they're gracious enough to allow me to work with them.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:42:31 And so we're creating a series of Sidekick side.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:42:37 Are based off Daria where you would actually upload a transcript And then that's one. Are you seeing the screen?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:42:46 Yeah. I mean, the one of these quote unquote tools that A lot of people don't necessarily know about a lot of people don't necessarily know about I have found it to be found to be mildly useful is the research assistant.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:42:47 Okay.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:43:04 I don't like I don't like how I can't tell it what areas to go or what types of areas of the web.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:43:05 I used the research assistant. I used it last night.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:43:17 So like if I'm doing UX research, I don't give a shit about Dow Jones.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:43:22 I wanted to hit Google Scholar. I wanted to hit some of the open repos.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:43:29 And, you know. It's nice. It's great that it kind of puts together, you know, it looks really pretty.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:43:39 I like that it gives the references. I wish I could tell it what type of reference or what reference models I want.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:43:47 So do I want this? Formatted for APA? Do I want this formatted for ACM. Do I want this formatted for You know, some of the other common ways But, you know, the The insights are, they're okay.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:44:09 I think that it's a little reaching at times but You know, there's a reason why it's hidden over there on the left-hand side.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:44:20 There are definitely some other tools that are out there outside of Deloitte that are much better at that stuff.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:44:24 Do you use the deep research tool? In OpenAI?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:44:29 Yeah, I think that one's pretty good. Notebook LM in terms of doing some of the more qual heavy analysis I think is\u2026 is on par or better than like Dovetail um Dovetail is interesting because it's really a question when people tell me that they're using Dovetail, I always ask them in what capacity? Are they using it for qual analysis? Because it's really good at that.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:44:58 Or are they using it for more of that research repo? And sometimes it's both, but The research repo is kind of, it's a really, really strong suit of dovetail.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:45:11 And as you're talking about tagging and all this other stuff, Dovetail has all of that stuff baked into its qual analysis, which is why I was asking about it.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:45:19 Yeah. So this basically takes his interview.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:45:22 But you know.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:45:25 And then it takes each little snippet at the beginning and the end. That's what Dovetail does, and then captures that snippet. And then it does its price, it's conviction, and then we kind of fill in these tags as you go.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:45:36 And so, and this is a model I'm playing with because you end up like initially I end up with this kind of transcript out of, and this is straight out of like.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:45:37 Mm-hmm.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:45:44 What we're doing today. So I'll get this from from and then you do basically some sentiment analysis. There are various models I'm learning huggy face, blah, blah, blah. And they have like this one is super atomic.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:45:46 You know",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:45:57 This is a question that kind of built Workday that was great and then it breaks that in and starts to give it neutral. So this one is a little too atomic.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:46:08 And then also I lost the speaker. This should say Suzette Whereas the Jesse one is\u2026 It'll take some big paragraphs. If I had this wrapping, it would be, and then it gives you neutral stakeholder planning, research planning type stuff.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:46:22 So this is like having the machine go through and kind of break it up in what it thinks is important. They call it chunking.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:46:28 Mm-hmm.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:46:28 And so I think there's some promise in there. I think in general, the sweet spot is to try to manage the archive and manage the assets And where I am right now is I broke everything. So this is the tool that basically has the archived cards. And these are the five interviews that I have. I took all the green eggs and ham and stuff out because they're done. I passed that phase.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:46:52 So these are actually hour-long interviews similar to what we did today.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:46:56 And then I'm trying to\u2026 This is like your transcript, the raw one. And the raw one's good if you want to throw it to an AI to get like a a persona and there's probably other types of analysis that I'd need to pull.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:47:12 In specific, what type of analysis, you say statistical what kind of statistical report would you like to see out of a group of interviews?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:47:27 Interesting.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:47:29 Because that's all based on the prompting and I need to kind of do best practices and then go through and play with the prompting and then I'll feed it like 10 or 12 interviews and then generate a statistical report and then see if we like it.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:47:40 So the first two that were easy are personas and journey maps. The others are possible. So these little cards, you have the metadata.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:47:47 I probably need to start thinking about the types of demographic data that I want to collect.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:47:54 More seriously. And then you have the analysis. This is the one where you can actually go through. This is the statement from Suzette and I could hit the edit button.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:48:03 And then edit and add the tags. But you can see how long this is because it broke her super tiny, whereas Jesse's, it only gave me nine chunks in an hour interview. And I was like, there's clearly more than nine important things Jesse said in an hour-long interview. So that's where I am. That's the state of the",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:48:22 The research right now. But basically, I threw out the homepage because people don't in the The forms are just not, I think of this creating a research study one way. Everyone does their own thing.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:48:34 So I'm leaning right now going to an interview style for setting up a project to let the person Whether it's a discovery project or a research program.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:48:45 And just do a quick interview and capture their thoughts. And then go from there and then focus on capturing transcripts and analyzing transcripts and and storing as a repository transcripts. I think that's one thing Dovetail does nice is you can actually search Dovetail and you can sneak into all the videos from other Deloitte people.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:49:05 I don't know if it's intentional. But I do see, you know, I was able to find pretty good results on financial analyst from interviews I didn't conduct, but were related to financial analysts.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:49:18 That's a bug or a feature, but\u2026 It's an observation right now.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:49:21 I mean, it's because we're all using the same repo instance.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:49:26 Yeah. So I don't really have, you know, I've kind of ended up realizing that the needs are different.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:49:36 And so I'm trying to, like you say, wait till I get some more But I have really found fascinating results.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:49:44 Yeah.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:49:44 And I'll read those out to you. Everyone has a, like we do rely on the art more than we put potentially think. And there's these deep reservoirs of experience that is different and distinct in each researcher.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:49:56 That is the secret to how they've succeeded and been here so long at Deloitte.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:50:01 And you don't know what it is, but you know it when it starts to pop up during the interview. And that's when I try to get quiet and listen.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:50:03 Yeah.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:50:10 Nice. All right, man. I hope this was helpful.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:50:15 Super helpful.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:50:18 Yeah. And please let me know if there's anything else I can do to help. Otherwise, I'm going to hop.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:50:24 You go splash some water on my face before my 8 a.m.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:50:27 Okay, thanks for taking the time to share your story with me. I enjoyed it very much.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Stark, Theodore (Ted)",
+      "speaker_name": "Stark, Theodore (Ted)",
+      "content": "08:50:31 Yeah, man. All right. Take care, my friend.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "08:50:32 I'll keep you posted on our progress. Thank you.",
+      "timestamp": ""
+    }
+  ],
+  "character": "interviewer",
+  "interviewee": {
+    "name": "Ted Stark",
+    "role": "UX Researcher",
+    "email": ""
+  },
+  "researcher": {
+    "name": "Stephen Dulaney",
+    "email": "sdulaney@deloitte.com"
+  },
+  "analysis": null,
+  "id": "5570fd73-967b-4385-8785-d891ce129bfc",
+  "updated_at": "2025-05-08T13:36:35.495716",
+  "sessions": [
+    "e1fdfb86-2b57-48d9-96b2-b70621168983",
+    "5a42511f-7e5a-439d-bb04-b856ec03b9a3",
+    "ebabd873-9559-4e6b-8f07-292a2004aa54"
+  ],
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "custom_questions": []
+}

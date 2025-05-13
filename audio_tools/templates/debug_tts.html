@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug TTS Service</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #333;
+        }
+        h1 {
+            border-bottom: 2px solid #ddd;
+            padding-bottom: 10px;
+        }
+        .card {
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-active {
+            background-color: #4CAF50;
+        }
+        .status-inactive {
+            background-color: #f44336;
+        }
+        ul {
+            list-style-type: none;
+            padding: 0;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        a {
+            display: inline-block;
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            margin-top: 5px;
+        }
+        a:hover {
+            background-color: #45a049;
+        }
+        code {
+            background-color: #f1f1f1;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+        .api-endpoint {
+            margin-top: 5px;
+        }
+        .api-endpoint code {
+            display: block;
+            padding: 8px;
+            margin: 5px 0;
+            background-color: #f1f1f1;
+            border-left: 3px solid #2196F3;
+        }
+    </style>
+</head>
+<body>
+    <h1>Debug TTS Service</h1>
+    
+    <div class="card">
+        <h2>Service Status</h2>
+        <p>
+            <span class="status-indicator {{ 'status-active' if elevenlabs_enabled else 'status-inactive' }}"></span>
+            ElevenLabs TTS: <strong>{{ 'Enabled' if elevenlabs_enabled else 'Disabled' }}</strong>
+        </p>
+        {% if not elevenlabs_enabled %}
+        <p style="color: #f44336;">
+            ElevenLabs API key not found. Set the <code>ELEVENLABS_API_KEY</code> environment variable to enable ElevenLabs TTS.
+        </p>
+        {% endif %}
+    </div>
+    
+    <div class="card">
+        <h2>Available Tools</h2>
+        <ul>
+            <li>
+                <strong>TTS Test Interface</strong>
+                <p>Test text-to-speech functionality with a simple UI</p>
+                <a href="/test">Open TTS Test Interface</a>
+            </li>
+            <li>
+                <strong>Request History</strong>
+                <p>View the history of recent TTS requests</p>
+                <a href="/requests">View Request History</a>
+            </li>
+        </ul>
+    </div>
+    
+    <div class="card">
+        <h2>API Endpoints</h2>
+        <div class="api-endpoint">
+            <strong>GET /health</strong>
+            <p>Check the health status of the service</p>
+            <code>curl http://localhost:5015/health</code>
+        </div>
+        
+        <div class="api-endpoint">
+            <strong>POST /text_to_speech</strong>
+            <p>Convert text to speech using ElevenLabs or browser fallback</p>
+            <code>curl -X POST http://localhost:5015/text_to_speech \<br>
+            -H "Content-Type: application/json" \<br>
+            -d '{"text": "Hello, how are you?", "voice_id": "EXAVITQu4vr4xnSDxMaL"}'</code>
+        </div>
+        
+        <div class="api-endpoint">
+            <strong>GET /requests</strong>
+            <p>View the history of recent TTS requests</p>
+            <code>curl http://localhost:5015/requests</code>
+        </div>
+        
+        <div class="api-endpoint">
+            <strong>POST /clear_requests</strong>
+            <p>Clear the request history</p>
+            <code>curl -X POST http://localhost:5015/clear_requests</code>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>Testing Tips</h2>
+        <ul>
+            <li>The debug TTS service includes detailed logging for troubleshooting</li>
+            <li>If ElevenLabs fails, the service will fall back to browser speech synthesis</li>
+            <li>Check browser console for detailed error messages</li>
+            <li>Use the <code>/test</code> endpoint to try different voices and text</li>
+        </ul>
+    </div>
+    
+    <script>
+        // Check service health every 30 seconds
+        function checkHealth() {
+            fetch('/health')
+            .then(response => response.json())
+            .then(data => {
+                console.log('Health check:', data);
+                // Update UI if needed
+            })
+            .catch(error => {
+                console.error('Health check error:', error);
+            });
+        }
+        
+        // Initial health check
+        checkHealth();
+        
+        // Set up periodic health checks
+        setInterval(checkHealth, 30000);
+    </script>
+</body>
+</html> 

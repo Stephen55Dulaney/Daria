@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}History: {{ agent }} - DARIA{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{{ url_for('prompts.prompt_list') }}">Prompt Manager</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('prompts.view_prompt', agent=agent) }}">{{ agent }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">History</li>
+{% endblock %}
+
+{% block inner_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h1>{{ agent }} - Version History</h1>
+        <p class="text-muted">Viewing version from {{ filename }}</p>
+    </div>
+    <div class="d-flex gap-2">
+        <a href="{{ url_for('prompts.restore_history', agent=agent, filename=filename) }}" class="btn btn-primary">
+            <i class="bi bi-arrow-counterclockwise me-2"></i> Restore This Version
+        </a>
+        <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">
+            <i class="bi bi-arrow-left me-2"></i> Back to Current
+        </a>
+    </div>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5>Prompt Configuration</h5>
+    </div>
+    <div class="card-body">
+        <h6>Description</h6>
+        <p>{{ config.description }}</p>
+
+        <h6 class="mt-4">Role</h6>
+        <p>{{ config.role }}</p>
+
+        <h6 class="mt-4">Tone</h6>
+        <p>{{ config.tone }}</p>
+
+        <h6 class="mt-4">Core Objectives</h6>
+        <ul>
+            {% for objective in config.core_objectives %}
+                <li>{{ objective }}</li>
+            {% endfor %}
+        </ul>
+
+        <h6 class="mt-4">Contextual Instructions</h6>
+        <pre class="p-3 bg-light rounded">{{ config.contextual_instructions }}</pre>
+
+        <h6 class="mt-4">Dynamic Prompt Prefix</h6>
+        <pre class="p-3 bg-light rounded">{{ config.dynamic_prompt_prefix }}</pre>
+
+        {% if config.analysis_prompt %}
+        <h6 class="mt-4">Analysis Prompt</h6>
+        <pre class="p-3 bg-light rounded">{{ config.analysis_prompt }}</pre>
+        {% endif %}
+
+        {% if config.example_questions %}
+            <h6 class="mt-4">Example Questions</h6>
+            <ul>
+                {% for question in config.example_questions %}
+                    <li>{{ question }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if config.example_outputs %}
+            <h6 class="mt-4">Example Outputs</h6>
+            <ul>
+                {% for output in config.example_outputs %}
+                    <li>{{ output }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+
+        {% if config.evaluation_metrics %}
+            <h6 class="mt-4">Evaluation Metrics</h6>
+            <ul>
+                {% for key, metric in config.evaluation_metrics.items() %}
+                    <li><strong>{{ key }}</strong>: {{ metric }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    </div>
+</div>
+
+{% if config.evaluation_notes %}
+<div class="card">
+    <div class="card-header">
+        <h5>Evaluation Notes</h5>
+    </div>
+    <div class="card-body">
+        <ul class="list-group list-group-flush">
+            {% for note in config.evaluation_notes %}
+                <li class="list-group-item">{{ note }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+{% endif %}
+{% endblock %} 

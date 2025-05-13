@@ -1,0 +1,291 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Interview Details - DARIA{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="header">
+        <div class="d-flex justify-content-between align-items-center">
+            <div>
+                <h1>{{ interview.title }}</h1>
+                <p class="lead">{{ interview.description }}</p>
+            </div>
+            <div>
+                <a href="/interview_archive" class="btn btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Back to Archive
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Interview Information</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Status</span>
+                            <span class="badge {% if interview.status == 'completed' %}bg-success{% elif interview.status == 'active' %}bg-primary{% else %}bg-secondary{% endif %}">{{ interview.status|capitalize }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Character</span>
+                            <span>{{ interview.character }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Created</span>
+                            <span>{{ interview.created_at.strftime('%b %d, %Y') if interview.created_at else 'Unknown' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Last Updated</span>
+                            <span>{{ interview.last_updated.strftime('%b %d, %Y') if interview.last_updated else 'Unknown' }}</span>
+                        </li>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <span>Session ID</span>
+                            <span class="text-muted small">{{ session_id }}</span>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-footer">
+                    <div class="d-grid gap-2">
+                        {% if interview.status == 'active' %}
+                            <a href="/interview_session/{{ session_id }}" class="btn btn-primary">
+                                <i class="fas fa-play me-2"></i> Resume Interview
+                            </a>
+                            <button class="btn btn-outline-danger" id="endInterviewBtn">
+                                <i class="fas fa-stop me-2"></i> End Interview
+                            </button>
+                        {% else %}
+                            <a href="/prompts/{{ interview.character }}" class="btn btn-outline-primary">
+                                <i class="fas fa-comment-dots me-2"></i> View Prompt
+                            </a>
+                            <button class="btn btn-outline-secondary" id="exportBtn">
+                                <i class="fas fa-file-export me-2"></i> Export Transcript
+                            </button>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Prompt Feedback</h5>
+                    <span class="badge bg-info" id="feedbackCount">0</span>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="overallScore" class="form-label">Overall Effectiveness (1-5)</label>
+                        <input type="range" class="form-range" min="1" max="5" step="1" id="overallScore" value="3">
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small">Poor</span>
+                            <span class="text-muted small">Excellent</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="feedbackText" class="form-label">Feedback Comments</label>
+                        <textarea class="form-control" id="feedbackText" rows="3" placeholder="What worked well or could be improved about this prompt?"></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-success" id="submitFeedbackBtn">
+                            <i class="fas fa-paper-plane me-2"></i> Submit Feedback
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5>Conversation Transcript</h5>
+                    <div>
+                        <div class="btn-group btn-group-sm" role="group">
+                            <button type="button" class="btn btn-outline-secondary" id="copyTranscriptBtn">
+                                <i class="fas fa-copy me-1"></i> Copy
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" id="printTranscriptBtn">
+                                <i class="fas fa-print me-1"></i> Print
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-body" style="max-height: 600px; overflow-y: auto;">
+                    <div id="transcriptContainer">
+                        {% if interview.conversation_history and interview.conversation_history|length > 0 %}
+                            {% for message in interview.conversation_history %}
+                                {% if message.role != 'system' %}
+                                    <div class="message {% if message.role == 'user' %}message-user{% else %}message-assistant{% endif %} mb-3">
+                                        <div class="p-3 rounded {% if message.role == 'user' %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                            {{ message.content }}
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            {% endfor %}
+                        {% else %}
+                            <div class="text-center py-5">
+                                <i class="fas fa-comments fs-1 text-muted mb-3"></i>
+                                <p>No conversation history available</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Prompt Analysis</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-4">
+                        <h6>Prompt Performance Metrics</h6>
+                        <div class="row text-center">
+                            <div class="col-4">
+                                <div class="h4">4.2</div>
+                                <div class="text-muted small">Clarity</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="h4">3.8</div>
+                                <div class="text-muted small">Relevance</div>
+                            </div>
+                            <div class="col-4">
+                                <div class="h4">4.0</div>
+                                <div class="text-muted small">Effectiveness</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <h6>Improvement Suggestions</h6>
+                    <ul class="list-group mb-3">
+                        <li class="list-group-item">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            Add more follow-up questions to explore user responses in greater depth
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            Simplify language for more natural conversation flow
+                        </li>
+                        <li class="list-group-item">
+                            <i class="fas fa-lightbulb text-warning me-2"></i>
+                            Include more specific examples to guide responses
+                        </li>
+                    </ul>
+                    
+                    <div class="d-grid">
+                        <button class="btn btn-outline-primary" id="generateAnalysisBtn">
+                            <i class="fas fa-sync-alt me-2"></i> Generate Detailed Analysis
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // DOM elements
+        const endInterviewBtn = document.getElementById('endInterviewBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const copyTranscriptBtn = document.getElementById('copyTranscriptBtn');
+        const printTranscriptBtn = document.getElementById('printTranscriptBtn');
+        const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+        const generateAnalysisBtn = document.getElementById('generateAnalysisBtn');
+        
+        // End interview button
+        if (endInterviewBtn) {
+            endInterviewBtn.addEventListener('click', function() {
+                if (confirm('Are you sure you want to end this interview? This action cannot be undone.')) {
+                    // In a real implementation, this would make an API call
+                    alert('The interview has been ended.');
+                    window.location.reload();
+                }
+            });
+        }
+        
+        // Export transcript button
+        if (exportBtn) {
+            exportBtn.addEventListener('click', function() {
+                // In a real implementation, this would trigger a download
+                alert('Transcript exported successfully.');
+            });
+        }
+        
+        // Copy transcript button
+        if (copyTranscriptBtn) {
+            copyTranscriptBtn.addEventListener('click', function() {
+                const transcriptText = Array.from(document.querySelectorAll('.message div'))
+                    .map(el => el.textContent.trim())
+                    .join('\n\n');
+                
+                navigator.clipboard.writeText(transcriptText)
+                    .then(() => {
+                        const originalText = copyTranscriptBtn.innerHTML;
+                        copyTranscriptBtn.innerHTML = '<i class="fas fa-check me-1"></i> Copied';
+                        setTimeout(() => {
+                            copyTranscriptBtn.innerHTML = originalText;
+                        }, 2000);
+                    })
+                    .catch(err => {
+                        console.error('Failed to copy: ', err);
+                        alert('Failed to copy transcript');
+                    });
+            });
+        }
+        
+        // Print transcript button
+        if (printTranscriptBtn) {
+            printTranscriptBtn.addEventListener('click', function() {
+                window.print();
+            });
+        }
+        
+        // Submit feedback button
+        if (submitFeedbackBtn) {
+            submitFeedbackBtn.addEventListener('click', function() {
+                const score = document.getElementById('overallScore').value;
+                const feedback = document.getElementById('feedbackText').value.trim();
+                
+                if (!feedback) {
+                    alert('Please provide some feedback before submitting.');
+                    return;
+                }
+                
+                // In a real implementation, this would make an API call
+                // For demonstration, we'll just show success and update the UI
+                
+                // Show success message
+                alert(`Feedback submitted with a score of ${score}/5. Thank you!`);
+                
+                // Reset form
+                document.getElementById('overallScore').value = 3;
+                document.getElementById('feedbackText').value = '';
+                
+                // Update feedback count
+                const feedbackCount = document.getElementById('feedbackCount');
+                feedbackCount.textContent = parseInt(feedbackCount.textContent) + 1;
+            });
+        }
+        
+        // Generate analysis button
+        if (generateAnalysisBtn) {
+            generateAnalysisBtn.addEventListener('click', function() {
+                generateAnalysisBtn.disabled = true;
+                generateAnalysisBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Generating...';
+                
+                // In a real implementation, this would make an API call
+                // For demonstration, we'll simulate a delay
+                setTimeout(() => {
+                    generateAnalysisBtn.disabled = false;
+                    generateAnalysisBtn.innerHTML = '<i class="fas fa-sync-alt me-2"></i> Generate Detailed Analysis';
+                    alert('Analysis complete! The page will now refresh to show updated results.');
+                    window.location.reload();
+                }, 3000);
+            });
+        }
+    });
+</script>
+{% endblock %} 

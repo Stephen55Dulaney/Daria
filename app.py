@@ -20,30 +20,33 @@ from langchain.chains import ConversationChain
 from langchain_core.prompts import ChatPromptTemplate
 from datetime import datetime, timedelta
 from pathlib import Path
-from src.vector_store import InterviewVectorStore
+from daria_interview_tool.vector_store import InterviewVectorStore
 import traceback
 import logging
 from markupsafe import Markup
 from openai import OpenAI
 import markdown  # Added this import since it's used in the markdown filter
-from src.google_ai import GeminiPersonaGenerator
-from src.daria_resources import get_interview_prompt, BASE_SYSTEM_PROMPT, INTERVIEWER_BEST_PRACTICES
+from daria_interview_tool.google_ai import GeminiPersonaGenerator
+from daria_interview_tool.daria_resources import get_interview_prompt, BASE_SYSTEM_PROMPT, INTERVIEWER_BEST_PRACTICES
 from langchain.schema import SystemMessage, HumanMessage
 from langchain.vectorstores import VectorStore
 import MySQLdb
 from werkzeug.utils import secure_filename
 import re
 import markdown2
-from semantic_analysis import SemanticAnalyzer
+from daria_interview_tool.semantic_analysis import SemanticAnalyzer
 from sklearn.metrics.pairwise import cosine_similarity
-from src.processed_interview_store import ProcessedInterviewStore
+from daria_interview_tool.processed_interview_store import ProcessedInterviewStore
 import sys
-from src.discovery_gpt import DiscoveryGPT
+from daria_interview_tool.discovery_gpt import DiscoveryGPT
 from asgiref.sync import async_to_sync
-from src.persona_gpt import generate_persona_from_interviews
+from daria_interview_tool.persona_gpt import generate_persona_from_interviews
 from flask_sqlalchemy import SQLAlchemy
 from PIL import Image, ImageDraw, ImageFont
 import random
+
+# Import the jarvis_wrapper module
+import templates.jarvis_wrapper as jarvis_wrapper
 
 # Configure logging with a more detailed format
 logging.basicConfig(
@@ -61,7 +64,7 @@ logger = logging.getLogger(__name__)
 vector_store = None
 
 # Initialize Flask app
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='')
 app.config['SECRET_KEY'] = os.getenv('FLASK_SECRET_KEY', 'dev')
 app.config['UPLOAD_FOLDER'] = 'uploads'
 app.config['INTERVIEWS_DIR'] = 'interviews/raw'
@@ -70,20 +73,24 @@ app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')  # Add OpenAI API key
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Import and register the memory companion blueprint
+try:
+    from api_services.memory_companion_service import memory_companion_bp
+    app.register_blueprint(memory_companion_bp)
+    print("Successfully registered Memory Companion blueprint")
+except Exception as e:
+    print(f"Failed to register Memory Companion blueprint: {str(e)}")
+    # Continue without the memory companion functionality
+
+# Global directories
+interview_dirs = ['interviews', 'interviews/raw', 'interviews/processed']
+
 # Initialize SQLAlchemy
 db = SQLAlchemy(app)
 
 # Database models for the research survey functionality
 class ResearchSurveyResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    primary_objective = db.Column(db.String(50))
-    research_type = db.Column(db.String(50))
-    timeline = db.Column(db.String(50))
-    budget = db.Column(db.String(50))
-    methods = db.Column(db.String(50))
-    avatar_path = db.Column(db.String(255))
-    recommendations = db.Column(db.JSON)
 
 # Create database tables if they don't exist
 with app.app_context():
@@ -96,22 +103,24 @@ with app.app_context():
 # Configure CORS
 CORS(app, resources={
     r"/api/*": {
-        "origins": ["http://localhost:5173"],  # React dev server
+        "origins": ["http://localhost:5173", "http://localhost:5175"],  # React dev server ports
         "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
         "allow_headers": ["Content-Type", "Authorization"],
         "supports_credentials": True
     },
     r"/annotated-transcript/*": {
-        "origins": ["http://localhost:5174"],
+        "origins": ["http://localhost:5174", "http://localhost:5175"],
         "methods": ["GET"],
         "allow_headers": ["Content-Type"]
     },
-    r"/text_to_speech": {"origins": ["http://localhost:5174"]},
+    r"/text_to_speech": {"origins": ["http://localhost:5174", "http://localhost:5175"]},
+    r"/process_audio": {"origins": ["http://localhost:5174", "http://localhost:5175"]},
+    r"/*": {"origins": ["http://localhost:5175"]}  # Allow all routes for the new frontend port
 })
 
 # Configure SocketIO with CORS
 socketio = SocketIO(app, 
-    cors_allowed_origins=["http://localhost:5173"],
+    cors_allowed_origins=["http://localhost:5173", "http://localhost:5175"],
     async_mode='eventlet',
     logger=True,
     engineio_logger=True
@@ -148,6 +157,30 @@ AVAILABLE_VOICES = {
 # Store interview prompts and conversations
 interview_prompts = {}
 conversations = {}
+
+# Initialize TestProject for audio testing
+interview_prompts['TestProject'] = {
+    'prompt': 'This is a test project prompt for audio recording and transcription tests.',
+    'form_data': {'interviewee': {'name': 'Test User'}}
+}
+conversations['TestProject'] = {
+    'messages': [
+        {"role": "system", "content": "You are conducting an interview about TestProject."},
+        {"role": "assistant", "content": "Daria: Hello, this is Daria. How can I help you today?"}
+    ]
+}
+
+# Initialize GreenEggsAndHam project
+interview_prompts['GreenEggsAndHam'] = {
+    'prompt': 'This is an interview about the GreenEggsAndHam project, focusing on the user experience of reading Dr. Seuss books.',
+    'form_data': {'interviewee': {'name': 'Sam I Am'}}
+}
+conversations['GreenEggsAndHam'] = {
+    'messages': [
+        {"role": "system", "content": "You are conducting an interview about the GreenEggsAndHam project, focusing on user preferences for breakfast foods."},
+        {"role": "assistant", "content": "Daria: Hello, I'm Daria. I'd like to ask you some questions about your experience with Green Eggs and Ham. Let's begin our interview when you're ready."}
+    ]
+}
 
 # Add after the existing configuration
 INTERVIEWS_DIR = Path('interviews/raw')
@@ -699,8 +732,8 @@ def list_personas(limit=None):
                     persona['last_modified'] = persona.get('date', datetime.now().isoformat())
                 personas.append(persona)
     
-    # Sort by last modified date, most recent first
-    personas.sort(key=lambda x: x.get('last_modified', ''), reverse=True)
+    # Sort personas by creation date, most recent first
+    personas.sort(key=lambda x: x.get('created_at') or '', reverse=True)
     
     if limit:
         personas = personas[:limit]
@@ -935,13 +968,35 @@ def journey_map():
 def save_interview():
     """Save new interview configuration and generate prompt."""
     try:
+        logger.info("=== save_interview endpoint called ===")
+        logger.info(f"Request method: {request.method}")
+        logger.info(f"Request headers: {dict(request.headers)}")
+        
+        # Log detailed information about the request
+        if request.content_type and 'application/json' in request.content_type:
+            logger.info("Request has correct JSON content type")
+        else:
+            logger.warning(f"Unexpected content type: {request.content_type}")
+        
+        # Get and log the raw data
+        raw_data = request.get_data(as_text=True)
+        logger.info(f"Raw request data: {raw_data[:200]}...")
+        
         data = request.get_json()
-        logger.debug(f"Received form data: {data}")
+        if data is None:
+            logger.error("Failed to parse JSON data from request")
+            return jsonify({'error': 'Invalid JSON data or content-type'}), 400
+            
+        logger.info(f"Parsed JSON data: {data}")
         
         # Required fields
         project_name = data.get('project_name')
         interview_type = data.get('interview_type')
         project_description = data.get('project_description')
+        
+        logger.info(f"Project name: {project_name}")
+        logger.info(f"Interview type: {interview_type}")
+        logger.info(f"Project description: {project_description[:50]}...")
         
         # Validate required fields
         missing_fields = []
@@ -976,11 +1031,16 @@ def save_interview():
             }
         }
 
+        logger.info(f"Prepared metadata: {metadata}")
+
         # Generate the interview prompt
         try:
+            logger.info("Generating interview prompt...")
             interview_prompt = get_interview_prompt(interview_type, project_name, project_description)
+            logger.info("Interview prompt generated successfully")
         except Exception as e:
             logger.error(f"Error generating interview prompt: {str(e)}")
+            logger.error(traceback.format_exc())
             return jsonify({'error': 'Failed to generate interview prompt'}), 500
 
         # Store the interview configuration
@@ -992,19 +1052,25 @@ def save_interview():
         }
         
         logger.info(f"Successfully stored interview configuration for project: {project_name}")
-        logger.debug(f"Interview configuration: {interview_prompts[project_name]}")
         
-        return jsonify({
+        # Create response with redirect URL
+        redirect_url = url_for('interview', project_name=project_name)
+        logger.info(f"Generated redirect URL: {redirect_url}")
+        
+        response_data = {
             'status': 'success',
             'message': 'Interview configuration saved successfully',
             'project_name': project_name,
-            'redirect_url': url_for('interview', project_name=project_name)
-        })
+            'redirect_url': redirect_url
+        }
+        
+        logger.info(f"Returning success response: {response_data}")
+        return jsonify(response_data)
         
     except Exception as e:
         logger.error(f"Error saving interview: {str(e)}")
         logger.error(traceback.format_exc())
-        return jsonify({'error': 'Internal server error occurred'}), 500
+        return jsonify({'error': f'Internal server error occurred: {str(e)}'}), 500
 
 @app.route('/interview/<project_name>', methods=['GET', 'POST'])
 def interview(project_name):
@@ -1012,10 +1078,12 @@ def interview(project_name):
         if request.method == 'GET':
             # Check if the project exists in interview_prompts
             if project_name not in interview_prompts:
+                logger.warning(f"Project {project_name} not found in interview_prompts")
                 return redirect(url_for('new_interview'))
             
             # Get the prompt for this project
             prompt = interview_prompts[project_name]
+            logger.info(f"Retrieved prompt for project: {project_name}")
             
             # Render the interview template
             return render_template('interview.html', project_name=project_name, prompt=prompt)
@@ -1023,6 +1091,11 @@ def interview(project_name):
             data = request.get_json()
             user_input = data.get('user_input', '')
             question_count = data.get('question_count', 0)
+            is_follow_up = data.get('is_follow_up', False)
+            
+            logger.info(f"Processing interview POST for project: {project_name}")
+            logger.info(f"Question count: {question_count}, Is follow-up: {is_follow_up}")
+            logger.info(f"User input: {user_input[:50]}..." if len(user_input) > 50 else f"User input: {user_input}")
             
             # Create OpenAI client
             llm = create_openai_client()
@@ -1030,23 +1103,70 @@ def interview(project_name):
             # Get the interview prompt
             prompt = interview_prompts.get(project_name)
             if not prompt:
+                logger.error(f"Interview prompt not found for project: {project_name}")
                 return jsonify({'error': 'Interview prompt not found'}), 404
             
-            # Get the interview type from the prompt
-            interview_type = "Application Interview"  # Default
-            if "Persona Interview" in prompt['prompt']:
-                interview_type = "Persona Interview"
-            elif "Journey Map Interview" in prompt['prompt']:
-                interview_type = "Journey Map Interview"
+            # Get the interview type and project description
+            interview_type = prompt.get('type', 'Application Interview')
+            project_description = prompt.get('project_description', '')
             
-            # Generate system message based on interview type
-            system_message = get_interview_prompt(interview_type, project_name, prompt['form_data'].get('project_description', ''))
+            # Check if we're near the end of the interview (after 3 main questions)
+            # We add +1 because we're currently processing question_count, not the next one
+            is_final_round = (question_count >= 3 and not is_follow_up)
             
-            # Add the user's message to the conversation
+            # Initialize conversation if it doesn't exist
             if project_name not in conversations:
+                logger.info(f"Initializing new conversation for project: {project_name}")
                 conversations[project_name] = {'messages': []}
             
+            # Add the user's message to the conversation
             conversations[project_name]['messages'].append({"role": "user", "content": user_input})
+            
+            # Create an enhanced system prompt based on the original prompt
+            # but with additional instruction for improved interview quality
+            base_system_message = prompt.get('prompt', '')
+            
+            if is_final_round:
+                # For the final round, use a concluding prompt
+                system_message = f"""You are conducting a {interview_type} about {project_name}.
+
+This is the FINAL question of the interview. Create a thoughtful concluding question that:
+1. Asks the participant if there's anything else they'd like to share
+2. Gently signals that the interview is coming to an end
+3. Encourages any final thoughts or feedback
+4. Maintains a professional and appreciative tone
+
+Project context: {project_description}
+
+DO NOT thank the participant for their time yet - this is just the final question."""
+
+            else:
+                # Add specific instruction based on question count and if it's a follow-up
+                if is_follow_up:
+                    system_message = f"""{base_system_message}
+
+You are FOLLOWING UP on the previous question about {project_name}.
+1. Ask ONE specific follow-up question based on their previous response
+2. Dig deeper into an interesting point they mentioned
+3. Do NOT change the topic - stay focused on what they just discussed
+4. Keep your follow-up question concise and clear
+5. NEVER repeat a question that has already been asked
+
+Current question count: {question_count} of 3
+Project context: {project_description}"""
+                else:
+                    system_message = f"""{base_system_message}
+
+You are now asking question #{question_count + 1} of 3 about {project_name}.
+1. Ask ONE specific, open-ended question related to {project_name}
+2. NEVER repeat a question that has already been asked
+3. Move to a new topic - don't ask about the same aspects covered in previous questions
+4. Keep your question concise and clear (1-2 sentences maximum)
+5. Do not include unnecessary preambles or explanations
+6. Format as a direct question only
+
+Current question count: {question_count + 1} of 3
+Project context: {project_description}"""
             
             # Generate response
             response = llm.chat.completions.create(
@@ -1062,13 +1182,31 @@ def interview(project_name):
             assistant_response = response.choices[0].message.content
             conversations[project_name]['messages'].append({"role": "assistant", "content": assistant_response})
             
+            # Check if this response contains a follow-up question
+            # Look for key phrases that suggest it's a follow-up
+            response_lower = assistant_response.lower()
+            contains_follow_up = any(phrase in response_lower for phrase in [
+                "could you expand", "tell me more", "can you elaborate", 
+                "what specifically", "why did you", "how did you", 
+                "can you provide", "would you mind", "follow up", "follow-up"
+            ])
+            
+            # Check if we've reached the end of the interview
+            should_end_interview = False
+            if is_final_round:
+                # This was the final question
+                should_end_interview = True
+            
             return jsonify({
                 'response': assistant_response,
-                'question_count': question_count + 1
+                'question_count': question_count + (0 if contains_follow_up or is_follow_up else 1),
+                'is_follow_up': contains_follow_up,
+                'should_stop_interview': should_end_interview
             })
             
     except Exception as e:
         logger.error(f"Error in interview route: {str(e)}")
+        logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 @app.route('/process_audio', methods=['POST'])
@@ -1076,62 +1214,134 @@ def process_audio():
     try:
         project_name = request.args.get('project_name')
         if not project_name:
+            logger.error("Project name is required for process_audio")
             return jsonify({'error': 'Project name is required'}), 400
 
         if 'audio' not in request.files:
+            logger.error("No audio file provided in request")
             return jsonify({'error': 'No audio file provided'}), 400
 
         audio_file = request.files['audio']
         if not audio_file:
+            logger.error("Empty audio file provided")
             return jsonify({'error': 'Empty audio file'}), 400
 
         # Create a temporary file to store the audio
         with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio:
             audio_file.save(temp_audio.name)
+            logger.info(f"Audio saved to temporary file: {temp_audio.name}")
             
             # Process the audio file with OpenAI's Whisper API
-            client = OpenAI()
-            with open(temp_audio.name, 'rb') as audio:
-                transcription = client.audio.transcriptions.create(
-                    model="whisper-1",
-                    file=audio
-                )
+            try:
+                client = OpenAI()
+                with open(temp_audio.name, 'rb') as audio:
+                    transcription = client.audio.transcriptions.create(
+                        model="whisper-1",
+                        file=audio
+                    )
+                logger.info(f"Audio transcribed successfully: {transcription.text[:30]}...")
+            except Exception as whisper_error:
+                logger.error(f"Error transcribing audio with Whisper API: {str(whisper_error)}")
+                return jsonify({'error': f'Transcription error: {str(whisper_error)}'}), 500
 
         # Clean up the temporary file
         os.unlink(temp_audio.name)
+        logger.info("Temporary audio file deleted")
 
         # Get the saved interview prompt
-        interview_prompt = interview_prompts.get(project_name)
-        if not interview_prompt:
-            return jsonify({'error': 'Interview prompt not found'}), 400
+        interview_prompt_data = interview_prompts.get(project_name)
+        if not interview_prompt_data:
+            logger.warning(f"Interview prompt not found for project: {project_name}. Using default prompt.")
+            interview_prompt_data = {
+                'prompt': f"You are conducting an interview about {project_name}. Ask relevant questions to understand the user's experience.",
+                'form_data': {'interviewee': {'name': 'Anonymous'}}
+            }
+
+        # Extract form data for context
+        form_data = interview_prompt_data.get('form_data', {})
+        
+        # Extract interview type from prompt or form data
+        interview_type = form_data.get('interview_type', 'User Interview')
+        if not interview_type:
+            # Try to infer from the prompt text
+            prompt_text = interview_prompt_data.get('prompt', '')
+            if "Persona Interview" in prompt_text:
+                interview_type = "Persona Interview"
+            elif "Journey Map Interview" in prompt_text:
+                interview_type = "Journey Map Interview"
+            else:
+                interview_type = "Application Interview"
+        
+        # Extract project description
+        project_description = form_data.get('project_description', f"Project about {project_name}")
+        
+        # Extract participant details
+        interviewee = form_data.get('interviewee', {})
+        participant_name = interviewee.get('name', 'Anonymous')
+        participant_role = interviewee.get('role', '')
+        
+        # Create a rich system message with all available context
+        system_message = f"""You are Daria, an experienced UX researcher conducting a {interview_type} about {project_name}.
+        
+Project Description: {project_description}
+
+Participant: {participant_name}{f", {participant_role}" if participant_role else ""}
+
+Your goal is to gather meaningful insights about the user's experience, pain points, and needs.
+Ask follow-up questions based on their responses to dig deeper into important topics.
+Keep the conversation natural and conversational while guiding it towards valuable research outcomes.
+Focus on specific examples and stories rather than general opinions.
+"""
+
+        # Initialize the conversation if it doesn't exist
+        if project_name not in conversations:
+            logger.info(f"Initializing new conversation for project: {project_name}")
+            conversations[project_name] = {
+                'messages': [
+                    {"role": "system", "content": system_message},
+                    {"role": "assistant", "content": f"Daria: Hello, I'm Daria, and I'm conducting research about {project_name}. Thank you for participating."}
+                ]
+            }
 
         # Get the current conversation
         conversation = conversations[project_name]
         current_round = len(conversation['messages']) // 2
+        
+        # Update the system message with the enhanced context
+        conversation['messages'][0]['content'] = system_message
 
         # Add the transcription to the conversation history
         conversation['messages'].append({"role": "user", "content": f"You: {transcription.text}\n\n"})
 
         # Get AI response using OpenAI client
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=conversation['messages'],
-            temperature=0.7
-        )
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=conversation['messages'],
+                temperature=0.7
+            )
 
-        ai_response = response.choices[0].message.content
-        conversation['messages'].append({"role": "assistant", "content": f"Daria: {ai_response}\n\n"})
+            ai_response = response.choices[0].message.content
+            conversation['messages'].append({"role": "assistant", "content": f"Daria: {ai_response}\n\n"})
+            logger.info(f"Generated AI response: {ai_response[:30]}...")
+        except Exception as openai_error:
+            logger.error(f"Error generating AI response: {str(openai_error)}")
+            ai_response = "I'm sorry, I couldn't process your request at the moment."
+            conversation['messages'].append({"role": "assistant", "content": f"Daria: {ai_response}\n\n"})
 
         # Only set should_stop_interview if we've reached max rounds and have meaningful conversation
         should_stop = False
         if current_round > 0 and len(transcription.text.split()) > 2 and current_round >= MAX_ROUNDS:
             should_stop = False  # Don't stop the interview automatically
 
-        return jsonify({
+        # Add CORS headers to the response
+        response = jsonify({
             'transcription': transcription.text,
             'response': ai_response,
             'should_stop_interview': should_stop
         })
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        return response
 
     except Exception as e:
         logger.error(f"Error processing audio: {str(e)}")
@@ -1145,28 +1355,48 @@ def text_to_speech():
         voice_id = request.json.get('voice_id', AVAILABLE_VOICES['rachel'])  # Default to Rachel if not specified
         
         if not text:
+            logger.error("No text provided for text-to-speech")
             return jsonify({'error': 'No text provided'}), 400
         
+        logger.info(f"Text-to-speech request received: {text[:30]}...")
+        
+        if not ELEVENLABS_API_KEY:
+            logger.error("ELEVENLABS_API_KEY not found in environment")
+            return jsonify({'error': 'ElevenLabs API key is not configured'}), 500
+        
         # Convert text to speech using ElevenLabs
-        audio_stream = elevenlabs_client.text_to_speech.convert_as_stream(
-            text=text,
-            voice_id=voice_id,
-            model_id="eleven_multilingual_v2"
-        )
-        
-        # Convert stream to bytes
-        audio_data = BytesIO()
-        for chunk in audio_stream:
-            audio_data.write(chunk)
-        audio_data.seek(0)
-        
-        return send_file(
-            audio_data,
-            mimetype='audio/wav',
-            as_attachment=False
-        )
+        try:
+            audio_stream = elevenlabs_client.text_to_speech.convert_as_stream(
+                text=text,
+                voice_id=voice_id,
+                model_id="eleven_multilingual_v2"
+            )
+            
+            # Convert stream to bytes
+            audio_data = BytesIO()
+            for chunk in audio_stream:
+                audio_data.write(chunk)
+            audio_data.seek(0)
+            
+            logger.info(f"Text-to-speech conversion successful, size: {audio_data.getbuffer().nbytes} bytes")
+            
+            response = send_file(
+                audio_data,
+                mimetype='audio/wav',
+                as_attachment=False
+            )
+            
+            # Add CORS headers explicitly
+            response.headers.add('Access-Control-Allow-Origin', '*')
+            return response
+            
+        except Exception as elevenlabs_error:
+            logger.error(f"ElevenLabs API error: {str(elevenlabs_error)}")
+            return jsonify({'error': f'ElevenLabs API error: {str(elevenlabs_error)}'}), 500
         
     except Exception as e:
+        logger.error(f"Error in text_to_speech: {str(e)}")
+        logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
 @app.route('/chat', methods=['POST'])
@@ -1325,70 +1555,133 @@ def final_analysis():
         # Get the saved interview prompt and form data
         interview_data = interview_prompts.get(project_name)
         if not interview_data:
-            return jsonify({'status': 'error', 'error': 'Interview data not found'}), 404
+            logger.warning(f"Interview data not found for project: {project_name}. Using default context.")
+            # Create default context instead of failing
+            interview_data = {
+                'prompt': f"An interview about {project_name}",
+                'form_data': {
+                    'project_name': project_name,
+                    'project_description': f"A project about {project_name}",
+                    'interview_type': "Application Interview", 
+                    'interviewee': {'name': 'Anonymous'}
+                }
+            }
 
-        interview_prompt = interview_data['prompt']
-        form_data = interview_data['form_data']
+        # Load all configuration data
+        interview_prompt = interview_data.get('prompt', '')
+        form_data = interview_data.get('form_data', {})
+        
+        # Extract critical context information
+        project_description = form_data.get('project_description', '')
+        interview_type = form_data.get('interview_type', '')
+        
+        # Extract participant information
+        interviewee = form_data.get('interviewee', {})
+        participant_name = interviewee.get('name', 'Anonymous')
+        participant_role = interviewee.get('role', '')
+        participant_experience = interviewee.get('experience_level', '')
+        participant_department = interviewee.get('department', '')
+        
+        # Create rich participant context
+        participant_context = f"{participant_name}"
+        if participant_role:
+            participant_context += f", {participant_role}"
+        if participant_experience:
+            participant_context += f", with {participant_experience} experience"
+        if participant_department:
+            participant_context += f" in the {participant_department} department"
 
-        # Determine interview type from the prompt
-        interview_type = "Application Interview"  # default
-        if "Persona Interview" in interview_prompt:
-            interview_type = "Persona Interview"
-        elif "Journey Map Interview" in interview_prompt:
-            interview_type = "Journey Map Interview"
+        # Determine interview type from the prompt if not explicitly provided
+        if not interview_type:
+            if "Persona Interview" in interview_prompt:
+                interview_type = "Persona Interview"
+            elif "Journey Map Interview" in interview_prompt:
+                interview_type = "Journey Map Interview"
+            else:
+                interview_type = "Application Interview"
 
-        # Create a new instance of ChatOpenAI for analysis
-        analysis_llm = ChatOpenAI(
-            temperature=0.7,
-            model_name="gpt-4",
-            openai_api_key=os.getenv('OPENAI_API_KEY')
-        )
-
-        # Generate analysis prompt based on interview type
+        # Create context-rich analysis prompt
         if interview_type == "Application Interview":
-            analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Application Evaluation interviews.
-#Objective: Evaluate the interviewee's experience with {project_name}
-#Instructions: Evaluate the interview transcript and provide a comprehensive analysis.
+            analysis_prompt = f"""#Role: You are Daria, an expert UX researcher analyzing an Application Evaluation interview.
+#Project: {project_name}
+#Project Description: {project_description}
+#Participant: {participant_context}
+
+#Objective: Evaluate the participant's experience with {project_name}
+
+#Instructions: Analyze the interview transcript and provide a comprehensive evaluation report.
 
 Your analysis should include:
-1. Role and Experience: Describe their role and how they use the system
-2. Key Tasks: List the main tasks they perform
-3. Pain Points: Identify any frustrations and challenges
-4. Suggestions: Note any improvements they mentioned
-5. Overall Assessment: Evaluate their experience and needs
+1. User Role and Experience: How the participant uses the system and their relevant background
+2. Key Tasks and Workflows: Main activities and processes they perform
+3. Pain Points and Challenges: Specific frustrations and obstacles they encounter
+4. Positive Aspects: Features or elements they find valuable or effective
+5. Suggestions and Ideas: Improvements they mentioned or implied
+6. Overall Assessment: Evaluation of their experience and critical needs
+7. Key Quotes: Include meaningful direct quotes from the transcript
 
-Format your response with clear sections using headers."""
+Format your response with clear section headers and concise, actionable insights. Support your analysis with evidence from the transcript."""
         elif interview_type == "Persona Interview":
-            analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Creating a Persona interviews.
-#Objective: Generate a persona based on the interviewee's responses about {project_name}
-#Instructions: Evaluate the interview transcript and generate a persona based on the interviewee's responses.
+            analysis_prompt = f"""#Role: You are Daria, an expert UX researcher analyzing a Persona Interview.
+#Project: {project_name}
+#Project Description: {project_description}
+#Participant: {participant_context}
+
+#Objective: Generate a detailed persona based on the interview
+
+#Instructions: Analyze the interview transcript and create a robust user persona.
 
 Your analysis should include:
-1. Demographics: Age, role, experience level, and other relevant characteristics
-2. Behaviors: How they interact with the system, their workflow, and habits
-3. Goals: What they're trying to achieve and their motivations
-4. Challenges: Pain points, frustrations, and obstacles they face
-5. Preferences: Their likes, dislikes, and preferences in using the system
-6. Key Insights: Important quotes or observations that define their experience
+1. Persona Demographics: Age, role, experience level, and other relevant characteristics
+2. Behaviors and Usage Patterns: How they interact with the system, their workflow, and habits
+3. Goals and Motivations: What they're trying to achieve, both functionally and emotionally
+4. Challenges and Frustrations: Specific pain points they experience
+5. Needs and Preferences: Their requirements and what they value in a solution
+6. Mental Models: How they think about and approach the system or problem space
+7. Key Quotes: Include meaningful direct quotes that illuminate their perspective
 
-Format your response with clear sections using headers and include relevant quotes from the transcript."""
+Format your response with clear section headers, and make the persona specific and actionable. Base all insights directly on evidence from the transcript."""
         else:  # Journey Map Interview
-            analysis_prompt = f"""#Role: You are Daria, an expert UX researcher conducting Creating a Journey Map interviews.
-#Objective: Generate a comprehensive Journey Map based on the interviewee's responses about {project_name}
-#Instructions: Evaluate the interview transcript and generate a Journey Map based on the interviewee's responses.
+            analysis_prompt = f"""#Role: You are Daria, an expert UX researcher analyzing a Journey Map Interview.
+#Project: {project_name}
+#Project Description: {project_description}
+#Participant: {participant_context}
+
+#Objective: Create a detailed journey map based on the participant's experience
+
+#Instructions: Analyze the interview transcript and develop a comprehensive journey map.
 
 Your analysis should include:
-1. User Journey Stages: Break down the experience into key stages or phases
-2. Touchpoints: Identify all interactions with the system and other stakeholders
-3. Emotions: Track emotional highs and lows throughout the journey
-4. Pain Points: Identify frustrations and challenges at each stage
-5. Moments of Delight: Note positive experiences and successful interactions
-6. Opportunities: Suggest improvements for each stage of the journey
+1. Journey Stages: Identify and name each key phase of the user journey
+2. User Actions: What the participant does at each stage
+3. Touchpoints: All interactions with the system, people, or other elements
+4. Emotions and Thoughts: How they feel and what they think at each stage
+5. Pain Points: Specific challenges, frustrations, or obstacles encountered
+6. Opportunities: Potential improvements or solutions at each stage
+7. Key Quotes: Include meaningful direct quotes for each journey stage
 
-Format your response with clear sections using headers and include relevant quotes from the transcript."""
+For each stage, provide a clear analysis of what works well and what needs improvement.
+Format your response with clear section headers and ensure insights are specific and actionable.
+Structure the journey chronologically and highlight critical moments that impact the overall experience."""
 
-        # Generate the analysis using the actual transcript from the current interview
-        analysis = analysis_llm.predict(analysis_prompt + "\n\nInterview Transcript:\n" + transcript)
+        # Create a new instance of the OpenAI client
+        client = OpenAI()
+        
+        # Generate the analysis using the enhanced prompt
+        try:
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": analysis_prompt},
+                    {"role": "user", "content": f"Here is the interview transcript to analyze:\n\n{transcript}"}
+                ],
+                temperature=0.7
+            )
+            
+            analysis = response.choices[0].message.content
+        except Exception as api_error:
+            logger.error(f"Error with OpenAI API: {str(api_error)}")
+            return jsonify({'status': 'error', 'error': f'API error: {str(api_error)}'}), 500
 
         # Save the interview data with the transcript and analysis
         save_interview_data(project_name, interview_type, transcript, analysis, form_data)
@@ -1400,7 +1693,8 @@ Format your response with clear sections using headers and include relevant quot
         })
 
     except Exception as e:
-        print(f"Error in final_analysis: {str(e)}")
+        logger.error(f"Error in final_analysis: {str(e)}")
+        logger.error(traceback.format_exc())
         return jsonify({'status': 'error', 'error': str(e)}), 500
 
 @socketio.on('connect')
@@ -2098,7 +2392,7 @@ def generate_persona():
             interview_texts.append(transcript)
 
         # Use the robust persona synthesis function
-        from src.persona_gpt import generate_persona_from_interviews
+        from daria_interview_tool.persona_gpt import generate_persona_from_interviews
         try:
             persona_data = generate_persona_from_interviews(
                 interview_texts=interview_texts,
@@ -2346,7 +2640,7 @@ def list_personas():
                 continue
         
         # Sort personas by creation date, most recent first
-        personas.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        personas.sort(key=lambda x: x.get('created_at') or '', reverse=True)
         return jsonify(personas)
         
     except Exception as e:
@@ -2642,7 +2936,11 @@ def create_journey_map():
         logger.info(f"Received journey map request with data: {data}")
         
         interview_ids = data.get('interview_ids', [])
+        # Get model preference (default to gpt-4 if not provided)
+        model = data.get('model', 'gpt-4')
+        
         logger.info(f"Processing {len(interview_ids)} interview IDs: {interview_ids}")
+        logger.info(f"Using model: {model}")
         
         if not interview_ids:
             logger.error("No interviews selected")
@@ -2676,143 +2974,41 @@ def create_journey_map():
             
         logger.info(f"Successfully loaded {len(interviews)} interviews")
         
-        # Generate journey map HTML
-        logger.info("Generating journey map HTML")
-        journey_map_html = generate_journey_map_html(interviews)
-        logger.info(f"Generated HTML content length: {len(journey_map_html)}")
+        # Get project name from first interview or use default
+        project_name = interviews[0].get('project_name', 'Journey Map Project')
         
-        return jsonify({'html': journey_map_html})
+        # Generate journey map JSON using our function, passing the model parameter
+        from daria_interview_tool.journey_map import generate_journey_map_json
+        journey_map_json = generate_journey_map_json(interviews, project_name, model)
+        logger.info(f"Generated journey map JSON for {project_name} using {model}")
+        
+        # Extract model info for debugging if available
+        model_info = journey_map_json.get('model_info', {})
+        
+        # Save the journey map to file if needed
+        journey_map_id = journey_map_json.get('id')
+        journey_maps_dir = Path('journey_maps')
+        journey_maps_dir.mkdir(exist_ok=True)
+        
+        file_path = journey_maps_dir / f"{journey_map_id}.json"
+        with open(file_path, 'w') as f:
+            json.dump(journey_map_json, f, indent=2)
+        logger.info(f"Saved journey map to {file_path}")
+        
+        # Create HTML from JSON for display
+        from daria_interview_tool.journey_map_renderer import render_journey_map_html
+        journey_map_html = render_journey_map_html(journey_map_json)
+        
+        # Add HTML to the response
+        response_data = journey_map_json.copy()
+        response_data['html'] = journey_map_html
+        response_data['model_info'] = model_info
+        
+        return jsonify(response_data)
     except Exception as e:
         logger.error(f"Error creating journey map: {str(e)}")
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
-
-def generate_journey_map_html(interviews):
-    """Generate HTML for the journey map based on interview data, optimized for token limits and API usage."""
-    try:
-        client = OpenAI(api_key=OPENAI_API_KEY)
-        logger.info(f"Processing {len(interviews)} interviews for journey map (optimized)")
-
-        # Limit the number of interviews to avoid context overflow
-        MAX_INTERVIEWS = 5
-        if len(interviews) > MAX_INTERVIEWS:
-            logger.warning(f"Too many interviews selected ({len(interviews)}); only using the first {MAX_INTERVIEWS}.")
-            interviews = interviews[:MAX_INTERVIEWS]
-
-        interview_summaries = []
-        for i, interview in enumerate(interviews):
-            transcript = interview.get('transcript', '')
-            analysis = interview.get('analysis', '')
-            logger.info(f"Summarizing interview {i+1}/{len(interviews)} (ID: {interview.get('id')})")
-
-            # Step 1: Summarize transcript in chunks if too long
-            if len(transcript) > 3000:
-                logger.info(f"Transcript is long ({len(transcript)} chars), chunking and summarizing...")
-                chunk_size = 2000
-                chunks = [transcript[j:j+chunk_size] for j in range(0, len(transcript), chunk_size)]
-                chunk_summaries = []
-                for k, chunk in enumerate(chunks):
-                    logger.info(f"Summarizing chunk {k+1}/{len(chunks)} of interview {i+1}")
-                    try:
-                        response = client.chat.completions.create(
-                            model="gpt-4",
-                            messages=[
-                                {"role": "system", "content": "You are a research analyst. Summarize the following interview transcript chunk for journey mapping. Focus on key events, actions, pain points, and emotions. Be concise."},
-                                {"role": "user", "content": chunk}
-                            ],
-                            max_tokens=300,
-                            temperature=0.3
-                        )
-                        chunk_summaries.append(response.choices[0].message.content)
-                    except Exception as e:
-                        logger.error(f"Error summarizing chunk {k+1}: {str(e)}")
-                        continue
-                # Step 2: Combine chunk summaries into one interview summary
-                combined_summary = "\n".join(chunk_summaries)
-                logger.info(f"Combining {len(chunk_summaries)} chunk summaries for interview {i+1}")
-                try:
-                    response = client.chat.completions.create(
-                        model="gpt-4",
-                        messages=[
-                            {"role": "system", "content": "You are a research analyst. Combine the following chunk summaries into a single, concise summary for journey mapping. Focus on key stages, touchpoints, pain points, and emotions."},
-                            {"role": "user", "content": combined_summary}
-                        ],
-                        max_tokens=400,
-                        temperature=0.3
-                    )
-                    interview_summary = response.choices[0].message.content
-                except Exception as e:
-                    logger.error(f"Error combining chunk summaries: {str(e)}")
-                    interview_summary = combined_summary
-            else:
-                interview_summary = transcript
-
-            # Step 3: Truncate or summarize analysis if too long
-            if len(analysis) > 1500:
-                processed_analysis = analysis[:1500] + "... [truncated]"
-            else:
-                processed_analysis = analysis
-
-            interview_summaries.append({
-                'id': interview.get('id'),
-                'date': interview.get('date'),
-                'type': interview.get('interview_type'),
-                'summary': interview_summary,
-                'analysis': processed_analysis
-            })
-            logger.info(f"Finished summary for interview {i+1}")
-
-        # Step 4: Build the final journey map prompt using only summaries
-        analysis_prompt = f"""As a UX research expert, analyze these {len(interview_summaries)} interviews and create a detailed journey map.\nFocus on extracting specific, actionable insights from the interviews.\n\nFor each interview, I'll provide:\n1. The summary of the interview transcript\n2. The analysis summary\n3. The interview date and type\n\nPlease create a comprehensive journey map that includes:\n1. Key stages of the user journey\n2. Important touchpoints at each stage\n3. User emotions and pain points\n4. Opportunities for improvement\n\nFormat the response as HTML with appropriate styling classes. Use the following structure:\n\n<div class=\"journey-map-container\">\n    <div class=\"journey-map-section stages\">\n        <h2>Journey Stages</h2>\n        [Stage cards...]\n    </div>\n    <div class=\"journey-map-section touchpoints\">\n        <h2>Key Touchpoints</h2>\n        [Touchpoint cards...]\n    </div>\n    <div class=\"journey-map-section emotions\">\n        <h2>User Emotions</h2>\n        [Emotion cards...]\n    </div>\n    <div class=\"journey-map-section pain-points\">\n        <h2>Pain Points</h2>\n        [Pain point cards...]\n    </div>\n    <div class=\"journey-map-section opportunities\">\n        <h2>Opportunities</h2>\n        [Opportunity cards...]\n    </div>\n</div>\n\nHere are the interviews to analyze:\n"""
-        for i, interview in enumerate(interview_summaries, 1):
-            analysis_prompt += f"""
-Interview {i}:
-Date: {interview['date']}
-Type: {interview['type']}
-
-Summary:
-{interview['summary']}
-
-Analysis:
-{interview['analysis']}
-
----
-"""
-        logger.info("Sending final journey map prompt to OpenAI (optimized)")
-        response = client.chat.completions.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are a UX research expert skilled at creating journey maps from interview data."},
-                {"role": "user", "content": analysis_prompt}
-            ],
-            max_tokens=3500,
-            temperature=0.7
-        )
-        journey_map_html = response.choices[0].message.content
-        final_html = f"""
-<div class=\"journey-map-wrapper p-6 bg-white rounded-lg shadow-lg\">
-    <div class=\"mb-6\">
-        <h1 class=\"text-2xl font-bold text-gray-900 mb-2\">User Journey Map</h1>
-        <p class=\"text-gray-600\">Based on {len(interviews)} interview{'' if len(interviews) == 1 else 's'}</p>
-    </div>
-    {journey_map_html}
-</div>
-"""
-        return final_html
-    except Exception as e:
-        logger.error(f"Error generating journey map HTML: {str(e)}")
-        logger.error(traceback.format_exc())
-        return f"""
-<div class=\"error-message\">
-    <svg class=\"w-6 h-6\" fill=\"none\" stroke=\"currentColor\" viewBox=\"0 0 24 24\">
-        <path stroke-linecap=\"round\" stroke-linejoin=\"round\" stroke-width=\"2\" d=\"M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z\" />
-    </svg>
-    <div>
-        <h3 class=\"font-semibold\">Error Generating Journey Map</h3>
-        <p class=\"text-sm\">{str(e)}</p>
-    </div>
-</div>
-"""
 
 @app.route('/generate_report', methods=['POST'])
 def generate_report():
@@ -4143,10 +4339,11 @@ def list_raw_interviews():
 
 @app.route('/api/projects', methods=['GET'])
 def get_projects():
+    """Get a list of all projects that have interviews."""
     try:
-        logger.info("Getting all projects")
-        # Get all project names from both interview directories
-        project_names = set()
+        projects = set()
+        # Check both interviews and interviews/raw directories
+        interview_dirs = ['interviews', 'interviews/raw']
         
         for dir_path in interview_dirs:
             if os.path.exists(dir_path):
@@ -4155,64 +4352,22 @@ def get_projects():
                         with open(file) as f:
                             interview_data = json.load(f)
                             project_name = interview_data.get('project_name')
+                            project_id = interview_data.get('project_id', project_name)
+                            
                             if project_name:
-                                project_names.add(project_name)
+                                projects.add((project_name, project_id))
                     except json.JSONDecodeError:
                         continue
                     except Exception as e:
                         logger.error(f"Error reading file {file}: {str(e)}")
                         continue
         
-        projects = [{'id': name, 'name': name} for name in sorted(project_names) if name]
-        
-        return jsonify(projects)
-        
+        # Convert to list of dictionaries
+        project_list = [{'name': name, 'id': id} for name, id in projects]
+        logger.info(f"Found {len(project_list)} projects")
+        return jsonify(project_list)
     except Exception as e:
-        logger.error(f"Error in get_projects: {str(e)}")
-        return jsonify({'error': str(e)}), 500
-
-@app.route('/api/project/<project_name>/interviews', methods=['GET'])
-def get_project_interviews_alt(project_name):
-    try:
-        logger.info(f"Getting interviews for project: {project_name}")
-        interviews = []
-        
-        if project_name:
-            # Now get all interviews for this project from both directories
-            for dir_path in interview_dirs:
-                if os.path.exists(dir_path):
-                    for file in Path(dir_path).glob('*.json'):
-                        try:
-                            with open(file) as f:
-                                interview_data = json.load(f)
-                                if interview_data.get('project_name') == project_name:
-                                    # Format date for display
-                                    date = interview_data.get('date', '')
-                                    if date:
-                                        try:
-                                            date = datetime.fromisoformat(date)
-                                            formatted_date = date.strftime('%B %d, %Y')
-                                        except ValueError:
-                                            formatted_date = date
-                                    else:
-                                        formatted_date = 'No date'
-                                    
-                                    interviews.append({
-                                        'id': interview_data.get('id'),
-                                        'title': interview_data.get('title', 'Untitled Interview'),
-                                        'date': formatted_date,
-                                        'interview_type': interview_data.get('interview_type', 'Unknown Type')
-                                    })
-                        except json.JSONDecodeError:
-                            continue
-                        except Exception as e:
-                            logger.error(f"Error reading file {file}: {str(e)}")
-                            continue
-        
-        logger.info(f"Found {len(interviews)} interviews for project {project_name}")
-        return jsonify(interviews)
-    except Exception as e:
-        logger.error(f"Error getting project interviews: {str(e)}")
+        logger.error(f"Error getting projects: {str(e)}")
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
 
@@ -4220,11 +4375,53 @@ def get_project_interviews_alt(project_name):
 def api_generate_persona():
     try:
         data = request.json
-        # Process the request data here
-        return jsonify({"status": "success"})
+        project_id = data.get('project_id')
+        interview_ids = data.get('interview_ids', [])
+        model = data.get('model', 'gpt-4')
+
+        if not project_id or not interview_ids:
+             return jsonify({'error': 'Project ID and at least one interview ID are required.'}), 400
+
+        interview_data = []
+        for interview_id in interview_ids:
+            interview = get_interview(interview_id)
+            if interview:
+                # Ensure transcript exists, default to empty string if not
+                interview['transcript'] = interview.get('transcript', '') 
+                interview_data.append(interview)
+
+        if not interview_data:
+            return jsonify({'error': 'No valid interviews found for the provided IDs.'}), 404
+
+        interview_texts = [i['transcript'] for i in interview_data]
+
+        # Generate persona using the multi-step process
+        from daria_interview_tool.persona_gpt import generate_persona_from_interviews
+        # Pass the user's preferred base model (e.g., gpt-4) for synthesis
+        # The function itself will upgrade to gpt-4-turbo for final generation
+        persona_data = generate_persona_from_interviews(
+            interview_texts=interview_texts,
+            project_name=project_id,
+            model=model # Pass user's choice for synthesis stage
+        )
+
+        # Successfully generated
+        return jsonify(persona_data)
+
+    except ValueError as ve:
+        # Catch specific errors raised from persona_gpt (like JSON parsing, validation, context limit)
+        logger.error(f"ValueError during persona generation: {str(ve)}")
+        # Return a specific error message to the frontend
+        return jsonify({"error": f"Persona Generation Error: {str(ve)}"}), 500
+    except NotImplementedError as nie:
+        # Catch if Claude model was selected but logic isn't updated
+        logger.error(f"NotImplementedError: {str(nie)}")
+        return jsonify({"error": str(nie)}), 501 # 501 Not Implemented
     except Exception as e:
-        logger.error(f"Error in API generate persona: {str(e)}")
-        return jsonify({"error": str(e)}), 500
+        # Catch any other unexpected errors
+        logger.error(f"Unexpected error in /api/generate_persona: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({"error": "An unexpected internal server error occurred."}), 500
 
 # Helper function to generate researcher avatar
 def generate_researcher_avatar(survey_responses):
@@ -4663,6 +4860,527 @@ Your goal is to discover different research methods and techniques to build your
         'message': response,
         'game_state': current_game_state
     })
+
+@app.route('/api/transcript/<interview_id>')
+def api_get_transcript(interview_id):
+    """API endpoint to get interview transcript data as JSON."""
+    try:
+        # Load interview from raw directory
+        interview_file = Path('interviews/raw') / f"{interview_id}.json"
+        if not interview_file.exists():
+            return jsonify({'error': 'Interview not found'}), 404
+        
+        with open(interview_file, 'r') as f:
+            interview = json.load(f)
+        
+        if not interview:
+            return jsonify({'error': 'Interview not found'}), 404
+        
+        return jsonify(interview)
+    except Exception as e:
+        logger.error(f"Error retrieving transcript: {str(e)}")
+        return jsonify({'error': 'Failed to retrieve transcript'}), 500
+
+@app.route('/api/interviews/recent')
+def get_recent_interviews():
+    """Get the most recent interviews across all projects."""
+    try:
+        # Directories to check for interview files
+        interview_dirs = ['interviews', 'interviews/raw']
+        interviews = []
+        
+        # Read interviews from both directories
+        for dir_path in interview_dirs:
+            if os.path.exists(dir_path):
+                # Get all JSON files in directory
+                interview_files = list(Path(dir_path).glob('*.json'))
+                
+                # Sort by modification time, most recent first
+                interview_files.sort(key=lambda x: x.stat().st_mtime, reverse=True)
+                
+                for file in interview_files:
+                    try:
+                        with open(file) as f:
+                            interview_data = json.load(f)
+                            
+                            # Extract interview ID from filename
+                            interview_id = file.stem
+                            
+                            # Create standardized interview summary
+                            summary = {
+                                'id': interview_data.get('id', interview_id),
+                                'title': interview_data.get('title', 'Untitled Interview'),
+                                'project_name': interview_data.get('project_name', 'Unassigned'),
+                                'participant_name': interview_data.get('interviewee', interview_data.get('participant_name', 'Anonymous')),
+                                'created_at': interview_data.get('date', ''),
+                                'type': interview_data.get('interview_type', 'Interview'),
+                                'status': interview_data.get('status', 'Completed'),
+                                'preview': interview_data.get('preview', '')
+                            }
+                            
+                            # Check if we already have this interview (avoid duplicates)
+                            if not any(i.get('id') == summary['id'] for i in interviews):
+                                interviews.append(summary)
+                    except json.JSONDecodeError:
+                        logger.error(f"Invalid JSON in file {file}")
+                        continue
+                    except Exception as e:
+                        logger.error(f"Error reading interview file {file}: {str(e)}")
+                        continue
+        
+        # Sort all interviews by date, most recent first
+        interviews.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        
+        # Return only the 10 most recent interviews
+        return jsonify(interviews[:10])
+        
+    except Exception as e:
+        logger.error(f"Error getting recent interviews: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+# Serve test_audio_endpoints.html directly from the root
+@app.route('/test_audio_endpoints.html')
+def test_audio_endpoints():
+    return send_file('test_audio_endpoints.html')
+
+@app.route('/api/interview-prompt', methods=['GET'])
+def api_interview_prompt():
+    """API endpoint to get interview prompt for a project."""
+    try:
+        project_name = request.args.get('project_name')
+        if not project_name:
+            logger.error("Project name is required for interview prompt")
+            return jsonify({'error': 'Project name is required'}), 400
+
+        logger.info(f"Getting interview prompt for project: {project_name}")
+        
+        # First, look for previously created interview configuration in the project files
+        project_files = []
+        project_config = None
+        
+        # Look in interviews directory for matching project name
+        interviews_dir = Path('interviews')
+        if interviews_dir.exists():
+            json_files = list(interviews_dir.glob('*.json'))
+            for file_path in json_files:
+                try:
+                    with open(file_path, 'r') as f:
+                        interview_data = json.load(f)
+                        if interview_data.get('project_name') == project_name:
+                            project_files.append(interview_data)
+                            # Use the most recent file's config as our base
+                            if not project_config or (interview_data.get('created_at', '') > project_config.get('created_at', '')):
+                                project_config = interview_data
+                except Exception as e:
+                    logger.error(f"Error reading file {file_path}: {str(e)}")
+        
+        # Get the prompt information from our predefined prompts
+        prompt_info = interview_prompts.get(project_name)
+        
+        # If we found project config but no predefined prompt, create one
+        if project_config and not prompt_info:
+            # Extract interview details to create a prompt
+            project_description = project_config.get('project_description', f"Project {project_name}")
+            interview_type = project_config.get('interview_type', 'User Interview')
+            
+            prompt_text = f"""
+You are Daria, an experienced UX researcher conducting a {interview_type} for the following project:
+
+Project: {project_name}
+Description: {project_description}
+
+Your goal is to gather meaningful insights about the user's experience, pain points, and needs. 
+Ask open-ended questions and follow up on responses to uncover deeper insights.
+Keep the conversation natural and conversational while guiding it towards valuable research outcomes.
+"""
+            
+            # Create a prompt info based on the project configuration
+            prompt_info = {
+                'prompt': prompt_text,
+                'form_data': {
+                    'project_name': project_name,
+                    'project_description': project_description,
+                    'interview_type': interview_type,
+                    'interviewee': {
+                        'name': project_config.get('participant_name', 'Anonymous'),
+                        'role': project_config.get('role', ''),
+                        'experience_level': project_config.get('experience_level', ''),
+                        'department': project_config.get('department', '')
+                    },
+                    'tags': project_config.get('tags', []),
+                    'emotion': project_config.get('emotion', ''),
+                    'status': project_config.get('status', 'Draft'),
+                    'author': project_config.get('author', '')
+                }
+            }
+        
+        if not prompt_info:
+            logger.warning(f"Interview prompt not found for project: {project_name}. Using default prompt.")
+            # Return a default prompt for unknown projects
+            default_prompt = f"""
+You are Daria, an experienced UX researcher conducting an interview for project {project_name}.
+
+Your goal is to:
+1. Understand the user's experiences and needs
+2. Identify pain points and challenges
+3. Gather insights for product improvement
+
+Ask open-ended questions, and follow up on interesting points. Maintain a conversational tone while
+guiding the discussion toward valuable research outcomes.
+"""
+            prompt_info = {
+                'prompt': default_prompt,
+                'form_data': {'interviewee': {'name': 'Anonymous'}}
+            }
+        
+        # Return the prompt information with enhanced context
+        return jsonify(prompt_info)
+        
+    except Exception as e:
+        logger.error(f"Error getting interview prompt: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/diagnostics/microphone', methods=['POST'])
+def check_microphone():
+    """Diagnostic endpoint to check microphone status and audio processing."""
+    try:
+        logger.info("Microphone diagnostic endpoint called")
+        
+        # Check for audio file
+        if 'audio' not in request.files:
+            logger.error("No audio file provided to diagnostic endpoint")
+            return jsonify({
+                'status': 'error',
+                'message': 'No audio file provided',
+                'debug_info': {
+                    'request_files': list(request.files.keys()),
+                    'request_form': list(request.form.keys()),
+                    'content_type': request.content_type
+                }
+            }), 400
+
+        # Process the audio file
+        audio_file = request.files['audio']
+        if not audio_file:
+            return jsonify({'status': 'error', 'message': 'Empty audio file'}), 400
+            
+        # Get file details
+        file_size = 0
+        with tempfile.NamedTemporaryFile(delete=False, suffix='.wav') as temp_audio:
+            audio_file.save(temp_audio.name)
+            file_size = os.path.getsize(temp_audio.name)
+            logger.info(f"Diagnostic audio file saved: {temp_audio.name}, size: {file_size} bytes")
+            
+            # Only attempt transcription if file is large enough
+            if file_size > 1000:  # At least 1KB of data
+                try:
+                    client = OpenAI()
+                    with open(temp_audio.name, 'rb') as audio:
+                        transcription = client.audio.transcriptions.create(
+                            model="whisper-1", 
+                            file=audio
+                        )
+                    logger.info(f"Diagnostic transcription successful: {transcription.text}")
+                    
+                    # Clean up the temporary file
+                    os.unlink(temp_audio.name)
+                    
+                    return jsonify({
+                        'status': 'success',
+                        'message': 'Microphone and transcription working correctly',
+                        'file_size': file_size,
+                        'transcription': transcription.text
+                    })
+                except Exception as e:
+                    logger.error(f"Diagnostic transcription error: {str(e)}")
+                    # Clean up the temporary file
+                    os.unlink(temp_audio.name)
+                    return jsonify({
+                        'status': 'error',
+                        'message': f'Transcription error: {str(e)}',
+                        'file_size': file_size
+                    }), 500
+            else:
+                # File too small, likely no audio
+                os.unlink(temp_audio.name)
+                return jsonify({
+                    'status': 'error',
+                    'message': 'Audio file too small, no speech detected',
+                    'file_size': file_size
+                }), 400
+                
+    except Exception as e:
+        logger.error(f"Microphone diagnostic error: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({
+            'status': 'error',
+            'message': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
+@app.route('/run_mic_test', methods=['GET'])
+def run_mic_test():
+    """Run the microphone test script and return results."""
+    try:
+        import subprocess
+        import sys
+        
+        logger.info("Running microphone test script")
+        
+        # Path to the script
+        script_path = os.path.join(app.root_path, 'test_mic_recording.py')
+        
+        # Check if script exists
+        if not os.path.exists(script_path):
+            return jsonify({
+                'error': 'Test script not found',
+                'path': script_path
+            }), 404
+            
+        # Run the script as a subprocess and capture output
+        process = subprocess.Popen(
+            [sys.executable, script_path],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True
+        )
+        
+        stdout, stderr = process.communicate()
+        
+        # Return results
+        return jsonify({
+            'status': 'complete',
+            'exit_code': process.returncode,
+            'stdout': stdout,
+            'stderr': stderr
+        })
+        
+    except Exception as e:
+        logger.error(f"Error running microphone test: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({
+            'error': str(e),
+            'traceback': traceback.format_exc()
+        }), 500
+
+@app.route('/api/save_interview', methods=['POST'])
+def api_save_interview():
+    """API endpoint to save new interview configuration and generate prompt."""
+    try:
+        logger.info("=== /api/save_interview endpoint called ===")
+        logger.info(f"Request method: {request.method}")
+        logger.info(f"Request headers: {dict(request.headers)}")
+        
+        # Log detailed information about the request
+        if request.content_type and 'application/json' in request.content_type:
+            logger.info("Request has correct JSON content type")
+        else:
+            logger.warning(f"Unexpected content type: {request.content_type}")
+        
+        # Get and log the raw data
+        raw_data = request.get_data(as_text=True)
+        logger.info(f"Raw request data: {raw_data[:200]}...")
+        
+        data = request.get_json()
+        if data is None:
+            logger.error("Failed to parse JSON data from request")
+            return jsonify({'error': 'Invalid JSON data or content-type'}), 400
+            
+        logger.info(f"Parsed JSON data: {data}")
+        
+        # Required fields
+        project_name = data.get('project_name')
+        interview_type = data.get('interview_type')
+        project_description = data.get('project_description')
+        
+        logger.info(f"Project name: {project_name}")
+        logger.info(f"Interview type: {interview_type}")
+        logger.info(f"Project description: {project_description[:50]}..." if project_description else "No project description")
+        
+        # Validate required fields
+        missing_fields = []
+        if not project_name:
+            missing_fields.append('project_name')
+        if not interview_type:
+            missing_fields.append('interview_type')
+        if not project_description:
+            missing_fields.append('project_description')
+            
+        if missing_fields:
+            error_msg = f"Missing required fields: {', '.join(missing_fields)}"
+            logger.error(error_msg)
+            return jsonify({'error': error_msg}), 400
+        
+        # Get the form_data field if it exists, or create it from the individual fields
+        form_data = data.get('form_data', {})
+        
+        # Ensure the form_data has all the required fields
+        if not form_data.get('interviewee'):
+            form_data['interviewee'] = {
+                'name': data.get('participant_name', 'Anonymous'),
+                'role': data.get('role', ''),
+                'experience_level': data.get('experience_level', ''),
+                'department': data.get('department', '')
+            }
+            
+        # Ensure project information is in form_data
+        form_data['project_name'] = project_name
+        form_data['project_description'] = project_description
+        form_data['interview_type'] = interview_type
+            
+        # Get all the metadata fields
+        metadata = {
+            'participant': {
+                'name': data.get('participant_name', 'Anonymous'),
+                'role': data.get('role', ''),
+                'experience_level': data.get('experience_level', ''),
+                'department': data.get('department', '')
+            },
+            'session': {
+                'date': datetime.now().isoformat(),
+                'status': data.get('status', 'Draft')
+            },
+            'tags': data.get('tags', []),
+            'emotion': data.get('emotion', 'Neutral'),
+            'researcher': {
+                'name': data.get('author', 'Unknown')
+            }
+        }
+
+        logger.info(f"Prepared form data: {form_data}")
+        logger.info(f"Prepared metadata: {metadata}")
+
+        # Generate the interview prompt
+        try:
+            logger.info("Generating interview prompt...")
+            interview_prompt = get_interview_prompt(interview_type, project_name, project_description)
+            logger.info("Interview prompt generated successfully")
+        except Exception as e:
+            logger.error(f"Error generating interview prompt: {str(e)}")
+            logger.error(traceback.format_exc())
+            return jsonify({'error': 'Failed to generate interview prompt'}), 500
+
+        # Store the interview configuration
+        interview_prompts[project_name] = {
+            'prompt': interview_prompt,
+            'metadata': metadata,
+            'project_description': project_description,
+            'type': interview_type,
+            'form_data': form_data
+        }
+        
+        logger.info(f"Successfully stored interview configuration for project: {project_name}")
+        
+        # Create response with redirect URL
+        redirect_url = url_for('interview', project_name=project_name)
+        logger.info(f"Generated redirect URL: {redirect_url}")
+        
+        response_data = {
+            'status': 'success',
+            'message': 'Interview configuration saved successfully',
+            'project_name': project_name,
+            'redirect_url': redirect_url
+        }
+        
+        logger.info(f"Returning success response: {response_data}")
+        return jsonify(response_data)
+        
+    except Exception as e:
+        logger.error(f"Error in api_save_interview: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': f'Internal server error: {str(e)}'}), 500
+
+# Add Jarvis interview routes
+@app.route('/api/jarvis/start', methods=['POST'])
+def jarvis_start():
+    """Initialize a new Jarvis interview session."""
+    try:
+        data = request.get_json() or {}
+        project_name = data.get('project_name', 'default')
+        
+        # Initialize a new session
+        session_id = jarvis_wrapper.initialize_session(project_name)
+        
+        # Set the session ID in the response cookie
+        response = jsonify({'status': 'success', 'session_id': session_id})
+        response.set_cookie('jarvis_session_id', session_id)
+        
+        return response
+    except Exception as e:
+        logger.error(f"Error starting Jarvis interview: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/jarvis/record', methods=['POST'])
+def jarvis_record():
+    """Record audio from the user and return the transcript."""
+    try:
+        # For simplicity in this demo, we'll just return a simulated transcript
+        # In a real implementation, this would handle browser-based audio recording
+        data = request.get_json() or {}
+        simulated_input = data.get('simulated_input')
+        
+        if simulated_input:
+            # Return the simulated input as the transcript
+            logger.info(f"Using simulated input: {simulated_input}")
+            return jsonify({
+                'transcript': simulated_input,
+                'confidence': 0.98
+            })
+        
+        # If no simulated input, return a default response
+        logger.info("No simulated input provided, returning default response")
+        return jsonify({
+            'transcript': 'I am a manager of the ordering portal and use it daily for my work.',
+            'confidence': 0.95
+        })
+    except Exception as e:
+        logger.error(f"Error recording Jarvis audio: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/jarvis/respond', methods=['POST'])
+def jarvis_respond():
+    """Process user input and generate an AI response for the Jarvis interview."""
+    try:
+        data = request.get_json() or {}
+        user_input = data.get('user_input', '')
+        
+        # Get session ID from cookie or request data
+        session_id = request.cookies.get('jarvis_session_id')
+        if not session_id:
+            session_id = data.get('session_id')
+            
+        if not session_id:
+            return jsonify({'error': 'No active session'}), 400
+        
+        # Process the user input using the wrapper
+        response = jarvis_wrapper.process_user_input(session_id, user_input)
+        
+        # Return the response
+        return jsonify(response)
+    except Exception as e:
+        logger.error(f"Error generating Jarvis response: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
+
+# Add a route to get the current session data for debugging
+@app.route('/api/jarvis/session/<session_id>', methods=['GET'])
+def jarvis_session(session_id):
+    """Get the current data for a Jarvis session."""
+    try:
+        session_data = jarvis_wrapper.get_session_data(session_id)
+        
+        if 'error' in session_data:
+            return jsonify(session_data), 404
+            
+        return jsonify(session_data)
+    except Exception as e:
+        logger.error(f"Error retrieving Jarvis session: {str(e)}")
+        logger.error(traceback.format_exc())
+        return jsonify({'error': str(e)}), 500
 
 if __name__ == '__main__':
     socketio.run(app, 

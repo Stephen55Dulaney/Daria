@@ -1,0 +1,39 @@
+{
+  "id": "6052321b-b60e-42ba-b1bd-b6f0ad2bc788",
+  "guide_id": "ed77a698-01b3-4d7b-a7d3-6c76434ba03d",
+  "interviewee": {
+    "name": "New Participant",
+    "email": ""
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "user",
+      "content": "bananas page",
+      "id": "cee9e8a1-8573-463f-bc02-cb7364450df4",
+      "timestamp": "2025-05-07T14:35:04.781047"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for mentioning the \"bananas page.\" Could you please share more details about your experience with this page? What stood out to you the most or what specific information were you looking for on that page? This will help us understand your user journey better and improve our overall user experience.",
+      "id": "0d52206a-0787-4e6c-a9b8-188383c0eaeb",
+      "timestamp": "2025-05-07T14:35:09.542941"
+    },
+    {
+      "role": "user",
+      "content": " and then this page was in love",
+      "id": "27ca13fc-3ef6-41e4-9fe0-2539cb3259da",
+      "timestamp": "2025-05-07T14:35:10.089435"
+    },
+    {
+      "role": "assistant",
+      "content": "Participant, it's intriguing to hear that the \"bananas page\" made you feel like it was \"in love.\" Could you elaborate on what specifically about the page gave you that impression? Understanding more about your emotional response can provide valuable insights into the overall user experience. How did this feeling of being \"in love\" impact your interaction with the page or your decision-making process?",
+      "id": "7f7fa28b-1467-4f20-9cb2-fa7d739ca329",
+      "timestamp": "2025-05-07T14:35:13.587288"
+    }
+  ],
+  "transcript": "\n\nParticipant: bananas page\n\nModerator: Thank you for mentioning the \"bananas page.\" Could you please share more details about your experience with this page? What stood out to you the most or what specific information were you looking for on that page? This will help us understand your user journey better and improve our overall user experience.\n\nParticipant:  and then this page was in love\n\nModerator: Participant, it's intriguing to hear that the \"bananas page\" made you feel like it was \"in love.\" Could you elaborate on what specifically about the page gave you that impression? Understanding more about your emotional response can provide valuable insights into the overall user experience. How did this feeling of being \"in love\" impact your interaction with the page or your decision-making process?",
+  "analysis": null,
+  "created_at": "2025-05-07T14:27:14.393328",
+  "updated_at": "2025-05-07T14:35:13.587402"
+}

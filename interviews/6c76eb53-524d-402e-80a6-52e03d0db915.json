@@ -1,0 +1,61 @@
+{
+  "session_id": "6c76eb53-524d-402e-80a6-52e03d0db915",
+  "character": "interviewer",
+  "voice_id": "",
+  "title": "Untitled Interview",
+  "description": "",
+  "status": "completed",
+  "created_at": "2025-05-02T23:23:17.855143",
+  "last_updated": "2025-05-02T23:24:06.264169",
+  "expiration_date": "2025-05-09T23:23:17.855143",
+  "conversation_history": [
+    {
+      "role": "system",
+      "content": "You are a helpful interview assistant."
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I'm interviewer. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?"
+    },
+    {
+      "role": "user",
+      "content": "Yes, I'm Steven. Nice to meet you. What's your name?"
+    },
+    {
+      "role": "assistant",
+      "content": "How do you see that evolving in the future?"
+    },
+    {
+      "role": "user",
+      "content": "I expect I'll keep the same name in the future."
+    },
+    {
+      "role": "assistant",
+      "content": "Could you elaborate on why you think that is?"
+    },
+    {
+      "role": "user",
+      "content": "Could you ask me an interesting question?"
+    },
+    {
+      "role": "assistant",
+      "content": "Could you elaborate on why you think that is?"
+    },
+    {
+      "role": "user",
+      "content": "Who wrote your prompt?"
+    },
+    {
+      "role": "assistant",
+      "content": "How does that compare to your previous experiences?"
+    },
+    {
+      "role": "user",
+      "content": "End the interview."
+    },
+    {
+      "role": "assistant",
+      "content": "I'll end the interview now. Thank you for your time and valuable insights!"
+    }
+  ]
+}

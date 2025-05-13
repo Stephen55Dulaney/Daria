@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interview Terms & Consent</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #0ea5e9;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --light-bg: #f9fafb;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .terms-container {
+            max-width: 700px;
+            padding: 2rem;
+            background-color: var(--card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .terms-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+        
+        .terms-content {
+            margin-bottom: 1.5rem;
+        }
+        
+        .terms-footer {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 2rem;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+    </style>
+</head>
+<body>
+    <div class="terms-container">
+        <div class="terms-header">
+            <h1 class="h3">Research Interview Consent</h1>
+            <p class="text-muted">Please review and accept the terms before proceeding</p>
+        </div>
+        
+        <div class="terms-content">
+            <h4>About this session</h4>
+            <p>
+                You've been invited to participate in a research interview session. 
+                During this session, you will be interacting with an AI interviewer who will ask you questions about 
+                {% if session_topic %}{{ session_topic }}{% else %}various topics related to the research{% endif %}.
+            </p>
+            
+            <h4>How it works</h4>
+            <p>
+                <ul>
+                    <li>This session will be conducted via text and/or voice interaction</li>
+                    <li>Your responses will be recorded for research purposes</li>
+                    <li>The session may last approximately 15-30 minutes</li>
+                    <li>You can end the session at any time</li>
+                </ul>
+            </p>
+            
+            <h4>Your privacy</h4>
+            <p>
+                Your participation is voluntary and confidential. The information you provide will be used for research purposes only. 
+                Your personal information will be handled according to our privacy policy.
+            </p>
+            
+            <h4>Consent</h4>
+            <p>
+                By proceeding, you agree that:
+                <ul>
+                    <li>You voluntarily agree to participate in this research session</li>
+                    <li>You understand the session will be recorded</li>
+                    <li>You can withdraw from the session at any time</li>
+                    <li>You are at least 18 years of age</li>
+                </ul>
+            </p>
+            
+            {% if user_info_required %}
+            <div class="mb-4">
+                <h4>Your Information</h4>
+                <p class="text-muted small">Please provide the following information before proceeding:</p>
+                
+                <form id="participant-form" class="mt-3">
+                    <div class="mb-3">
+                        <label for="participant-name" class="form-label">Name *</label>
+                        <input type="text" class="form-control" id="participant-name" name="name" required
+                               value="{{ name }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="participant-email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="participant-email" name="email"
+                               value="{{ email }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="participant-role" class="form-label">Role/Position</label>
+                        <input type="text" class="form-control" id="participant-role" name="role"
+                               value="{{ role }}">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="participant-department" class="form-label">Department/Team</label>
+                        <input type="text" class="form-control" id="participant-department" name="department"
+                               value="{{ department }}">
+                    </div>
+                </form>
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="terms-footer">
+            <button type="button" class="btn btn-outline-secondary" onclick="window.close()">
+                <i class="bi bi-x-circle me-2"></i>Cancel
+            </button>
+            
+            <button type="button" class="btn btn-primary" id="accept-terms-btn">
+                <i class="bi bi-check-circle me-2"></i>Accept & Begin
+            </button>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const acceptButton = document.getElementById('accept-terms-btn');
+            const participantForm = document.getElementById('participant-form');
+            
+            acceptButton.addEventListener('click', function() {
+                // Build the redirect URL with participant info
+                let redirectUrl = '{{ request.url }}&accepted=true';
+                
+                // Add voice_id if available
+                {% if voice_id %}
+                redirectUrl += '&voice_id={{ voice_id }}';
+                {% endif %}
+                
+                // If form exists, add participant information
+                if (participantForm) {
+                    const name = document.getElementById('participant-name').value;
+                    const email = document.getElementById('participant-email').value;
+                    const role = document.getElementById('participant-role').value;
+                    const department = document.getElementById('participant-department').value;
+                    
+                    if (!name) {
+                        alert('Please provide your name before continuing.');
+                        return;
+                    }
+                    
+                    // Add to URL
+                    redirectUrl += '&name=' + encodeURIComponent(name);
+                    if (email) redirectUrl += '&email=' + encodeURIComponent(email);
+                    if (role) redirectUrl += '&role=' + encodeURIComponent(role);
+                    if (department) redirectUrl += '&department=' + encodeURIComponent(department);
+                }
+                
+                // Redirect to the interview
+                window.location.href = redirectUrl;
+            });
+        });
+    </script>
+</body>
+</html> 

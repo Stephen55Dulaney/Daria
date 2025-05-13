@@ -1,0 +1,337 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Monitor{% endblock %}
+
+{% block extra_head %}
+<style>
+  .transcript-container {
+    height: 500px;
+    overflow-y: auto;
+    background-color: #f9f9f9;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 15px;
+  }
+  
+  .exchange {
+    margin-bottom: 25px;
+    padding-bottom: 15px;
+    border-bottom: 1px dashed #ccc;
+  }
+  
+  .question {
+    background-color: #e3f2fd;
+    border-left: 4px solid #2196F3;
+    padding: 10px 15px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+  }
+  
+  .response {
+    background-color: #e8f5e9;
+    border-left: 4px solid #4CAF50;
+    padding: 10px 15px;
+    border-radius: 5px;
+  }
+  
+  .timestamp {
+    color: #757575;
+    font-size: 0.8rem;
+    margin-top: 5px;
+    text-align: right;
+  }
+  
+  .live-indicator {
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    background-color: #f44336;
+    border-radius: 50%;
+    margin-right: 5px;
+    animation: pulse 1.5s ease infinite;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  .info-label {
+    font-weight: bold;
+    width: 150px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid mt-4">
+  <div class="row">
+    <div class="col-md-4">
+      <div class="card shadow mb-4">
+        <div class="card-header bg-primary text-white">
+          <h4 class="mb-0">Interview Details</h4>
+        </div>
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <div>
+              <h5>{{ interview.title }}</h5>
+            </div>
+            <div>
+              <span class="badge bg-{% if interview.status == 'active' or interview.status == 'in_progress' %}success{% elif interview.status == 'pending' %}warning{% else %}secondary{% endif %}">
+                {{ interview.status|capitalize }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="mb-3">
+            <div class="d-flex mb-2">
+              <span class="info-label">Participant:</span>
+              <span>{{ interview.participant_email }}</span>
+            </div>
+            <div class="d-flex mb-2">
+              <span class="info-label">Interview Type:</span>
+              <span>{{ interview.interview_type|capitalize }}</span>
+            </div>
+            <div class="d-flex mb-2">
+              <span class="info-label">Created:</span>
+              <span>{{ interview.created_at }}</span>
+            </div>
+            <div class="d-flex mb-2">
+              <span class="info-label">Expires:</span>
+              <span>{{ interview.expires_at }}</span>
+            </div>
+            <div class="d-flex mb-2">
+              <span class="info-label">Interview ID:</span>
+              <span>{{ interview.id }}</span>
+            </div>
+          </div>
+          
+          {% if interview.status == 'active' or interview.status == 'in_progress' %}
+          <div class="alert alert-info">
+            <div class="d-flex align-items-center">
+              <span class="live-indicator"></span>
+              <span>This interview is currently active. Transcript updates will appear in real-time.</span>
+            </div>
+          </div>
+          {% endif %}
+          
+          <div class="d-grid gap-2 mt-4">
+            <a href="{{ url_for('langchain_dashboard') }}" class="btn btn-outline-primary">
+              <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            {% if interview.status == 'completed' %}
+            <a href="#" class="btn btn-success" onclick="downloadTranscript()">
+              <i class="fas fa-download"></i> Download Transcript
+            </a>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+      
+      {% if interview.status == 'active' or interview.status == 'in_progress' %}
+      <div class="card shadow">
+        <div class="card-header bg-info text-white">
+          <h4 class="mb-0">Monitor Controls</h4>
+        </div>
+        <div class="card-body">
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="auto-refresh" checked>
+            <label class="form-check-label" for="auto-refresh">Auto-refresh transcript</label>
+          </div>
+          
+          <div class="form-check form-switch mb-3">
+            <input class="form-check-input" type="checkbox" id="notify-updates">
+            <label class="form-check-label" for="notify-updates">Notify on new responses</label>
+          </div>
+          
+          <div class="d-grid gap-2 mt-4">
+            <button id="refresh-transcript" class="btn btn-primary">
+              <i class="fas fa-sync-alt"></i> Refresh Transcript
+            </button>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+    </div>
+    
+    <div class="col-md-8">
+      <div class="card shadow">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+          <h4 class="mb-0">Interview Transcript</h4>
+          {% if interview.status == 'active' or interview.status == 'in_progress' %}
+          <span class="badge bg-danger">
+            <span class="live-indicator"></span> LIVE
+          </span>
+          {% endif %}
+        </div>
+        <div class="card-body">
+          <div class="transcript-container" id="transcript-container">
+            {% if transcript|length > 0 %}
+              {% for exchange in transcript %}
+                <div class="exchange">
+                  <div class="question">
+                    <strong>DARIA:</strong> {{ exchange.question }}
+                  </div>
+                  <div class="response">
+                    <strong>Participant:</strong> {{ exchange.response }}
+                  </div>
+                  <div class="timestamp">
+                    {{ exchange.timestamp }}
+                  </div>
+                </div>
+              {% endfor %}
+            {% else %}
+              <div class="alert alert-info">
+                <i class="fas fa-info-circle"></i> No transcript available yet. The interview has not started or no responses have been recorded.
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Interview data
+  const interviewId = "{{ interview_id }}";
+  const interviewStatus = "{{ interview.status }}";
+  let transcriptData = {{ transcript|tojson|safe }};
+  let refreshInterval;
+  
+  document.addEventListener('DOMContentLoaded', function() {
+    // Set up refresh button
+    document.getElementById('refresh-transcript')?.addEventListener('click', refreshTranscript);
+    
+    // Set up auto-refresh
+    const autoRefreshCheckbox = document.getElementById('auto-refresh');
+    if (autoRefreshCheckbox) {
+      autoRefreshCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+          startAutoRefresh();
+        } else {
+          stopAutoRefresh();
+        }
+      });
+      
+      // Initialize auto-refresh if checked and interview is active
+      if (autoRefreshCheckbox.checked && (interviewStatus === 'active' || interviewStatus === 'in_progress')) {
+        startAutoRefresh();
+      }
+    }
+  });
+  
+  function startAutoRefresh() {
+    // Refresh every 5 seconds
+    refreshInterval = setInterval(refreshTranscript, 5000);
+  }
+  
+  function stopAutoRefresh() {
+    clearInterval(refreshInterval);
+  }
+  
+  function refreshTranscript() {
+    // Fetch the latest transcript data
+    fetch(`/api/langchain_interview/transcript?interview_id=${interviewId}`)
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          // Check if there are new exchanges
+          const newData = data.transcript;
+          const notifyUpdates = document.getElementById('notify-updates')?.checked;
+          
+          if (newData.length > transcriptData.length && notifyUpdates) {
+            // Play notification sound
+            const audio = new Audio('/static/sounds/notification.mp3');
+            audio.play().catch(e => console.log('No sound available'));
+            
+            // Show browser notification if possible
+            if ('Notification' in window && Notification.permission === 'granted') {
+              new Notification('New Interview Response', {
+                body: 'The participant has provided a new response.',
+                icon: '/static/images/daria-logo.png'
+              });
+            }
+          }
+          
+          // Update transcript data
+          transcriptData = newData;
+          
+          // Update the UI
+          updateTranscriptUI(transcriptData);
+        }
+      })
+      .catch(error => {
+        console.error('Error refreshing transcript:', error);
+      });
+  }
+  
+  function updateTranscriptUI(transcriptData) {
+    const container = document.getElementById('transcript-container');
+    
+    if (transcriptData.length === 0) {
+      container.innerHTML = `
+        <div class="alert alert-info">
+          <i class="fas fa-info-circle"></i> No transcript available yet. The interview has not started or no responses have been recorded.
+        </div>
+      `;
+      return;
+    }
+    
+    let html = '';
+    transcriptData.forEach(exchange => {
+      html += `
+        <div class="exchange">
+          <div class="question">
+            <strong>DARIA:</strong> ${exchange.question}
+          </div>
+          <div class="response">
+            <strong>Participant:</strong> ${exchange.response}
+          </div>
+          <div class="timestamp">
+            ${exchange.timestamp}
+          </div>
+        </div>
+      `;
+    });
+    
+    container.innerHTML = html;
+    
+    // Scroll to the bottom
+    container.scrollTop = container.scrollHeight;
+  }
+  
+  function downloadTranscript() {
+    // Create formatted transcript
+    let content = `DARIA INTERVIEW TRANSCRIPT\n`;
+    content += `Interview ID: ${interviewId}\n`;
+    content += `Date: ${new Date().toLocaleString()}\n\n`;
+    
+    transcriptData.forEach((exchange, index) => {
+      content += `Q${index + 1}: ${exchange.question}\n`;
+      content += `A${index + 1}: ${exchange.response}\n\n`;
+    });
+    
+    // Create download link
+    const blob = new Blob([content], { type: 'text/plain' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `interview_transcript_${interviewId}.txt`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+  
+  // Request notification permission if needed
+  if ('Notification' in window && Notification.permission !== 'granted' && Notification.permission !== 'denied') {
+    document.getElementById('notify-updates')?.addEventListener('change', function() {
+      if (this.checked) {
+        Notification.requestPermission();
+      }
+    });
+  }
+</script>
+{% endblock %} 

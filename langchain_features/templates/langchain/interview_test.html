@@ -1,0 +1,320 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Interview Test - DARIA{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="header">
+        <h1>Interview Test</h1>
+        <p class="lead">Test an interview with different prompt agents</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Select Prompt</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="promptSelect" class="form-label">Prompt Agent</label>
+                        <select class="form-select" id="promptSelect">
+                            <option selected disabled>Choose a prompt...</option>
+                            <option value="interviewer">Interviewer</option>
+                            <option value="researcher">Researcher</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label for="sessionName" class="form-label">Session Name</label>
+                        <input type="text" class="form-control" id="sessionName" placeholder="Optional session name">
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-primary" id="startInterviewBtn">
+                            <i class="fas fa-play me-2"></i> Start Interview
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Prompt Details</h5>
+                </div>
+                <div class="card-body">
+                    <div id="promptDetails">
+                        <p class="text-muted text-center">Select a prompt to see details</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 id="interviewTitle">Interview Session</h5>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary me-2" id="resetBtn" disabled>
+                            <i class="fas fa-sync-alt me-1"></i> Reset
+                        </button>
+                        <button class="btn btn-sm btn-danger" id="endInterviewBtn" disabled>
+                            <i class="fas fa-stop me-1"></i> End
+                        </button>
+                    </div>
+                </div>
+                <div class="card-body" style="min-height: 400px; max-height: 60vh; overflow-y: auto;">
+                    <div id="conversationContainer">
+                        <div class="text-center py-5">
+                            <i class="fas fa-comment-dots fs-1 text-muted mb-3"></i>
+                            <p>Select a prompt and click "Start Interview" to begin a conversation.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer">
+                    <div class="input-group">
+                        <input type="text" class="form-control" id="userInput" placeholder="Type your message..." disabled>
+                        <button class="btn btn-primary" type="button" id="sendBtn" disabled>
+                            <i class="fas fa-paper-plane"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>Feedback Panel</h5>
+                </div>
+                <div class="card-body">
+                    <div class="mb-3">
+                        <label for="scoreRange" class="form-label">Overall Score (1-5)</label>
+                        <input type="range" class="form-range" min="1" max="5" step="1" id="scoreRange" value="3" disabled>
+                        <div class="d-flex justify-content-between">
+                            <span class="text-muted small">Poor</span>
+                            <span class="text-muted small">Excellent</span>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="feedbackNotes" class="form-label">Feedback Notes</label>
+                        <textarea class="form-control" id="feedbackNotes" rows="3" placeholder="Enter your feedback about this prompt's performance..." disabled></textarea>
+                    </div>
+                    <div class="d-grid">
+                        <button class="btn btn-success" id="submitFeedbackBtn" disabled>
+                            <i class="fas fa-save me-2"></i> Submit Feedback
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Global variables
+    let currentSessionId = null;
+    let selectedPrompt = null;
+    let currentPromptConfig = null;
+    
+    // DOM elements
+    const promptSelect = document.getElementById('promptSelect');
+    const sessionName = document.getElementById('sessionName');
+    const startInterviewBtn = document.getElementById('startInterviewBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const endInterviewBtn = document.getElementById('endInterviewBtn');
+    const userInput = document.getElementById('userInput');
+    const sendBtn = document.getElementById('sendBtn');
+    const promptDetails = document.getElementById('promptDetails');
+    const conversationContainer = document.getElementById('conversationContainer');
+    const interviewTitle = document.getElementById('interviewTitle');
+    const scoreRange = document.getElementById('scoreRange');
+    const feedbackNotes = document.getElementById('feedbackNotes');
+    const submitFeedbackBtn = document.getElementById('submitFeedbackBtn');
+    
+    // Event listeners
+    promptSelect.addEventListener('change', onPromptSelect);
+    startInterviewBtn.addEventListener('click', startInterview);
+    resetBtn.addEventListener('click', resetInterview);
+    endInterviewBtn.addEventListener('click', endInterview);
+    sendBtn.addEventListener('click', sendMessage);
+    userInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') sendMessage();
+    });
+    submitFeedbackBtn.addEventListener('click', submitFeedback);
+    
+    // Functions
+    function onPromptSelect() {
+        selectedPrompt = promptSelect.value;
+        fetchPromptDetails(selectedPrompt);
+    }
+    
+    function fetchPromptDetails(promptName) {
+        // In a real implementation, this would make an API call
+        // For now, we'll just show a placeholder
+        promptDetails.innerHTML = `
+            <div class="mb-2">
+                <strong>Name:</strong> ${promptName}
+            </div>
+            <div class="mb-2">
+                <strong>Role:</strong> ${promptName.charAt(0).toUpperCase() + promptName.slice(1)}
+            </div>
+            <div class="mb-2">
+                <strong>Description:</strong> A prompt for conducting interviews as a ${promptName}.
+            </div>
+        `;
+    }
+    
+    function startInterview() {
+        if (!selectedPrompt) {
+            alert('Please select a prompt first');
+            return;
+        }
+        
+        const title = sessionName.value || `${selectedPrompt} Interview`;
+        interviewTitle.textContent = title;
+        
+        // In a real implementation, this would make an API call
+        // For demonstration, we'll simulate it
+        conversationContainer.innerHTML = '<div class="text-center"><div class="spinner-border text-primary" role="status"></div><p>Starting interview...</p></div>';
+        
+        setTimeout(() => {
+            currentSessionId = Date.now().toString();
+            
+            // Enable UI elements
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            resetBtn.disabled = false;
+            endInterviewBtn.disabled = false;
+            startInterviewBtn.disabled = true;
+            promptSelect.disabled = true;
+            sessionName.disabled = true;
+            
+            // Show initial greeting
+            conversationContainer.innerHTML = '';
+            const greeting = `Hello! I'm your ${selectedPrompt} for today. How are you doing?`;
+            addMessage(greeting, 'assistant');
+        }, 1500);
+    }
+    
+    function resetInterview() {
+        if (!confirm('Are you sure you want to reset this interview? All progress will be lost.')) {
+            return;
+        }
+        
+        // Reset state
+        currentSessionId = null;
+        
+        // Reset UI
+        conversationContainer.innerHTML = `
+            <div class="text-center py-5">
+                <i class="fas fa-comment-dots fs-1 text-muted mb-3"></i>
+                <p>Select a prompt and click "Start Interview" to begin a conversation.</p>
+            </div>
+        `;
+        
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+        resetBtn.disabled = true;
+        endInterviewBtn.disabled = true;
+        startInterviewBtn.disabled = false;
+        promptSelect.disabled = false;
+        sessionName.disabled = false;
+        
+        userInput.value = '';
+        interviewTitle.textContent = 'Interview Session';
+    }
+    
+    function endInterview() {
+        if (!confirm('Are you sure you want to end this interview?')) {
+            return;
+        }
+        
+        // In a real implementation, this would make an API call
+        // For demonstration, we'll just update the UI
+        
+        // Disable input
+        userInput.disabled = true;
+        sendBtn.disabled = true;
+        
+        // Add ending message
+        addMessage('Thank you for participating in this interview. The session has now ended.', 'assistant');
+        
+        // Enable feedback controls
+        scoreRange.disabled = false;
+        feedbackNotes.disabled = false;
+        submitFeedbackBtn.disabled = false;
+    }
+    
+    function sendMessage() {
+        const message = userInput.value.trim();
+        if (!message) return;
+        
+        // Add user message to conversation
+        addMessage(message, 'user');
+        
+        // Clear input
+        userInput.value = '';
+        
+        // In a real implementation, this would make an API call
+        // For demonstration, we'll simulate a response after a delay
+        setTimeout(() => {
+            const response = "Thank you for sharing that. Could you please elaborate more on your experience?";
+            addMessage(response, 'assistant');
+        }, 1000);
+    }
+    
+    function addMessage(text, sender) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender === 'user' ? 'message-user' : 'message-assistant'} mb-3`;
+        
+        const content = document.createElement('div');
+        content.className = `p-3 rounded ${sender === 'user' ? 'bg-primary text-white' : 'bg-light'}`;
+        content.innerText = text;
+        
+        messageDiv.appendChild(content);
+        conversationContainer.appendChild(messageDiv);
+        
+        // Scroll to bottom
+        conversationContainer.scrollTop = conversationContainer.scrollHeight;
+    }
+    
+    function submitFeedback() {
+        const score = scoreRange.value;
+        const notes = feedbackNotes.value.trim();
+        
+        if (!notes) {
+            alert('Please provide some feedback notes');
+            return;
+        }
+        
+        // In a real implementation, this would make an API call
+        // For demonstration, we'll just show an alert
+        alert(`Feedback submitted with score: ${score}/5`);
+        
+        // Reset UI
+        resetInterview();
+        scoreRange.disabled = true;
+        feedbackNotes.disabled = true;
+        submitFeedbackBtn.disabled = true;
+        scoreRange.value = 3;
+        feedbackNotes.value = '';
+    }
+</script>
+
+<style>
+    .message-user {
+        display: flex;
+        justify-content: flex-end;
+    }
+    
+    .message-assistant {
+        display: flex;
+        justify-content: flex-start;
+    }
+    
+    .message-user > div,
+    .message-assistant > div {
+        max-width: 80%;
+    }
+</style>
+{% endblock %} 

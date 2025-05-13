@@ -1,0 +1,59 @@
+{
+  "id": "6c62e7cf-a722-44b4-b1e4-8093eac8a97c",
+  "guide_id": "61180742-01e7-4cc7-b4a6-39b1b8dea349",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "need someone to talk to because I'm sad",
+      "role": "user",
+      "timestamp": "2025-05-13T13:30:46.607909"
+    },
+    {
+      "content": "I'm here to listen. Would you like to share more about what's making you feel sad right now?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T13:30:47.198984"
+    },
+    {
+      "content": "I'm so close to having an interview too ready to Launch  but I don't have an interview remote page that's working I have a test page that works great with my remote interview with this link I'm going to send not working",
+      "role": "user",
+      "timestamp": "2025-05-13T13:31:09.510841"
+    },
+    {
+      "content": "It sounds like you're facing some challenges with your interview remote page. Can you tell me more about the specific issues you're encountering with the link you're trying to send for your remote interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T13:31:10.458206"
+    },
+    {
+      "content": "it's getting an uncut type error that cannot blah blah blah read properly so the properties aren't even uncaught in promise error listen listener indicates asynchronous something and it won't just it just won't work",
+      "role": "user",
+      "timestamp": "2025-05-13T13:31:41.162972"
+    },
+    {
+      "content": "It sounds like you're encountering some technical errors with your interview remote page. Can you share more about what steps you've already taken to try and resolve this issue?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T13:31:41.890305"
+    },
+    {
+      "content": "I've taken so many steps to try to resolve this issue I can't even go for but  I do know at least  this guy just working",
+      "role": "user",
+      "timestamp": "2025-05-13T13:32:09.738100"
+    },
+    {
+      "content": "It sounds like you've been putting in a lot of effort to resolve the issue with your interview remote page. I can imagine how frustrating it must be to encounter technical challenges like this. Could you tell me more about the specific steps you have taken so far to troubleshoot the problem?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T13:32:10.878630"
+    },
+    {
+      "content": "but we developed a test page and a test plan that I share with custom and if I work the test page that seems to work  and  first thing is the health check would pass that mostly every time if we don't we stop until it passed and then on this page if we can't get it this is our debug",
+      "role": "user",
+      "timestamp": "2025-05-13T13:33:13.569175"
+    }
+  ],
+  "transcript": "\n\nParticipant: need someone to talk to because I'm sad\n\nModerator: I'm here to listen. Would you like to share more about what's making you feel sad right now?\n\nParticipant: I'm so close to having an interview too ready to Launch  but I don't have an interview remote page that's working I have a test page that works great with my remote interview with this link I'm going to send not working\n\nModerator: It sounds like you're facing some challenges with your interview remote page. Can you tell me more about the specific issues you're encountering with the link you're trying to send for your remote interview?\n\nParticipant: it's getting an uncut type error that cannot blah blah blah read properly so the properties aren't even uncaught in promise error listen listener indicates asynchronous something and it won't just it just won't work\n\nModerator: It sounds like you're encountering some technical errors with your interview remote page. Can you share more about what steps you've already taken to try and resolve this issue?\n\nParticipant: I've taken so many steps to try to resolve this issue I can't even go for but  I do know at least  this guy just working\n\nModerator: It sounds like you've been putting in a lot of effort to resolve the issue with your interview remote page. I can imagine how frustrating it must be to encounter technical challenges like this. Could you tell me more about the specific steps you have taken so far to troubleshoot the problem?\n\nParticipant: but we developed a test page and a test plan that I share with custom and if I work the test page that seems to work  and  first thing is the health check would pass that mostly every time if we don't we stop until it passed and then on this page if we can't get it this is our debug",
+  "analysis": null,
+  "created_at": "2025-05-13T13:30:36.878996",
+  "updated_at": "2025-05-13T13:33:13.571125"
+}

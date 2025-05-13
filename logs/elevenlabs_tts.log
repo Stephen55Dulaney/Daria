@@ -1,0 +1,8 @@
+2025-05-07 15:50:51,854 - __main__ - INFO - ElevenLabs API key is configured
+Starting ElevenLabs TTS Service on port 5015
+Health check endpoint: http://127.0.0.1:5015/health
+API endpoint: http://127.0.0.1:5015/text_to_speech
+ * Serving Flask app 'elevenlabs_tts'
+ * Debug mode: on
+Address already in use
+Port 5015 is in use by another program. Either identify and stop that program, or start the server with a different port.

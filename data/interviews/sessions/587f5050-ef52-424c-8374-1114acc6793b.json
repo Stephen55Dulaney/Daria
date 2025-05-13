@@ -1,0 +1,44 @@
+{
+  "id": "587f5050-ef52-424c-8374-1114acc6793b",
+  "guide_id": "61180742-01e7-4cc7-b4a6-39b1b8dea349",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "doing test number five",
+      "role": "user",
+      "timestamp": "2025-05-13T12:19:06.269215"
+    },
+    {
+      "content": "That's great to hear that you're working on test number five! Can you share with me what specific aspects of the end-to-end journey map you are currently testing in this phase?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:19:07.239192"
+    },
+    {
+      "content": "I just wanted to work",
+      "role": "user",
+      "timestamp": "2025-05-13T12:22:00.278498"
+    },
+    {
+      "content": "It sounds like you're focused on getting things done. In your experience, what are some common challenges or roadblocks that you typically encounter when working on end-to-end journey map testing?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:22:01.117498"
+    },
+    {
+      "content": "well I'm actually testing an interview till it would be used to make Journey Maps but because it's an interview tool it needs to have a remote interview  feature that's not working",
+      "role": "user",
+      "timestamp": "2025-05-13T12:22:28.879304"
+    },
+    {
+      "content": "That's interesting that you're testing an interview tool for creating Journey Maps. The remote interview feature not working must be quite a challenge. Could you tell me more about how the absence of this feature is impacting your testing process and the overall quality of the end-to-end journey maps you're working on?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:22:30.188343"
+    }
+  ],
+  "transcript": "\n\nParticipant: doing test number five\n\nModerator: That's great to hear that you're working on test number five! Can you share with me what specific aspects of the end-to-end journey map you are currently testing in this phase?\n\nParticipant: I just wanted to work\n\nModerator: It sounds like you're focused on getting things done. In your experience, what are some common challenges or roadblocks that you typically encounter when working on end-to-end journey map testing?\n\nParticipant: well I'm actually testing an interview till it would be used to make Journey Maps but because it's an interview tool it needs to have a remote interview  feature that's not working\n\nModerator: That's interesting that you're testing an interview tool for creating Journey Maps. The remote interview feature not working must be quite a challenge. Could you tell me more about how the absence of this feature is impacting your testing process and the overall quality of the end-to-end journey maps you're working on?",
+  "analysis": null,
+  "created_at": "2025-05-13T12:18:55.469507",
+  "updated_at": "2025-05-13T12:22:30.188920"
+}

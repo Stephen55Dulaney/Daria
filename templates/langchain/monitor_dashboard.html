@@ -1,0 +1,100 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Research Session Monitor{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Active Research Sessions</h1>
+        <a href="/dashboard" class="btn btn-outline-secondary">
+            <i class="bi bi-house"></i> Dashboard
+        </a>
+    </div>
+
+    <div class="row">
+        <div class="col-md-12">
+            <div class="card">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5 class="mb-0">Sessions Available for Monitoring</h5>
+                    <button class="btn btn-sm btn-outline-primary" onclick="location.reload()">
+                        <i class="bi bi-arrow-clockwise"></i> Refresh
+                    </button>
+                </div>
+                <div class="card-body">
+                    {% if sessions and sessions|length > 0 %}
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Participant</th>
+                                        <th>Guide</th>
+                                        <th>Started</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for session in sessions %}
+                                        {% set session_id = session.session_id or session.id or loop.index %}
+                                        <tr>
+                                            <td>{{ session.title }}</td>
+                                            <td>
+                                                {% if session.interviewee %}
+                                                    {{ session.interviewee.name }}
+                                                    {% if session.interviewee.email %}
+                                                        <span class="text-muted small d-block">{{ session.interviewee.email }}</span>
+                                                    {% endif %}
+                                                {% else %}
+                                                    <span class="text-muted">Unknown</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if session.guide_id %}
+                                                    <a href="/discussion_guide/{{ session.guide_id }}">View Guide</a>
+                                                {% else %}
+                                                    <span class="text-muted">No guide</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if session.created_at %}
+                                                    {{ session.created_at|replace("T", " ")|truncate(16, True, "") }}
+                                                {% else %}
+                                                    <span class="text-muted">Unknown</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if session.status == 'active' %}
+                                                    <span class="badge bg-success">Active</span>
+                                                {% elif session.status == 'completed' %}
+                                                    <span class="badge bg-secondary">Completed</span>
+                                                {% else %}
+                                                    <span class="badge bg-info">{{ session.status|title }}</span>
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                <div class="btn-group">
+                                                    <a href="/monitor_interview/{{ session_id }}" class="btn btn-sm btn-primary">
+                                                        <i class="bi bi-display"></i> Monitor
+                                                    </a>
+                                                    <a href="/interview_details/{{ session_id }}" class="btn btn-sm btn-outline-secondary">
+                                                        <i class="bi bi-info-circle"></i> Details
+                                                    </a>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    {% else %}
+                        <div class="alert alert-info">
+                            <i class="bi bi-info-circle me-2"></i> No active sessions found.
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

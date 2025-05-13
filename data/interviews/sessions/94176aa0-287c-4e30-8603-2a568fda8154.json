@@ -1,0 +1,54 @@
+{
+  "id": "94176aa0-287c-4e30-8603-2a568fda8154",
+  "guide_id": "61180742-01e7-4cc7-b4a6-39b1b8dea349",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "again to make sure you're working",
+      "role": "user",
+      "timestamp": "2025-05-13T13:02:33.804841"
+    },
+    {
+      "content": "It sounds like you mentioned \"again to make sure you're working\" in the context of End to End Journey Map Testing. Can you elaborate on why this aspect is important in the testing process? How does ensuring that every step is working contribute to the overall quality of the journey map?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T13:02:34.973890"
+    },
+    {
+      "content": "I think it's done pretty good we just get one time when we make a call we get  that one air that's persistent but then it goes away",
+      "role": "user",
+      "timestamp": "2025-05-13T13:03:07.182845"
+    },
+    {
+      "content": "Can you tell me more about how you and your team typically address that one error that occurs when making a call during the End to End Journey Map Testing process? How do you troubleshoot and resolve it to ensure a smooth journey mapping experience for users?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T13:03:08.301200"
+    },
+    {
+      "content": "well I'm trying to understand how it goes and when this air comes back but I'm saying stuff it's working now and then I'm watching the debug logs for this error to come back",
+      "role": "user",
+      "timestamp": "2025-05-13T13:03:39.386938"
+    },
+    {
+      "content": "It sounds like monitoring the debug logs is a crucial part of your process in addressing errors during End to End Journey Map Testing. Can you share more about how you analyze the debug logs when the error reoccurs? How do you use that information to troubleshoot and improve the overall journey mapping experience?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T13:03:40.786783"
+    },
+    {
+      "content": "hello",
+      "role": "user",
+      "timestamp": "2025-05-13T13:08:03.868406"
+    },
+    {
+      "content": "It seems like monitoring the debug logs plays a significant role in your process. Could you walk me through a specific instance where you identified and resolved an error in the journey mapping process by analyzing the debug logs? How did that experience shape your approach to future testing scenarios?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T13:08:04.876409"
+    }
+  ],
+  "transcript": "\n\nParticipant: again to make sure you're working\n\nModerator: It sounds like you mentioned \"again to make sure you're working\" in the context of End to End Journey Map Testing. Can you elaborate on why this aspect is important in the testing process? How does ensuring that every step is working contribute to the overall quality of the journey map?\n\nParticipant: I think it's done pretty good we just get one time when we make a call we get  that one air that's persistent but then it goes away\n\nModerator: Can you tell me more about how you and your team typically address that one error that occurs when making a call during the End to End Journey Map Testing process? How do you troubleshoot and resolve it to ensure a smooth journey mapping experience for users?\n\nParticipant: well I'm trying to understand how it goes and when this air comes back but I'm saying stuff it's working now and then I'm watching the debug logs for this error to come back\n\nModerator: It sounds like monitoring the debug logs is a crucial part of your process in addressing errors during End to End Journey Map Testing. Can you share more about how you analyze the debug logs when the error reoccurs? How do you use that information to troubleshoot and improve the overall journey mapping experience?\n\nParticipant: hello\n\nModerator: It seems like monitoring the debug logs plays a significant role in your process. Could you walk me through a specific instance where you identified and resolved an error in the journey mapping process by analyzing the debug logs? How did that experience shape your approach to future testing scenarios?",
+  "analysis": null,
+  "created_at": "2025-05-13T13:02:24.104386",
+  "updated_at": "2025-05-13T13:08:04.877014"
+}

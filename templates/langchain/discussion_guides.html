@@ -1,0 +1,346 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Discussion Guides{% endblock %}
+
+{% block extra_css %}
+<style>
+    .archive-container {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .guide-list {
+        margin-bottom: 2rem;
+    }
+    
+    .archive-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .search-container {
+        max-width: 400px;
+    }
+    
+    .guide-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .guide-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+    }
+    
+    .status-active {
+        background-color: #198754;
+        color: white;
+    }
+    
+    .status-archived {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .sessions-badge {
+        background-color: #4f46e5;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .right-sidebar {
+        background-color: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="archive-header">
+        <div>
+            <h1 class="h3">Discussion Guides</h1>
+            <p class="text-muted">Create and manage your research discussion guides</p>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-funnel me-1"></i> <span id="currentFilter">All Guides</span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="all">All Guides</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="active">Active Guides</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="archived">Archived Guides</a></li>
+                </ul>
+            </div>
+            <div class="search-container">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search guides...">
+                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if guides %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="guide-list">
+                {% for guide in guides %}
+                <div class="guide-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ guide.title if guide.title else "Untitled Guide" }}</h5>
+                        <div>
+                            <span class="status-badge status-{{ guide.status }}">{{ guide.status|capitalize }}</span>
+                            {% if guide.sessions %}
+                            <span class="status-badge sessions-badge ms-2">{{ guide.sessions|length }} Session{% if guide.sessions|length != 1 %}s{% endif %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Project:</strong> {{ guide.project if guide.project else "Not specified" }}</p>
+                                <p class="mb-1"><strong>Created:</strong> {% if guide.created_at %}{{ guide.created_at.split('T')[0] if guide.created_at is string else guide.created_at.strftime('%b %d, %Y') }}{% else %}Unknown{% endif %}</p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Type:</strong> {{ guide.interview_type|replace('_', ' ')|capitalize if guide.interview_type else "Not specified" }}</p>
+                                <p class="mb-1"><strong>Last Updated:</strong> {% if guide.updated_at %}{{ guide.updated_at.split('T')[0] if guide.updated_at is string else guide.updated_at.strftime('%b %d, %Y') }}{% else %}Unknown{% endif %}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-end">
+                            <div class="btn-group">
+                                <a href="/discussion_guide/{{ guide.id }}" class="btn btn-primary">View Guide</a>
+                                <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteGuideModal" data-guide-id="{{ guide.id }}" data-guide-title="{{ guide.title }}">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="right-sidebar">
+                <h4>Quick Stats</h4>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Guides</span>
+                        <span class="badge bg-primary">{{ guides|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Active Guides</span>
+                        <span class="badge bg-success">{{ guides|selectattr('status', 'equalto', 'active')|list|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Archived Guides</span>
+                        <span class="badge bg-secondary">{{ guides|selectattr('status', 'equalto', 'archived')|list|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Sessions</span>
+                        <span class="badge bg-info">{{ guides|map(attribute='sessions')|map('length')|sum }}</span>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Actions</h4>
+                <div class="d-grid gap-2">
+                    <a href="/interview_setup" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle me-2"></i>New Discussion Guide
+                    </a>
+                    <button class="btn btn-outline-secondary" id="exportDataBtn">
+                        <i class="bi bi-download me-2"></i>Export Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-archive fs-1 text-muted mb-3"></i>
+        <h4>No Discussion Guides Yet</h4>
+        <p class="text-muted">Create your first discussion guide to get started</p>
+        <a href="/interview_setup" class="btn btn-primary mt-2">Create Discussion Guide</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Guide Modal -->
+<div class="modal fade" id="deleteGuideModal" tabindex="-1" aria-labelledby="deleteGuideModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteGuideModalLabel">Delete Discussion Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="guideTitle"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. Sessions associated with this guide will be marked as orphaned but will remain accessible.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const guideCards = document.querySelectorAll('.guide-card');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const filterOptions = document.querySelectorAll('.filter-option');
+        const currentFilterText = document.getElementById('currentFilter');
+        
+        // Delete guide functionality
+        const deleteModal = document.getElementById('deleteGuideModal');
+        const guideTitleElement = document.getElementById('guideTitle');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        let guideIdToDelete = null;
+        
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                guideIdToDelete = button.getAttribute('data-guide-id');
+                const guideTitle = button.getAttribute('data-guide-title') || 'this guide';
+                guideTitleElement.textContent = guideTitle;
+            });
+            
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (guideIdToDelete) {
+                    deleteGuide(guideIdToDelete);
+                }
+            });
+        }
+        
+        function deleteGuide(guideId) {
+            fetch(`/api/discussion_guide/${guideId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close the modal
+                    const bsModal = bootstrap.Modal.getInstance(deleteModal);
+                    bsModal.hide();
+                    
+                    // Show success message and refresh the page
+                    alert('Discussion guide successfully deleted.');
+                    window.location.reload();
+                } else {
+                    alert(`Error: ${data.error || 'Failed to delete guide'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting guide:', error);
+                alert('An error occurred while deleting the guide. Please try again.');
+            });
+        }
+        
+        let currentFilter = 'all';
+        
+        // Filter functionality
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            guideCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                const statusElement = card.querySelector('.status-badge');
+                const status = statusElement ? statusElement.textContent.toLowerCase() : '';
+                
+                // Check search term
+                const matchesSearch = cardText.includes(searchTerm);
+                
+                // Check status filter
+                let matchesFilter = true;
+                if (currentFilter === 'active') {
+                    matchesFilter = status.includes('active');
+                } else if (currentFilter === 'archived') {
+                    matchesFilter = status.includes('archived');
+                }
+                
+                // Show/hide card based on combined filters
+                if (matchesSearch && matchesFilter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Filter dropdown
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                currentFilter = this.dataset.filter;
+                currentFilterText.textContent = this.textContent;
+                applyFilters();
+            });
+        });
+        
+        // Search functionality
+        function performSearch() {
+            applyFilters();
+        }
+        
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Export data functionality (placeholder)
+        if (exportDataBtn) {
+            exportDataBtn.addEventListener('click', function() {
+                alert('Export functionality would go here');
+            });
+        }
+    });
+</script>
+{% endblock %} 

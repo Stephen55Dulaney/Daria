@@ -1,0 +1,53 @@
+{
+  "id": "e6e3cce6-6f6a-4e00-9f5d-f50832e0a93c",
+  "guide_id": "41a89e2d-c3ce-49b0-a406-2f3c47675d21",
+  "interviewee": {
+    "name": "Test User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "f5d35cc0-e0a8-4a8e-8af3-358149696896",
+      "content": "Hello, this is a test participant message",
+      "role": "user",
+      "timestamp": "2025-05-08T14:23:01.048998"
+    },
+    {
+      "id": "7cec0097-d94a-4757-8da3-63266927fbfb",
+      "content": "Can you tell me more about a specific time when you felt particularly frustrated or overwhelmed by the amount of information you had to manage in your role? How did you handle that situation?",
+      "role": "assistant",
+      "timestamp": "2025-05-08T14:23:01.889975"
+    },
+    {
+      "id": "0f9de26a-8a39-4a0d-8d26-68f3245ec020",
+      "content": "This is a follow-up response from the participant",
+      "role": "user",
+      "timestamp": "2025-05-08T14:26:16.476941"
+    },
+    {
+      "id": "68f18ef1-c96f-42d2-abe5-3004bd0c64b6",
+      "content": "It seems like you may not have encountered a specific situation where you felt overwhelmed by managing information in your role. That's completely okay! Can you share with me then, on a typical day, how do you usually organize or prioritize the information you need to work with?",
+      "role": "assistant",
+      "timestamp": "2025-05-08T14:26:17.810713"
+    },
+    {
+      "role": "system",
+      "content": "What is the name of your cat",
+      "type": "suggestion",
+      "id": "f3a445ce-8435-407a-8b8c-83ed84d96200",
+      "timestamp": "2025-05-08T14:27:24.719122"
+    },
+    {
+      "role": "system",
+      "content": "This is great. super duper job.",
+      "type": "researcher_note",
+      "note_type": "observation",
+      "id": "5464fb93-6d64-400f-be7a-f8734cb031b1",
+      "timestamp": "2025-05-08T14:31:39.139133"
+    }
+  ],
+  "transcript": "\n\nParticipant: Hello, this is a test participant message\n\nModerator: Can you tell me more about a specific time when you felt particularly frustrated or overwhelmed by the amount of information you had to manage in your role? How did you handle that situation?\n\nParticipant: This is a follow-up response from the participant\n\nModerator: It seems like you may not have encountered a specific situation where you felt overwhelmed by managing information in your role. That's completely okay! Can you share with me then, on a typical day, how do you usually organize or prioritize the information you need to work with?\n\nParticipant: What is the name of your cat\n\nParticipant: This is great. super duper job.",
+  "analysis": null,
+  "created_at": "2025-05-08T14:20:44.448887",
+  "updated_at": "2025-05-08T14:31:39.140318"
+}

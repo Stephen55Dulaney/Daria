@@ -1,0 +1,76 @@
+{
+  "session_id": "543c8fad-bbf8-48c3-ba46-f09c8817e750",
+  "character": "interviewer",
+  "voice_id": "",
+  "title": "Untitled Interview",
+  "description": "",
+  "status": "completed",
+  "created_at": "2025-05-02T23:39:09.697970",
+  "last_updated": "2025-05-02T23:39:31.532682",
+  "expiration_date": "2025-05-09T23:39:09.697970",
+  "conversation_history": [
+    {
+      "role": "system",
+      "content": "You are a helpful interview assistant."
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I'm interviewer. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?"
+    },
+    {
+      "role": "user",
+      "content": "Yes, I'm Stephen. How come you have the same prompt every time?"
+    },
+    {
+      "role": "assistant",
+      "content": "What alternatives have you considered?"
+    },
+    {
+      "role": "user",
+      "content": "I want to end the interview."
+    },
+    {
+      "role": "assistant",
+      "content": "I'll end the interview now. Thank you for your time and valuable insights!"
+    }
+  ],
+  "analysis": null,
+  "transcript": [
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "You are a helpful interview assistant.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Hello! I'm interviewer. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "Yes, I'm Stephen. How come you have the same prompt every time?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "What alternatives have you considered?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "I want to end the interview.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "I'll end the interview now. Thank you for your time and valuable insights!",
+      "timestamp": ""
+    }
+  ]
+}

@@ -1,0 +1,333 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Dashboard - Remote Interview System{% endblock %}
+
+{% block extra_css %}
+<style>
+    .interview-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .interview-card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .card-hover {
+        cursor: pointer;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Dashboard</h1>
+        <a href="/interview_setup" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>
+            New Interview
+        </a>
+    </div>
+    
+    <!-- Status Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                        <i class="bi bi-mic fs-4 text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Active Interviews</h6>
+                        <h2 class="mb-0" id="active-count">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                        <i class="bi bi-check-circle fs-4 text-success"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Completed Interviews</h6>
+                        <h2 class="mb-0" id="completed-count">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                        <i class="bi bi-chat-text fs-4 text-info"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Total Interviews</h6>
+                        <h2 class="mb-0" id="total-count">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Interviews -->
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5 class="mb-0">Recent Interviews</h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Character</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-interviews">
+                        <!-- Interview rows will be added here -->
+                        <tr id="no-interviews" class="text-center">
+                            <td colspan="6">No interviews found. Click "New Interview" to get started.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access Cards -->
+    <h5 class="mb-3">Quick Access</h5>
+    <div class="row" id="quick-access">
+        <!-- Cards will be added here -->
+        <div class="col-md-3">
+            <div class="card interview-card card-hover mb-3" onclick="window.location.href='/interview_setup'">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="bi bi-plus-circle fs-1 text-primary"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Create New Interview</h5>
+                    <p class="card-text text-muted mb-0">Start a new interview session</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card interview-card card-hover mb-3" onclick="window.location.href='/upload_transcript'">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-warning bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="bi bi-cloud-upload fs-1 text-warning"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Upload Transcript</h5>
+                    <p class="card-text text-muted mb-0">Import existing transcripts</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card interview-card card-hover mb-3" onclick="window.location.href='/interview_archive'">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="bi bi-archive fs-1 text-info"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Interview Archive</h5>
+                    <p class="card-text text-muted mb-0">View all past interviews</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card interview-card card-hover mb-3" onclick="window.location.href='/prompts/'">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="bi bi-chat-quote fs-1 text-success"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Prompt Manager</h5>
+                    <p class="card-text text-muted mb-0">Manage interview characters</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Fetch interviews when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchInterviews();
+        checkServices();
+    });
+    
+    // Function to ensure session ID is valid before navigating to monitor page
+    function ensureSessionId(event, sessionId) {
+        if (!sessionId || sessionId === 'undefined' || sessionId === 'null') {
+            event.preventDefault();
+            alert('Cannot monitor this interview: Invalid session ID');
+            return false;
+        }
+        return true;
+    }
+    
+    // Function to fetch interviews from the API
+    function fetchInterviews() {
+        fetch('/api/interviews')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error fetching interviews');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    updateDashboard(data.interviews);
+                } else {
+                    console.error('Error:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    
+    // Function to check if all services are running
+    function checkServices() {
+        fetch('/api/check_services')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const services = data.services;
+                    
+                    // Check audio service status
+                    const audioStatus = services.audio_service.status;
+                    if (audioStatus !== 'running') {
+                        showServiceAlert(audioStatus);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error checking services:', error);
+            });
+    }
+    
+    // Function to show service alert
+    function showServiceAlert(status) {
+        const alertHtml = `
+            <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+                <strong>Service Issue:</strong> The ElevenLabs audio service is ${status === 'not_running' ? 'not running' : 'having issues'}.
+                Voice features may not work correctly until this is resolved.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        document.querySelector('.container-fluid').insertAdjacentHTML('afterbegin', alertHtml);
+    }
+    
+    // Function to update the dashboard with interview data
+    function updateDashboard(interviews) {
+        // Sort interviews by last_updated, newest first
+        interviews.sort((a, b) => new Date(b.last_updated) - new Date(a.last_updated));
+        
+        const activeInterviews = interviews.filter(interview => interview.status === 'active');
+        const completedInterviews = interviews.filter(interview => interview.status === 'completed');
+        
+        // Update counts
+        document.getElementById('active-count').textContent = activeInterviews.length;
+        document.getElementById('completed-count').textContent = completedInterviews.length;
+        document.getElementById('total-count').textContent = interviews.length;
+        
+        // Update recent interviews table
+        const recentInterviewsTable = document.getElementById('recent-interviews');
+        const noInterviewsRow = document.getElementById('no-interviews');
+        
+        if (interviews.length > 0) {
+            // Hide the "No interviews" message
+            noInterviewsRow.style.display = 'none';
+            
+            // Clear existing rows
+            recentInterviewsTable.innerHTML = '';
+            
+            // Add interview rows (show up to 5 most recent)
+            const recentInterviews = interviews.slice(0, 5);
+            
+            recentInterviews.forEach(interview => {
+                const createdDate = new Date(interview.created_at).toLocaleDateString();
+                const updatedDate = new Date(interview.last_updated).toLocaleDateString();
+                
+                const statusBadge = interview.status === 'active' 
+                    ? '<span class="badge bg-success">Active</span>' 
+                    : '<span class="badge bg-secondary">Completed</span>';
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="/interview_details/${interview.session_id}" class="text-decoration-none">${interview.title}</a></td>
+                    <td>${interview.character || 'Interviewer'}</td>
+                    <td>${statusBadge}</td>
+                    <td>${createdDate}</td>
+                    <td>${updatedDate}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            ${interview.status === 'active' ? 
+                                `<a href="/interview_session/${interview.session_id}" class="btn btn-outline-primary" title="Continue Interview">
+                                    <i class="bi bi-mic"></i>
+                                </a>
+                                <a href="/monitor_interview/${interview.session_id || interview.id}" class="btn btn-outline-info" title="Monitor Interview" onclick="return ensureSessionId(event, '${interview.session_id || interview.id}')">
+                                    <i class="bi bi-display"></i>
+                                </a>` : 
+                                `<a href="/view_completed_interview/${interview.session_id}" class="btn btn-outline-success" title="View Transcript">
+                                    <i class="bi bi-file-text"></i>
+                                </a>`
+                            }
+                            <a href="/interview_details/${interview.session_id}" class="btn btn-outline-secondary" title="View Details">
+                                <i class="bi bi-info-circle"></i>
+                            </a>
+                        </div>
+                    </td>
+                `;
+                recentInterviewsTable.appendChild(row);
+            });
+            
+            // Add quick access cards for active interviews
+            const quickAccessContainer = document.getElementById('quick-access');
+            
+            // Show up to 3 active interviews in the quick access area
+            activeInterviews.slice(0, 3).forEach(interview => {
+                const card = document.createElement('div');
+                card.className = 'col-md-4';
+                card.innerHTML = `
+                    <div class="card interview-card card-hover mb-3" onclick="window.location.href='/interview_session/${interview.session_id}'">
+                        <div class="card-body p-4">
+                            <span class="status-badge badge bg-success">Active</span>
+                            <h5 class="card-title mb-2">${interview.title}</h5>
+                            <p class="card-text text-muted mb-3">Character: ${interview.character || 'Interviewer'}</p>
+                            <div class="d-flex align-items-center">
+                                <div class="me-2">
+                                    <i class="bi bi-chat-text text-primary"></i>
+                                </div>
+                                <div>
+                                    <small class="text-muted">${interview.message_count || 0} messages</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                
+                // Insert the active interview cards at the beginning of the quick access section
+                if (quickAccessContainer.children.length > 0) {
+                    quickAccessContainer.insertBefore(card, quickAccessContainer.firstChild);
+                } else {
+                    quickAccessContainer.appendChild(card);
+                }
+            });
+        }
+    }
+</script>
+{% endblock %} 
