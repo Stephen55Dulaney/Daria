@@ -1064,65 +1064,93 @@
             }
         });
         
-        // Listen for session completed event
+        // Session completion handler
+        function handleInterviewEnded() {
+            console.log('Interview has ended');
+            
+            // Clear intervals
+            if (checkStatusInterval) {
+                clearInterval(checkStatusInterval);
+            }
+            if (pollInterval) {
+                clearInterval(pollInterval);
+            }
+            
+            // Show notification to researcher
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-info alert-dismissible fade show';
+            notification.innerHTML = `
+                <strong>Interview Completed!</strong> The interview has been ended and the interviewee has been thanked.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            `;
+            document.querySelector('.container-fluid').prepend(notification);
+            
+            // Disable controls
+            if (document.getElementById('endSessionBtn')) {
+                document.getElementById('endSessionBtn').disabled = true;
+            }
+            if (document.getElementById('suggestQuestionBtn')) {
+                document.getElementById('suggestQuestionBtn').disabled = true;
+            }
+            document.querySelectorAll('.direct-intervention').forEach(btn => {
+                btn.disabled = true;
+            });
+            
+            // Add completed label to the title
+            const pageTitle = document.querySelector('h1');
+            if (pageTitle) {
+                // Check if the badge already exists
+                if (!pageTitle.querySelector('.badge.bg-success')) {
+                    const statusBadge = document.createElement('span');
+                    statusBadge.className = 'badge bg-success ms-2';
+                    statusBadge.textContent = 'COMPLETED';
+                    pageTitle.appendChild(statusBadge);
+                }
+            }
+            
+            // Change live indicator
+            const liveIndicator = document.querySelector('.live-indicator');
+            if (liveIndicator) {
+                liveIndicator.innerHTML = '<span class="text-success"><i class="bi bi-check-circle"></i> COMPLETED</span>';
+            }
+            
+            // Add view analysis button if it doesn't exist
+            const actionButtonsContainer = document.querySelector('.d-flex.align-items-center');
+            if (actionButtonsContainer && !document.getElementById('view-analysis-btn')) {
+                const viewAnalysisBtn = document.createElement('a');
+                viewAnalysisBtn.id = 'view-analysis-btn';
+                viewAnalysisBtn.href = `/interview_details/${sessionId}`;
+                viewAnalysisBtn.className = 'btn btn-sm btn-success me-2';
+                viewAnalysisBtn.innerHTML = '<i class="bi bi-file-text me-1"></i> View Analysis';
+                actionButtonsContainer.appendChild(viewAnalysisBtn);
+            }
+            
+            // Update connection status
+            updateSocketStatus('completed');
+        }
+        
+        // Listen for session completion events
         socket.on('session_completed', function(data) {
             if (data.session_id === sessionId) {
                 console.log('Session completed:', data);
-                // Show notification
-                showNotification('Interview Completed', 'The interview has ended. Analysis is being generated.', 'info');
-                
-                // Disable controls
-                messageInput.disabled = true;
-                sendBtn.disabled = true;
-                endInterviewBtn.disabled = true;
-                
-                // Add completion indicator to transcript
-                const completionDiv = document.createElement('div');
-                completionDiv.className = 'alert alert-info my-3 text-center';
-                completionDiv.innerHTML = `
-                    <i class="bi bi-check-circle-fill me-2"></i>
-                    <strong>Interview Completed</strong>
-                    <p class="mb-0 mt-2">The interview has ended and analysis is being generated.</p>
-                    <div class="mt-2">
-                        <div class="spinner-border spinner-border-sm text-primary" role="status">
-                            <span class="visually-hidden">Loading...</span>
-                        </div>
-                        <span class="ms-2">Generating analysis...</span>
-                    </div>
-                `;
-                transcriptContainer.appendChild(completionDiv);
-                transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+                handleInterviewEnded();
             }
         });
         
-        // Listen for analysis complete event
+        // Also listen for analysis completion
         socket.on('analysis_complete', function(data) {
             if (data.session_id === sessionId) {
                 console.log('Analysis completed:', data);
-                // Show notification
-                showNotification('Analysis Ready', 'The interview analysis is now available.', 'success');
                 
-                // Update UI to show analysis is ready
-                const completionDivs = transcriptContainer.querySelectorAll('.alert.alert-info');
-                if (completionDivs.length > 0) {
-                    const lastCompletionDiv = completionDivs[completionDivs.length - 1];
-                    lastCompletionDiv.className = 'alert alert-success my-3 text-center';
-                    lastCompletionDiv.innerHTML = `
-                        <i class="bi bi-check-circle-fill me-2"></i>
-                        <strong>Analysis Complete</strong>
-                        <p class="mb-0 mt-2">The interview analysis is now ready.</p>
-                        <a href="/interview_details/${sessionId}" class="btn btn-primary mt-2">
-                            <i class="bi bi-file-text me-1"></i> View Analysis
-                        </a>
-                    `;
-                }
-            }
-        });
-        
-        // Listen for suggested questions from AI
-        socket.on('suggested_questions', function(data) {
-            if (data.session_id === sessionId && data.questions) {
-                updateSuggestedQuestions(data.questions);
+                // Show notification
+                const notification = document.createElement('div');
+                notification.className = 'alert alert-success alert-dismissible fade show';
+                notification.innerHTML = `
+                    <strong>Analysis Complete!</strong> The interview analysis is now ready to view.
+                    <a href="/interview_details/${sessionId}" class="btn btn-sm btn-outline-success ms-3">View Analysis</a>
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                `;
+                document.querySelector('.container-fluid').prepend(notification);
             }
         });
         
@@ -1349,6 +1377,16 @@
         // Direct intervention buttons
         document.querySelectorAll('.direct-intervention').forEach(button => {
             button.addEventListener('click', function() {
+                // Prevent multiple rapid clicks
+                if (this.getAttribute('data-processing') === 'true') {
+                    return;
+                }
+                
+                // Disable the button temporarily
+                this.setAttribute('data-processing', 'true');
+                const originalText = this.innerHTML;
+                this.innerHTML = `<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Sending...`;
+                
                 const intervention = this.getAttribute('data-intervention');
                 let message = '';
                 
@@ -1379,6 +1417,13 @@
                 
                 // Show confirmation
                 showNotification('Intervention Sent', 'Your direction has been sent to the AI interviewer.', 'warning');
+                
+                // Re-enable the button after a delay
+                const button = this;
+                setTimeout(function() {
+                    button.removeAttribute('data-processing');
+                    button.innerHTML = originalText;
+                }, 3000);
             });
         });
         
