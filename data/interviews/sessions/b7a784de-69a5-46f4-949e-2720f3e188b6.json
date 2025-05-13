@@ -1,0 +1,44 @@
+{
+  "id": "b7a784de-69a5-46f4-949e-2720f3e188b6",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "three questions please",
+      "role": "user",
+      "timestamp": "2025-05-12T17:35:32.694231"
+    },
+    {
+      "content": "It seems like you are interested in discussing three specific questions. Could you please share more details about these questions? I'd love to understand what topics or areas you are focusing on.",
+      "role": "assistant",
+      "timestamp": "2025-05-12T17:35:33.723112"
+    },
+    {
+      "content": "we are debugging the interview tool and I've been having trouble with it working perfect so I need to have  two more questions and I'll feel like we got a good interview",
+      "role": "user",
+      "timestamp": "2025-05-12T17:36:02.120285"
+    },
+    {
+      "content": "It sounds like you're currently facing challenges with the interview tool during the debugging process. Could you share more about the specific issues you've been encountering while trying to make it work perfectly? Understanding the difficulties you're facing could help us explore potential solutions or improvements together.",
+      "role": "assistant",
+      "timestamp": "2025-05-12T17:36:03.150522"
+    },
+    {
+      "content": "I am trying to get a decent interview to take place and so we got to test it then this one is the test interview it's working great now we got to get the real interview",
+      "role": "user",
+      "timestamp": "2025-05-12T17:36:38.366587"
+    },
+    {
+      "content": "It's great to hear that the test interview is working well for you now. As you prepare for the real interview, what specific aspects or features are you hoping to test or validate to ensure that it meets your standards for a successful interview experience?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T17:36:39.369799"
+    }
+  ],
+  "transcript": "\n\nParticipant: three questions please\n\nModerator: It seems like you are interested in discussing three specific questions. Could you please share more details about these questions? I'd love to understand what topics or areas you are focusing on.\n\nParticipant: we are debugging the interview tool and I've been having trouble with it working perfect so I need to have  two more questions and I'll feel like we got a good interview\n\nModerator: It sounds like you're currently facing challenges with the interview tool during the debugging process. Could you share more about the specific issues you've been encountering while trying to make it work perfectly? Understanding the difficulties you're facing could help us explore potential solutions or improvements together.\n\nParticipant: I am trying to get a decent interview to take place and so we got to test it then this one is the test interview it's working great now we got to get the real interview\n\nModerator: It's great to hear that the test interview is working well for you now. As you prepare for the real interview, what specific aspects or features are you hoping to test or validate to ensure that it meets your standards for a successful interview experience?",
+  "analysis": null,
+  "created_at": "2025-05-12T17:35:23.739692",
+  "updated_at": "2025-05-12T17:36:39.370416"
+}

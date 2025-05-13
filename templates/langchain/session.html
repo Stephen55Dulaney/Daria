@@ -192,9 +192,9 @@
                             </div>
                             
                             <div class="d-grid gap-2">
-                                <a href="mailto:?subject=Invitation to Research Session&body=Hello,%0D%0A%0D%0AYou're invited to participate in our research session. Please join using this link:%0D%0A%0D%0A{{ request.url_root }}interview/{{ session_id }}?remote=true%0D%0A%0D%0AThank you!" class="btn btn-outline-primary btn-sm">
+                                <button id="emailLinkBtn" class="btn btn-outline-primary btn-sm">
                                     <i class="bi bi-envelope me-1"></i> Email Participation Link
-                                </a>
+                                </button>
                                 
                                 <button class="btn btn-outline-secondary btn-sm" id="advancedLinkOptionsBtn" data-bs-toggle="collapse" data-bs-target="#advancedLinkOptions">
                                     <i class="bi bi-gear me-1"></i> Advanced Link Options
@@ -642,6 +642,13 @@ document.addEventListener('DOMContentLoaded', function() {
             URL.revokeObjectURL(url);
         });
     }
+
+    // Email link functionality
+    document.getElementById('emailLinkBtn').addEventListener('click', function() {
+        const subject = encodeURIComponent("Invitation to Research Session");
+        const body = encodeURIComponent(`Hello,\n\nYou're invited to participate in our research session. Please join using this link:\n\n${document.getElementById('remoteLink').value}\n\nThank you!`);
+        window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
+    });
 });
 </script>
 {% endblock %} 

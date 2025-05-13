@@ -1,0 +1,44 @@
+/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/langchain/chat_models/__init__.py:31: LangChainDeprecationWarning: Importing chat models from langchain is deprecated. Importing from langchain will no longer be supported as of langchain==0.2.0. Please import from langchain-community instead:
+
+`from langchain_community.chat_models import ChatOpenAI`.
+
+To install langchain-community run `pip install -U langchain-community`.
+  warnings.warn(
+INFO:__main__:CORS enabled for all origins with extended header support
+INFO:__main__:SocketIO initialized for real-time communication
+INFO:__main__:Initialized PromptManager with prompt_dir=/Users/sdulaney/DariaInterviewTool/tools/prompt_manager/prompts
+INFO:langchain_features.services.discussion_service:Initialized DiscussionService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:Discussion service initialized successfully
+INFO:__main__:Observer service initialized successfully
+INFO:__main__:Using simple response generation (LangChain disabled)
+Starting DARIA Interview API on port 5025
+Health check endpoint: http://127.0.0.1:5025/api/health
+Interview start endpoint: http://127.0.0.1:5025/api/interview/start
+Monitor interviews: http://127.0.0.1:5025/monitor_interview
+ * Serving Flask app 'run_interview_api'
+ * Debug mode: on
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5025
+ * Running on http://192.168.86.42:5025
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug: * Restarting with stat
+/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/langchain/chat_models/__init__.py:31: LangChainDeprecationWarning: Importing chat models from langchain is deprecated. Importing from langchain will no longer be supported as of langchain==0.2.0. Please import from langchain-community instead:
+
+`from langchain_community.chat_models import ChatOpenAI`.
+
+To install langchain-community run `pip install -U langchain-community`.
+  warnings.warn(
+INFO:__main__:CORS enabled for all origins with extended header support
+INFO:__main__:SocketIO initialized for real-time communication
+INFO:__main__:Initialized PromptManager with prompt_dir=/Users/sdulaney/DariaInterviewTool/tools/prompt_manager/prompts
+INFO:langchain_features.services.discussion_service:Initialized DiscussionService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:Discussion service initialized successfully
+INFO:__main__:Observer service initialized successfully
+INFO:__main__:Using simple response generation (LangChain disabled)
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 124-683-066
+/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:277: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-5d1zuxez'}
+  warnings.warn(
+/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:277: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-5cdne1v3'}
+  warnings.warn(

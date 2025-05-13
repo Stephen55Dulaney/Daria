@@ -73,6 +73,15 @@ app.config['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')  # Add OpenAI API key
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///app.db'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
+# Import and register the memory companion blueprint
+try:
+    from api_services.memory_companion_service import memory_companion_bp
+    app.register_blueprint(memory_companion_bp)
+    print("Successfully registered Memory Companion blueprint")
+except Exception as e:
+    print(f"Failed to register Memory Companion blueprint: {str(e)}")
+    # Continue without the memory companion functionality
+
 # Global directories
 interview_dirs = ['interviews', 'interviews/raw', 'interviews/processed']
 
@@ -82,14 +91,6 @@ db = SQLAlchemy(app)
 # Database models for the research survey functionality
 class ResearchSurveyResponse(db.Model):
     id = db.Column(db.Integer, primary_key=True)
-    created_at = db.Column(db.DateTime, default=datetime.utcnow)
-    primary_objective = db.Column(db.String(50))
-    research_type = db.Column(db.String(50))
-    timeline = db.Column(db.String(50))
-    budget = db.Column(db.String(50))
-    methods = db.Column(db.String(50))
-    avatar_path = db.Column(db.String(255))
-    recommendations = db.Column(db.JSON)
 
 # Create database tables if they don't exist
 with app.app_context():

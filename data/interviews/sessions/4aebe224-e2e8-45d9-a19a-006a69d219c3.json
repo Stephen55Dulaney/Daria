@@ -1,0 +1,84 @@
+{
+  "id": "4aebe224-e2e8-45d9-a19a-006a69d219c3",
+  "guide_id": "9576b33a-daed-45de-9724-adf3524ebd0a",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "- 3-4 questions in a row",
+      "role": "user",
+      "timestamp": "2025-05-12T16:55:07.224204"
+    },
+    {
+      "content": "It seems like you have a lot of questions on your mind. Is there a particular topic or area that you're especially curious about, or are you looking for more general information?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T16:55:08.674597"
+    },
+    {
+      "content": "I am looking for a follow-up conversation where you come back and ask for deeper questions based on my comment",
+      "role": "user",
+      "timestamp": "2025-05-12T16:55:31.254033"
+    },
+    {
+      "content": "It's great to hear that you're looking for a deeper conversation. Could you share with me an example of a specific comment or topic you'd like to explore further so we can delve into it together?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T16:55:32.067924"
+    },
+    {
+      "content": "well my biggest topic is I want to know why this  debug interview flow page works so well  I mean sometimes we have problems we can always get it working then when I go to the actual interview page of the interview tool  it's not working it doesn't questions it's not behaving like you are  like if you were the actual real",
+      "role": "user",
+      "timestamp": "2025-05-12T16:56:37.772256"
+    },
+    {
+      "content": "It sounds like you've noticed a difference in the functionality between the debug interview flow page and the actual interview page of the tool. Could you provide more details on what specific differences or challenges you encounter when transitioning from the debug flow to the live interview page?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T16:56:38.542993"
+    },
+    {
+      "content": "well on the live interview page I don't even hear the first question  microphone turns on it starts waiting for my answer but I don't even hear the first question on this page you read the first question and then you listen from my responsive when I stopped talking to you added to the transcript",
+      "role": "user",
+      "timestamp": "2025-05-12T16:57:18.810257"
+    },
+    {
+      "content": "It sounds like the issue with not hearing the first question on the live interview page is causing some frustration. Have you noticed if this problem occurs consistently every time you use the live interview page, or is it intermittent?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T16:57:19.615280"
+    },
+    {
+      "content": "I have not heard the first question on the interview page except maybe two out of 30 times today",
+      "role": "user",
+      "timestamp": "2025-05-12T16:57:46.061950"
+    },
+    {
+      "content": "It sounds like experiencing the issue of not hearing the first question on the interview page is quite frustrating for you, especially given that it has occurred so frequently. Can you share how this issue impacts your overall experience during the interview process?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T16:57:46.851783"
+    },
+    {
+      "content": "how can you have  an interview tool  without an interview page",
+      "role": "user",
+      "timestamp": "2025-05-12T16:58:15.489602"
+    },
+    {
+      "content": "It seems like you're highlighting a crucial aspect - the importance of having a functional interview page in an interview tool. Building on that, could you elaborate on specific features or functionalities that you believe are essential for an effective interview page to ensure a smooth and productive interviewing experience for users like yourself?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T16:58:16.330419"
+    },
+    {
+      "content": "at the end of an interview I should be able to say and the interview and then it quits",
+      "role": "user",
+      "timestamp": "2025-05-12T16:58:48.994080"
+    },
+    {
+      "content": "It sounds like having a clear way to end an interview is important to you. In your ideal scenario, what would be the benefit or impact of being able to definitively end the interview session with a statement like \"end the interview\" before it quits? Can you share more about why this feature is significant for you in the interview process?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T16:58:50.062591"
+    }
+  ],
+  "transcript": "\n\nParticipant: - 3-4 questions in a row\n\nModerator: It seems like you have a lot of questions on your mind. Is there a particular topic or area that you're especially curious about, or are you looking for more general information?\n\nParticipant: I am looking for a follow-up conversation where you come back and ask for deeper questions based on my comment\n\nModerator: It's great to hear that you're looking for a deeper conversation. Could you share with me an example of a specific comment or topic you'd like to explore further so we can delve into it together?\n\nParticipant: well my biggest topic is I want to know why this  debug interview flow page works so well  I mean sometimes we have problems we can always get it working then when I go to the actual interview page of the interview tool  it's not working it doesn't questions it's not behaving like you are  like if you were the actual real\n\nModerator: It sounds like you've noticed a difference in the functionality between the debug interview flow page and the actual interview page of the tool. Could you provide more details on what specific differences or challenges you encounter when transitioning from the debug flow to the live interview page?\n\nParticipant: well on the live interview page I don't even hear the first question  microphone turns on it starts waiting for my answer but I don't even hear the first question on this page you read the first question and then you listen from my responsive when I stopped talking to you added to the transcript\n\nModerator: It sounds like the issue with not hearing the first question on the live interview page is causing some frustration. Have you noticed if this problem occurs consistently every time you use the live interview page, or is it intermittent?\n\nParticipant: I have not heard the first question on the interview page except maybe two out of 30 times today\n\nModerator: It sounds like experiencing the issue of not hearing the first question on the interview page is quite frustrating for you, especially given that it has occurred so frequently. Can you share how this issue impacts your overall experience during the interview process?\n\nParticipant: how can you have  an interview tool  without an interview page\n\nModerator: It seems like you're highlighting a crucial aspect - the importance of having a functional interview page in an interview tool. Building on that, could you elaborate on specific features or functionalities that you believe are essential for an effective interview page to ensure a smooth and productive interviewing experience for users like yourself?\n\nParticipant: at the end of an interview I should be able to say and the interview and then it quits\n\nModerator: It sounds like having a clear way to end an interview is important to you. In your ideal scenario, what would be the benefit or impact of being able to definitively end the interview session with a statement like \"end the interview\" before it quits? Can you share more about why this feature is significant for you in the interview process?",
+  "analysis": null,
+  "created_at": "2025-05-12T16:54:56.878521",
+  "updated_at": "2025-05-12T16:58:50.062884"
+}

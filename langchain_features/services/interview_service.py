@@ -365,12 +365,12 @@ class InterviewService:
             logger.error(f"Error generating summary: {str(e)}")
             return f"Error generating summary: {str(e)}"
             
-    def generate_response(self, messages: List[Dict[str, str]], prompt: str = "", character: str = None) -> str:
+    def generate_response(self, session_id_or_messages, prompt: str = "", character: str = None) -> str:
         """
         Generate a new AI response based on conversation history
         
         Args:
-            messages: List of message dictionaries with 'role' and 'content'
+            session_id_or_messages: Either a session ID string or a list of message dictionaries
             prompt: Optional system prompt to control the interview style
             character: Optional character name to customize the prompt
             
@@ -378,6 +378,21 @@ class InterviewService:
             str: The generated response
         """
         try:
+            # Handle either session_id or messages list
+            messages = []
+            if isinstance(session_id_or_messages, str):
+                # This is a session ID, load the messages
+                session_id = session_id_or_messages
+                interview_data = self._load_interview(session_id)
+                if interview_data and 'conversation_history' in interview_data:
+                    messages = interview_data.get('conversation_history', [])
+                    logger.info(f"Loaded {len(messages)} messages from session {session_id}")
+                else:
+                    logger.warning(f"No conversation history found for session {session_id}")
+            else:
+                # This is already a list of messages
+                messages = session_id_or_messages
+            
             # Import the necessary LangChain components
             try:
                 from langchain_community.chat_models import ChatOpenAI
@@ -397,7 +412,8 @@ class InterviewService:
                         "eurekia": "You are Eurekia, Deloitte's Insight Generator. Find patterns and opportunities in the conversation.",
                         "thesea": "You are Thesea, Deloitte's Journey Mapper. Focus on understanding experiences and journeys.",
                         "askia": "You are Askia, Deloitte's Strategic Questioner. Ask incisive questions to uncover deeper insights.",
-                        "odessia": "You are Odessia, Deloitte's Journey Expert. Map and analyze user experiences."
+                        "odessia": "You are Odessia, Deloitte's Journey Expert. Map and analyze user experiences.",
+                        "synthia": "You are Synthia, Deloitte's Discovery Assistant. You help formulate questions and build an 8-week discovery plan to uncover user needs, business requirements, and project scope."
                     }
                     prompt = character_prompts.get(character.lower(), 
                     """

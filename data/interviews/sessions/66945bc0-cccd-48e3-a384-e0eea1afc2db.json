@@ -1,0 +1,197 @@
+{
+  "id": "66945bc0-cccd-48e3-a384-e0eea1afc2db",
+  "guide_id": "431af968-a334-4dcd-9d2a-1e02d32785e6",
+  "interviewee": {
+    "name": "John Jacob Jengle Himer Smith",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "hello this is me and you're listening I can see that but I didn't hear the question",
+      "role": "user",
+      "id": "fd1286c8-59cb-4a64-80a6-7778629a38dd",
+      "timestamp": "2025-05-12T14:27:36.174539"
+    },
+    {
+      "content": "that is awesome",
+      "role": "user",
+      "id": "c7da67b7-efad-4139-9d50-e0081b033b93",
+      "timestamp": "2025-05-12T14:27:38.105948"
+    },
+    {
+      "content": "that is crazy good",
+      "role": "user",
+      "id": "c87c864b-8652-4534-a74b-b5b45f5202d0",
+      "timestamp": "2025-05-12T14:27:41.212834"
+    },
+    {
+      "content": "I like what you've done there we only thing is we need to get the",
+      "role": "user",
+      "id": "24d9c665-bde7-45fd-b96c-97fec0698a10",
+      "timestamp": "2025-05-12T14:27:48.722911"
+    },
+    {
+      "content": "text to speech",
+      "role": "user",
+      "id": "18aa5a97-e632-4a64-b31a-a9046d652529",
+      "timestamp": "2025-05-12T14:27:51.014915"
+    },
+    {
+      "content": "okay another thing I noticed is that when I say an answer",
+      "role": "user",
+      "id": "91e8c986-c511-4f1f-a519-9195aef9921f",
+      "timestamp": "2025-05-12T14:27:56.580255"
+    },
+    {
+      "content": "my answer is showing up in the transcript but it is not being transmitted today llm so we do not get",
+      "role": "user",
+      "id": "268e1c6f-2c54-4bd4-a3df-c10d58315d2d",
+      "timestamp": "2025-05-12T14:28:02.917608"
+    },
+    {
+      "content": "answer back from the LL",
+      "role": "user",
+      "id": "1d0770f9-484b-4528-8c36-ba16dcb32c55",
+      "timestamp": "2025-05-12T14:28:05.885115"
+    },
+    {
+      "content": "but",
+      "role": "user",
+      "id": "8660ceed-3c09-4d47-a34b-f04e9ef769ce",
+      "timestamp": "2025-05-12T14:28:08.350538"
+    },
+    {
+      "content": "this is great I'm going to send you the transcript as our debugging tool the console the debugging airs there's only one get",
+      "role": "user",
+      "id": "e3036e61-0d2c-4c86-b895-7d0a7954d260",
+      "timestamp": "2025-05-12T14:28:18.001458"
+    },
+    {
+      "content": "I'll send you that one it's a socket setup of some kind it was aborted I don't know if that's the",
+      "role": "user",
+      "id": "0ad86c9b-f44f-4a92-9b93-0a869ae6f859",
+      "timestamp": "2025-05-12T14:28:23.844500"
+    },
+    {
+      "content": "I'm just pasted in the transcript",
+      "role": "user",
+      "id": "0da22542-c3dc-46c6-bdba-48b25cf99e7c",
+      "timestamp": "2025-05-12T14:28:27.786159"
+    },
+    {
+      "content": "66945bc0-cccd-48e3-a\u2026e&accepted=true:430   GET http://127.0.0.1:5025/socket.io/socket.io.js net::ERR_ABORTED 400 (BAD REQUEST) setupSocketConnection\t@\t66945bc0-cccd-48e3-a\u2026e&accepted=true:430 (anonymous)\t@\t66945bc0-cccd-48e3-a\u2026e&accepted=true:587",
+      "role": "user",
+      "id": "f4c38be6-a3e6-4423-98a2-890ff5b3f782",
+      "timestamp": "2025-05-12T14:28:31.902206"
+    },
+    {
+      "content": "so here in the transcript",
+      "role": "user",
+      "id": "d5841cdd-35aa-4f9a-8301-7adf74f54dc8",
+      "timestamp": "2025-05-12T14:28:31.963114"
+    },
+    {
+      "content": "is the console air I'm not seeing",
+      "role": "user",
+      "id": "d0b98506-522d-48cd-ac3a-c27c7afcecd9",
+      "timestamp": "2025-05-12T14:28:36.194833"
+    },
+    {
+      "content": "okay here's another uncut it's",
+      "role": "user",
+      "id": "b32a6ecb-d6f9-40ec-bb40-9c8547d52b16",
+      "timestamp": "2025-05-12T14:28:42.404905"
+    },
+    {
+      "content": "maybe this has to do with it LOL",
+      "role": "user",
+      "id": "2211fdee-0bd8-4b70-a8c1-e80eb2752e75",
+      "timestamp": "2025-05-12T14:28:46.665068"
+    },
+    {
+      "content": "6945bc0-cccd-48e3-a384-e0eea1afc2db:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received",
+      "role": "user",
+      "id": "6cfdca5e-da3d-4f77-9b25-330489b6143c",
+      "timestamp": "2025-05-12T14:28:47.404674"
+    },
+    {
+      "content": "okay let me look I don't see in land chain I'm seeing some stuff here",
+      "role": "user",
+      "id": "aea07884-61e7-4c6f-8f9c-c6fc17b471c4",
+      "timestamp": "2025-05-12T14:28:52.114945"
+    },
+    {
+      "content": "I'm definitely getting an error of land chain session session true blah blah blah so yeah it looks like there's terminal",
+      "role": "user",
+      "id": "36e78937-99be-437f-9af5-2b211e9f0a3d",
+      "timestamp": "2025-05-12T14:29:00.159226"
+    },
+    {
+      "content": "this looks like this is two terminal log errors I'm going to put this in the chat",
+      "role": "user",
+      "id": "52dd9bb2-d5ed-4ca4-9edb-31e630cb98a5",
+      "timestamp": "2025-05-12T14:29:06.117270"
+    },
+    {
+      "content": "NFO:__main__:Session message request for 66945bc0-cccd-48e3-a384-e0eea1afc2db: {'content': '6945bc0-cccd-48e3-a384-e0eea1afc2db:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received', 'role': 'user'} INFO:langchain_features.services.discussion_service:Added message to session 66945bc0-cccd-48e3-a384-e0eea1afc2db INFO:__main__:Added message 6cfdca5e-da3d-4f77-9b25-330489b6143c to session 66945bc0-cccd-48e3-a384-e0eea1afc2db via WebSocket: True INFO:werkzeug:127.0.0.1 - - [12/May/2025 14:28:47] \"POST /api/session/66945bc0-cccd-48e3-a384-e0eea1afc2db/add_message HTTP/1.1\" 200 - INFO:__main__:Session message request for 66945bc0-cccd-48e3-a384-e0eea1afc2db: {'content': \" okay let me look I don't see in land chain I'm seeing some stuff here\", 'role': 'user'} INFO:langchain_features.services.discussion_service:Added message to session 66945bc0-cccd-48e3-a384-e0eea1afc2db INFO:__main__:Added message aea07884-61e7-4c6f-8f9c-c6fc17b471c4 to session 66945bc0-cccd-48e3-a384-e0eea1afc2db via WebSocket: True INFO:werkzeug:127.0.0.1 - - [12/May/2025 14:28:52] \"POST /api/session/66945bc0-cccd-48e3-a384-e0eea1afc2db/add_message HTTP/1.1\" 200 - INFO:__main__:Session message request for 66945bc0-cccd-48e3-a384-e0eea1afc2db: {'content': \" I'm definitely getting",
+      "role": "user",
+      "id": "342762cf-7b6c-4bb4-bd30-3d48592bee8e",
+      "timestamp": "2025-05-12T14:29:06.423892"
+    },
+    {
+      "content": "and then I'm going to select the entire chat transcript",
+      "role": "user",
+      "id": "533045c4-5114-4644-8015-fe2068049a98",
+      "timestamp": "2025-05-12T14:29:10.975145"
+    },
+    {
+      "content": "and copy it and that will be our air log for this time I'm going to stop at this time",
+      "role": "user",
+      "id": "22a27a6a-5b50-440c-b810-17a8b432ed54",
+      "timestamp": "2025-05-12T14:29:18.412134"
+    },
+    {
+      "content": "that is good",
+      "role": "user",
+      "id": "4c6f1227-bac9-49fe-b1fb-5dc7bf517743",
+      "timestamp": "2025-05-12T14:29:21.982378"
+    },
+    {
+      "content": "okay you'll be good",
+      "role": "user",
+      "id": "e097d945-6aa4-4e78-bdaf-00947a3a4b42",
+      "timestamp": "2025-05-12T14:30:23.442510"
+    },
+    {
+      "content": "okay the session is continuing and I can hear that there so what happened is the exit interview didn't work",
+      "role": "user",
+      "id": "063c0ece-0360-4b47-9f5e-691af1088025",
+      "timestamp": "2025-05-12T14:31:24.442289"
+    },
+    {
+      "content": "okay",
+      "role": "user",
+      "id": "492dcc10-1f7a-4be1-a514-844aca7e2af9",
+      "timestamp": "2025-05-12T14:31:42.216360"
+    },
+    {
+      "content": "I had nothing",
+      "role": "user",
+      "id": "b332f2d3-a88c-4fb3-9bc1-f4a184d3d1b9",
+      "timestamp": "2025-05-12T14:33:01.520733"
+    }
+  ],
+  "transcript": "\n\nParticipant: hello this is me and you're listening I can see that but I didn't hear the question\n\nParticipant: that is awesome\n\nParticipant: that is crazy good\n\nParticipant: I like what you've done there we only thing is we need to get the\n\nParticipant: text to speech\n\nParticipant: okay another thing I noticed is that when I say an answer\n\nParticipant: my answer is showing up in the transcript but it is not being transmitted today llm so we do not get\n\nParticipant: answer back from the LL\n\nParticipant: but\n\nParticipant: this is great I'm going to send you the transcript as our debugging tool the console the debugging airs there's only one get\n\nParticipant: I'll send you that one it's a socket setup of some kind it was aborted I don't know if that's the\n\nParticipant: I'm just pasted in the transcript\n\nParticipant: 66945bc0-cccd-48e3-a\u2026e&accepted=true:430   GET http://127.0.0.1:5025/socket.io/socket.io.js net::ERR_ABORTED 400 (BAD REQUEST) setupSocketConnection\t@\t66945bc0-cccd-48e3-a\u2026e&accepted=true:430 (anonymous)\t@\t66945bc0-cccd-48e3-a\u2026e&accepted=true:587\n\nParticipant: so here in the transcript\n\nParticipant: is the console air I'm not seeing\n\nParticipant: okay here's another uncut it's\n\nParticipant: maybe this has to do with it LOL\n\nParticipant: 6945bc0-cccd-48e3-a384-e0eea1afc2db:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received\n\nParticipant: okay let me look I don't see in land chain I'm seeing some stuff here\n\nParticipant: I'm definitely getting an error of land chain session session true blah blah blah so yeah it looks like there's terminal\n\nParticipant: this looks like this is two terminal log errors I'm going to put this in the chat\n\nParticipant: NFO:__main__:Session message request for 66945bc0-cccd-48e3-a384-e0eea1afc2db: {'content': '6945bc0-cccd-48e3-a384-e0eea1afc2db:1 Uncaught (in promise) Error: A listener indicated an asynchronous response by returning true, but the message channel closed before a response was received', 'role': 'user'} INFO:langchain_features.services.discussion_service:Added message to session 66945bc0-cccd-48e3-a384-e0eea1afc2db INFO:__main__:Added message 6cfdca5e-da3d-4f77-9b25-330489b6143c to session 66945bc0-cccd-48e3-a384-e0eea1afc2db via WebSocket: True INFO:werkzeug:127.0.0.1 - - [12/May/2025 14:28:47] \"POST /api/session/66945bc0-cccd-48e3-a384-e0eea1afc2db/add_message HTTP/1.1\" 200 - INFO:__main__:Session message request for 66945bc0-cccd-48e3-a384-e0eea1afc2db: {'content': \" okay let me look I don't see in land chain I'm seeing some stuff here\", 'role': 'user'} INFO:langchain_features.services.discussion_service:Added message to session 66945bc0-cccd-48e3-a384-e0eea1afc2db INFO:__main__:Added message aea07884-61e7-4c6f-8f9c-c6fc17b471c4 to session 66945bc0-cccd-48e3-a384-e0eea1afc2db via WebSocket: True INFO:werkzeug:127.0.0.1 - - [12/May/2025 14:28:52] \"POST /api/session/66945bc0-cccd-48e3-a384-e0eea1afc2db/add_message HTTP/1.1\" 200 - INFO:__main__:Session message request for 66945bc0-cccd-48e3-a384-e0eea1afc2db: {'content': \" I'm definitely getting\n\nParticipant: and then I'm going to select the entire chat transcript\n\nParticipant: and copy it and that will be our air log for this time I'm going to stop at this time\n\nParticipant: that is good\n\nParticipant: okay you'll be good\n\nParticipant: okay the session is continuing and I can hear that there so what happened is the exit interview didn't work\n\nParticipant: okay\n\nParticipant: I had nothing",
+  "analysis": null,
+  "created_at": "2025-05-12T14:19:56.043828",
+  "updated_at": "2025-05-12T14:33:01.521019"
+}

@@ -96,6 +96,54 @@ Daria Interview Tool is an AI-powered research interviewing platform currently i
 5. Integration approach for Memory Companion feature
 
 ## Session Notes
+### Session 4 (May 12, 2025)
+- I'll update the memory log with our recent AWS deployment progress for the Daria project. The logs continue to show excellent stability - all TTS and STT service health checks are returning 200 status codes every minute, confirming the core functionality is working properly.
+- 
+- We've successfully:
+- 1. Created a "Hello World" test app using Flask in AWS CloudShell
+- 2. Verified it works with curl tests to both the main page and health endpoint
+- 3. Identified the security challenges with Deloitte's AWS environment
+- 4. Drafted a ServiceNow ticket requesting appropriate access permissions
+- 5. Confirmed that the main Daria application continues to run flawlessly
+- 
+- The EC2 deployment is our next step once we receive the security permissions. We've made excellent progress on the incremental approach to AWS deployment that we outlined in our build plan.
+- 
+- Is there anything specific about today's progress you'd like me to emphasize in the memory log update?
+- 
+- 3
+
+### Session 3 (May 10, 2025)
+- Here's a summary of what we've accomplished today:
+- 
+- ### Memory Companion Configuration & Integration
+- - Fixed port conflicts between the main Daria application (port 5025) and Memory Companion (port 5030)
+- - Updated all documentation, HTML files, and scripts to reference the correct ports
+- - Modified the debug toolkit HTML to properly link to the memory companion on port 5030
+- - Updated configuration files in multiple locations (debug_toolkit.html, memory_companion_info.html, DARIA_MEMORY_COMPANION.md)
+- - Created proper start scripts that initialize services on their correct ports
+- 
+- ### Service Deployment & Verification
+- - Successfully deployed and tested all services:
+-   - Main Daria application (port 5025)
+-   - Memory Companion (port 5030)
+-   - Text-to-Speech service (port 5015)
+-   - Speech-to-Text service (port 5016)
+- - Confirmed integration with OpenAI API for LLM responses
+- - Fixed issues in start_daria_with_memory.sh to ensure reliable startup
+- 
+- ### Implementation Testing
+- - Tested Memory Companion API endpoints
+- - Verified memory persistence between sessions
+- - Confirmed the "50 First Dates" concept works as intended with Daria remembering project context
+- - Tested the boot sequence and journal visualization components
+- 
+- ### Documentation Updates
+- - Updated all relevant documentation to reflect the new port configuration
+- - Made sure setup instructions accurately guide users to the correct URLs
+- - Ensured a consistent approach to using the debug server vs. production server  
+- 
+- The system now successfully maintains project context across sessions and all components work together properly on their designated ports.
+
 *Add notes from each working session here to maintain continuity*
 
 ### Session 1 (Current Date)

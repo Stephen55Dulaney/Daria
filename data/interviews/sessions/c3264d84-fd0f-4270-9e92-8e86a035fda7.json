@@ -1,0 +1,44 @@
+{
+  "id": "c3264d84-fd0f-4270-9e92-8e86a035fda7",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "a cycle number four",
+      "role": "user",
+      "timestamp": "2025-05-13T11:56:27.793313"
+    },
+    {
+      "content": "Can you tell me more about your experience during cycle number four of the end-to-end testing process? Were there any particular challenges or successes that stood out to you during that cycle?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:56:29.004997"
+    },
+    {
+      "content": "well this is the second step the so far we passed API check all healthy now we're doing four questions",
+      "role": "user",
+      "timestamp": "2025-05-13T11:56:53.481430"
+    },
+    {
+      "content": "It's great to hear that the API check was successful so far. Could you elaborate on the process of transitioning from the API check to working on the four questions? Were there any specific steps or considerations involved in this transition that you found particularly important or challenging?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:56:56.105260"
+    },
+    {
+      "content": "no it's just important to go through this test because this debugging tool is actually working if I had to turn it into the remote tool it would work but it doesn't do other things but this is working correctly every time and so we need to keep this working  make the others work like this",
+      "role": "user",
+      "timestamp": "2025-05-13T11:57:37.773234"
+    },
+    {
+      "content": "It sounds like ensuring the debugging tool is working correctly during the testing process is crucial for you. Can you share more about how this tool has helped in identifying and resolving issues during testing? Have there been any specific instances where the debugging tool played a significant role in improving the overall testing process?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:57:39.555807"
+    }
+  ],
+  "transcript": "\n\nParticipant: a cycle number four\n\nModerator: Can you tell me more about your experience during cycle number four of the end-to-end testing process? Were there any particular challenges or successes that stood out to you during that cycle?\n\nParticipant: well this is the second step the so far we passed API check all healthy now we're doing four questions\n\nModerator: It's great to hear that the API check was successful so far. Could you elaborate on the process of transitioning from the API check to working on the four questions? Were there any specific steps or considerations involved in this transition that you found particularly important or challenging?\n\nParticipant: no it's just important to go through this test because this debugging tool is actually working if I had to turn it into the remote tool it would work but it doesn't do other things but this is working correctly every time and so we need to keep this working  make the others work like this\n\nModerator: It sounds like ensuring the debugging tool is working correctly during the testing process is crucial for you. Can you share more about how this tool has helped in identifying and resolving issues during testing? Have there been any specific instances where the debugging tool played a significant role in improving the overall testing process?",
+  "analysis": null,
+  "created_at": "2025-05-13T11:56:18.892253",
+  "updated_at": "2025-05-13T11:57:39.556859"
+}

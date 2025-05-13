@@ -273,6 +273,21 @@ class DiscussionService:
         """
         return self._load_session(session_id)
     
+    def get_messages(self, session_id: str) -> List[Dict[str, Any]]:
+        """Get all messages for a session.
+        
+        Args:
+            session_id (str): The session ID
+            
+        Returns:
+            List[Dict]: List of messages or empty list if not found
+        """
+        session = self._load_session(session_id)
+        if not session:
+            return []
+        
+        return session.get("messages", [])
+    
     def list_guide_sessions(self, guide_id: str) -> List[Dict[str, Any]]:
         """List all sessions for a discussion guide.
         
@@ -355,6 +370,34 @@ class DiscussionService:
         
         return True
     
+    def add_message_to_session(self, session_id: str, content: str, role: str, message_id: str = None) -> str:
+        """Add a message to a session with separate parameters.
+        
+        Args:
+            session_id (str): The session ID
+            content (str): The message content
+            role (str): The message role (user or assistant)
+            message_id (str, optional): The message ID, generated if not provided
+            
+        Returns:
+            str: The message ID
+        """
+        if not message_id:
+            message_id = str(uuid.uuid4())
+            
+        message = {
+            "id": message_id,
+            "content": content,
+            "role": role,
+            "timestamp": datetime.now().isoformat()
+        }
+        
+        success = self.add_message(session_id, message)
+        if not success:
+            logger.error(f"Failed to add message to session {session_id}")
+            
+        return message_id
+    
     def complete_session(self, session_id: str) -> bool:
         """Mark a session as completed.
         
@@ -387,15 +430,80 @@ class DiscussionService:
         """
         session = self._load_session(session_id)
         if not session:
+            logger.warning(f"Session not found for analysis: {session_id}")
             return False
         
         session["analysis"] = analysis
-        session["status"] = "analyzed"
-        session["updated_at"] = datetime.now().isoformat()
+        session["updated_at"] = datetime.now()
         self._save_session(session_id, session)
-        
         logger.info(f"Added analysis to session {session_id}")
+        
         return True
+    
+    def delete_session(self, session_id: str) -> bool:
+        """Delete a session permanently.
+        
+        Args:
+            session_id (str): The session ID
+            
+        Returns:
+            bool: True if successful
+        """
+        session_path = self.sessions_dir / f"{session_id}.json"
+        if not session_path.exists():
+            logger.warning(f"Session not found for deletion: {session_id}")
+            return False
+        
+        # Load the session to get guide ID
+        session = self._load_session(session_id)
+        if session and session.get("guide_id"):
+            # Remove this session ID from the guide's sessions list
+            guide_id = session.get("guide_id")
+            guide = self._load_guide(guide_id)
+            if guide and "sessions" in guide:
+                if session_id in guide["sessions"]:
+                    guide["sessions"].remove(session_id)
+                    guide["updated_at"] = datetime.now()
+                    self._save_guide(guide_id, guide)
+                    logger.info(f"Removed session {session_id} from guide {guide_id}")
+        
+        # Delete the session file
+        try:
+            session_path.unlink()
+            logger.info(f"Deleted session with ID {session_id}")
+            return True
+        except Exception as e:
+            logger.error(f"Error deleting session {session_id}: {str(e)}")
+            return False
+    
+    def get_character_info(self, guide_id: str) -> Dict[str, Any]:
+        """Get character information from a guide.
+        
+        Args:
+            guide_id (str): The guide ID
+            
+        Returns:
+            Dict: Character information
+        """
+        guide = self._load_guide(guide_id)
+        if not guide:
+            return {
+                "name": "interviewer",
+                "prompt": "You are a professional interviewer conducting a research interview."
+            }
+        
+        character_name = guide.get("character_select", "").lower()
+        if not character_name:
+            return {
+                "name": "interviewer", 
+                "prompt": "You are a professional interviewer conducting a research interview."
+            }
+        
+        # Return the character info
+        return {
+            "name": character_name,
+            "prompt": guide.get("interview_prompt", "")
+        }
     
     # Helper methods
     

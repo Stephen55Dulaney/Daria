@@ -485,10 +485,29 @@
         <button class="btn btn-outline-primary">
             <i class="bi bi-files me-1"></i> Duplicate
         </button>
-        <button class="btn btn-outline-danger">
+        <button class="btn btn-outline-danger" id="delete-interview-btn">
             <i class="bi bi-trash me-1"></i> Delete
         </button>
     </div>
+</div>
+
+<!-- Confirmation Modal -->
+<div class="modal fade" id="deleteConfirmModal" tabindex="-1" aria-labelledby="deleteConfirmModalLabel" aria-hidden="true">
+  <div class="modal-dialog">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="deleteConfirmModalLabel">Confirm Deletion</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+      </div>
+      <div class="modal-body">
+        Are you sure you want to delete this interview? This action cannot be undone.
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+        <button type="button" class="btn btn-danger" id="confirm-delete-btn">Delete</button>
+      </div>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -626,6 +645,64 @@ function updateExpirationDate(date) {
     });
 }
 
+// Function to delete the interview
+function deleteInterview() {
+    const sessionId = '{{ session_id }}';
+    
+    // Show loading state
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.disabled = true;
+        confirmDeleteBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Deleting...';
+    }
+    
+    // Call the API to delete the interview
+    fetch(`/api/interview/delete/${sessionId}`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Redirect to dashboard
+            window.location.href = '/dashboard';
+        } else {
+            // Show error
+            alert(`Error deleting interview: ${data.error}`);
+            
+            // Reset button
+            if (confirmDeleteBtn) {
+                confirmDeleteBtn.disabled = false;
+                confirmDeleteBtn.innerHTML = 'Delete';
+            }
+            
+            // Hide modal
+            const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+            if (deleteModal) {
+                deleteModal.hide();
+            }
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred while deleting the interview. Please try again.');
+        
+        // Reset button
+        if (confirmDeleteBtn) {
+            confirmDeleteBtn.disabled = false;
+            confirmDeleteBtn.innerHTML = 'Delete';
+        }
+        
+        // Hide modal
+        const deleteModal = bootstrap.Modal.getInstance(document.getElementById('deleteConfirmModal'));
+        if (deleteModal) {
+            deleteModal.hide();
+        }
+    });
+}
+
 // Add event listener for save expiration button
 document.addEventListener('DOMContentLoaded', function() {
     const saveExpirationBtn = document.getElementById('save-expiration');
@@ -660,6 +737,30 @@ document.addEventListener('DOMContentLoaded', function() {
         btn.parentNode.insertBefore(copyBtn, btn.nextSibling);
     });
     {% endif %}
+    
+    // Add event listener for the delete button
+    const deleteBtn = document.getElementById('delete-interview-btn');
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            // Show the confirmation modal
+            const deleteModal = new bootstrap.Modal(document.getElementById('deleteConfirmModal'));
+            deleteModal.show();
+        });
+    }
+    
+    // Add event listener for the confirm delete button in the modal
+    const confirmDeleteBtn = document.getElementById('confirm-delete-btn');
+    if (confirmDeleteBtn) {
+        confirmDeleteBtn.addEventListener('click', function() {
+            deleteInterview();
+        });
+    }
+    
+    // Add event listener for the generate analysis button
+    const generateAnalysisButton = document.getElementById('generate-analysis-btn');
+    if (generateAnalysisButton) {
+        generateAnalysisButton.addEventListener('click', generateAnalysis);
+    }
 });
 
 function generateAnalysis() {
@@ -711,13 +812,5 @@ function generateAnalysis() {
         if (button) button.classList.remove('d-none');
     });
 }
-
-// Add event listener for the generate analysis button
-document.addEventListener('DOMContentLoaded', function() {
-    const generateAnalysisButton = document.getElementById('generate-analysis-btn');
-    if (generateAnalysisButton) {
-        generateAnalysisButton.addEventListener('click', generateAnalysis);
-    }
-});
 </script>
 {% endblock %} 

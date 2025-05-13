@@ -8,188 +8,231 @@
     <style>
         body {
             font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
             max-width: 1200px;
             margin: 0 auto;
-            padding: 20px;
-            background-color: #f5f5f5;
         }
-        h1, h2, h3 {
-            color: #1a1a1a;
-        }
+        
         .container {
             display: flex;
             flex-direction: column;
+            height: calc(100vh - 40px);
+        }
+        
+        header {
+            background-color: #f0f0f0;
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+        
+        h1 {
+            margin: 0;
+            font-size: 24px;
+        }
+        
+        .content {
+            display: flex;
+            flex-grow: 1;
             gap: 20px;
+            overflow: hidden;
         }
-        .debug-panel {
-            background-color: white;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        
+        .left-panel {
+            flex: 7;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
         }
+        
+        .right-panel {
+            flex: 5;
+            display: flex;
+            flex-direction: column;
+            background-color: #f5f5f5;
+            padding: 10px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        
+        .message-container {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            margin-bottom: 10px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background-color: #e7f4fd;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .assistant-message {
+            background-color: #f0f0f0;
+            align-self: flex-start;
+        }
+        
+        .error-message {
+            background-color: #ffebee;
+            border-left: 4px solid #f44336;
+            color: #d32f2f;
+            font-weight: bold;
+            width: 100%;
+        }
+        
+        .input-area {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        textarea {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            resize: none;
+        }
+        
         button {
-            padding: 8px 16px;
-            background-color: #0078d4;
+            padding: 10px;
+            background-color: #4CAF50;
             color: white;
             border: none;
-            border-radius: 4px;
+            border-radius: 5px;
             cursor: pointer;
-            margin-right: 5px;
-            margin-bottom: 5px;
         }
+        
         button:hover {
-            background-color: #0069bd;
+            background-color: #45a049;
         }
+        
         button:disabled {
             background-color: #cccccc;
             cursor: not-allowed;
         }
+        
         .control-panel {
-            display: flex;
-            gap: 10px;
-            margin-bottom: 10px;
-            flex-wrap: wrap;
-        }
-        .log-container {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: #f9f9f9;
-            padding: 10px;
-            max-height: 300px;
-            overflow-y: auto;
-            font-family: monospace;
-            font-size: 14px;
-        }
-        .log-entry {
-            margin-bottom: 5px;
-            border-bottom: 1px solid #eee;
-            padding-bottom: 5px;
-        }
-        .timestamp {
-            color: #666;
-            font-size: 0.8em;
-        }
-        .tts-log {
-            color: #0078d4;
-        }
-        .stt-log {
-            color: #107c10;
-        }
-        .error-log {
-            color: #d83b01;
-        }
-        .warn-log {
-            color: #ff8c00;
-        }
-        .llm-log {
-            color: #8064a2;
-        }
-        .status-indicator {
-            display: inline-block;
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-            margin-right: 5px;
-        }
-        .status-active {
-            background-color: #107c10;
-        }
-        .status-inactive {
-            background-color: #d83b01;
-        }
-        .status-warn {
-            background-color: #ff8c00;
-        }
-        textarea {
-            width: 100%;
-            height: 100px;
-            padding: 8px;
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            resize: vertical;
             margin-bottom: 10px;
         }
-        .message-container {
-            border: 1px solid #ddd;
-            border-radius: 4px;
-            background-color: white;
-            padding: 15px;
-            margin-bottom: 20px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .message {
-            margin-bottom: 15px;
-            padding: 10px;
-            border-radius: 8px;
-        }
-        .assistant-message {
-            background-color: #f0f7ff;
-            border-left: 4px solid #0078d4;
-        }
-        .user-message {
-            background-color: #f9f9f9;
-            border-left: 4px solid #107c10;
-            text-align: right;
-        }
-        .settings-grid {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 10px;
-            margin-bottom: 15px;
-        }
-        .settings-item {
-            display: flex;
-            flex-direction: column;
-        }
-        .settings-item label {
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        select {
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-        input[type="checkbox"] {
-            margin-right: 5px;
-        }
-        input[type="number"] {
-            padding: 8px;
-            border-radius: 4px;
-            border: 1px solid #ddd;
-        }
-        .flex-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-bottom: 10px;
-        }
-        .slider-container {
-            display: flex;
-            flex-direction: column;
-            width: 100%;
-            margin-bottom: 15px;
-        }
-        .slider-header {
+        
+        .status-area {
             display: flex;
             justify-content: space-between;
-            margin-bottom: 5px;
+            margin-bottom: 10px;
         }
-        .slider-label {
+        
+        .status-indicator {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 12px;
             font-weight: bold;
         }
-        .slider-value {
-            font-family: monospace;
+        
+        .connected {
+            background-color: #c8e6c9;
+            color: #2e7d32;
         }
-        input[type="range"] {
-            width: 100%;
+        
+        .disconnected {
+            background-color: #ffcdd2;
+            color: #c62828;
+        }
+        
+        .listening {
+            background-color: #bbdefb;
+            color: #1565c0;
+        }
+        
+        .speaking {
+            background-color: #e1bee7;
+            color: #6a1b9a;
+        }
+        
+        .logs {
+            flex-grow: 1;
+            overflow-y: auto;
+            background-color: #000;
+            color: #fff;
+            padding: 10px;
+            font-family: monospace;
+            border-radius: 5px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 2px;
+        }
+        
+        .log-info {
+            color: #4CAF50;
+        }
+        
+        .log-warn {
+            color: #FFC107;
+        }
+        
+        .log-error {
+            color: #F44336;
+        }
+        
+        .log-stt {
+            color: #2196F3;
+        }
+        
+        .log-tts {
+            color: #9C27B0;
+        }
+        
+        .controls {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .control-group {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+        }
+        
+        .control-group h3 {
+            margin-top: 0;
+            font-size: 16px;
+        }
+        
+        .slider-container {
+            margin-bottom: 10px;
+        }
+        
+        .slider-container label {
+            display: block;
             margin-bottom: 5px;
         }
-        .two-column {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 20px;
+        
+        input[type="range"] {
+            width: 100%;
+        }
+        
+        .value-display {
+            font-size: 12px;
+            color: #666;
+            text-align: right;
         }
     </style>
 </head>
@@ -369,7 +412,7 @@
 
     <script>
         // Global variables
-        const ttsAudio = new Audio();
+        let ttsAudio = new Audio();
         let recognition = null;
         let ttsActive = false;
         let sttActive = false;
@@ -381,6 +424,9 @@
         let lastAssistantMessage = "";
         let isConnected = false;
         let automationActive = false;
+        
+        // Initialize the endInterviewTTSPlayed flag
+        window.endInterviewTTSPlayed = false;
         
         // DOM Elements
         const apiPortInput = document.getElementById('api-port');
@@ -573,8 +619,13 @@
             if (role === 'assistant') {
                 lastAssistantMessage = content;
                 
-                // Auto-play TTS if enabled
-                if (autoTtsCheckbox.checked) {
+                // Auto-play TTS if enabled - but check for end interview flag to prevent duplicates
+                const isEndMessage = content.includes("Thank you for testing the interview");
+                if (autoTtsCheckbox.checked && !(isEndMessage && window.endInterviewTTSPlayed)) {
+                    // If this is an end interview message, set the flag
+                    if (isEndMessage) {
+                        window.endInterviewTTSPlayed = true;
+                    }
                     playTTS(content);
                 }
             }
@@ -729,6 +780,54 @@
             }
         }
         
+        // Fetch latest messages - used after sending a message to get the AI's response
+        async function fetchLatestMessages() {
+            if (!sessionId) {
+                log('No session ID available', 'error');
+                return false;
+            }
+            
+            try {
+                log('Fetching latest messages...', 'info');
+                
+                const messagesResponse = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
+                
+                if (!messagesResponse.ok) {
+                    throw new Error(`Failed to fetch messages: ${messagesResponse.status}`);
+                }
+                
+                const messagesData = await messagesResponse.json();
+                
+                if (!messagesData.success) {
+                    throw new Error(messagesData.error || 'Failed to load messages');
+                }
+                
+                const messages = messagesData.messages || [];
+                
+                // Find latest assistant message
+                let found = false;
+                if (messages.length > 0) {
+                    for (let i = messages.length - 1; i >= 0; i--) {
+                        const message = messages[i];
+                        if (message.role === 'assistant' && message.content !== lastAssistantMessage) {
+                            addMessage(message.content, 'assistant');
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                
+                if (!found) {
+                    log('No new messages found', 'warn');
+                }
+                
+                return true;
+            } catch (error) {
+                log(`Error fetching latest messages: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
         // Send user message to API
         async function sendUserMessage(message) {
             if (!sessionId || !message) {
@@ -753,6 +852,9 @@
                     if (automationActive) {
                         stopAutomation();
                     }
+                    
+                    // Set a flag to prevent duplicate TTS playback
+                    window.endInterviewTTSPlayed = true;
                     
                     // Add a thank you message
                     addMessage(message, 'user');
@@ -782,7 +884,21 @@
                 });
                 
                 if (!response.ok) {
-                    throw new Error(`API returned status: ${response.status}`);
+                    const statusCode = response.status;
+                    let errorMessage = `Failed to send message: ${statusCode}`;
+                    
+                    // Try to parse the error response to get more details
+                    try {
+                        const errorData = await response.json();
+                        if (errorData && errorData.error) {
+                            errorMessage = `Failed to send message: ${statusCode} - ${errorData.error}`;
+                        }
+                    } catch (parseError) {
+                        // If we can't parse the response, just use the status code
+                        console.error("Error parsing error response:", parseError);
+                    }
+                    
+                    throw new Error(errorMessage);
                 }
                 
                 const data = await response.json();
@@ -793,77 +909,20 @@
                 
                 log('Message sent successfully', 'info');
                 
-                // Wait for AI response
-                setTimeout(async () => {
-                    await getAIResponse();
-                }, 1000);
+                // Get the AI response
+                await fetchLatestMessages();
                 
                 return true;
-                
             } catch (error) {
                 log(`Error sending message: ${error.message}`, 'error');
-                return false;
-            }
-        }
-        
-        // Get AI response
-        async function getAIResponse() {
-            if (!sessionId) {
-                log('Cannot get AI response: missing session ID', 'error');
-                return false;
-            }
-            
-            try {
-                log('Getting AI response...', 'llm');
                 
-                // Get latest messages
-                const messagesResponse = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
+                // Display a more user-friendly error message in the chat
+                const errorMessage = document.createElement('div');
+                errorMessage.className = 'message error-message';
+                errorMessage.innerHTML = `<p>Error: Unable to send message. ${error.message}</p>`;
+                messageContainer.appendChild(errorMessage);
+                messageContainer.scrollTop = messageContainer.scrollHeight;
                 
-                if (!messagesResponse.ok) {
-                    throw new Error(`Failed to fetch messages: ${messagesResponse.status}`);
-                }
-                
-                const messagesData = await messagesResponse.json();
-                
-                if (!messagesData.success) {
-                    throw new Error(messagesData.error || 'Failed to load messages');
-                }
-                
-                const messages = messagesData.messages || [];
-                
-                // Find the latest assistant message
-                let latestAssistantMessage = null;
-                
-                for (let i = messages.length - 1; i >= 0; i--) {
-                    if (messages[i].role === 'assistant') {
-                        latestAssistantMessage = messages[i];
-                        break;
-                    }
-                }
-                
-                if (latestAssistantMessage && latestAssistantMessage.content !== lastAssistantMessage) {
-                    log('Received new AI response', 'llm');
-                    addMessage(latestAssistantMessage.content, 'assistant');
-                    
-                    // If automation is active, TTS will play automatically (via addMessage),
-                    // and then STT will start automatically after TTS ends
-                    
-                    return true;
-                } else {
-                    log('No new AI response found. Trying again in 2 seconds...', 'warn');
-                    
-                    // Try again after delay, but only if automation is still active or this was called manually
-                    if (automationActive) {
-                        setTimeout(async () => {
-                            await getAIResponse();
-                        }, 2000);
-                    }
-                    
-                    return false;
-                }
-                
-            } catch (error) {
-                log(`Error getting AI response: ${error.message}`, 'error');
                 return false;
             }
         }
@@ -992,8 +1051,10 @@
                                                 addMessage(finalTranscript, 'user');
                                                 addMessage("Thank you for testing the interview! The debug interface will remain open for additional testing.", 'assistant');
                                                 
-                                                // Play thank you message if auto-TTS is enabled
-                                                if (autoTtsCheckbox.checked) {
+                                                // Check if we've already played the TTS for ending the interview
+                                                // to prevent duplicate playback
+                                                if (autoTtsCheckbox.checked && !window.endInterviewTTSPlayed) {
+                                                    window.endInterviewTTSPlayed = true;
                                                     playTTS("Thank you for testing the interview! The debug interface will remain open for additional testing.");
                                                 }
                                                 
@@ -1196,7 +1257,7 @@
         function playTTS(text) {
             if (!text) {
                 log('No text provided for TTS', 'error');
-                return false;
+                return Promise.reject(new Error('No text provided for TTS'));
             }
             
             // If STT is active and auto-stop is enabled, stop it
@@ -1204,78 +1265,270 @@
                 stopSpeechRecognition();
             }
             
-            const voiceId = ttsVoiceSelect.value;
-            const url = `${apiUrl}/api/text_to_speech_elevenlabs`;
+            // Stop any currently playing audio
+            stopTTS();
             
+            // Reset TTS state
             updateTTSStatus(true, 'Preparing speech...');
             log(`Preparing TTS: ${text.substring(0, 30)}${text.length > 30 ? '...' : ''}`, 'tts');
             
-            fetch(url, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    text: text,
-                    voice_id: voiceId
-                })
-            })
-            .then(response => {
-                if (!response.ok) {
-                    return response.json().then(err => {
-                        throw new Error(`API error: ${err.error || 'Unknown error'}`);
-                    });
-                }
-                return response.blob();
-            })
-            .then(blob => {
-                const audioUrl = URL.createObjectURL(blob);
-                ttsAudio.src = audioUrl;
+            // Use a Promise to properly handle the audio flow and prevent race conditions
+            return new Promise((resolveMain, rejectMain) => {
+                const voiceId = ttsVoiceSelect.value;
+                const url = `${apiUrl}/api/text_to_speech_elevenlabs`;
                 
-                ttsAudio.onplay = () => {
-                    updateTTSStatus(true, 'Speaking...');
-                    log('TTS playing', 'tts');
-                };
+                // Flag to track if we're using browser fallback
+                let usingBrowserFallback = false;
+                let elevenlabsPlaying = false;
                 
-                ttsAudio.onended = () => {
-                    updateTTSStatus(false, 'Completed');
-                    log('TTS finished', 'tts');
+                // Function to use browser TTS fallback
+                const useFallbackTTS = () => {
+                    if (usingBrowserFallback || elevenlabsPlaying) return; // Prevent double fallback or both playing
+                    usingBrowserFallback = true;
                     
-                    // Clear any existing timeout
-                    if (ttsEndedTimeout) {
-                        clearTimeout(ttsEndedTimeout);
+                    if (!window.speechSynthesis) {
+                        log('Browser TTS not available', 'error');
+                        updateTTSStatus(false, 'Failed');
+                        rejectMain(new Error('Browser TTS not available'));
+                        return false;
                     }
                     
-                    // Start STT after delay if auto-start is enabled
-                    if ((autoStartSttCheckbox.checked || automationActive) && isConnected) {
-                        const delay = parseInt(ttsSttDelaySlider.value);
-                        log(`Will start STT in ${delay}ms`, 'stt');
+                    log('Attempting fallback to browser TTS', 'warn');
+                    updateTTSStatus(true, 'Speaking (Browser)');
+                    
+                    // Cancel any existing speech synthesis
+                    window.speechSynthesis.cancel();
+                    
+                    const utterance = new SpeechSynthesisUtterance(text);
+                    
+                    utterance.onend = () => {
+                        log('Browser TTS finished', 'tts');
+                        updateTTSStatus(false, 'Completed');
                         
-                        ttsEndedTimeout = setTimeout(() => {
-                            startSpeechRecognition();
-                        }, delay);
+                        // Start STT after delay if auto-start is enabled
+                        if ((autoStartSttCheckbox.checked || automationActive) && isConnected) {
+                            const delay = parseInt(ttsSttDelaySlider.value);
+                            log(`Will start STT in ${delay}ms`, 'stt');
+                            
+                            if (ttsEndedTimeout) {
+                                clearTimeout(ttsEndedTimeout);
+                            }
+                            
+                            ttsEndedTimeout = setTimeout(() => {
+                                startSpeechRecognition();
+                            }, delay);
+                        }
+                        
+                        resolveMain(true);
+                    };
+                    
+                    utterance.onerror = (e) => {
+                        log(`Browser TTS error: ${e.error || 'Unknown error'}`, 'error');
+                        updateTTSStatus(false, 'Failed');
+                        rejectMain(new Error(`Browser TTS error: ${e.error || 'Unknown error'}`));
+                    };
+                    
+                    window.speechSynthesis.speak(utterance);
+                    return true;
+                };
+                
+                // First try ElevenLabs
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ text: text, voice_id: voiceId })
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`API error: ${response.status} ${response.statusText}`);
                     }
-                };
-                
-                ttsAudio.onerror = (e) => {
-                    updateTTSStatus(false, 'Error');
-                    log(`TTS error: ${e.error || 'Audio playback error'}`, 'error');
-                };
-                
-                ttsAudio.play();
-                return true;
-            })
-            .catch(error => {
-                updateTTSStatus(false, 'Error');
-                log(`TTS error: ${error.message}`, 'error');
-                return false;
+                    return response.blob();
+                })
+                .then(blob => {
+                    if (!blob || blob.size === 0) {
+                        throw new Error('Empty audio data received');
+                    }
+                    
+                    // If we're already using browser fallback, don't continue
+                    if (usingBrowserFallback) {
+                        return resolveMain(true);
+                    }
+                    
+                    return new Promise((resolve, reject) => {
+                        // Create a NEW Audio element each time to prevent issues with reuse
+                        window.ttsAudio = new Audio();
+                        
+                        // Create object URL after ensuring we have a valid blob
+                        const audioUrl = URL.createObjectURL(blob);
+                        window.ttsAudio.src = audioUrl;
+                        window.ttsAudio.preload = 'auto';
+                        
+                        const cleanupAudio = () => {
+                            try {
+                                if (audioUrl) {
+                                    URL.revokeObjectURL(audioUrl);
+                                }
+                            } catch (e) {
+                                log(`Error revoking URL: ${e.message}`, 'warn');
+                            }
+                        };
+                        
+                        // Set up event handlers
+                        window.ttsAudio.onloadedmetadata = () => {
+                            if (usingBrowserFallback) return;
+                            log('ElevenLabs audio metadata loaded', 'tts');
+                        };
+                        
+                        window.ttsAudio.oncanplay = () => {
+                            if (usingBrowserFallback) return;
+                            log('ElevenLabs audio ready to play', 'tts');
+                        };
+                        
+                        window.ttsAudio.onplay = () => {
+                            if (usingBrowserFallback) return;
+                            elevenlabsPlaying = true;
+                            updateTTSStatus(true, 'Speaking (ElevenLabs)');
+                            log('TTS playing', 'tts');
+                        };
+                        
+                        window.ttsAudio.onended = () => {
+                            if (usingBrowserFallback) return;
+                            
+                            elevenlabsPlaying = false;
+                            updateTTSStatus(false, 'Completed');
+                            log('TTS finished', 'tts');
+                            cleanupAudio();
+                            
+                            // Start STT after delay if auto-start is enabled
+                            if ((autoStartSttCheckbox.checked || automationActive) && isConnected) {
+                                const delay = parseInt(ttsSttDelaySlider.value);
+                                log(`Will start STT in ${delay}ms`, 'stt');
+                                
+                                if (ttsEndedTimeout) {
+                                    clearTimeout(ttsEndedTimeout);
+                                }
+                                
+                                ttsEndedTimeout = setTimeout(() => {
+                                    startSpeechRecognition();
+                                }, delay);
+                            }
+                            
+                            resolve(true);
+                        };
+                        
+                        window.ttsAudio.onerror = (e) => {
+                            if (usingBrowserFallback) return;
+                            
+                            // Get a better error message from the error event
+                            let errorMsg;
+                            if (window.ttsAudio.error) {
+                                // MediaError object has useful information
+                                const mediaError = window.ttsAudio.error;
+                                const errorCodes = {
+                                    1: 'MEDIA_ERR_ABORTED',
+                                    2: 'MEDIA_ERR_NETWORK',
+                                    3: 'MEDIA_ERR_DECODE',
+                                    4: 'MEDIA_ERR_SRC_NOT_SUPPORTED'
+                                };
+                                const errorCode = errorCodes[mediaError.code] || `Unknown error code ${mediaError.code}`;
+                                errorMsg = `${errorCode}: ${mediaError.message || 'MEDIA_ELEMENT_ERROR: Empty src attribute'}`;
+                            } else {
+                                errorMsg = e.message || 'Unknown error';
+                            }
+                            
+                            log(`ElevenLabs audio playback error: ${errorMsg}`, 'error');
+                            cleanupAudio();
+                            elevenlabsPlaying = false;
+                            
+                            // Fall back to browser TTS
+                            useFallbackTTS();
+                            reject(new Error(`Audio error: ${errorMsg}`));
+                        };
+                        
+                        // Play the audio with better error handling
+                        try {
+                            log('Attempting to play ElevenLabs audio', 'tts');
+                            
+                            const playPromise = window.ttsAudio.play();
+                            
+                            // Make sure playPromise is defined before calling then/catch on it
+                            if (playPromise !== undefined && playPromise !== null) {
+                                playPromise
+                                    .then(() => {
+                                        if (usingBrowserFallback) return;
+                                        log('ElevenLabs playback started successfully', 'tts');
+                                    })
+                                    .catch(error => {
+                                        if (usingBrowserFallback) return;
+                                        
+                                        log(`ElevenLabs playback failed: ${error.message}`, 'error');
+                                        cleanupAudio();
+                                        elevenlabsPlaying = false;
+                                        
+                                        // Fall back to browser TTS on play failure
+                                        useFallbackTTS();
+                                        reject(error);
+                                    });
+                            } else {
+                                // This browser may not return a promise from play()
+                                log('No play promise returned, assuming playback started', 'warn');
+                            }
+                        } catch (error) {
+                            if (usingBrowserFallback) return;
+                            
+                            log(`ElevenLabs play() exception: ${error.message}`, 'error');
+                            cleanupAudio();
+                            elevenlabsPlaying = false;
+                            
+                            // Fall back to browser TTS on exception
+                            useFallbackTTS();
+                            reject(error);
+                        }
+                    });
+                })
+                .then(() => {
+                    resolveMain(true);
+                })
+                .catch(error => {
+                    log(`TTS error: ${error.message}`, 'error');
+                    
+                    // Always use fallback if we get here and it's not already being used
+                    if (!usingBrowserFallback && !elevenlabsPlaying) {
+                        useFallbackTTS();
+                    } else if (!elevenlabsPlaying) {
+                        resolveMain(false);
+                    }
+                });
             });
         }
         
         // Stop TTS playback
         function stopTTS() {
-            ttsAudio.pause();
-            ttsAudio.currentTime = 0;
+            // Stop ElevenLabs audio
+            if (window.ttsAudio) {
+                try {
+                    window.ttsAudio.pause();
+                    window.ttsAudio.currentTime = 0;
+                    
+                    // Set src to empty to fully release the audio resource
+                    if (window.ttsAudio.src) {
+                        // If src is an object URL, revoke it
+                        if (window.ttsAudio.src.startsWith('blob:')) {
+                            URL.revokeObjectURL(window.ttsAudio.src);
+                        }
+                        window.ttsAudio.removeAttribute('src'); // Better than empty string
+                        window.ttsAudio.load(); // Force reload to release resources
+                    }
+                } catch (e) {
+                    log(`Error cleaning up audio: ${e.message}`, 'warn');
+                }
+            }
+            
+            // Stop browser TTS
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+            
             updateTTSStatus(false, 'Stopped');
             log('TTS stopped', 'tts');
             
@@ -1317,6 +1570,9 @@
                 clearTimeout(sttSubmitTimeout);
                 sttSubmitTimeout = null;
             }
+            
+            // Clear end interview flag
+            window.endInterviewTTSPlayed = false;
             
             // Clear user input
             userInput.value = '';
@@ -1378,9 +1634,23 @@
         // TTS event listeners
         playLastTtsBtn.addEventListener('click', () => {
             if (lastAssistantMessage) {
-                playTTS(lastAssistantMessage);
+                // Stop any current audio first
+                stopTTS();
+                
+                // Add a small delay to ensure cleanup is complete
+                setTimeout(() => {
+                    playTTS(lastAssistantMessage)
+                        .then(success => {
+                            if (!success) {
+                                log('Failed to replay last message', 'error');
+                            }
+                        })
+                        .catch(error => {
+                            log(`Error replaying message: ${error.message}`, 'error');
+                        });
+                }, 100);
             } else {
-                log('No assistant message to play', 'warn');
+                log('No message to replay', 'warn');
             }
         });
         

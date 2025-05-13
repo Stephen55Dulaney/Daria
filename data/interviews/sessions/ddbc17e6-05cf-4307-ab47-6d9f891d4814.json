@@ -1,0 +1,103 @@
+{
+  "id": "ddbc17e6-05cf-4307-ab47-6d9f891d4814",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Michael J Fox",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "hello why did you not read me the first question",
+      "role": "user",
+      "timestamp": "2025-05-13T11:34:09.079926"
+    },
+    {
+      "content": "It seems like there may have been a miscommunication or technical issue regarding the first question. I apologize for any confusion. Moving forward, I'd like to ask: In your experience with end-to-end testing, what are some common challenges you have faced during the testing process?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:34:10.210804"
+    },
+    {
+      "content": "in that case speech recognition failed",
+      "role": "user",
+      "timestamp": "2025-05-13T11:36:05.549919"
+    },
+    {
+      "content": "Could you please elaborate on how speech recognition failed in that situation during end-to-end testing? What specific challenges did you encounter and how did it impact your testing process?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:36:06.294645"
+    },
+    {
+      "content": "testing the text input overide",
+      "role": "user",
+      "timestamp": "2025-05-13T11:36:48.226835"
+    },
+    {
+      "content": "Can you provide more details about testing the text input override? What specific issues or difficulties have you encountered when testing this aspect of the system during end-to-end testing?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:36:49.008410"
+    },
+    {
+      "content": "it is working",
+      "role": "user",
+      "timestamp": "2025-05-13T11:36:50.762181"
+    },
+    {
+      "content": "It's great to hear that the text input override is working! In your experience, what strategies or approaches have you found most effective in ensuring the smooth functioning of features like text input overrides during end-to-end testing?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:36:51.680209"
+    },
+    {
+      "content": "There is a big white empty box below this text typing area that I do not know what it is for. Next I will reload and check the monitoring. progress.",
+      "role": "user",
+      "timestamp": "2025-05-13T11:37:27.604064"
+    },
+    {
+      "content": "Could you share more about how encountering the big white empty box impacted your testing process? Did it raise any concerns or questions about the functionality of the system that you were testing?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:37:28.505063"
+    },
+    {
+      "content": "okay are you listening to me I'm giving you a one more chance I tested the monitoring page and it didn't work",
+      "role": "user",
+      "timestamp": "2025-05-13T11:41:04.137540"
+    },
+    {
+      "content": "I appreciate your patience, and I'm here to listen to your experiences. When you encountered issues with the monitoring page during testing, can you describe the specific functionalities or aspects that were not working as expected? Additionally, how did this impact your overall testing process and what steps did you take to address these challenges?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:41:05.607721"
+    },
+    {
+      "content": "the monitoring page when I click refresh the transcript updates with the new question much like it does on the interview page when I click the suggestions I see the harbor stay nothing happens there should be a confirmation floating like little tile that tells me what happened at the direct interventions they have a hover steak they do not work the research notes does not come up and on the right hand side of the air Observer is Silent not paying any attention monitor is also",
+      "role": "user",
+      "timestamp": "2025-05-13T11:42:20.124180"
+    },
+    {
+      "content": "It sounds like you've encountered quite a few issues with the monitoring page during your testing. Could you please elaborate on how these specific issues, such as the lack of confirmation floating tiles, non-functional hover states, and silent observers, have impacted your ability to effectively test the system? How do these challenges affect your overall testing process and the accuracy of your results?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:42:21.257810"
+    },
+    {
+      "content": "are you listening and the interview",
+      "role": "user",
+      "timestamp": "2025-05-13T11:44:42.255737"
+    },
+    {
+      "content": "I want to ensure I'm fully understanding your perspective. Could you please share more about what you mean by \"are you listening and the interview\"? How do you feel regarding the current interview process, and is there anything specific you would like to discuss or address further?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:44:43.319054"
+    }
+  ],
+  "transcript": "\n\nParticipant: hello why did you not read me the first question\n\nModerator: It seems like there may have been a miscommunication or technical issue regarding the first question. I apologize for any confusion. Moving forward, I'd like to ask: In your experience with end-to-end testing, what are some common challenges you have faced during the testing process?\n\nParticipant: in that case speech recognition failed\n\nModerator: Could you please elaborate on how speech recognition failed in that situation during end-to-end testing? What specific challenges did you encounter and how did it impact your testing process?\n\nParticipant: testing the text input overide\n\nModerator: Can you provide more details about testing the text input override? What specific issues or difficulties have you encountered when testing this aspect of the system during end-to-end testing?\n\nParticipant: it is working\n\nModerator: It's great to hear that the text input override is working! In your experience, what strategies or approaches have you found most effective in ensuring the smooth functioning of features like text input overrides during end-to-end testing?\n\nParticipant: There is a big white empty box below this text typing area that I do not know what it is for. Next I will reload and check the monitoring. progress.\n\nModerator: Could you share more about how encountering the big white empty box impacted your testing process? Did it raise any concerns or questions about the functionality of the system that you were testing?\n\nParticipant: okay are you listening to me I'm giving you a one more chance I tested the monitoring page and it didn't work\n\nModerator: I appreciate your patience, and I'm here to listen to your experiences. When you encountered issues with the monitoring page during testing, can you describe the specific functionalities or aspects that were not working as expected? Additionally, how did this impact your overall testing process and what steps did you take to address these challenges?\n\nParticipant: the monitoring page when I click refresh the transcript updates with the new question much like it does on the interview page when I click the suggestions I see the harbor stay nothing happens there should be a confirmation floating like little tile that tells me what happened at the direct interventions they have a hover steak they do not work the research notes does not come up and on the right hand side of the air Observer is Silent not paying any attention monitor is also\n\nModerator: It sounds like you've encountered quite a few issues with the monitoring page during your testing. Could you please elaborate on how these specific issues, such as the lack of confirmation floating tiles, non-functional hover states, and silent observers, have impacted your ability to effectively test the system? How do these challenges affect your overall testing process and the accuracy of your results?\n\nParticipant: are you listening and the interview\n\nModerator: I want to ensure I'm fully understanding your perspective. Could you please share more about what you mean by \"are you listening and the interview\"? How do you feel regarding the current interview process, and is there anything specific you would like to discuss or address further?",
+  "analysis": null,
+  "created_at": "2025-05-13T11:30:18.632256",
+  "updated_at": "2025-05-13T11:44:43.321499"
+}

@@ -671,8 +671,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Interview created successfully!');
                 console.log("Redirecting to:", data.redirect_url);
                 
-                // Redirect to the interview details page using the URL from the response
-                window.location.href = data.redirect_url || `/interview_details/${data.session_id}`;
+                // Redirect to the page using the URL from the response
+                // Always use the redirect_url from the server if available
+                window.location.href = data.redirect_url;
             } else {
                 alert('Error creating interview: ' + (data.error || 'Unknown error'));
             }
