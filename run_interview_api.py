@@ -1072,36 +1072,79 @@ def text_to_speech_elevenlabs():
 def speech_to_text():
     """Process audio file and convert speech to text.
     
-    Note: For simplicity, this endpoint returns a success response
-    with hardcoded text. The actual speech-to-text functionality
-    is implemented client-side using the Web Speech API in the browser.
+    This endpoint can:
+    1. Use the external audio service (if available)
+    2. Return a placeholder response if audio service isn't available
     """
     try:
-        # For compatibility with the API, still accept the audio file
+        # Check if audio file is provided
         if 'audio' not in request.files:
             return jsonify({"success": False, "error": "No audio file provided"}), 400
         
-        # Get the audio file and save it (to simulate processing)
+        # Get session ID if provided
+        session_id = request.form.get('session_id', '')
+        
+        # Get the audio file
         audio_file = request.files['audio']
-        filename = os.path.join('uploads', f"temp_audio_{uuid.uuid4()}.webm")
         
         # Ensure uploads directory exists
         os.makedirs('uploads', exist_ok=True)
+        
+        # Save the temporary file
+        filename = os.path.join('uploads', f"temp_audio_{uuid.uuid4()}.webm")
         audio_file.save(filename)
         
-        # Clean up the file (no need to keep it)
+        # Try to forward to audio service
         try:
-            os.remove(filename)
-        except:
-            pass
+            audio_service_url = 'http://localhost:5015/speech_to_text'
+            
+            logger.info(f"Forwarding STT request to {audio_service_url}")
+            
+            # Create a new multipart form with the saved file
+            files = {'audio': open(filename, 'rb')}
+            data = {'session_id': session_id} if session_id else {}
+            
+            response = requests.post(
+                audio_service_url,
+                files=files,
+                data=data,
+                timeout=10
+            )
+            
+            # Clean up the temporary file
+            try:
+                os.remove(filename)
+            except Exception as e:
+                logger.error(f"Error removing temp file: {str(e)}")
+            
+            # Return the response from the STT service
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error(f"Error from STT service: {response.status_code}")
+                # Return a fallback response if the service fails
+                return jsonify({
+                    'success': True,
+                    'text': "I'm saying something important in this interview.",
+                    'fallback': True
+                })
+                
+        except Exception as e:
+            logger.error(f"Error forwarding to STT service: {str(e)}")
+            
+            # Clean up the temporary file
+            try:
+                os.remove(filename)
+            except Exception as file_e:
+                logger.error(f"Error removing temp file: {str(file_e)}")
+            
+            # Return a fallback response
+            return jsonify({
+                'success': True,
+                'text': "I didn't quite catch that. Could you please repeat?",
+                'fallback': True
+            })
         
-        # Return a success response with placeholder text
-        # In reality, we're relying on the browser's Web Speech API
-        # This is just to maintain API compatibility
-        return jsonify({
-            'success': True,
-            'text': "I'm saying something important in this interview."
-        })
     except Exception as e:
         logger.error(f"Error in speech_to_text: {str(e)}")
         return jsonify({
@@ -1526,7 +1569,22 @@ def monitor_interview_session(session_id):
 @app.route('/interview_details/<session_id>')
 def interview_details(session_id):
     """Show details for a specific interview."""
+    # First try to load from the file-based storage
     interview_data = load_interview(session_id)
+    
+    # If not found in file storage, try to get it from the LangChain discussion service
+    if not interview_data and discussion_service:
+        try:
+            langchain_session = discussion_service.get_session(session_id)
+            if langchain_session:
+                # Convert LangChain session to the format expected by the template
+                interview_data = langchain_session
+                # Ensure all necessary fields exist
+                if 'title' not in interview_data:
+                    interview_data['title'] = f"Session {session_id[:8]}"
+        except Exception as e:
+            logger.error(f"Error loading LangChain session {session_id}: {str(e)}")
+    
     if not interview_data:
         return render_template('langchain/interview_error.html',
                                error=f"No interview found for session: {session_id}")
@@ -1952,110 +2010,131 @@ def api_add_session_message(session_id):
             logger.error(f"No data provided for session {session_id}")
             return jsonify({'success': False, 'error': 'No data provided'}), 400
         
-        # Check if the session exists before attempting to add a message
-        try:
-            session = discussion_service.get_session(session_id)
-            if not session:
-                logger.warning(f"Session {session_id} not found")
-                return jsonify({'success': False, 'error': f'Session {session_id} not found'}), 404
-        except Exception as e:
-            logger.error(f"Error checking session {session_id}: {str(e)}")
-            return jsonify({'success': False, 'error': 'Error checking session'}), 500
-        
-        content = data.get('content', '').strip()
+        content = data.get('content')
         role = data.get('role', 'user')
         
         if not content:
-            logger.error(f"Message content missing for session {session_id}")
-            return jsonify({'success': False, 'error': 'Message content required'}), 400
+            logger.error(f"No content provided for session {session_id}")
+            return jsonify({'success': False, 'error': 'No content provided'}), 400
         
         # Create message object
         message = {
             'content': content,
             'role': role,
-            'id': str(uuid.uuid4()),
             'timestamp': datetime.datetime.now().isoformat()
         }
         
-        # Add the user message
-        success = discussion_service.add_message(session_id, message)
-        if not success:
+        # Add message to the session
+        message_id = discussion_service.add_message(session_id, message)
+        if not message_id:
             return jsonify({'success': False, 'error': 'Failed to add message'}), 500
-            
-        message_id = message['id']
         
-        # If using SocketIO, emit the message to the monitoring room
-        try:
-            socketio.emit('new_message', {
+        # Emit message via WebSocket if available
+        if socketio:
+            result = socketio.emit('new_message', {
                 'session_id': session_id,
-                'message': message
+                'message_id': message_id,
+                'content': content,
+                'role': role
             }, room=f"monitor_{session_id}")
-            
-            logger.info(f"Added message {message_id} to session {session_id} via WebSocket: {socketio is not None}")
-        except Exception as e:
-            logger.error(f"Socket.io error for session {session_id}: {str(e)}")
+            logger.info(f"Added message {message_id} to session {session_id} via WebSocket: {bool(result)}")
         
-        # Generate AI response if this is a user message
-        if role == 'user' and interview_service:
+        # Generate AI response if this was a user message
+        if role == 'user' and use_langchain:
+            logger.info(f"Generating AI response for session {session_id}")
+            # Use LangChain for response generation
             try:
-                # Get the session to retrieve guide ID and character
-                session = discussion_service.get_session(session_id)
-                guide_id = session.get('guide_id') if session else None
+                # Get session info to provide context to the LLM
+                session_info = discussion_service.get_session(session_id)
+                if not session_info:
+                    logger.error(f"Session {session_id} not found")
+                    return jsonify({'success': False, 'error': 'Session not found'}), 404
                 
-                # Get character information if available
-                character_info = {}
-                if guide_id and discussion_service:
-                    character_info = discussion_service.get_character_info(guide_id)
+                # Get the guide for this session
+                guide_id = session_info.get('guide_id', '')
+                guide = discussion_service.get_guide(guide_id) if guide_id else None
                 
-                # Generate response using LangChain
-                logger.info(f"Generating AI response for session {session_id}")
-                ai_message_content = interview_service.generate_response(
-                    session_id, 
-                    prompt=character_info.get('prompt', ''),
-                    character=character_info.get('name', '')
-                )
+                # Get all messages for context
+                messages = discussion_service.get_messages(session_id)
                 
-                # Create AI message object
-                ai_message = {
-                    'content': ai_message_content,
-                    'role': 'assistant',
-                    'id': str(uuid.uuid4()),
-                    'timestamp': datetime.datetime.now().isoformat()
-                }
+                # Generate response
+                interview_service = InterviewService()
                 
-                # Add AI response to the session
-                ai_success = discussion_service.add_message(session_id, ai_message)
-                if not ai_success:
-                    return jsonify({'success': False, 'error': 'Failed to add AI response'}), 500
-                    
-                ai_message_id = ai_message['id']
-                
-                # Also emit the AI response to monitoring room
                 try:
-                    socketio.emit('new_message', {
-                        'session_id': session_id,
-                        'message': ai_message
-                    }, room=f"monitor_{session_id}")
-                except Exception as e:
-                    logger.error(f"Socket.io error emitting AI response for session {session_id}: {str(e)}")
-                
-                return jsonify({
-                    'success': True,
-                    'message': {
-                        'content': ai_message_content,
+                    # Get relevant context from the guide
+                    context = guide.get('content', {}).get('context', '') if guide else ''
+                    topic = guide.get('title', 'Research Interview') if guide else 'Research Interview'
+                    goals = guide.get('content', {}).get('goals', '') if guide else ''
+                    
+                    # Create custom prompt with additional context
+                    custom_prompt = f"""
+                    You are conducting a research interview about: {topic}
+                    
+                    CONTEXT: {context}
+                    
+                    GOALS: {goals}
+                    
+                    Ask thoughtful follow-up questions based on the participant's responses.
+                    Be curious, empathetic, and probe for deeper insights.
+                    Focus on understanding the participant's experiences, challenges, and needs.
+                    Ask one question at a time, and avoid leading questions.
+                    """
+                    
+                    # Generate response with LangChain
+                    ai_response = interview_service.generate_response(
+                        messages,
+                        prompt=custom_prompt
+                    )
+                    
+                    # Create AI message object
+                    ai_message = {
+                        'content': ai_response,
                         'role': 'assistant',
-                        'id': ai_message_id
+                        'timestamp': datetime.datetime.now().isoformat()
                     }
-                })
+                    
+                    # Add AI response to the session
+                    ai_message_id = discussion_service.add_message(session_id, ai_message)
+                    
+                    # Emit AI message via WebSocket
+                    if socketio:
+                        socketio.emit('new_message', {
+                            'session_id': session_id,
+                            'message_id': ai_message_id,
+                            'content': ai_response,
+                            'role': 'assistant'
+                        }, room=f"monitor_{session_id}")
+                        
+                except Exception as e:
+                    logger.error(f"Error generating response: {str(e)}")
+                    # If we can't generate a real response, use a fallback
+                    fallback_response = "I'm sorry, I'm having trouble processing your input. Could you please rephrase or try again?"
+                    
+                    # Create fallback message object
+                    fallback_message = {
+                        'content': fallback_response,
+                        'role': 'assistant',
+                        'timestamp': datetime.datetime.now().isoformat()
+                    }
+                    
+                    # Add fallback message
+                    ai_message_id = discussion_service.add_message(session_id, fallback_message)
+                    
+                    # Emit fallback message
+                    if socketio:
+                        socketio.emit('new_message', {
+                            'session_id': session_id,
+                            'message_id': ai_message_id,
+                            'content': fallback_response,
+                            'role': 'assistant'
+                        }, room=f"monitor_{session_id}")
             except Exception as e:
-                logger.error(f"Error generating response for session {session_id}: {str(e)}")
-                return jsonify({'success': False, 'error': str(e)}), 500
+                logger.error(f"Error in LangChain response generation: {str(e)}")
+                # Continue without AI response, don't fail the API call
         
-        # If we're not using LangChain or it's not a user message, just return success
         return jsonify({'success': True, 'message_id': message_id})
-        
     except Exception as e:
-        logger.error(f"Error in api_add_session_message for session {session_id}: {str(e)}")
+        logger.error(f"Error adding message to session {session_id}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/session/<session_id>/messages', methods=['GET'])
@@ -3209,6 +3288,51 @@ def test_monitor_websocket(session_id):
     except Exception as e:
         logger.error(f"Error testing monitor WebSocket: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+# Add this after the API route for analyzing interviews or in the API routes section
+
+@app.route('/api/interview/delete/<interview_id>', methods=['POST'])
+def delete_interview_api(interview_id):
+    """Delete an interview by ID."""
+    try:
+        # Check if the interview exists
+        interview_file = os.path.join(DATA_DIR, f"{interview_id}.json")
+        if not os.path.exists(interview_file):
+            return jsonify({
+                'success': False,
+                'error': f"Interview with ID {interview_id} not found."
+            }), 404
+        
+        # Delete the interview file
+        try:
+            os.remove(interview_file)
+            logger.info(f"Deleted interview file for {interview_id}")
+            
+            # If using discussion service, try to delete the session there too
+            if discussion_service:
+                try:
+                    discussion_service.delete_session(interview_id)
+                    logger.info(f"Deleted session {interview_id} from discussion service")
+                except Exception as e:
+                    logger.warning(f"Could not delete session from discussion service: {str(e)}")
+            
+            return jsonify({
+                'success': True,
+                'message': "Interview deleted successfully."
+            })
+        except Exception as e:
+            logger.error(f"Error deleting interview file: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': f"Error deleting interview file: {str(e)}"
+            }), 500
+    
+    except Exception as e:
+        logger.error(f"Error deleting interview {interview_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f"Error deleting interview: {str(e)}"
+        }), 500
 
 # Start the app
 if __name__ == '__main__':

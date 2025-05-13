@@ -36,6 +36,7 @@
                                 </thead>
                                 <tbody>
                                     {% for session in sessions %}
+                                        {% set session_id = session.session_id or session.id or loop.index %}
                                         <tr>
                                             <td>{{ session.title }}</td>
                                             <td>
@@ -73,10 +74,10 @@
                                             </td>
                                             <td>
                                                 <div class="btn-group">
-                                                    <a href="/monitor_interview/{{ session.session_id }}" class="btn btn-sm btn-primary">
+                                                    <a href="/monitor_interview/{{ session_id }}" class="btn btn-sm btn-primary">
                                                         <i class="bi bi-display"></i> Monitor
                                                     </a>
-                                                    <a href="/session/{{ session.session_id }}" class="btn btn-sm btn-outline-secondary">
+                                                    <a href="/interview_details/{{ session_id }}" class="btn btn-sm btn-outline-secondary">
                                                         <i class="bi bi-info-circle"></i> Details
                                                     </a>
                                                 </div>
