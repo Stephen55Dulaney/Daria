@@ -308,7 +308,7 @@
             <div class="live-indicator me-3">
                 <span class="dot"></span> LIVE
             </div>
-            <a href="/session/{{ session_id }}" class="btn btn-sm btn-outline-secondary me-2">
+            <a href="/interview_details/{{ session_id }}" class="btn btn-sm btn-outline-secondary me-2">
                 <i class="bi bi-info-circle me-1"></i> Session Details
             </a>
             <button id="end-session-btn" class="btn btn-sm btn-danger">
@@ -630,17 +630,216 @@
         const addNoteModal = new bootstrap.Modal(document.getElementById('addNoteModal'));
         const endInterviewModal = new bootstrap.Modal(document.getElementById('endInterviewModal'));
         
-        // Socket connection for real-time updates
-        const socket = io();
-        
-        // Join monitoring room for this session
-        socket.on('connect', function() {
-            socket.emit('join_monitor_room', { session_id: sessionId });
-            console.log('Connected to monitoring room for session:', sessionId);
+        // Initialize socket.io connection
+        function initSocketConnection() {
+            // Connect to socket.io server for real-time updates
+            if (typeof io !== 'undefined') {
+                console.log("Setting up Socket.IO connection");
+                
+                // Try to reuse existing socket if available
+                if (window.socket && window.socket.connected) {
+                    console.log("Using existing socket connection");
+                    joinMonitoringRoom(window.socket);
+                    return;
+                }
+                
+                // Create new socket connection with improved reliability options
+                const options = {
+                    reconnection: true,
+                    reconnectionAttempts: 10,
+                    reconnectionDelay: 1000,
+                    reconnectionDelayMax: 5000,
+                    timeout: 20000,
+                    // Prefer WebSocket transport but fall back to polling if needed
+                    transports: ['websocket', 'polling']
+                };
+                
+                try {
+                    // First try to connect using the current page's origin
+                    window.socket = io(window.location.origin, options);
+                    
+                    window.socket.on('connect', function() {
+                        console.log("Socket connected successfully");
+                        updateSocketStatus('connected');
+                        joinMonitoringRoom(window.socket);
+                    });
+                    
+                    window.socket.on('connect_error', function(error) {
+                        console.error("Socket connection error:", error);
+                        updateSocketStatus('error');
+                        // Schedule a reconnection attempt
+                        setTimeout(() => {
+                            if (!window.socket.connected) {
+                                console.log("Attempting to reconnect socket...");
+                                window.socket.connect();
+                            }
+                        }, 3000);
+                    });
+                    
+                    window.socket.on('disconnect', function() {
+                        console.log("Socket disconnected");
+                        updateSocketStatus('disconnected');
+                    });
+                    
+                    window.socket.on('error', function(error) {
+                        console.error("Socket error:", error);
+                        updateSocketStatus('error');
+                    });
+                    
+                } catch (error) {
+                    console.error("Error initializing socket:", error);
+                    updateSocketStatus('error');
+                    
+                    // Try again with CDN version if there's an issue
+                    loadSocketIOFromCDN();
+                }
+            } else {
+                console.error("Socket.IO not available");
+                updateSocketStatus('unavailable');
+                
+                // Try to load it from CDN
+                loadSocketIOFromCDN();
+            }
+        }
+
+        // Load Socket.IO from CDN if not available
+        function loadSocketIOFromCDN() {
+            console.log("Loading Socket.IO from CDN");
             
-            // Request AI suggested questions
-            socket.emit('request_suggested_questions', { session_id: sessionId });
-        });
+            const script = document.createElement('script');
+            script.src = 'https://cdn.socket.io/4.6.0/socket.io.min.js';
+            script.crossOrigin = 'anonymous';
+            
+            script.onload = function() {
+                console.log("Socket.IO loaded from CDN");
+                initSocketConnection();
+            };
+            
+            script.onerror = function(error) {
+                console.error("Failed to load Socket.IO from CDN:", error);
+                updateSocketStatus('failed');
+                
+                // Try a fallback version
+                const fallbackScript = document.createElement('script');
+                fallbackScript.src = 'https://cdn.socket.io/socket.io-3.0.5.js';
+                fallbackScript.crossOrigin = 'anonymous';
+                
+                fallbackScript.onload = function() {
+                    console.log("Socket.IO loaded from fallback CDN");
+                    initSocketConnection();
+                };
+                
+                fallbackScript.onerror = function() {
+                    console.error("Failed to load Socket.IO from fallback CDN");
+                    updateSocketStatus('failed');
+                    
+                    // Show manual refresh option
+                    const statusEl = document.getElementById('connection-status');
+                    if (statusEl) {
+                        statusEl.innerHTML = '<span class="text-danger">Connection failed</span> <button class="btn btn-sm btn-outline-primary ms-2" onclick="window.location.reload()">Refresh</button>';
+                    }
+                };
+                
+                document.head.appendChild(fallbackScript);
+            };
+            
+            document.head.appendChild(script);
+        }
+
+        // Join the monitoring room
+        function joinMonitoringRoom(socket) {
+            if (!socket) return;
+            
+            // Join monitoring room for this session
+            socket.emit('join', {
+                session_id: sessionId
+            });
+            
+            // Setup event handlers for monitoring-specific events
+            
+            // Handle new messages from the interview
+            socket.on('new_message', function(data) {
+                console.log("Received new message:", data);
+                if (data.message_id && data.content) {
+                    // Add the message to the transcript
+                    addMessageToTranscript(data.role, data.content, data.message_id);
+                    
+                    // Notify researcher if enabled
+                    if (notifyEnabled) {
+                        notifyNewMessage(data.role, data.content);
+                    }
+                } else if (data.message) {
+                    // Handle legacy format
+                    const message = data.message;
+                    addMessageToTranscript(message.role, message.content, message.id);
+                }
+            });
+            
+            // Handle observations from AI observer
+            socket.on('new_observation', function(data) {
+                console.log("Received new observation:", data);
+                if (data.observation) {
+                    displayObservation(data.observation, data.message_id);
+                }
+            });
+            
+            // Handle new insights
+            socket.on('new_insights', function(data) {
+                console.log("Received new insights:", data);
+                if (data.insights && data.insights.length > 0) {
+                    updateInsights(data.insights);
+                }
+            });
+            
+            // Handle suggested questions
+            socket.on('suggested_questions', function(data) {
+                console.log("Received suggested questions:", data);
+                if (data.questions && data.questions.length > 0) {
+                    updateSuggestedQuestions(data.questions);
+                }
+            });
+            
+            // Handle errors
+            socket.on('error', function(data) {
+                console.error("Socket error:", data);
+                showToast('Error', data.error || 'An unknown error occurred', 'danger');
+            });
+            
+            // Handle successful room joining
+            socket.on('joined_room', function(data) {
+                console.log("Successfully joined room:", data);
+                updateSocketStatus('monitoring');
+            });
+        }
+
+        // Update the socket connection status display
+        function updateSocketStatus(status) {
+            const statusEl = document.getElementById('connection-status');
+            if (!statusEl) return;
+            
+            switch (status) {
+                case 'connected':
+                    statusEl.innerHTML = '<span class="text-success"><i class="bi bi-check-circle me-1"></i>Connected</span>';
+                    break;
+                case 'disconnected':
+                    statusEl.innerHTML = '<span class="text-warning"><i class="bi bi-exclamation-circle me-1"></i>Disconnected</span>';
+                    break;
+                case 'error':
+                    statusEl.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Connection Error</span>';
+                    break;
+                case 'monitoring':
+                    statusEl.innerHTML = '<span class="text-success"><i class="bi bi-broadcast me-1"></i>Monitoring Active</span>';
+                    break;
+                case 'unavailable':
+                    statusEl.innerHTML = '<span class="text-secondary"><i class="bi bi-dash-circle me-1"></i>WebSocket Unavailable</span>';
+                    break;
+                case 'failed':
+                    statusEl.innerHTML = '<span class="text-danger"><i class="bi bi-x-circle me-1"></i>Connection Failed</span>';
+                    break;
+                default:
+                    statusEl.innerHTML = '<span class="text-secondary"><i class="bi bi-question-circle me-1"></i>Unknown Status</span>';
+            }
+        }
         
         // Track message timestamps for calculating statistics
         let messageTimestamps = [];
