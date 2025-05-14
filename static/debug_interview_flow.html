@@ -17,47 +17,44 @@
         .container {
             display: flex;
             flex-direction: column;
-            height: calc(100vh - 40px);
+            gap: 15px;
         }
         
-        header {
-            background-color: #f0f0f0;
-            padding: 10px;
-            margin-bottom: 10px;
-            border-radius: 5px;
-        }
-        
-        h1 {
-            margin: 0;
-            font-size: 24px;
-        }
-        
-        .content {
-            display: flex;
-            flex-grow: 1;
-            gap: 20px;
-            overflow: hidden;
-        }
-        
-        .left-panel {
-            flex: 7;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-        }
-        
-        .right-panel {
-            flex: 5;
-            display: flex;
-            flex-direction: column;
+        .debug-panel {
             background-color: #f5f5f5;
-            padding: 10px;
+            border: 1px solid #ddd;
             border-radius: 5px;
-            overflow: hidden;
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            margin-top: 0;
+        }
+        
+        .two-column {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .two-column > div {
+            flex: 1;
+        }
+        
+        .flex-row {
+            display: flex;
+            gap: 10px;
+            align-items: flex-end;
+            margin-bottom: 10px;
+        }
+        
+        .settings-item {
+            margin-bottom: 10px;
         }
         
         .message-container {
-            flex-grow: 1;
+            height: 300px;
             overflow-y: auto;
             padding: 10px;
             background-color: #fff;
@@ -66,22 +63,32 @@
             margin-bottom: 10px;
         }
         
+        .log-container {
+            height: 200px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #000;
+            color: #fff;
+            font-family: monospace;
+            border-radius: 5px;
+        }
+        
         .message {
             margin-bottom: 15px;
             padding: 10px;
             border-radius: 5px;
-            max-width: 80%;
         }
         
         .user-message {
             background-color: #e7f4fd;
-            align-self: flex-end;
-            margin-left: auto;
+            border-left: 4px solid #2196F3;
+            margin-left: 20px;
         }
         
         .assistant-message {
             background-color: #f0f0f0;
-            align-self: flex-start;
+            border-left: 4px solid #9E9E9E;
+            margin-right: 20px;
         }
         
         .error-message {
@@ -92,27 +99,26 @@
             width: 100%;
         }
         
-        .input-area {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
         textarea {
-            flex-grow: 1;
+            width: 100%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
-            resize: none;
+            resize: vertical;
+            min-height: 60px;
+            font-family: Arial, sans-serif;
+            margin-bottom: 10px;
         }
         
         button {
-            padding: 10px;
+            padding: 8px 12px;
             background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
             cursor: pointer;
+            margin-right: 5px;
+            margin-bottom: 5px;
         }
         
         button:hover {
@@ -128,111 +134,109 @@
             margin-bottom: 10px;
         }
         
-        .status-area {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
         .status-indicator {
-            padding: 5px 10px;
-            border-radius: 5px;
-            font-size: 12px;
-            font-weight: bold;
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
         }
         
-        .connected {
-            background-color: #c8e6c9;
-            color: #2e7d32;
+        .status-active {
+            background-color: #4CAF50;
         }
         
-        .disconnected {
-            background-color: #ffcdd2;
-            color: #c62828;
+        .status-inactive {
+            background-color: #F44336;
         }
         
-        .listening {
-            background-color: #bbdefb;
-            color: #1565c0;
-        }
-        
-        .speaking {
-            background-color: #e1bee7;
-            color: #6a1b9a;
-        }
-        
-        .logs {
-            flex-grow: 1;
-            overflow-y: auto;
-            background-color: #000;
-            color: #fff;
-            padding: 10px;
-            font-family: monospace;
-            border-radius: 5px;
-        }
-        
-        .log-entry {
-            margin-bottom: 5px;
-            border-bottom: 1px solid #333;
-            padding-bottom: 2px;
-        }
-        
-        .log-info {
-            color: #4CAF50;
-        }
-        
-        .log-warn {
-            color: #FFC107;
-        }
-        
-        .log-error {
-            color: #F44336;
-        }
-        
-        .log-stt {
-            color: #2196F3;
-        }
-        
-        .log-tts {
-            color: #9C27B0;
-        }
-        
-        .controls {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px;
-            margin-top: 10px;
-        }
-        
-        .control-group {
-            margin-bottom: 10px;
-            padding: 10px;
-            background-color: #eee;
-            border-radius: 5px;
-        }
-        
-        .control-group h3 {
-            margin-top: 0;
-            font-size: 16px;
+        .status-warning {
+            background-color: #FFC107;
         }
         
         .slider-container {
-            margin-bottom: 10px;
+            margin-bottom: 15px;
         }
         
-        .slider-container label {
-            display: block;
+        .slider-header {
+            display: flex;
+            justify-content: space-between;
             margin-bottom: 5px;
+        }
+        
+        .slider-label {
+            font-weight: bold;
         }
         
         input[type="range"] {
             width: 100%;
         }
         
-        .value-display {
-            font-size: 12px;
-            color: #666;
-            text-align: right;
+        select, input[type="text"], input[type="number"] {
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            margin-bottom: 5px;
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #333;
+            padding-bottom: 2px;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        
+        .info-log {
+            color: #4CAF50;
+        }
+        
+        .warn-log {
+            color: #FFC107;
+        }
+        
+        .error-log {
+            color: #F44336;
+        }
+        
+        .stt-log {
+            color: #2196F3;
+        }
+        
+        .tts-log {
+            color: #9C27B0;
+        }
+        
+        /* Hide the native audio controls */
+        audio:not([controls]) {
+            display: none;
+            height: 0;
+        }
+        
+        /* Additional styles for debug panel */
+        .debug-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .debug-btn {
+            padding: 8px 12px;
+            background-color: #4CAF50;
+            color: white;
+            border: 1px solid #3e8e41;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s;
+        }
+        
+        .debug-btn:hover {
+            background-color: #3e8e41;
+        }
+        
+        .debug-btn:active {
+            background-color: #357a38;
         }
     </style>
 </head>
@@ -405,8 +409,11 @@
         
         <div class="debug-panel">
             <h2>Debug Log</h2>
-            <button id="clear-log">Clear Log</button>
-            <div class="log-container" id="log-container"></div>
+            <div class="debug-controls">
+                <button id="clear-log" class="debug-btn">Clear Log</button>
+                <button id="copy-log" class="debug-btn">Copy All Logs</button>
+            </div>
+            <div id="log-container" class="log-container"></div>
         </div>
     </div>
 
@@ -473,6 +480,7 @@
         const automationStatusText = document.getElementById('automation-status-text');
         
         const clearLogBtn = document.getElementById('clear-log');
+        const copyLogBtn = document.getElementById('copy-log');
         const logContainer = document.getElementById('log-container');
         
         // Get port from URL parameters if available
@@ -568,7 +576,7 @@
             sttActive = isActive;
             
             if (isWarning) {
-                sttStatusIndicator.className = 'status-indicator status-warn';
+                sttStatusIndicator.className = 'status-indicator status-warning';
             } else if (isActive) {
                 sttStatusIndicator.className = 'status-indicator status-active';
             } else {
@@ -828,101 +836,104 @@
             }
         }
         
-        // Send user message to API
-        async function sendUserMessage(message) {
-            if (!sessionId || !message) {
-                log('Cannot send message: missing session ID or message content', 'error');
-                return false;
+        // Send message to API server
+        async function sendMessage(text) {
+            const input = text || userInput.value.trim();
+            
+            if (!input) {
+                log("Cannot send empty message");
+                return;
+            }
+            
+            log(`Sending message: ${input.substring(0, 30)}${input.length > 30 ? '...' : ''}`);
+            
+            // Check for end interview commands
+            const lowerInput = input.toLowerCase();
+            if (lowerInput.includes("end the interview") || 
+                lowerInput.includes("end interview") || 
+                lowerInput.includes("finish the interview") || 
+                lowerInput.includes("complete the interview") ||
+                lowerInput.includes("stop the interview")) {
+                
+                log('End interview request detected', 'info');
+                
+                // Stop automation if active
+                if (automationActive) {
+                    stopAutomation();
+                }
+                
+                // Add the messages manually
+                addMessage(input, 'user');
+                addMessage("Thank you for testing the interview! The debug interface will remain open for additional testing.", 'assistant');
+                
+                // Check if we've already played the TTS for ending the interview
+                // to prevent duplicate playback
+                if (autoTtsCheckbox.checked && !window.endInterviewTTSPlayed) {
+                    window.endInterviewTTSPlayed = true;
+                    playTTS("Thank you for testing the interview! The debug interface will remain open for additional testing.");
+                }
+                
+                userInput.value = '';
+                return;
             }
             
             try {
-                log(`Sending message: ${message.substring(0, 30)}${message.length > 30 ? '...' : ''}`, 'info');
-                
-                // Check for "end the interview" or similar phrases
-                const lowerMessage = message.toLowerCase();
-                if (lowerMessage.includes("end the interview") || 
-                    lowerMessage.includes("end interview") || 
-                    lowerMessage.includes("finish the interview") || 
-                    lowerMessage.includes("complete the interview") ||
-                    lowerMessage.includes("stop the interview")) {
-                    
-                    log('End interview request detected', 'info');
-                    
-                    // Stop automation if active
-                    if (automationActive) {
-                        stopAutomation();
-                    }
-                    
-                    // Set a flag to prevent duplicate TTS playback
-                    window.endInterviewTTSPlayed = true;
-                    
-                    // Add a thank you message
-                    addMessage(message, 'user');
-                    addMessage("Thank you for testing the interview! The debug interface will remain open for additional testing.", 'assistant');
-                    
-                    // Play thank you message if auto-TTS is enabled
-                    if (autoTtsCheckbox.checked) {
-                        playTTS("Thank you for testing the interview! The debug interface will remain open for additional testing.");
-                    }
-                    
-                    return true;
+                // Check if we have a valid session
+                if (!sessionId) {
+                    log("No session ID available - cannot send message");
+                    logError("Cannot send message without a session ID");
+                    return;
                 }
                 
-                // Add message to UI
-                addMessage(message, 'user');
+                // First update the UI
+                addMessage(input, 'user');
+                userInput.value = ''; // Clear input field
                 
-                // Send to API
-                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                // Stop speech recognition if it's running
+                if (sttActive) {
+                    stopSpeechRecognition();
+                }
+                
+                // Properly handle API endpoint for message sending
+                const addMessageEndpoint = `http://${window.location.hostname}:${apiPort}/api/session/${sessionId}/add_message`;
+                log(`Sending message to endpoint: ${addMessageEndpoint}`);
+                
+                const response = await fetch(addMessageEndpoint, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        content: message,
+                        content: input,
                         role: 'user'
                     })
                 });
                 
+                // Check if the response was successful
                 if (!response.ok) {
-                    const statusCode = response.status;
-                    let errorMessage = `Failed to send message: ${statusCode}`;
-                    
-                    // Try to parse the error response to get more details
-                    try {
-                        const errorData = await response.json();
-                        if (errorData && errorData.error) {
-                            errorMessage = `Failed to send message: ${statusCode} - ${errorData.error}`;
-                        }
-                    } catch (parseError) {
-                        // If we can't parse the response, just use the status code
-                        console.error("Error parsing error response:", parseError);
-                    }
-                    
-                    throw new Error(errorMessage);
+                    const errorText = await response.text();
+                    logError(`API error ${response.status}: ${errorText}`);
+                    throw new Error(`API error ${response.status}: ${errorText}`);
                 }
                 
-                const data = await response.json();
+                const responseData = await response.json();
                 
-                if (!data.success) {
-                    throw new Error(data.error || 'Failed to send message');
+                if (!responseData.success) {
+                    logError(`API returned error: ${responseData.error || 'Unknown error'}`);
+                    throw new Error(responseData.error || 'API reported failure');
                 }
                 
-                log('Message sent successfully', 'info');
+                log(`Message sent successfully with ID: ${responseData.message_id}`);
                 
-                // Get the AI response
-                await fetchLatestMessages();
+                // Poll for new messages after a short delay
+                setTimeout(() => {
+                    fetchLatestMessages();
+                }, 2000);
                 
                 return true;
             } catch (error) {
-                log(`Error sending message: ${error.message}`, 'error');
-                
-                // Display a more user-friendly error message in the chat
-                const errorMessage = document.createElement('div');
-                errorMessage.className = 'message error-message';
-                errorMessage.innerHTML = `<p>Error: Unable to send message. ${error.message}</p>`;
-                messageContainer.appendChild(errorMessage);
-                messageContainer.scrollTop = messageContainer.scrollHeight;
-                
+                logError(`Error sending message: ${error.message}`);
+                console.error('Error sending message:', error);
                 return false;
             }
         }
@@ -1062,7 +1073,7 @@
                                                 return;
                                             }
                                             
-                                            sendUserMessage(finalTranscript);
+                                            sendMessage(finalTranscript);
                                             userInput.value = '';
                                             finalTranscript = '';
                                         } else {
@@ -1612,7 +1623,7 @@
         sendMessageBtn.addEventListener('click', () => {
             const message = userInput.value.trim();
             if (message) {
-                sendUserMessage(message);
+                sendMessage(message);
                 userInput.value = '';
             } else {
                 log('No message to send', 'warn');
@@ -1622,7 +1633,7 @@
         skipSttBtn.addEventListener('click', () => {
             const message = userInput.value.trim();
             if (message) {
-                sendUserMessage(message);
+                sendMessage(message);
                 userInput.value = '';
             } else {
                 log('No message to send', 'warn');
@@ -1669,6 +1680,21 @@
         clearLogBtn.addEventListener('click', () => {
             logContainer.innerHTML = '';
             log('Log cleared', 'info');
+        });
+        
+        // Add Copy All Logs button functionality
+        copyLogBtn.addEventListener('click', function() {
+            // Get all log entries
+            const logTexts = Array.from(logContainer.children).map(entry => entry.textContent).join('\n');
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(logTexts)
+                .then(() => {
+                    log('Debug logs copied to clipboard', 'system');
+                })
+                .catch(err => {
+                    logError(`Failed to copy logs: ${err}`);
+                });
         });
         
         // Additional event listeners for audio element

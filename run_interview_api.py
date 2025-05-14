@@ -451,12 +451,15 @@ def create_fresh_interview_link():
             
         # Generate the sharing URL
         host_url = request.host_url.rstrip('/')
-        sharing_url = f"{host_url}/interview/{new_session_id}?remote=true"
+        standard_url = f"{host_url}/interview/{new_session_id}?remote=true"
+        remote_url = f"{host_url}/remote_interview?session_id={new_session_id}"
             
         return jsonify({
             'success': True,
             'session_id': new_session_id,
-            'sharing_url': sharing_url
+            'sharing_url': remote_url,  # Use the new remote URL by default
+            'standard_url': standard_url,
+            'remote_url': remote_url
         })
             
     except Exception as e:
@@ -1278,13 +1281,12 @@ def join_interview(interview_id):
                                     }
                                     discussion_service.update_session(interview_id, current_session)
                         
-                        # Show the remote session interface
-                        return render_template('langchain/session_remote.html',
+                        # Use the debug-based interview template for improved reliability
+                        return render_template('remote_interview_debug.html',
                                               session_id=interview_id,
                                               guide=guide,
                                               character_name=character_name,
-                                              voice_id=voice_id,
-                                              remote=True)
+                                              voice_id=voice_id)
                 else:
                     # This is the researcher view
                     # Use a different template for a research session
@@ -2054,89 +2056,118 @@ def api_add_session_message(session_id):
                 session = discussion_service.get_session(session_id)
                 
                 if not session:
+                    logger.error(f"Session {session_id} not found")
                     raise ValueError(f"Session {session_id} not found")
                 
                 # We need the guide ID to get the context
                 guide_id = session.get('guide_id')
                 if not guide_id:
+                    logger.error(f"No guide_id found for session {session_id}")
                     raise ValueError("No guide_id found for session")
                 
                 # Get the guide to get context information
                 guide = discussion_service.get_guide(guide_id)
                 if not guide:
+                    logger.error(f"Guide {guide_id} not found for session {session_id}")
                     raise ValueError(f"Guide {guide_id} not found")
+
+                # Prepare required context for LangChain interview
+                context = guide.get('context', '')
+                topic = guide.get('name', 'General Interview')
+                goals = guide.get('goals', [])
                 
-                # Generate response
-                response_text = interview_service.generate_response(session_id, content)
+                if not context or not goals:
+                    logger.warning(f"Missing context or goals in guide {guide_id} for session {session_id}")
+                    # Default values if missing
+                    if not context:
+                        context = "This is an interview conversation."
+                    if not goals:
+                        goals = ["Gather information from the participant"]
+
+                # Log key information before calling generate_response
+                logger.info(f"Using topic: {topic}, context length: {len(context)}, goals: {len(goals)} items")
                 
-                # Add AI response to the session
-                ai_message_id = str(uuid.uuid4())
-                discussion_service.add_message_to_session(session_id, response_text, 'assistant', ai_message_id)
-                
-                # Create message data for websocket
-                ai_message = {
-                    'id': ai_message_id,
-                    'content': response_text,
-                    'role': 'assistant',
-                    'timestamp': datetime.datetime.now().isoformat()
-                }
-                
-                # Emit AI message to all clients
-                socketio.emit('new_message', {
-                    'session_id': session_id,
-                    'message': ai_message
-                }, room=f"monitor_{session_id}")
-                
-            except Exception as e:
-                logger.error(f"Error generating response: {str(e)}")
-                # Add a fallback message if generation fails
-                fallback_text = "I'm sorry, I had trouble processing that. Could you try again or rephrase?"
-                
-                # Add fallback message to the session
-                fallback_id = str(uuid.uuid4())
-                discussion_service.add_message_to_session(session_id, fallback_text, 'assistant', fallback_id)
-                
-                # Emit fallback message
-                fallback_message = {
-                    'id': fallback_id,
-                    'content': fallback_text,
-                    'role': 'assistant',
-                    'timestamp': datetime.datetime.now().isoformat(),
-                    'is_fallback': True
-                }
-                
-                socketio.emit('new_message', {
-                    'session_id': session_id,
-                    'message': fallback_message
-                }, room=f"monitor_{session_id}")
-        
-        # If this is an AI message, we should trigger observer analysis
-        if role == 'assistant' and observer_service and use_langchain:
-            try:
-                # Get context for analysis
-                session = discussion_service.get_session(session_id)
-                if session:
-                    messages = session.get('messages', [])
-                    context = messages[-5:] if len(messages) > 5 else messages
-                    
-                    # Analyze message
-                    observation = observer_service.analyze_message(
+                # Generate response with all required context information
+                try:
+                    # Pass all required information to the interview service
+                    response_text = interview_service.generate_response(
                         session_id, 
-                        message_data,
-                        context
+                        content,
+                        {
+                            'topic': topic,
+                            'context': context,
+                            'goals': goals
+                        }
                     )
                     
-                    # Emit observation
-                    socketio.emit('new_observation', {
+                    # Add AI response to the session
+                    ai_message_id = str(uuid.uuid4())
+                    discussion_service.add_message_to_session(session_id, response_text, 'assistant', ai_message_id)
+                    
+                    # Create message data for websocket
+                    ai_message = {
+                        'id': ai_message_id,
+                        'content': response_text,
+                        'role': 'assistant',
+                        'timestamp': datetime.datetime.now().isoformat()
+                    }
+                    
+                    # Emit AI message to all clients
+                    socketio.emit('new_message', {
                         'session_id': session_id,
-                        'observation': observation
+                        'message': ai_message
+                    }, room=f"monitor_{session_id}")
+                    
+                    logger.info(f"Added AI response ({len(response_text)} chars) to session {session_id}")
+                except Exception as e:
+                    logger.error(f"Error generating response: {str(e)}")
+                    error_message = f"Sorry, I encountered an error while processing your response. {str(e)}"
+                    
+                    # Add an error message as the AI response
+                    ai_message_id = str(uuid.uuid4())
+                    discussion_service.add_message_to_session(
+                        session_id, 
+                        error_message, 
+                        'assistant', 
+                        ai_message_id
+                    )
+                    
+                    # Emit error message to clients
+                    socketio.emit('new_message', {
+                        'session_id': session_id,
+                        'message': {
+                            'id': ai_message_id,
+                            'content': error_message,
+                            'role': 'assistant',
+                            'timestamp': datetime.datetime.now().isoformat()
+                        }
                     }, room=f"monitor_{session_id}")
             except Exception as e:
-                logger.error(f"Error in observer analysis: {str(e)}")
+                logger.error(f"Error in LangChain response generation: {str(e)}")
+                ai_message_id = str(uuid.uuid4())
+                error_message = f"I apologize for the confusion, but it seems like there might have been an error in the conversation retrieval. Could you please provide me with the latest response from the participant so that I can continue the interview or introduce a new relevant topic? Thank you for your understanding."
+                
+                discussion_service.add_message_to_session(
+                    session_id, 
+                    error_message, 
+                    'assistant', 
+                    ai_message_id
+                )
+                
+                socketio.emit('new_message', {
+                    'session_id': session_id,
+                    'message': {
+                        'id': ai_message_id,
+                        'content': error_message,
+                        'role': 'assistant',
+                        'timestamp': datetime.datetime.now().isoformat()
+                    }
+                }, room=f"monitor_{session_id}")
         
         return jsonify({'success': True, 'message_id': message_id})
+        
     except Exception as e:
-        logger.error(f"Error adding message to session: {str(e)}")
+        logger.error(f"Error adding message: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/session/<session_id>/messages', methods=['GET'])
@@ -3471,6 +3502,49 @@ def test_send_message(session_id):
             'success': False,
             'error': f"Exception: {str(e)}"
         }), 500
+
+@app.route('/remote_interview')
+def remote_interview():
+    """
+    Render the simplified remote interview page
+    """
+    try:
+        # Get session ID from query parameter
+        session_id = request.args.get('session_id')
+        accepted = request.args.get('accepted', 'false').lower() == 'true'
+        
+        if not session_id:
+            error_msg = "No session ID provided"
+            logger.error(error_msg)
+            return render_template('error.html', message=error_msg)
+            
+        # Verify session exists
+        session_info = discussion_service.get_session(session_id)
+        
+        if not session_info:
+            error_msg = f"Session {session_id} not found"
+            logger.error(error_msg)
+            return render_template('error.html', message=error_msg)
+            
+        # If not accepted, show welcome page first
+        if not accepted:
+            # Get guide info for context
+            guide_id = session_info.get('guide_id')
+            guide_info = discussion_service.get_guide(guide_id) if guide_id else None
+            guide_name = guide_info.get('name', 'Research Session') if guide_info else 'Research Session'
+            
+            return render_template('welcome.html', 
+                                 session_id=session_id,
+                                 guide_name=guide_name,
+                                 port=request.host.split(':')[-1] if ':' in request.host else '5025')
+        
+        # Render the interview page
+        return render_template('remote_interview.html',
+                             session_id=session_id,
+                             port=request.host.split(':')[-1] if ':' in request.host else '5025')
+    except Exception as e:
+        logger.exception(f"Error rendering remote interview: {str(e)}")
+        return render_template('error.html', message=f"Error rendering interview: {str(e)}")
 
 # Start the app
 if __name__ == '__main__':

@@ -56,6 +56,15 @@ static/images/researcher_avatar_*.png
 vector_store
 vector_store_metadata.json
 
+# Interview and session data
+data/interviews/sessions/*.json
+data/interviews/*.json
+data/users/*.json
+*.backup
+
+# Prompt history
+tools/prompt_manager/prompts/.history/
+
 # Misc
 .DS_Store
 .env.local

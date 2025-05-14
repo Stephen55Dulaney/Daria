@@ -164,6 +164,16 @@
                         <p class="mb-1"><strong>Transcript Length:</strong> {{ (session.transcript|string|length / 1000)|round(1) }}k characters</p>
                     </div>
                     
+                    <div class="mb-3">
+                        <h3 class="h6 text-muted">Session ID</h3>
+                        <div class="d-flex align-items-center">
+                            <span class="me-2" id="session-id">{{ session_id }}</span>
+                            <button class="btn btn-sm btn-outline-secondary" id="copy-session-id" title="Copy Session ID">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                    
                     <hr>
                     
                     <!-- Session Actions -->
@@ -321,6 +331,36 @@
                                 </div>
                             {% endif %}
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-3">
+        <div class="col">
+            <div class="d-flex justify-content-between align-items-center mb-2">
+                <h3 class="mb-0">Interview Links</h3>
+            </div>
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Start the Interview</h5>
+                    <p class="card-text">Use one of the following links to start the interview:</p>
+                    
+                    <div class="list-group mb-3">
+                        <a href="/interview/{{ session_id }}?remote=true&accepted=true" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Standard Interview Interface
+                            <span class="badge bg-primary rounded-pill">Recommended</span>
+                        </a>
+                        <a href="/remote_interview?session_id={{ session_id }}&accepted=true" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            Simplified Interview Interface
+                            <span class="badge bg-success rounded-pill">New</span>
+                        </a>
+                    </div>
+                    
+                    <div class="alert alert-info">
+                        <i class="bi bi-info-circle me-2"></i>
+                        If you experience issues with the standard interface, try the simplified version.
                     </div>
                 </div>
             </div>
@@ -649,6 +689,28 @@ document.addEventListener('DOMContentLoaded', function() {
         const body = encodeURIComponent(`Hello,\n\nYou're invited to participate in our research session. Please join using this link:\n\n${document.getElementById('remoteLink').value}\n\nThank you!`);
         window.open(`mailto:?subject=${subject}&body=${body}`, '_blank');
     });
+
+    // Copy session ID button
+    const copySessionIdBtn = document.getElementById('copy-session-id');
+    if (copySessionIdBtn) {
+        copySessionIdBtn.addEventListener('click', function() {
+            const sessionIdSpan = document.getElementById('session-id');
+            const sessionIdText = sessionIdSpan.textContent || sessionIdSpan.innerText;
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(sessionIdText)
+                    .then(() => {
+                        alert('Session ID copied to clipboard');
+                    })
+                    .catch(err => {
+                        console.error('Error copying to clipboard:', err);
+                        prompt('Copy this ID:', sessionIdText);
+                    });
+            } else {
+                prompt('Copy this ID:', sessionIdText);
+            }
+        });
+    }
 });
 </script>
 {% endblock %} 

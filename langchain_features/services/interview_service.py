@@ -365,122 +365,147 @@ class InterviewService:
             logger.error(f"Error generating summary: {str(e)}")
             return f"Error generating summary: {str(e)}"
             
-    def generate_response(self, session_id_or_messages, prompt: str = "", character: str = None) -> str:
+    def generate_response(self, session_id_or_messages, prompt: str = "", character: str = None, context_data: dict = None) -> str:
         """
-        Generate a new AI response based on conversation history
+        Generate a response based on a session or a set of messages
         
         Args:
-            session_id_or_messages: Either a session ID string or a list of message dictionaries
-            prompt: Optional system prompt to control the interview style
-            character: Optional character name to customize the prompt
+            session_id_or_messages: Session ID or list of messages
+            prompt: Optional explicit prompt for the LLM
+            character: Character name (optional)
+            context_data: Dictionary containing topic, context, and goals
             
         Returns:
-            str: The generated response
+            Generated response string
         """
         try:
-            # Handle either session_id or messages list
-            messages = []
+            if context_data is None:
+                context_data = {}
+            
+            # Set default values for required parameters
+            topic = context_data.get('topic', 'General Interview')
+            context = context_data.get('context', 'This is an interview conversation.')
+            goals = context_data.get('goals', ['Gather relevant information from the participant'])
+            
+            # Ensure goals is a list
+            if isinstance(goals, str):
+                goals = [goals]
+            
+            # Log the context being used
+            logger.info(f"generate_response: Using topic: {topic}, context length: {len(context)}, goals: {len(goals)} items")
+            
+            # Prepare input data
             if isinstance(session_id_or_messages, str):
-                # This is a session ID, load the messages
-                session_id = session_id_or_messages
-                interview_data = self._load_interview(session_id)
-                if interview_data and 'conversation_history' in interview_data:
-                    messages = interview_data.get('conversation_history', [])
-                    logger.info(f"Loaded {len(messages)} messages from session {session_id}")
-                else:
-                    logger.warning(f"No conversation history found for session {session_id}")
-            else:
-                # This is already a list of messages
-                messages = session_id_or_messages
-            
-            # Import the necessary LangChain components
-            try:
-                from langchain_community.chat_models import ChatOpenAI
-            except ImportError:
-                from langchain.chat_models import ChatOpenAI
+                # It's a session ID, try to load the session
+                logger.info(f"generate_response: Loading session with ID {session_id_or_messages}")
+                session_data = self._load_interview(session_id_or_messages)
                 
-            from langchain.chains import LLMChain
-            from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
+                if not session_data:
+                    logger.warning(f"No conversation history found for session {session_id_or_messages}")
+                    
+                conversation_history = []
+                
+                if session_data and 'conversation_history' in session_data:
+                    conversation_history = session_data['conversation_history']
+                    logger.info(f"generate_response: Loaded {len(conversation_history)} messages from session")
+                
+                # Use dedicated character from session if not provided
+                if not character and session_data:
+                    character = session_data.get('character', 'interviewer')
+                    logger.info(f"generate_response: Using character '{character}' from session")
+            else:
+                # It's already a list of messages
+                conversation_history = session_id_or_messages
+                logger.info(f"generate_response: Using provided list of {len(conversation_history)} messages")
             
-            # Default prompt if none provided
+            # Prepare the prompt
             if not prompt:
-                if character:
-                    # If a character is provided but no prompt, use character-specific prompt
-                    character_prompts = {
-                        "daria": "You are Daria, Deloitte's Advanced Research & Interview Assistant. Ask thoughtful follow-up questions.",
-                        "skeptica": "You are Skeptica, Deloitte's Assumption Buster. Challenge assumptions and ask for evidence.",
-                        "eurekia": "You are Eurekia, Deloitte's Insight Generator. Find patterns and opportunities in the conversation.",
-                        "thesea": "You are Thesea, Deloitte's Journey Mapper. Focus on understanding experiences and journeys.",
-                        "askia": "You are Askia, Deloitte's Strategic Questioner. Ask incisive questions to uncover deeper insights.",
-                        "odessia": "You are Odessia, Deloitte's Journey Expert. Map and analyze user experiences.",
-                        "synthia": "You are Synthia, Deloitte's Discovery Assistant. You help formulate questions and build an 8-week discovery plan to uncover user needs, business requirements, and project scope."
-                    }
-                    prompt = character_prompts.get(character.lower(), 
-                    """
-                    You are a professional research interviewer conducting a user research session.
-                    Your job is to ask thoughtful follow-up questions based on the participant's responses.
-                    Be curious, empathetic, and probe for deeper insights.
-                    Focus on understanding the participant's experiences, challenges, and needs.
-                    Ask one question at a time, and avoid leading questions.
-                    """)
-                else:
-                    prompt = """
-                    You are a professional research interviewer conducting a user research session.
-                    Your job is to ask thoughtful follow-up questions based on the participant's responses.
-                    Be curious, empathetic, and probe for deeper insights.
-                    Focus on understanding the participant's experiences, challenges, and needs.
-                    Ask one question at a time, and avoid leading questions.
-                    """
+                # Use most recent user message as prompt
+                if conversation_history:
+                    for msg in reversed(conversation_history):
+                        if msg.get('role') == 'user':
+                            prompt = msg.get('content', '')
+                            break
+                
+                if not prompt:
+                    prompt = "Hello, can you help me with this interview?"
+                    logger.warning("generate_response: No prompt found in conversation history, using default")
             
-            # Get the user's last message
-            last_user_message = ""
-            for msg in reversed(messages):
-                if msg.get('role') == 'user':
-                    last_user_message = msg.get('content', '')
-                    break
+            # Set a default character if not provided
+            if not character:
+                character = "interviewer"
+                logger.info(f"generate_response: Using default character '{character}'")
             
-            # Build prompt template with conversation history
-            system_message_prompt = SystemMessagePromptTemplate.from_template(prompt)
-            human_template = """
-            Previous conversation:
-            {conversation_history}
+            # Build the complete system prompt
+            system_prompt = f"""You are conducting an interview on the topic of '{topic}'. 
+
+Context: {context}
+
+Your goals are:
+"""
+            # Add goals to prompt
+            for goal in goals:
+                system_prompt += f"- {goal}\n"
             
-            Participant's latest response: {last_response}
+            system_prompt += """
+Maintain a professional, empathetic tone throughout the conversation.
+Ask follow-up questions based on the participant's responses.
+Keep your responses concise and focused on the interview topic.
+"""
             
-            Continue the interview with a thoughtful follow-up question or introduce a new relevant topic.
-            """
-            human_message_prompt = HumanMessagePromptTemplate.from_template(human_template)
+            # Create messages list for the API call
+            messages = [
+                {"role": "system", "content": system_prompt}
+            ]
             
-            chat_prompt = ChatPromptTemplate.from_messages([
-                system_message_prompt,
-                human_message_prompt
-            ])
+            # Add conversation history (limited to last 10 messages to avoid token limits)
+            history_limit = min(len(conversation_history), 10)
+            for msg in conversation_history[-history_limit:]:
+                role = msg.get('role')
+                content = msg.get('content')
+                
+                # Only include user and assistant messages
+                if role in ['user', 'assistant'] and content:
+                    messages.append({"role": role, "content": content})
             
-            # Format conversation history
-            conversation_history = ""
-            for msg in messages:
-                role = "Interviewer" if msg.get('role') == 'assistant' else "Participant"
-                conversation_history += f"{role}: {msg.get('content', '')}\n\n"
-            
-            # Create the LLM chain
-            llm = ChatOpenAI(
-                temperature=0.7,
-                model_name="gpt-3.5-turbo"
-            )
-            chain = LLMChain(llm=llm, prompt=chat_prompt)
-            
-            # Generate the response
-            response = chain.run(
-                conversation_history=conversation_history,
-                last_response=last_user_message
-            )
-            
-            logger.info(f"Generated response of {len(response)} characters")
-            return response
-            
+            # Use GPT model to generate response
+            try:
+                openai_api_key = os.environ.get('OPENAI_API_KEY')
+                if not openai_api_key:
+                    logger.error("Missing OPENAI_API_KEY environment variable")
+                    return "I'm sorry, I'm having trouble accessing my reasoning capabilities at the moment."
+                
+                # Add user's current message if it's not already in the history
+                if prompt and (not messages or messages[-1]["role"] != "user"):
+                    messages.append({"role": "user", "content": prompt})
+                
+                from openai import OpenAI
+                
+                client = OpenAI(api_key=openai_api_key)
+                logger.info(f"generate_response: Sending request to OpenAI with {len(messages)} messages")
+                
+                response = client.chat.completions.create(
+                    model="gpt-3.5-turbo",
+                    messages=messages,
+                    temperature=0.7,
+                    max_tokens=500,
+                    top_p=1.0,
+                    frequency_penalty=0.0,
+                    presence_penalty=0.0
+                )
+                
+                response_text = response.choices[0].message.content.strip()
+                logger.info(f"generate_response: Generated response of {len(response_text)} characters")
+                
+                return response_text
+                
+            except Exception as e:
+                logger.error(f"Error generating response: {str(e)}")
+                return f"I apologize, but I'm having trouble processing your response at the moment. Could you please rephrase your question?"
+                
         except Exception as e:
-            logger.error(f"Error generating response: {str(e)}")
-            return "I apologize, but I'm having trouble formulating a response. Could you please share more about your experience or perspective on this topic?"
+            logger.error(f"Error in generate_response method: {str(e)}")
+            return "I apologize, but I encountered an error while processing your request. Let's continue our conversation from a different angle. Could you tell me more about your thoughts on this topic?"
             
     def _format_transcript(self, interview_data: Dict[str, Any]) -> str:
         """Format interview data into a readable transcript for analysis"""
