@@ -249,6 +249,19 @@ class DiscussionService:
             "updated_at": datetime.now().isoformat()
         }
         
+        # Copy important fields from the guide to the session
+        if "title" in guide:
+            session_data["title"] = guide["title"]
+        if "project" in guide:
+            session_data["project"] = guide["project"]
+        if "interview_type" in guide:
+            session_data["interview_type"] = guide["interview_type"]
+        if "character_select" in guide:
+            session_data["character"] = guide["character_select"]
+            session_data["character_select"] = guide["character_select"]
+        if "voice_id" in guide:
+            session_data["voice_id"] = guide["voice_id"]
+        
         # Save the session
         self._save_session(session_id, session_data)
         
@@ -259,7 +272,7 @@ class DiscussionService:
         guide["updated_at"] = datetime.now()
         self._save_guide(guide_id, guide)
         
-        logger.info(f"Created session {session_id} for guide {guide_id}")
+        logger.info(f"Created session {session_id} for guide {guide_id} with character {session_data.get('character', 'None')}")
         return session_id
     
     def get_session(self, session_id: str) -> Optional[Dict[str, Any]]:

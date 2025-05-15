@@ -517,6 +517,19 @@
         let lastAssistantMessage = "";
         let isConnected = false;
         let automationActive = false;
+        let characterName = null;
+        
+        // Character mappings for consistent handling
+        const characterMap = {
+            'askia': 'askia',
+            'odessia': 'odessia',
+            'thesea': 'thesea',
+            'skeptica': 'skeptica',
+            'eurekia': 'eurekia',
+            'thomas': 'thomas',
+            'interviewer': 'interviewer',
+            'researcher': 'researcher'
+        };
         
         // Initialize the endInterviewTTSPlayed flag
         window.endInterviewTTSPlayed = false;
@@ -770,55 +783,23 @@
                 
                 // If session ID is provided, try to use it
                 if (customSessionId) {
+                    log(`Using provided session ID: ${customSessionId}`, 'info');
                     sessionId = customSessionId;
-                    log(`Using provided session ID: ${sessionId}`, 'info');
-                    
-                    // Verify session exists
-                    const sessionResponse = await fetch(`${apiUrl}/api/session/${sessionId}`);
-                    
-                    if (!sessionResponse.ok) {
-                        throw new Error(`Session not found: ${sessionId}`);
-                    }
-                    
-                    const sessionData = await sessionResponse.json();
-                    
-                    if (!sessionData.success) {
-                        throw new Error(sessionData.error || 'Failed to load session');
-                    }
-                    
-                    log(`Session loaded: ${sessionId}`, 'info');
                 } else {
-                    // Create a new session using the first available discussion guide
                     log('No session ID provided. Creating a new session...', 'info');
                     
-                    // Get available discussion guides
-                    const guidesResponse = await fetch(`${apiUrl}/api/discussion_guides`);
-                    
-                    if (!guidesResponse.ok) {
-                        throw new Error(`Failed to fetch discussion guides: ${guidesResponse.status}`);
-                    }
-                    
-                    const guidesData = await guidesResponse.json();
-                    
-                    if (!guidesData.success || !guidesData.guides || guidesData.guides.length === 0) {
-                        throw new Error('No discussion guides available');
-                    }
-                    
-                    // Use the first guide
-                    const guideId = guidesData.guides[0].id;
-                    log(`Using discussion guide: ${guideId}`, 'info');
-                    
                     // Create a new session
+                    const discussionGuideId = "6484f57f-7fef-4bb7-8e9d-16ec498073a9"; // Default discussion guide ID
+                    
+                    log(`Using discussion guide: ${discussionGuideId}`, 'info');
+                    
                     const createResponse = await fetch(`${apiUrl}/api/session/create`, {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json'
                         },
                         body: JSON.stringify({
-                            guide_id: guideId,
-                            interviewee: {
-                                name: 'Debug User'
-                            }
+                            guide_id: discussionGuideId
                         })
                     });
                     
@@ -839,6 +820,113 @@
                 
                 // Get session messages
                 await loadSessionMessages();
+                
+                // Set character if specified in URL
+                const characterParam = urlParams.get('character');
+                
+                if (characterParam) {
+                    // Use the character map to ensure consistent character naming
+                    const lowerChar = characterParam.toLowerCase();
+                    characterName = characterMap[lowerChar] || lowerChar;
+                    
+                    log(`Setting character to ${characterName} from URL parameter`, 'info');
+                    
+                    try {
+                        // First, add a strong system message to ensure the character is properly set
+                        const systemMessageResponse = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                content: `SYSTEM: Character set to ${characterName}. 
+                                IMPORTANT: You are ${characterName}. Your name is ${characterName}.
+                                You MUST always respond as ${characterName}. Never break character or reveal you are an AI.
+                                When asked "who are you" or "what is your name", you MUST respond with "I am ${characterName}."
+                                If character is Thomas, always respond to identity questions with "My name is Thomas."`,
+                                role: 'system'
+                            })
+                        });
+                        
+                        if (systemMessageResponse.ok) {
+                            log(`Set character ${characterName} via initial system message`, 'info');
+                            
+                            // Add a welcome message that reinforces character identity
+                            const welcomeMessageResponse = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    content: `Hello, I am ${characterName}. How can I assist you today?`,
+                                    role: 'assistant'
+                                })
+                            });
+                            
+                            if (welcomeMessageResponse.ok) {
+                                log(`Added character welcome message as ${characterName}`, 'info');
+                                
+                                // Try setting character using set_character endpoint as well
+                                const setCharResponse = await fetch(`${apiUrl}/api/session/${sessionId}/set_character`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        character: characterName
+                                    })
+                                });
+                                
+                                if (setCharResponse.ok) {
+                                    log(`Successfully set character to ${characterName} via API endpoint`, 'info');
+                                } else {
+                                    log(`Set_character API call failed: ${setCharResponse.status}, but system message was successful`, 'warn');
+                                }
+                            } else {
+                                log(`Failed to add welcome message: ${welcomeMessageResponse.status}`, 'warn');
+                            }
+                        } else {
+                            log(`Failed to set initial system message: ${systemMessageResponse.status}`, 'error');
+                            
+                            // Try the original set_character endpoint as fallback
+                            const setCharResponse = await fetch(`${apiUrl}/api/session/${sessionId}/set_character`, {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    character: characterName
+                                })
+                            });
+                            
+                            if (setCharResponse.ok) {
+                                log(`Successfully set character to ${characterName} via API endpoint fallback`, 'info');
+                            } else {
+                                log(`Failed to set character via API: ${setCharResponse.status}`, 'warn');
+                                
+                                // Try a simpler system message as last resort
+                                const sysMessageResponse = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json'
+                                    },
+                                    body: JSON.stringify({
+                                        content: `You are ${characterName}, a specialized AI interviewer. Your responses should be in character. When asked about your name, always introduce yourself as ${characterName}.`,
+                                        role: 'system'
+                                    })
+                                });
+                                
+                                if (sysMessageResponse.ok) {
+                                    log(`Set character ${characterName} via simplified system message`, 'info');
+                                } else {
+                                    log(`All attempts to set character failed`, 'error');
+                                }
+                            }
+                        }
+                    } catch (charError) {
+                        log(`Error setting character: ${charError.message}`, 'error');
+                    }
+                }
                 
                 // Update UI
                 updateConnectionStatus(true, 'Connected');
@@ -1886,6 +1974,7 @@
             const urlParams = new URLSearchParams(window.location.search);
             const portParam = urlParams.get('port');
             const sessionIdParam = urlParams.get('session_id');
+            const characterParam = urlParams.get('character');
             
             if (portParam) {
                 apiPortInput.value = portParam;
@@ -1898,6 +1987,11 @@
             }
             
             log('Debug interview flow tool initialized', 'info');
+            
+            // Log character if provided
+            if (characterParam) {
+                log(`Character specified in URL: ${characterParam}`, 'info');
+            }
             
             // Set up collapsible panels
             setupCollapsiblePanels();

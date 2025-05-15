@@ -2090,10 +2090,15 @@ def api_add_session_message(session_id):
                 
                 # Generate response with all required context information
                 try:
+                    # Get character from session data if available
+                    session_data = discussion_service.get_session(session_id)
+                    character = session_data.get('character', 'interviewer') if session_data else 'interviewer'
+                    
                     # Pass all required information to the interview service
                     response_text = interview_service.generate_response(
                         session_id, 
                         content,
+                        character,
                         {
                             'topic': topic,
                             'context': context,

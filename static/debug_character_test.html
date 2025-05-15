@@ -266,7 +266,10 @@
                 </div>
                 <div class="form-group">
                     <label for="session-id">Session ID (Optional)</label>
-                    <input type="text" id="session-id" placeholder="Leave empty to create new session">
+                    <div style="display: flex; gap: 5px;">
+                        <input type="text" id="session-id" placeholder="Leave empty to create new session" style="flex-grow: 1;">
+                        <button id="open-flow-debug-btn" class="secondary" title="Open this session in the Interview Flow Debugger" disabled>Open in Flow Debugger</button>
+                    </div>
                     <small class="text-muted">Only provide this if you want to connect to an existing interview session.</small>
                 </div>
             </div>
@@ -343,7 +346,10 @@
         
         <div class="conversation-container">
             <div class="conversation-header">
-                <h2>Test Conversation</h2>
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h2>Test Conversation</h2>
+                    <button id="copy-conversation-btn" class="secondary">Copy Conversation</button>
+                </div>
             </div>
             <div id="message-container">
                 <div class="message system-message">Connect to start a conversation.</div>
@@ -425,6 +431,7 @@
         const sendWhoamiBtn = document.getElementById('send-whoami-btn');
         const endInterviewBtn = document.getElementById('end-interview-btn');
         const copyLogBtn = document.getElementById('copy-log-btn');
+        const copyConversationBtn = document.getElementById('copy-conversation-btn');
         
         // Logging function
         function log(message, type = 'info') {
@@ -454,40 +461,45 @@
             debugLogDiv.scrollTop = debugLogDiv.scrollHeight;
         }
         
-        // Initialize
+        // Initialize the application
         function init() {
-            log('Character Debug Tool initialized');
+            // Debug message
+            log('Character Debug Tool initialized', 'info');
             
-            // Set up button event listeners
-            connectBtn.addEventListener('click', connectToApi);
+            // Set up event listeners
+            connectBtn.addEventListener('click', connectToAPI);
             createSessionBtn.addEventListener('click', createNewSession);
-            characterSelect.addEventListener('change', onCharacterSelected);
-            setCharacterBtn.addEventListener('click', setCharacterApiMethod);
-            setCharacterSystemMsgBtn.addEventListener('click', setCharacterSystemMessageMethod);
+            setCharacterBtn.addEventListener('click', setCharacter);
+            setCharacterSystemMsgBtn.addEventListener('click', setCharacterViaSystemMsg);
             resetCharacterBtn.addEventListener('click', resetCharacter);
             sendMessageBtn.addEventListener('click', sendUserMessage);
             sendWhoamiBtn.addEventListener('click', sendWhoamiMessage);
             endInterviewBtn.addEventListener('click', endInterview);
             copyLogBtn.addEventListener('click', copyDebugLog);
+            copyConversationBtn.addEventListener('click', copyConversation);
             
-            // Handle Guide ID input/select interaction
-            guideIdInput.addEventListener('input', function() {
-                // If manual input is provided, clear the dropdown selection
-                if (this.value.trim() !== '') {
+            // Add event listener for the Open in Flow Debugger button
+            const openFlowDebugBtn = document.getElementById('open-flow-debug-btn');
+            openFlowDebugBtn.addEventListener('click', openInFlowDebugger);
+            
+            // Set up input validation
+            guideIdInput.addEventListener('input', () => {
+                if (guideIdInput.value) {
                     guideIdSelect.value = '';
                 }
             });
             
-            guideIdSelect.addEventListener('change', function() {
-                // If dropdown selection is made, clear the manual input
-                if (this.value !== '') {
+            guideIdSelect.addEventListener('change', () => {
+                if (guideIdSelect.value) {
                     guideIdInput.value = '';
-                    
-                    // If API is connected, load the guide details immediately
-                    if (isConnected) {
-                        guideId = this.value;
-                        fetchGuideDetails(guideId);
-                    }
+                }
+            });
+            
+            // Allow pressing Enter to send messages
+            userInputTextarea.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendUserMessage();
                 }
             });
             
@@ -533,7 +545,12 @@
                             { id: "odessia-id", name: "Odessia (Default)", content: "You are Odessia, Deloitte's expert Journey Mapper." },
                             { id: "thesea-id", name: "Thesea (Default)", content: "You are Thesea, Deloitte's expert Persona Analyzer." },
                             { id: "skeptica-id", name: "Skeptica (Default)", content: "You are Skeptica, Deloitte's Assumption Buster." },
-                            { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." }
+                            { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." },
+                            { id: "synthia-id", name: "Synthia (Default)", content: "You are Synthia, a synthesizer of information who periodically summarizes what you've heard and integrates diverse perspectives into coherent insights." },
+                            { id: "daria-id", name: "Daria (Default)", content: "You are DARIA (Deloitte's Advanced Research & Interview Assistant). Your communication style is professional, attentive, and insightful." },
+                            { id: "interviewer-id", name: "Interviewer (Default)", content: "You are a professional interviewer conducting a research interview. Your tone is neutral but warm." },
+                            { id: "researcher-id", name: "Researcher (Default)", content: "You are a researcher gathering data through this interview. You're methodical and focused on accuracy." },
+                            { id: "thomas-id", name: "Thomas (Default)", content: "You are Thomas, a test character for the DARIA interview system. When asked about your name, always say 'My name is Thomas.'" }
                         ];
                         
                         // Populate character select
@@ -572,7 +589,7 @@
         }
         
         // Connect to API
-        async function connectToApi() {
+        async function connectToAPI() {
             // Get port value
             apiPort = apiPortInput.value;
             apiUrl = `http://${window.location.hostname}:${apiPort}`;
@@ -739,13 +756,18 @@
                             )
                         );
                     } else {
-                        // Add some default characters if no prompts were loaded
+                        // Add default characters
                         characters = [
                             { id: "askia-id", name: "Askia (Default)", content: "You are Askia, Deloitte's expert Discovery Interviewer." },
                             { id: "odessia-id", name: "Odessia (Default)", content: "You are Odessia, Deloitte's expert Journey Mapper." },
                             { id: "thesea-id", name: "Thesea (Default)", content: "You are Thesea, Deloitte's expert Persona Analyzer." },
                             { id: "skeptica-id", name: "Skeptica (Default)", content: "You are Skeptica, Deloitte's Assumption Buster." },
-                            { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." }
+                            { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." },
+                            { id: "synthia-id", name: "Synthia (Default)", content: "You are Synthia, a synthesizer of information who periodically summarizes what you've heard and integrates diverse perspectives into coherent insights." },
+                            { id: "daria-id", name: "Daria (Default)", content: "You are DARIA (Deloitte's Advanced Research & Interview Assistant). Your communication style is professional, attentive, and insightful." },
+                            { id: "interviewer-id", name: "Interviewer (Default)", content: "You are a professional interviewer conducting a research interview. Your tone is neutral but warm." },
+                            { id: "researcher-id", name: "Researcher (Default)", content: "You are a researcher gathering data through this interview. You're methodical and focused on accuracy." },
+                            { id: "thomas-id", name: "Thomas (Default)", content: "You are Thomas, a test character for the DARIA interview system. When asked about your name, always say 'My name is Thomas.'" }
                         ];
                     }
                     
@@ -769,7 +791,12 @@
                         { id: "odessia-id", name: "Odessia (Default)", content: "You are Odessia, Deloitte's expert Journey Mapper." },
                         { id: "thesea-id", name: "Thesea (Default)", content: "You are Thesea, Deloitte's expert Persona Analyzer." },
                         { id: "skeptica-id", name: "Skeptica (Default)", content: "You are Skeptica, Deloitte's Assumption Buster." },
-                        { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." }
+                        { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." },
+                        { id: "synthia-id", name: "Synthia (Default)", content: "You are Synthia, a synthesizer of information who periodically summarizes what you've heard and integrates diverse perspectives into coherent insights." },
+                        { id: "daria-id", name: "Daria (Default)", content: "You are DARIA (Deloitte's Advanced Research & Interview Assistant). Your communication style is professional, attentive, and insightful." },
+                        { id: "interviewer-id", name: "Interviewer (Default)", content: "You are a professional interviewer conducting a research interview. Your tone is neutral but warm." },
+                        { id: "researcher-id", name: "Researcher (Default)", content: "You are a researcher gathering data through this interview. You're methodical and focused on accuracy." },
+                        { id: "thomas-id", name: "Thomas (Default)", content: "You are Thomas, a test character for the DARIA interview system. When asked about your name, always say 'My name is Thomas.'" }
                     ];
                     
                     // Populate character select
@@ -793,7 +820,12 @@
                     { id: "odessia-id", name: "Odessia (Default)", content: "You are Odessia, Deloitte's expert Journey Mapper." },
                     { id: "thesea-id", name: "Thesea (Default)", content: "You are Thesea, Deloitte's expert Persona Analyzer." },
                     { id: "skeptica-id", name: "Skeptica (Default)", content: "You are Skeptica, Deloitte's Assumption Buster." },
-                    { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." }
+                    { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." },
+                    { id: "synthia-id", name: "Synthia (Default)", content: "You are Synthia, a synthesizer of information who periodically summarizes what you've heard and integrates diverse perspectives into coherent insights." },
+                    { id: "daria-id", name: "Daria (Default)", content: "You are DARIA (Deloitte's Advanced Research & Interview Assistant). Your communication style is professional, attentive, and insightful." },
+                    { id: "interviewer-id", name: "Interviewer (Default)", content: "You are a professional interviewer conducting a research interview. Your tone is neutral but warm." },
+                    { id: "researcher-id", name: "Researcher (Default)", content: "You are a researcher gathering data through this interview. You're methodical and focused on accuracy." },
+                    { id: "thomas-id", name: "Thomas (Default)", content: "You are Thomas, a test character for the DARIA interview system. When asked about your name, always say 'My name is Thomas.'" }
                 ];
                 
                 // Populate character select
@@ -1107,7 +1139,12 @@
                         { id: "odessia-id", name: "Odessia (Default)", content: "You are Odessia, Deloitte's expert Journey Mapper." },
                         { id: "thesea-id", name: "Thesea (Default)", content: "You are Thesea, Deloitte's expert Persona Analyzer." },
                         { id: "skeptica-id", name: "Skeptica (Default)", content: "You are Skeptica, Deloitte's Assumption Buster." },
-                        { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." }
+                        { id: "eurekia-id", name: "Eurekia (Default)", content: "You are Eurekia, Deloitte's Opportunity Finder." },
+                        { id: "synthia-id", name: "Synthia (Default)", content: "You are Synthia, a synthesizer of information who periodically summarizes what you've heard and integrates diverse perspectives into coherent insights." },
+                        { id: "daria-id", name: "Daria (Default)", content: "You are DARIA (Deloitte's Advanced Research & Interview Assistant). Your communication style is professional, attentive, and insightful." },
+                        { id: "interviewer-id", name: "Interviewer (Default)", content: "You are a professional interviewer conducting a research interview. Your tone is neutral but warm." },
+                        { id: "researcher-id", name: "Researcher (Default)", content: "You are a researcher gathering data through this interview. You're methodical and focused on accuracy." },
+                        { id: "thomas-id", name: "Thomas (Default)", content: "You are Thomas, a test character for the DARIA interview system. When asked about your name, always say 'My name is Thomas.'" }
                     ];
                     
                     // Repopulate character select if empty
@@ -1144,15 +1181,36 @@
                         'odessia': 'odessia-id',
                         'thesea': 'thesea-id',
                         'skeptica': 'skeptica-id',
-                        'eurekia': 'eurekia-id'
+                        'eurekia': 'eurekia-id',
+                        'thomas': 'thomas-id'
                     };
                     
                     if (characterMap[characterName]) {
                         characterSelect.value = characterMap[characterName];
                         onCharacterSelected();
-                        log(`Selected character using direct mapping: ${characterName}`, 'character');
+                        log(`Selected character ${characterName} via direct mapping`, 'character');
+                        found = true;
                     } else {
                         log(`Character "${characterName}" not found in dropdown or mapping`, 'warn');
+                        
+                        // Create a custom character option for this unknown character
+                        const customOption = document.createElement('option');
+                        customOption.value = `${characterName}-id`;
+                        customOption.textContent = `${characterName.charAt(0).toUpperCase() + characterName.slice(1)} (Custom)`;
+                        characterSelect.appendChild(customOption);
+                        
+                        // Select the newly created option
+                        characterSelect.value = `${characterName}-id`;
+                        
+                        // Add to characters array
+                        characters.push({
+                            id: `${characterName}-id`,
+                            name: `${characterName.charAt(0).toUpperCase() + characterName.slice(1)} (Custom)`,
+                            content: `You are ${characterName.charAt(0).toUpperCase() + characterName.slice(1)}, a custom interview character. Always respond as ${characterName.charAt(0).toUpperCase() + characterName.slice(1)}.`
+                        });
+                        
+                        onCharacterSelected();
+                        log(`Created and selected custom character: ${characterName}`, 'character');
                     }
                 }
             }
@@ -1249,6 +1307,7 @@
             sendWhoamiBtn.disabled = false;
             endInterviewBtn.disabled = false;
             userInputTextarea.disabled = false;
+            document.getElementById('open-flow-debug-btn').disabled = false;
         }
         
         // Handle character selection
@@ -1272,19 +1331,26 @@
         }
         
         // Set character using API method
-        async function setCharacterApiMethod() {
+        async function setCharacter() {
             if (!sessionId || !selectedCharacter) {
                 log('Session ID or character not selected', 'error');
                 return;
             }
             
-            const characterName = selectedCharacter.name.split(' ')[0]; // Get first word of name
+            // Get the full name without the "(Default)" or "(Custom)" part if present
+            const fullName = selectedCharacter.name;
+            const characterNameParts = fullName.split(' ');
+            const characterName = characterNameParts[0]; // Get first word of name
+            
             log(`Setting character to ${characterName} via API`, 'character');
             
             try {
-                // Since the set_character endpoint returns 404, use add_message with system role
+                // Create a more explicit system message that ensures the character responds as itself
                 const systemMessage = `SYSTEM: Character set to ${characterName}. 
-                Always respond as ${characterName}. The character prompt is:
+                IMPORTANT: You are ${characterName}. Your name is ${characterName}.
+                You MUST always respond as ${characterName}. Never break character or reveal you are an AI.
+                When asked "who are you" or "what is your name", you MUST respond with "I am ${characterName}" followed by your role.
+                The character prompt is:
                 ${selectedCharacter.content}`;
                 
                 const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
@@ -1335,7 +1401,7 @@
         }
         
         // Set character using system message
-        async function setCharacterSystemMessageMethod() {
+        async function setCharacterViaSystemMsg() {
             if (!sessionId || !selectedCharacter) {
                 log('Session ID or character not selected', 'error');
                 return;
@@ -1408,22 +1474,46 @@
             log('Resetting character to default Assistant', 'character');
             
             try {
-                const response = await fetch(`${apiUrl}/api/session/${sessionId}/set_character`, {
+                // Instead of using the set_character endpoint (which doesn't exist),
+                // use add_message to set a system message that resets the character
+                const systemMessage = "SYSTEM: Character reset to Assistant. Please respond as a helpful AI assistant.";
+                
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        character: 'Assistant',
-                        prompt: ''
+                        content: systemMessage,
+                        role: 'system'
                     })
                 });
                 
                 if (response.ok) {
-                    log('Successfully reset character to Assistant', 'character');
+                    log('Successfully reset character to Assistant via system message', 'character');
+                    
+                    // Add a default assistant message
+                    try {
+                        const assistantResponse = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                content: "Hello, I'm an AI assistant. How can I help you today?",
+                                role: 'assistant'
+                            })
+                        });
+                        
+                        if (assistantResponse.ok) {
+                            log('Successfully added assistant introduction after reset', 'character');
+                        }
+                    } catch (e) {
+                        log(`Error adding assistant message: ${e.message}`, 'warn');
+                    }
                     
                     // Update UI
-                    loadSessionData();
+                    fetchMessages();
                 } else {
                     const errorText = await response.text();
                     log(`Failed to reset character: ${response.status} - ${errorText}`, 'error');
@@ -1657,6 +1747,57 @@
                 log(`Error copying debug log: ${err.message}`, 'error');
                 alert('Failed to copy debug log');
             });
+        }
+        
+        // Copy conversation
+        function copyConversation() {
+            // Format conversation text
+            let conversationText = '';
+            
+            conversationHistory.forEach(msg => {
+                if (msg.role === 'user') {
+                    conversationText += `${msg.content}\n`;
+                } else if (msg.role === 'assistant') {
+                    conversationText += `${msg.content}\n`;
+                } else if (msg.role === 'system') {
+                    conversationText += `${msg.content}\n`;
+                }
+            });
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(conversationText).then(() => {
+                log('Conversation copied to clipboard', 'info');
+                alert('Conversation copied to clipboard');
+            }).catch(err => {
+                log(`Error copying conversation: ${err.message}`, 'error');
+                alert('Failed to copy conversation');
+            });
+        }
+        
+        // Open in Flow Debugger
+        function openInFlowDebugger() {
+            if (!sessionId) {
+                log('No session ID available', 'error');
+                return;
+            }
+            
+            log('Opening in Flow Debugger', 'info');
+            
+            // Get the selected character name
+            const characterName = selectedCharacter ? selectedCharacter.name.split(' ')[0] : '';
+            
+            // Construct the URL for opening the Flow Debugger
+            const port = apiPortInput.value;
+            let flowDebuggerUrl = `debug_interview_flow.html?port=${port}&session_id=${sessionId}`;
+            
+            // Add character parameter if available
+            if (characterName) {
+                flowDebuggerUrl += `&character=${characterName.toLowerCase()}`;
+                log(`Including character in URL: ${characterName}`, 'character');
+            }
+            
+            // Open the URL in a new tab
+            window.open(flowDebuggerUrl, '_blank');
         }
         
         // Initialize on page load

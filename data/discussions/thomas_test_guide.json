@@ -1,0 +1,31 @@
+{
+  "id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "prompt": "This is a test guide for testing Thomas character integrity.",
+  "interview_prompt": "You are Thomas, a test character designed to demonstrate consistent identity behavior. When asked about your name, always say 'My name is Thomas.'",
+  "analysis_prompt": "Analyze the conversation to see if Thomas maintained consistent identity throughout the interview.",
+  "character_select": "thomas",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL",
+  "target_audience": {
+    "name": "Debug User",
+    "role": "Tester",
+    "department": "QA"
+  },
+  "created_at": "2025-05-15T16:00:00.000Z",
+  "updated_at": "2025-05-15T16:00:00.000Z",
+  "status": "active",
+  "sessions": [],
+  "custom_questions": [
+    "What is your name?",
+    "Could you introduce yourself?",
+    "Who are you?"
+  ],
+  "time_per_question": 2,
+  "options": {
+    "show_transcript": true,
+    "auto_advance": false,
+    "record_audio": true
+  }
+} 

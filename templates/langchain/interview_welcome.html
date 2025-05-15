@@ -105,6 +105,9 @@
                 {% if is_remote %}
                 <input type="hidden" name="remote" value="true">
                 {% endif %}
+                {% if character %}
+                <input type="hidden" name="character" value="{{ character }}">
+                {% endif %}
                 
                 <button type="submit" class="btn btn-primary w-100">Start Interview</button>
             </form>

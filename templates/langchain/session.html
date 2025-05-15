@@ -74,7 +74,7 @@
     <div class="d-flex justify-content-between mb-4">
         <h1 class="h3">Research Session</h1>
         <div class="d-flex gap-2">
-            <a href="/interview/{{ session_id }}?remote=true&accepted=true" class="btn btn-success" target="_blank">
+            <a href="/interview/{{ session_id }}?remote=true&accepted=true&character={{ session.character }}" class="btn btn-success" target="_blank">
                 <i class="bi bi-play-fill me-1"></i> Start Remote Session
             </a>
             <a href="/discussion_guide/{{ session.guide_id }}" class="btn btn-outline-secondary">
@@ -348,11 +348,11 @@
                     <p class="card-text">Use one of the following links to start the interview:</p>
                     
                     <div class="list-group mb-3">
-                        <a href="/interview/{{ session_id }}?remote=true&accepted=true" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <a href="/interview/{{ session_id }}?remote=true&accepted=true&character={{ session.character }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             Standard Interview Interface
                             <span class="badge bg-primary rounded-pill">Recommended</span>
                         </a>
-                        <a href="/remote_interview?session_id={{ session_id }}&accepted=true" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <a href="/remote_interview?session_id={{ session_id }}&accepted=true&character={{ session.character }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
                             Simplified Interview Interface
                             <span class="badge bg-success rounded-pill">New</span>
                         </a>
@@ -625,6 +625,9 @@ document.addEventListener('DOMContentLoaded', function() {
             if (autoAccept) {
                 customUrl += '&accepted=true';
             }
+            
+            // Add character parameter
+            customUrl += '&character={{ session.character }}';
             
             // Update the link input field
             const remoteLinkInput = document.getElementById('remoteLink');

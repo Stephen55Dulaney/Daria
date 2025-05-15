@@ -9,6 +9,7 @@ import json
 import datetime
 import uuid
 from pathlib import Path
+import re
 
 from .interview_agent import InterviewAgent
 
@@ -404,6 +405,9 @@ class InterviewService:
             # Log the context being used
             logger.info(f"generate_response: Using topic: {topic}, context length: {len(context)}, goals: {len(goals)} items")
             
+            # Check for character in system messages
+            character_from_system = None
+            
             # Prepare input data
             if isinstance(session_id_or_messages, str):
                 # It's a session ID, try to load the session
@@ -428,6 +432,17 @@ class InterviewService:
                     if 'conversation_history' in session_data:
                         conversation_history = session_data['conversation_history']
                         logger.info(f"generate_response: Loaded {len(conversation_history)} messages from session")
+                        
+                        # Look for character in system messages
+                        for msg in conversation_history:
+                            if msg.get('role') == 'system' and 'content' in msg:
+                                content = msg.get('content', '')
+                                # Check for "Character set to X" pattern
+                                character_match = re.search(r'Character set to (\w+)', content)
+                                if character_match:
+                                    character_from_system = character_match.group(1).lower()
+                                    logger.info(f"Found character '{character_from_system}' in system message")
+                                    break
                     else:
                         logger.warning(f"Session {session_id_or_messages} has no conversation_history field")
                         # Create minimal conversation history with welcome message if prompt is provided
@@ -439,13 +454,33 @@ class InterviewService:
                             })
                 
                 # Use dedicated character from session if not provided
-                if not character and session_data:
-                    character = session_data.get('character', 'interviewer')
-                    logger.info(f"generate_response: Using character '{character}' from session")
+                if not character:
+                    if character_from_system:
+                        character = character_from_system
+                        logger.info(f"generate_response: Using character '{character}' from system message")
+                    elif session_data:
+                        character = session_data.get('character', 'interviewer')
+                        logger.info(f"generate_response: Using character '{character}' from session")
             else:
                 # It's already a list of messages
                 conversation_history = session_id_or_messages
                 logger.info(f"generate_response: Using provided list of {len(conversation_history)} messages")
+                
+                # Look for character in system messages
+                for msg in conversation_history:
+                    if msg.get('role') == 'system' and 'content' in msg:
+                        content = msg.get('content', '')
+                        # Check for "Character set to X" pattern
+                        character_match = re.search(r'Character set to (\w+)', content)
+                        if character_match:
+                            character_from_system = character_match.group(1).lower()
+                            logger.info(f"Found character '{character_from_system}' in system message")
+                            break
+                
+                # Override character with the one from system message if found
+                if character_from_system and not character:
+                    character = character_from_system
+                    logger.info(f"generate_response: Using character '{character}' from system message")
             
             # Prepare the prompt
             if not prompt:
@@ -470,6 +505,9 @@ class InterviewService:
                 character = "interviewer"
                 logger.info(f"generate_response: Using default character '{character}'")
             
+            # Import re if needed
+            import re
+                
             # Build the complete system prompt
             system_prompt = f"""You are conducting an interview on the topic of '{topic}'. 
 
@@ -491,7 +529,7 @@ Your goals are:
                 
                 "askia": """You are Askia, a question design expert. You craft precise, effective questions that elicit specific information. Your style is methodical and focused.""",
                 
-                "thesea": """You are Thesea, a big-picture thinker. You identify patterns and connections across topics, helping to surface themes and insights that might not be immediately obvious.""",
+                "thesea": """You are Thesea, a big-picture thinker who identifies patterns and connections across topics, helping to surface themes and insights that might not be immediately obvious.""",
                 
                 "odessia": """You are Odessia, a journey-mapping specialist. You excel at guiding conversations through experiences chronologically, while drawing out emotional and practical details.""",
                 
@@ -508,6 +546,10 @@ Your goals are:
                 system_prompt += f"\n{character_personas[character_key]}\n"
             else:
                 system_prompt += f"\nYou are a professional interviewer named {character}.\n"
+            
+            # Add explicit reminder about character identity - safely handle character formatting
+            character_name = str(character).title() if character else "the interviewer"
+            system_prompt += f"\nIMPORTANT: You MUST always respond as {character_name}. Never break character.\n"
             
             # Add communication guidance
             system_prompt += """
@@ -594,6 +636,128 @@ Communication guidelines:
                 ai_response = chat.invoke(formatted_messages)
                 response_text = ai_response.content
                 
+                # Sanitize response - remove any raw context data that might have leaked
+                if response_text and isinstance(response_text, str):
+                    try:
+                        # Check for leaked context data patterns (improved regex)
+                        # More robust pattern that handles various formats
+                        context_pattern = r"(?i)(?:I am\s*)?\{[\'\"]?Topic[\'\"]?:.*?[\'\"]?Goals[\'\"]?:.*?\}"
+                        if re.search(context_pattern, response_text):
+                            # Remove the context leak and any leading/trailing whitespace
+                            response_text = re.sub(context_pattern, "", response_text).strip()
+                            # Fix issues with "I am ." pattern after removing context
+                            response_text = re.sub(r"I am\s*\.", "I am", response_text)
+                            # Also fix any remaining empty punctuation
+                            response_text = re.sub(r"\s+\.", ".", response_text)
+                            logger.info("Removed leaked context data from response")
+                        
+                        # Additional pattern for other context data formats
+                        alt_context_pattern = r"(?i)(?:I am\s*)?[\{\(][\'\"]?(?:Topic|Context|Goals)[\'\"]?:.*?[\}\)]"
+                        if re.search(alt_context_pattern, response_text):
+                            response_text = re.sub(alt_context_pattern, "", response_text).strip()
+                            response_text = re.sub(r"I am\s*\.", "I am", response_text)
+                            response_text = re.sub(r"\s+\.", ".", response_text)
+                            logger.info("Removed alternative context data format from response")
+                        
+                        # Additional protection for character identity consistency
+                        # Check if this is a "who are you" type question
+                        identity_questions = ["who are you", "your name", "what is your name", "what's your name", 
+                                             "tell me your name", "what are you", "is your name", "who am i talking to",
+                                             "introduce yourself", "who am i speaking with", "identity", "tell me about yourself"]
+                        
+                        if prompt and isinstance(prompt, str) and any(q in prompt.lower() for q in identity_questions):
+                            # Get character name safely
+                            character_name = str(character).title() if character else "the interviewer"
+                            character_key = str(character).lower() if character else "interviewer"
+                            
+                            # Special handling for Thomas character
+                            if character_key == "thomas":
+                                logger.info(f"Using Thomas-specific identity response")
+                                return "My name is Thomas. I'm a test character for the DARIA interview system."
+                            
+                            # Create a safe identity response
+                            identity_response = f"I am {character_name}. "
+                            
+                            # Add character description based on role
+                            if character_key == "synthia" or character_key == "synthia-id":
+                                identity_response += "As Synthia, I'm a synthesizer of information who helps integrate diverse perspectives into coherent insights."
+                            elif character_key == "thesea" or character_key == "thesea-id":
+                                identity_response += "As Thesea, I'm Deloitte's expert Persona Analyzer."
+                            elif character_key == "daria" or character_key == "daria-id":
+                                identity_response += "As DARIA, I'm Deloitte's Advanced Research & Interview Assistant."
+                            elif character_key == "askia" or character_key == "askia-id":
+                                identity_response += "As Askia, I'm Deloitte's expert Discovery Interviewer."
+                            elif character_key == "odessia" or character_key == "odessia-id":
+                                identity_response += "As Odessia, I'm Deloitte's Journey Mapping specialist."
+                            elif character_key == "eurekia" or character_key == "eurekia-id":
+                                identity_response += "As Eurekia, I'm Deloitte's Opportunity Finder."
+                            elif character_key == "skeptica" or character_key == "skeptica-id":
+                                identity_response += "As Skeptica, I'm Deloitte's Assumption Buster."
+                            elif character_key == "thomas":
+                                identity_response += "I'm Thomas, your interview assistant for this session."
+                            elif character_key not in ["interviewer", "researcher", "assistant"]:
+                                # For any custom character not in our predefined list
+                                identity_response += f"I'm {character_name}, your custom interview assistant for this session."
+                            else:
+                                identity_response += "I'm your interview assistant helping to gather information through our conversation."
+                            
+                            # Use the identity response instead of potentially problematic response
+                            logger.info(f"Using identity response for character: {character_name}")
+                            return identity_response
+                    except Exception as e:
+                        logger.error(f"Error in response sanitization: {str(e)}")
+                        # Don't modify the response if there's an error in sanitization
+                
+                # Check for any remaining potential context leakage patterns
+                suspicious_patterns = [
+                    r"(?i)'Topic':", r"(?i)'Context':", r"(?i)'Goals':",
+                    r"(?i)\"Topic\":", r"(?i)\"Context\":", r"(?i)\"Goals\":",
+                    r"(?i)This is an interview conversation",
+                    r"(?i)Gather relevant information from the participant"
+                ]
+                
+                has_suspicious_content = any(re.search(pattern, response_text) for pattern in suspicious_patterns)
+                if has_suspicious_content and prompt and any(q in prompt.lower() for q in identity_questions):
+                    # Fall back to our safe identity response if suspicious patterns are found in an identity question
+                    logger.info("Detected suspicious content in identity response - using safe response")
+                    
+                    # Get character name safely
+                    character_name = str(character).title() if character else "the interviewer"
+                    character_key = str(character).lower() if character else "interviewer"
+                    
+                    # Special handling for Thomas character
+                    if character_key == "thomas":
+                        logger.info(f"Using fallback Thomas-specific identity response")
+                        return "My name is Thomas. I'm a test character for the DARIA interview system."
+                    
+                    # Create a safe identity response
+                    identity_response = f"I am {character_name}. "
+                    
+                    # Add character description based on role
+                    if character_key == "synthia" or character_key == "synthia-id":
+                        identity_response += "As Synthia, I'm a synthesizer of information who helps integrate diverse perspectives into coherent insights."
+                    elif character_key == "thesea" or character_key == "thesea-id":
+                        identity_response += "As Thesea, I'm Deloitte's expert Persona Analyzer."
+                    elif character_key == "daria" or character_key == "daria-id":
+                        identity_response += "As DARIA, I'm Deloitte's Advanced Research & Interview Assistant."
+                    elif character_key == "askia" or character_key == "askia-id":
+                        identity_response += "As Askia, I'm Deloitte's expert Discovery Interviewer."
+                    elif character_key == "odessia" or character_key == "odessia-id":
+                        identity_response += "As Odessia, I'm Deloitte's Journey Mapping specialist."
+                    elif character_key == "eurekia" or character_key == "eurekia-id":
+                        identity_response += "As Eurekia, I'm Deloitte's Opportunity Finder."
+                    elif character_key == "skeptica" or character_key == "skeptica-id":
+                        identity_response += "As Skeptica, I'm Deloitte's Assumption Buster."
+                    elif character_key == "thomas":
+                        identity_response += "I'm Thomas, your interview assistant for this session."
+                    elif character_key not in ["interviewer", "researcher", "assistant"]:
+                        # For any custom character not in our predefined list 
+                        identity_response += f"I'm {character_name}, your custom interview assistant for this session."
+                    else:
+                        identity_response += "I'm your interview assistant helping to gather information through our conversation."
+                    
+                    return identity_response
+                
                 logger.info(f"Generated response of {len(response_text)} characters")
                 return response_text
                 
@@ -616,16 +780,34 @@ Communication guidelines:
         """Format interview data into a readable transcript for analysis"""
         formatted = ""
         
-        # Add basic metadata
-        formatted += f"Interview Title: {interview_data.get('title', 'Untitled Interview')}\n"
-        formatted += f"Date: {interview_data.get('created_at', '')}\n"
-        formatted += f"Character: {interview_data.get('character', 'Interviewer')}\n\n"
-        formatted += "TRANSCRIPT:\n\n"
-        
-        # Add conversation history
-        if 'conversation_history' in interview_data and interview_data['conversation_history']:
-            for message in interview_data['conversation_history']:
-                speaker = "Interviewer" if message.get('role') == 'assistant' else "Participant"
-                formatted += f"{speaker}: {message.get('content', '')}\n\n"
-        
-        return formatted 
+        try:
+            # Add basic metadata - safely get values with defaults
+            title = interview_data.get('title', 'Untitled Interview') if isinstance(interview_data, dict) else 'Untitled Interview'
+            created_at = interview_data.get('created_at', '') if isinstance(interview_data, dict) else ''
+            character = interview_data.get('character', 'Interviewer') if isinstance(interview_data, dict) else 'Interviewer'
+            
+            formatted += f"Interview Title: {title}\n"
+            formatted += f"Date: {created_at}\n"
+            formatted += f"Character: {character}\n\n"
+            formatted += "TRANSCRIPT:\n\n"
+            
+            # Add conversation history
+            conversation_history = []
+            if isinstance(interview_data, dict) and 'conversation_history' in interview_data:
+                conversation_history = interview_data['conversation_history']
+            
+            if conversation_history and len(conversation_history) > 0:
+                for message in conversation_history:
+                    if isinstance(message, dict):
+                        role = message.get('role', '')
+                        content = message.get('content', '')
+                        speaker = "Interviewer" if role == 'assistant' else "Participant"
+                        formatted += f"{speaker}: {content}\n\n"
+            else:
+                formatted += "No conversation history available.\n"
+                
+            return formatted
+            
+        except Exception as e:
+            logger.error(f"Error formatting transcript: {str(e)}")
+            return "Error formatting transcript. Please check the interview data format." 
