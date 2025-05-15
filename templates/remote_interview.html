@@ -294,19 +294,52 @@
 
     <script>
         // Global variables
-        let ttsAudio = null;
+        let ttsAudio = new Audio();
         let recognition = null;
         let ttsActive = false;
         let sttActive = false;
+        let apiPort = 5025;
         let sessionId = null;
         let lastAssistantMessage = "";
         let isConnected = false;
-        
-        // Audio monitoring variables
+        let startTime = null;
+        let timerInterval = null;
+        let guideInfo = null;
+        let messageContainer = null;
         let audioContext = null;
         let analyser = null;
         let microphone = null;
         let audioLevelInterval = null;
+        let apiUrl = '';
+        
+        // UI Elements
+        let userInput = null;
+        let sendMessageBtn = null;
+        let startSpeakingBtn = null;
+        let stopSpeakingBtn = null;
+        let connectionStatus = null;
+        let connectionStatusText = null;
+        let endInterviewBtn = null;
+        
+        // Logger function to standardize logging
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            
+            // Create standard console message
+            console.log(`[${type}] ${message}`);
+            
+            // Add to debug log if available
+            const debugLog = document.getElementById('log-container');
+            if (debugLog) {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}-log`;
+                entry.textContent = `${timestamp} - ${message}`;
+                debugLog.appendChild(entry);
+                
+                // Auto-scroll to bottom
+                debugLog.scrollTop = debugLog.scrollHeight;
+            }
+        }
         
         // Initialize the audio element
         function initTTSAudio() {
@@ -322,17 +355,17 @@
         const urlParams = new URLSearchParams(window.location.search);
         sessionId = urlParams.get('session_id') || "{{ session_id }}";
         const port = urlParams.get('port') || "{{ port }}" || '5025';
-        const apiUrl = `http://${window.location.hostname}:${port}`;
+        apiUrl = `http://${window.location.hostname}:${port}`;
         
         // Ensure ttsAudio is initialized
         initTTSAudio();
         
         // DOM Elements
-        let messageContainer = document.getElementById('message-container');
-        let userInput = document.getElementById('user-input');
-        let sendMessageBtn = document.getElementById('send-message');
-        let startSpeakingBtn = document.getElementById('start-speaking');
-        let stopSpeakingBtn = document.getElementById('stop-speaking');
+        messageContainer = document.getElementById('message-container');
+        userInput = document.getElementById('user-input');
+        sendMessageBtn = document.getElementById('send-message');
+        startSpeakingBtn = document.getElementById('start-speaking');
+        stopSpeakingBtn = document.getElementById('stop-speaking');
         
         // Helper Functions
         
@@ -1067,59 +1100,52 @@
         // Connect to the API server
         async function connectToServer() {
             return new Promise((resolve, reject) => {
-                console.log("Connecting to API server...");
-                updateConnectionStatus(false, 'Connecting...');
-                
                 try {
-                    // Check server health
+                    console.log(`Connecting to API server on port ${apiPort}`);
                     fetch(`${apiUrl}/api/health`)
                         .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`API server returned status: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.status !== 'ok') {
-                                throw new Error('API server health check failed');
-                            }
-                            
-                            // Check session validity if we have a session ID
-                            if (sessionId) {
-                                return fetch(`${apiUrl}/api/session/${sessionId}`);
-                            } else {
-                                throw new Error('No session ID provided');
-                            }
-                        })
-                        .then(response => {
-                            if (!response.ok) {
-                                throw new Error(`Session check failed: ${response.status}`);
-                            }
-                            return response.json();
-                        })
-                        .then(data => {
-                            if (data.status === 'success') {
-                                updateConnectionStatus(true, 'Connected');
+                            if (response.ok) {
                                 isConnected = true;
+                                updateStatus();
+                                log('API server connection successful', 'info');
                                 
-                                // Initial message fetch
-                                return fetchLatestMessages();
+                                // Enable UI
+                                userInput.disabled = false;
+                                sendMessageBtn.disabled = false;
+                                endInterviewBtn.disabled = false;
+                                
+                                // Fetch initial messages if session ID is provided
+                                if (sessionId) {
+                                    log(`Loading messages for session: ${sessionId}`, 'info');
+                                    fetchLatestMessages();
+                                } else {
+                                    console.error("No session ID provided!");
+                                    addMessage("Error: No session ID provided", 'error');
+                                    log('Error: No session ID provided', 'error');
+                                }
+                                
+                                // Start timer
+                                startTimer();
+                                
+                                resolve(true);
                             } else {
-                                throw new Error('Session validation failed');
+                                console.error("API server health check failed:", response.status);
+                                connectionStatusText.textContent = "Connection Failed";
+                                connectionStatus.classList.add('status-inactive');
+                                log(`API server health check failed: ${response.status}`, 'error');
+                                reject(new Error(`Health check failed: ${response.status}`));
                             }
-                        })
-                        .then(() => {
-                            console.log("Connection and session validation successful");
-                            resolve();
                         })
                         .catch(error => {
-                            console.error("Connection error:", error);
-                            updateConnectionStatus(false, 'Connection Failed');
+                            console.error("Error connecting to server:", error);
+                            connectionStatusText.textContent = "Connection Error";
+                            connectionStatus.classList.add('status-inactive');
+                            log(`Connection error: ${error.message}`, 'error');
                             reject(error);
                         });
                 } catch (error) {
                     console.error("Critical connection error:", error);
-                    updateConnectionStatus(false, 'Connection Failed');
+                    updateStatus();
                     reject(error);
                 }
             });
@@ -1366,9 +1392,155 @@
             // Important: Do not return a value that could be treated as a Promise
         }
         
+        // Initialize all event listeners in one function
+        function initEventListeners() {
+            console.log("Initializing event listeners");
+            
+            if (sendMessageBtn) {
+                console.log("Adding send button click listener");
+                sendMessageBtn.addEventListener('click', () => {
+                    const message = userInput.value.trim();
+                    if (message) {
+                        sendMessage(message);
+                        userInput.value = '';
+                    }
+                });
+            } else {
+                console.warn("Send button not found");
+            }
+            
+            if (startSpeakingBtn) {
+                console.log("Adding start speaking button listener");
+                startSpeakingBtn.addEventListener('click', startSpeechRecognition);
+            } else {
+                console.warn("Start speaking button not found");
+            }
+            
+            if (stopSpeakingBtn) {
+                console.log("Adding stop speaking button listener");
+                stopSpeakingBtn.addEventListener('click', stopSpeechRecognition);
+            } else {
+                console.warn("Stop speaking button not found");
+            }
+            
+            if (userInput) {
+                console.log("Adding keypress listener for text input");
+                userInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (sendMessageBtn) {
+                            sendMessageBtn.click();
+                        }
+                    }
+                });
+            } else {
+                console.warn("Text input not found");
+            }
+            
+            console.log("Event listeners initialization complete");
+        }
+        
+        // Start timer function
+        function startTimer() {
+            console.log("Starting session timer");
+            startTime = new Date();
+            
+            timerInterval = setInterval(() => {
+                if (startTime) {
+                    const now = new Date();
+                    const diff = now - startTime;
+                    
+                    // Format time as mm:ss
+                    const minutes = Math.floor(diff / 60000);
+                    const seconds = Math.floor((diff % 60000) / 1000);
+                    
+                    // Update timer display if element exists
+                    const timerDisplay = document.getElementById('timer');
+                    if (timerDisplay) {
+                        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }
+            }, 1000);
+            
+            console.log("Timer started");
+        }
+        
+        // Update status of all UI elements
+        function updateStatus() {
+            console.log("Updating UI status indicators");
+            
+            // Update connection status
+            updateConnectionStatus(isConnected, isConnected ? 'Connected' : 'Disconnected');
+            
+            // Update mic status
+            updateMicStatus(sttActive, sttActive ? 'Active' : 'Ready');
+            
+            // Update TTS status
+            if (document.getElementById('tts-status')) {
+                const ttsStatus = document.getElementById('tts-status');
+                const ttsStatusText = document.getElementById('tts-status-text');
+                
+                if (ttsActive) {
+                    ttsStatus.className = 'status-indicator status-active';
+                    ttsStatusText.textContent = 'Speaking';
+                } else {
+                    ttsStatus.className = 'status-indicator status-connected';
+                    ttsStatusText.textContent = 'Ready';
+                }
+            }
+            
+            console.log("Status indicators updated");
+        }
+        
+        // Setup collapsible panels (accordions)
+        function setupCollapsiblePanels() {
+            console.log("Setting up collapsible panels");
+            
+            const headers = document.querySelectorAll('.collapsible-header');
+            if (!headers || headers.length === 0) {
+                console.warn("No collapsible headers found on page");
+                return;
+            }
+            
+            console.log(`Found ${headers.length} collapsible panels`);
+            
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    console.log(`Toggling panel: ${header.textContent}`);
+                    
+                    // Get the content panel
+                    const content = header.nextElementSibling;
+                    if (!content) {
+                        console.warn("No content element found for header:", header);
+                        return;
+                    }
+                    
+                    // Get the toggle icon
+                    const toggleIcon = header.querySelector('.toggle-icon');
+                    
+                    // Toggle the panel's expanded state
+                    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                        // Panel is expanded, so collapse it
+                        content.style.maxHeight = null;
+                        if (toggleIcon) toggleIcon.textContent = '+';
+                        console.log("Panel collapsed");
+                    } else {
+                        // Panel is collapsed, so expand it
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        if (toggleIcon) toggleIcon.textContent = '−';
+                        console.log("Panel expanded");
+                    }
+                });
+                
+                console.log(`Added click handler to panel: ${header.textContent}`);
+            });
+            
+            console.log("Collapsible panels setup complete");
+        }
+        
         // Event listeners
         document.addEventListener('DOMContentLoaded', () => {
-            console.log("DOMContentLoaded: Initializing interview page");
+            console.log("Document loaded, initializing interview interface");
             console.log(`DOMContentLoaded: Session ID is ${sessionId || 'not set'}`);
             console.log(`DOMContentLoaded: API URL is ${apiUrl}`);
             
@@ -1386,6 +1558,10 @@
                 // Initialize audio element early to ensure it's ready
                 ttsAudio = initTTSAudio();
                 console.log("DOMContentLoaded: TTS Audio initialized");
+                
+                // Set up collapsible panels
+                setupCollapsiblePanels();
+                console.log("DOMContentLoaded: Collapsible panels initialized");
                 
                 // CRITICAL FIX: Define a safe TTS wrapper function that won't throw if promise is undefined
                 const safeTTS = function(text) {
@@ -1504,46 +1680,7 @@
                 // Add event listeners
                 console.log("DOMContentLoaded: Setting up event listeners");
                 
-                if (sendMessageBtn) {
-                    console.log("DOMContentLoaded: Adding send button click listener");
-                    sendMessageBtn.addEventListener('click', () => {
-                        const message = userInput.value.trim();
-                        if (message) {
-                            sendMessage(message);
-                            userInput.value = '';
-                        }
-                    });
-                } else {
-                    console.warn("DOMContentLoaded: Send button not found");
-                }
-                
-                if (startSpeakingBtn) {
-                    console.log("DOMContentLoaded: Adding start speaking button listener");
-                    startSpeakingBtn.addEventListener('click', startSpeechRecognition);
-                } else {
-                    console.warn("DOMContentLoaded: Start speaking button not found");
-                }
-                
-                if (stopSpeakingBtn) {
-                    console.log("DOMContentLoaded: Adding stop speaking button listener");
-                    stopSpeakingBtn.addEventListener('click', stopSpeechRecognition);
-                } else {
-                    console.warn("DOMContentLoaded: Stop speaking button not found");
-                }
-                
-                if (userInput) {
-                    console.log("DOMContentLoaded: Adding keypress listener for text input");
-                    userInput.addEventListener('keypress', (e) => {
-                        if (e.key === 'Enter' && !e.shiftKey) {
-                            e.preventDefault();
-                            if (sendMessageBtn) {
-                                sendMessageBtn.click();
-                            }
-                        }
-                    });
-                } else {
-                    console.warn("DOMContentLoaded: Text input not found");
-                }
+                initEventListeners();
                 
                 console.log("DOMContentLoaded: Initialization sequence complete");
                 

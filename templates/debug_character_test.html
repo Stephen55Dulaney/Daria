@@ -1,0 +1,998 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com; style-src 'self' 'unsafe-inline'; connect-src 'self' http://127.0.0.1:* ws://127.0.0.1:*; media-src 'self' blob:;">
+    <title>DARIA Character Debug Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        
+        h1, h2, h3 {
+            color: #333;
+        }
+        
+        h1 {
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 10px;
+            margin-top: 0;
+        }
+        
+        .section {
+            margin-bottom: 30px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
+        
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select, textarea {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+        
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .secondary {
+            background-color: #2196F3;
+        }
+        
+        .warning {
+            background-color: #ff9800;
+        }
+        
+        .danger {
+            background-color: #f44336;
+        }
+        
+        pre {
+            background-color: #f5f5f5;
+            padding: 15px;
+            border-radius: 4px;
+            overflow-x: auto;
+            margin: 10px 0;
+        }
+        
+        .debug-log {
+            font-family: monospace;
+            height: 400px;
+            overflow-y: auto;
+            padding: 10px;
+            background-color: #222;
+            color: #f5f5f5;
+            border-radius: 8px;
+            line-height: 1.5;
+        }
+        
+        .debug-log .log-entry {
+            margin-bottom: 5px;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+        
+        .debug-log .info {
+            color: #4CAF50;
+        }
+        
+        .debug-log .warn {
+            color: #FFC107;
+        }
+        
+        .debug-log .error {
+            color: #F44336;
+        }
+        
+        .debug-log .api {
+            color: #2196F3;
+        }
+        
+        .debug-log .character {
+            color: #E91E63;
+        }
+        
+        .debug-log .langchain {
+            color: #9C27B0;
+        }
+        
+        .conversation-container {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .conversation-header {
+            background-color: #f5f5f5;
+            padding: 10px 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        #message-container {
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+            background-color: white;
+        }
+        
+        .message {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 8px;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background-color: #e3f2fd;
+            margin-left: auto;
+        }
+        
+        .assistant-message {
+            background-color: #f1f8e9;
+            margin-right: auto;
+        }
+        
+        .system-message {
+            background-color: #f5f5f5;
+            max-width: 100%;
+            text-align: center;
+            font-style: italic;
+        }
+        
+        /* Animation for API calls */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        .api-active {
+            animation: pulse 1.5s infinite;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>DARIA Character Debug Tool</h1>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>Connection Settings</h2>
+            </div>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="api-port">API Port</label>
+                    <input type="number" id="api-port" value="5025">
+                </div>
+                <div class="form-group">
+                    <label for="session-id">Session ID (Optional)</label>
+                    <input type="text" id="session-id" placeholder="Leave empty to create new session">
+                </div>
+                <div class="form-group">
+                    <label for="guide-id">Discussion Guide ID</label>
+                    <select id="guide-id">
+                        <option value="29358345-e541-4dfc-9db7-d9c84a578d50">Default Guide</option>
+                        <!-- More guides will be loaded dynamically -->
+                    </select>
+                </div>
+            </div>
+            <div class="button-row">
+                <button id="connect-btn" class="secondary">Connect to API</button>
+                <button id="create-session-btn" disabled>Create New Session</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>Character Selection</h2>
+            </div>
+            <div class="grid">
+                <div class="form-group">
+                    <label for="character-select">Select Character</label>
+                    <select id="character-select" disabled>
+                        <option value="">Loading characters...</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="interview-type">Interview Type</label>
+                    <select id="interview-type" disabled>
+                        <option value="General Interview">General Interview</option>
+                        <option value="Journey Map Interview">Journey Map Interview</option>
+                        <option value="Persona Interview">Persona Interview</option>
+                        <option value="Opportunity Interview">Opportunity Interview</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="character-prompt">Character Prompt</label>
+                    <textarea id="character-prompt" disabled></textarea>
+                </div>
+            </div>
+            <div class="button-row">
+                <button id="set-character-btn" class="secondary" disabled>Set Character</button>
+                <button id="set-character-system-msg-btn" disabled>Set via System Message</button>
+                <button id="reset-character-btn" class="warning" disabled>Reset Character</button>
+            </div>
+        </div>
+        
+        <div class="conversation-container">
+            <div class="conversation-header">
+                <h2>Test Conversation</h2>
+            </div>
+            <div id="message-container">
+                <div class="message system-message">Connect to start a conversation.</div>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="form-group">
+                <label for="user-input">Your Message</label>
+                <textarea id="user-input" placeholder="Type your message here..." disabled></textarea>
+            </div>
+            <div class="button-row">
+                <button id="send-message-btn" disabled>Send Message</button>
+                <button id="send-whoami-btn" class="secondary" disabled>Send "Who are you?"</button>
+                <button id="end-interview-btn" class="danger" disabled>End Interview</button>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>Session Information</h2>
+            </div>
+            <div class="form-group">
+                <label>Session Details</label>
+                <pre id="session-info">Not connected</pre>
+            </div>
+        </div>
+        
+        <div class="section">
+            <div class="section-header">
+                <h2>Debug Log</h2>
+                <button id="copy-log-btn" class="secondary">Copy Log</button>
+            </div>
+            <div id="debug-log" class="debug-log">
+                <!-- Log entries will appear here -->
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables
+        let apiUrl = '';
+        let apiPort = 5025;
+        let sessionId = null;
+        let guideId = null;
+        let isConnected = false;
+        let characters = [];
+        let selectedCharacter = null;
+        let messages = [];
+        
+        // DOM Elements
+        const apiPortInput = document.getElementById('api-port');
+        const sessionIdInput = document.getElementById('session-id');
+        const guideIdSelect = document.getElementById('guide-id');
+        const characterSelect = document.getElementById('character-select');
+        const interviewTypeSelect = document.getElementById('interview-type');
+        const characterPromptTextarea = document.getElementById('character-prompt');
+        const userInputTextarea = document.getElementById('user-input');
+        const messageContainer = document.getElementById('message-container');
+        const sessionInfoPre = document.getElementById('session-info');
+        const debugLogDiv = document.getElementById('debug-log');
+        
+        // Buttons
+        const connectBtn = document.getElementById('connect-btn');
+        const createSessionBtn = document.getElementById('create-session-btn');
+        const setCharacterBtn = document.getElementById('set-character-btn');
+        const setCharacterSystemMsgBtn = document.getElementById('set-character-system-msg-btn');
+        const resetCharacterBtn = document.getElementById('reset-character-btn');
+        const sendMessageBtn = document.getElementById('send-message-btn');
+        const sendWhoamiBtn = document.getElementById('send-whoami-btn');
+        const endInterviewBtn = document.getElementById('end-interview-btn');
+        const copyLogBtn = document.getElementById('copy-log-btn');
+        
+        // Logging function
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const formattedMessage = `${timestamp} - ${message}`;
+            
+            // Console logging
+            if (type === 'error') {
+                console.error(formattedMessage);
+            } else if (type === 'warn') {
+                console.warn(formattedMessage);
+            } else if (type === 'api') {
+                console.log(`%c${formattedMessage}`, 'color: #2196F3');
+            } else if (type === 'character') {
+                console.log(`%c${formattedMessage}`, 'color: #E91E63');
+            } else if (type === 'langchain') {
+                console.log(`%c${formattedMessage}`, 'color: #9C27B0');
+            } else {
+                console.log(formattedMessage);
+            }
+            
+            // Add to debug log
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = formattedMessage;
+            debugLogDiv.appendChild(entry);
+            debugLogDiv.scrollTop = debugLogDiv.scrollHeight;
+        }
+        
+        // Initialize
+        function init() {
+            log('Character Debug Tool initialized');
+            
+            // Set up button event listeners
+            connectBtn.addEventListener('click', connectToApi);
+            createSessionBtn.addEventListener('click', createNewSession);
+            characterSelect.addEventListener('change', onCharacterSelected);
+            setCharacterBtn.addEventListener('click', setCharacterApiMethod);
+            setCharacterSystemMsgBtn.addEventListener('click', setCharacterSystemMessageMethod);
+            resetCharacterBtn.addEventListener('click', resetCharacter);
+            sendMessageBtn.addEventListener('click', sendUserMessage);
+            sendWhoamiBtn.addEventListener('click', sendWhoamiMessage);
+            endInterviewBtn.addEventListener('click', endInterview);
+            copyLogBtn.addEventListener('click', copyDebugLog);
+            
+            // Set API port from URL if present
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.has('port')) {
+                apiPort = urlParams.get('port');
+                apiPortInput.value = apiPort;
+            }
+            
+            // Set session ID from URL if present
+            if (urlParams.has('session_id')) {
+                sessionId = urlParams.get('session_id');
+                sessionIdInput.value = sessionId;
+            }
+        }
+        
+        // Connect to API
+        async function connectToApi() {
+            // Get port value
+            apiPort = apiPortInput.value;
+            apiUrl = `http://${window.location.hostname}:${apiPort}`;
+            
+            log(`Connecting to API at ${apiUrl}`, 'api');
+            
+            try {
+                // Check API health
+                const healthResponse = await fetch(`${apiUrl}/api/health`);
+                
+                if (healthResponse.ok) {
+                    log('API connection successful', 'api');
+                    isConnected = true;
+                    
+                    // Enable buttons
+                    createSessionBtn.disabled = false;
+                    
+                    // If session ID is provided, load session
+                    const providedSessionId = sessionIdInput.value.trim();
+                    if (providedSessionId) {
+                        sessionId = providedSessionId;
+                        log(`Loading existing session: ${sessionId}`, 'api');
+                        loadSessionData();
+                    }
+                    
+                    // Load guides
+                    loadGuides();
+                    
+                    // Load characters
+                    loadCharacters();
+                } else {
+                    log(`API health check failed: ${healthResponse.status}`, 'error');
+                }
+            } catch (error) {
+                log(`API connection error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Load available guides
+        async function loadGuides() {
+            try {
+                const response = await fetch(`${apiUrl}/api/discussion_guides`);
+                
+                if (response.ok) {
+                    const guides = await response.json();
+                    log(`Loaded ${guides.length} discussion guides`, 'api');
+                    
+                    // Populate guide select
+                    guideIdSelect.innerHTML = '';
+                    guides.forEach(guide => {
+                        const option = document.createElement('option');
+                        option.value = guide.id;
+                        option.textContent = guide.title;
+                        guideIdSelect.appendChild(option);
+                    });
+                } else {
+                    log(`Failed to load guides: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`Error loading guides: ${error.message}`, 'error');
+            }
+        }
+        
+        // Load available characters
+        async function loadCharacters() {
+            try {
+                const response = await fetch(`${apiUrl}/api/prompts`);
+                
+                if (response.ok) {
+                    const prompts = await response.json();
+                    log(`Loaded ${prompts.length} prompts/characters`, 'character');
+                    
+                    // Filter characters (those with specific name patterns)
+                    characters = prompts.filter(p => 
+                        p.name.includes('Askia') || 
+                        p.name.includes('Eurekia') || 
+                        p.name.includes('Odessia') ||
+                        p.content.toLowerCase().includes('character')
+                    );
+                    
+                    // Populate character select
+                    characterSelect.innerHTML = '<option value="">Select a character</option>';
+                    characters.forEach(char => {
+                        const option = document.createElement('option');
+                        option.value = char.id;
+                        option.textContent = char.name;
+                        characterSelect.appendChild(option);
+                    });
+                    
+                    // Enable characters dropdown
+                    characterSelect.disabled = false;
+                } else {
+                    log(`Failed to load characters: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`Error loading characters: ${error.message}`, 'error');
+            }
+        }
+        
+        // Create a new session
+        async function createNewSession() {
+            guideId = guideIdSelect.value;
+            
+            if (!guideId) {
+                log('Please select a discussion guide', 'error');
+                return;
+            }
+            
+            log(`Creating new session with guide: ${guideId}`, 'api');
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/session/create`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        guide_id: guideId
+                    })
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    sessionId = data.session_id;
+                    log(`Created new session: ${sessionId}`, 'api');
+                    
+                    // Update UI
+                    sessionIdInput.value = sessionId;
+                    enableSessionControls();
+                    loadSessionData();
+                } else {
+                    log(`Failed to create session: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`Error creating session: ${error.message}`, 'error');
+            }
+        }
+        
+        // Load session data
+        async function loadSessionData() {
+            if (!sessionId) {
+                log('No session ID provided', 'error');
+                return;
+            }
+            
+            log(`Loading session data for: ${sessionId}`, 'api');
+            
+            try {
+                // Try different APIs to get session details
+                let sessionDetails = null;
+                
+                // First try the API endpoint
+                try {
+                    const apiResponse = await fetch(`${apiUrl}/api/session/${sessionId}`);
+                    if (apiResponse.ok) {
+                        const apiData = await apiResponse.json();
+                        log(`API session data: ${JSON.stringify(apiData)}`, 'api');
+                        sessionDetails = apiData;
+                    } else {
+                        log(`API session endpoint returned ${apiResponse.status}`, 'warn');
+                    }
+                } catch (e) {
+                    log(`Error fetching session API: ${e.message}`, 'warn');
+                }
+                
+                // If that failed, try the details endpoint
+                if (!sessionDetails) {
+                    try {
+                        const detailsResponse = await fetch(`${apiUrl}/api/session/${sessionId}/details`);
+                        if (detailsResponse.ok) {
+                            const detailsData = await detailsResponse.json();
+                            log(`Details endpoint data: ${JSON.stringify(detailsData)}`, 'api');
+                            sessionDetails = detailsData;
+                        } else {
+                            log(`Details endpoint returned ${detailsResponse.status}`, 'warn');
+                        }
+                    } catch (e) {
+                        log(`Error fetching session details: ${e.message}`, 'warn');
+                    }
+                }
+                
+                // If that also failed, try to get HTML
+                if (!sessionDetails) {
+                    try {
+                        const htmlResponse = await fetch(`${apiUrl}/session/${sessionId}`);
+                        if (htmlResponse.ok) {
+                            const html = await htmlResponse.text();
+                            log(`Successfully fetched session HTML page (${html.length} bytes)`, 'api');
+                            
+                            // Extract character
+                            const characterMatch = html.match(/<dt>AI Character<\/dt>\s*<dd[^>]*>(.*?)<\/dd>/i);
+                            if (characterMatch && characterMatch[1]) {
+                                log(`Found character in HTML: ${characterMatch[1].trim()}`, 'character');
+                                if (!sessionDetails) sessionDetails = {};
+                                sessionDetails.character_name = characterMatch[1].trim();
+                            }
+                            
+                            // Extract interview type
+                            const typeMatch = html.match(/<dt>Interview Type<\/dt>\s*<dd[^>]*>(.*?)<\/dd>/i);
+                            if (typeMatch && typeMatch[1]) {
+                                log(`Found interview type in HTML: ${typeMatch[1].trim()}`, 'api');
+                                if (!sessionDetails) sessionDetails = {};
+                                sessionDetails.interview_type = typeMatch[1].trim();
+                            }
+                        }
+                    } catch (e) {
+                        log(`Error fetching session HTML: ${e.message}`, 'warn');
+                    }
+                }
+                
+                // Update UI with session details
+                if (sessionDetails) {
+                    updateSessionInfo(sessionDetails);
+                    
+                    // Select character in dropdown if it exists
+                    if (sessionDetails.character_name) {
+                        const characterOpt = Array.from(characterSelect.options).find(
+                            opt => opt.textContent.includes(sessionDetails.character_name)
+                        );
+                        
+                        if (characterOpt) {
+                            characterSelect.value = characterOpt.value;
+                            onCharacterSelected();
+                        }
+                    }
+                    
+                    // Select interview type
+                    if (sessionDetails.interview_type) {
+                        const typeOpt = Array.from(interviewTypeSelect.options).find(
+                            opt => opt.textContent === sessionDetails.interview_type
+                        );
+                        
+                        if (typeOpt) {
+                            interviewTypeSelect.value = typeOpt.value;
+                        }
+                    }
+                }
+                
+                // Enable session controls
+                enableSessionControls();
+                
+                // Fetch messages
+                fetchMessages();
+            } catch (error) {
+                log(`Error loading session data: ${error.message}`, 'error');
+            }
+        }
+        
+        // Update the session info display
+        function updateSessionInfo(data) {
+            sessionInfoPre.textContent = JSON.stringify(data, null, 2);
+        }
+        
+        // Enable session controls
+        function enableSessionControls() {
+            interviewTypeSelect.disabled = false;
+            setCharacterBtn.disabled = false;
+            setCharacterSystemMsgBtn.disabled = false;
+            resetCharacterBtn.disabled = false;
+            sendMessageBtn.disabled = false;
+            sendWhoamiBtn.disabled = false;
+            endInterviewBtn.disabled = false;
+            userInputTextarea.disabled = false;
+        }
+        
+        // Handle character selection
+        function onCharacterSelected() {
+            const characterId = characterSelect.value;
+            
+            if (!characterId) {
+                characterPromptTextarea.value = '';
+                selectedCharacter = null;
+                return;
+            }
+            
+            selectedCharacter = characters.find(c => c.id === characterId);
+            
+            if (selectedCharacter) {
+                log(`Selected character: ${selectedCharacter.name}`, 'character');
+                characterPromptTextarea.value = selectedCharacter.content;
+            } else {
+                characterPromptTextarea.value = '';
+            }
+        }
+        
+        // Set character using API method
+        async function setCharacterApiMethod() {
+            if (!sessionId || !selectedCharacter) {
+                log('Session ID or character not selected', 'error');
+                return;
+            }
+            
+            const characterName = selectedCharacter.name.split(' ')[0]; // Get first word of name
+            log(`Setting character to ${characterName} via API`, 'character');
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/set_character`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        character: characterName,
+                        prompt: selectedCharacter.content
+                    })
+                });
+                
+                if (response.ok) {
+                    log(`Successfully set character to ${characterName}`, 'character');
+                    
+                    // Update session info
+                    loadSessionData();
+                } else {
+                    const errorText = await response.text();
+                    log(`Failed to set character: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`Error setting character: ${error.message}`, 'error');
+            }
+        }
+        
+        // Set character using system message
+        async function setCharacterSystemMessageMethod() {
+            if (!sessionId || !selectedCharacter) {
+                log('Session ID or character not selected', 'error');
+                return;
+            }
+            
+            const characterName = selectedCharacter.name.split(' ')[0]; // Get first word of name
+            log(`Setting character to ${characterName} via system message`, 'character');
+            
+            try {
+                const systemMessage = `IMPORTANT: You are ${characterName}. Always respond as ${characterName}. 
+                When asked about your name, say "I am ${characterName}".
+                When asked about your prompt or role, explain your specific purpose as ${characterName}.
+                Never identify yourself as "Assistant" or any other name.
+                Maintain the ${characterName} persona throughout the entire conversation.`;
+                
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: systemMessage,
+                        role: 'system'
+                    })
+                });
+                
+                if (response.ok) {
+                    log(`Successfully sent character system message for ${characterName}`, 'character');
+                    
+                    // Try to update first assistant message
+                    try {
+                        const forceFirstMessageResponse = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                content: `Hello, I am ${characterName}. How can I assist you today?`,
+                                role: 'assistant'
+                            })
+                        });
+                        
+                        if (forceFirstMessageResponse.ok) {
+                            log(`Successfully added introduction message as ${characterName}`, 'character');
+                        } else {
+                            log(`Failed to add introduction message: ${forceFirstMessageResponse.status}`, 'warn');
+                        }
+                    } catch (e) {
+                        log(`Error adding introduction message: ${e.message}`, 'warn');
+                    }
+                    
+                    // Update UI
+                    fetchMessages();
+                } else {
+                    const errorText = await response.text();
+                    log(`Failed to send system message: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`Error sending system message: ${error.message}`, 'error');
+            }
+        }
+        
+        // Reset character
+        async function resetCharacter() {
+            if (!sessionId) {
+                log('No active session', 'error');
+                return;
+            }
+            
+            log('Resetting character to default Assistant', 'character');
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/set_character`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        character: 'Assistant',
+                        prompt: ''
+                    })
+                });
+                
+                if (response.ok) {
+                    log('Successfully reset character to Assistant', 'character');
+                    
+                    // Update UI
+                    loadSessionData();
+                } else {
+                    const errorText = await response.text();
+                    log(`Failed to reset character: ${response.status} - ${errorText}`, 'error');
+                }
+            } catch (error) {
+                log(`Error resetting character: ${error.message}`, 'error');
+            }
+        }
+        
+        // Fetch messages
+        async function fetchMessages() {
+            if (!sessionId) {
+                log('No session ID available', 'error');
+                return;
+            }
+            
+            log(`Fetching messages for session ${sessionId}`, 'api');
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    log(`Received ${data.messages ? data.messages.length : 0} messages`, 'api');
+                    
+                    if (data.messages && data.messages.length > 0) {
+                        messages = data.messages;
+                        
+                        // Update UI
+                        messageContainer.innerHTML = '';
+                        
+                        messages.forEach(msg => {
+                            const messageElem = document.createElement('div');
+                            
+                            if (msg.role === 'user') {
+                                messageElem.className = 'message user-message';
+                                messageElem.textContent = msg.content;
+                            } else if (msg.role === 'assistant') {
+                                messageElem.className = 'message assistant-message';
+                                messageElem.textContent = msg.content;
+                            } else if (msg.role === 'system') {
+                                messageElem.className = 'message system-message';
+                                messageElem.textContent = `[System: ${msg.content}]`;
+                            }
+                            
+                            messageContainer.appendChild(messageElem);
+                        });
+                        
+                        // Scroll to bottom
+                        messageContainer.scrollTop = messageContainer.scrollHeight;
+                    } else {
+                        messageContainer.innerHTML = '<div class="message system-message">No messages in this session yet.</div>';
+                    }
+                } else {
+                    log(`Failed to fetch messages: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`Error fetching messages: ${error.message}`, 'error');
+            }
+        }
+        
+        // Send user message
+        async function sendUserMessage() {
+            const message = userInputTextarea.value.trim();
+            
+            if (!message || !sessionId) {
+                return;
+            }
+            
+            log(`Sending message: "${message.substring(0, 30)}${message.length > 30 ? '...' : ''}"`, 'api');
+            
+            try {
+                // Send to API
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: message,
+                        role: 'user'
+                    })
+                });
+                
+                if (response.ok) {
+                    log('Message sent successfully', 'api');
+                    
+                    // Clear input
+                    userInputTextarea.value = '';
+                    
+                    // Fetch updated messages
+                    setTimeout(fetchMessages, 1000);
+                } else {
+                    log(`Failed to send message: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`Error sending message: ${error.message}`, 'error');
+            }
+        }
+        
+        // Send "Who are you?" message
+        function sendWhoamiMessage() {
+            userInputTextarea.value = "What is your name and what is your prompt?";
+            sendUserMessage();
+        }
+        
+        // End interview
+        async function endInterview() {
+            if (!sessionId) {
+                return;
+            }
+            
+            log('Ending interview session', 'api');
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/end`, {
+                    method: 'POST'
+                });
+                
+                if (response.ok) {
+                    log('Interview ended successfully', 'api');
+                    
+                    // Add system message
+                    const systemMessage = document.createElement('div');
+                    systemMessage.className = 'message system-message';
+                    systemMessage.textContent = 'Interview session ended';
+                    messageContainer.appendChild(systemMessage);
+                    
+                    // Scroll to bottom
+                    messageContainer.scrollTop = messageContainer.scrollHeight;
+                } else {
+                    log(`Failed to end interview: ${response.status}`, 'error');
+                }
+            } catch (error) {
+                log(`Error ending interview: ${error.message}`, 'error');
+            }
+        }
+        
+        // Copy debug log
+        function copyDebugLog() {
+            // Extract log entries
+            const logEntries = Array.from(debugLogDiv.querySelectorAll('.log-entry'));
+            
+            // Format log text
+            let logText = 'DARIA Character Debug Tool Log\n';
+            logText += '===============================\n\n';
+            
+            logEntries.forEach(entry => {
+                logText += entry.textContent + '\n';
+            });
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(logText).then(() => {
+                log('Debug log copied to clipboard', 'info');
+                alert('Debug log copied to clipboard');
+            }).catch(err => {
+                log(`Error copying debug log: ${err.message}`, 'error');
+                alert('Failed to copy debug log');
+            });
+        }
+        
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', init);
+    </script>
+</body>
+</html> 

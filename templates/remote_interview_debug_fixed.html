@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA Remote Interview (Fixed)</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: #f7f9fc;
+            color: #333;
+        }
+        
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .interview-panel {
+            background-color: #fff;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        h1, h2, h3 {
+            margin-top: 0;
+            color: #333;
+        }
+        
+        .message-container {
+            height: 400px;
+            overflow-y: auto;
+            padding: 15px;
+            background-color: #fff;
+            border: 1px solid #eee;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+        
+        .message {
+            margin-bottom: 15px;
+            padding: 12px;
+            border-radius: 8px;
+            max-width: 85%;
+        }
+        
+        .user-message {
+            background-color: #e9f5ff;
+            color: #0066cc;
+            border-left: 4px solid #0066cc;
+            margin-left: auto;
+            margin-right: 0;
+        }
+        
+        .assistant-message {
+            background-color: #f0f4f8;
+            color: #333;
+            border-left: 4px solid #9E9E9E;
+            margin-right: auto;
+            margin-left: 0;
+        }
+        
+        textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            resize: vertical;
+            min-height: 80px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        
+        button {
+            padding: 12px 20px;
+            background-color: #0066cc;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            margin-right: 8px;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        button:hover {
+            background-color: #0058b3;
+        }
+        
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        
+        .control-panel {
+            margin-bottom: 15px;
+            display: flex;
+            gap: 10px;
+        }
+        
+        .status-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            background-color: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            border: 1px solid #eee;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-active {
+            background-color: #4CAF50;
+            box-shadow: 0 0 5px #4CAF50;
+            animation: pulse 1.5s infinite;
+        }
+        
+        .status-connected {
+            background-color: #4CAF50;
+        }
+        
+        .status-inactive {
+            background-color: #F44336;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0.7);
+            }
+            70% {
+                box-shadow: 0 0 0 5px rgba(76, 175, 80, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(76, 175, 80, 0);
+            }
+        }
+        
+        .collapsible-panel {
+            margin-top: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .collapsible-header {
+            background-color: #f7f9fc;
+            padding: 10px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .collapsible-header h3 {
+            margin: 0;
+            font-size: 16px;
+        }
+        
+        .toggle-icon {
+            font-size: 18px;
+            font-weight: bold;
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+        }
+        
+        .debug-log {
+            padding: 10px;
+            font-family: monospace;
+            font-size: 14px;
+            background-color: #f8f9fa;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+        
+        .log-entry {
+            margin-bottom: 4px;
+            padding: 2px 4px;
+            border-radius: 2px;
+        }
+        
+        .info {
+            color: #0066cc;
+        }
+        
+        .error {
+            color: #c62828;
+            background-color: #ffebee;
+        }
+        
+        .warn {
+            color: #e65100;
+            background-color: #fff3e0;
+        }
+        
+        .tts {
+            color: #2e7d32;
+            background-color: #e8f5e9;
+        }
+        
+        .stt {
+            color: #6a1b9a;
+            background-color: #f3e5f5;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="interview-panel">
+            <h1>Remote Interview</h1>
+            <p>Thank you for participating in this interview. Your responses will help us gather valuable insights.</p>
+            
+            <div class="status-container">
+                <div class="status-item">
+                    <span class="status-indicator status-inactive" id="connection-indicator"></span>
+                    <span id="connection-status-text">Connecting...</span>
+                </div>
+                <div class="status-item">
+                    <span>Session ID:</span>
+                    <span id="session-id-display">Loading...</span>
+                </div>
+            </div>
+            
+            <h2>Conversation</h2>
+            <div class="message-container" id="message-container">
+                <div class="message system-message">Connecting to interview session...</div>
+            </div>
+            
+            <h3>Your Response:</h3>
+            <textarea id="message-input" placeholder="Type your message here..." disabled></textarea>
+            
+            <div class="control-panel">
+                <button id="send-message" disabled>Send Message</button>
+                <button id="copy-conversation" disabled>Copy Conversation</button>
+                <button id="end-interview" disabled>End Interview</button>
+            </div>
+        </div>
+        
+        <!-- Always visible debug log -->
+        <div class="interview-panel">
+            <h3>Debug Log (Always Visible)</h3>
+            <div style="height: 300px; overflow-y: auto; background-color: #f8f9fa; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                <div id="debug-log-visible" class="debug-log"></div>
+            </div>
+        </div>
+        
+        <!-- Collapsible panels -->
+        <div class="collapsible-panel">
+            <div class="collapsible-header">
+                <h3>Session Information</h3>
+                <span class="toggle-icon">+</span>
+            </div>
+            <div class="collapsible-content">
+                <div class="info-grid">
+                    <div class="info-item">
+                        <strong>Guide:</strong>
+                        <span id="guide-name">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Character:</strong>
+                        <span id="character-name">Loading...</span>
+                    </div>
+                    <div class="info-item">
+                        <strong>Session Duration:</strong>
+                        <span id="timer">00:00</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let ttsAudio = new Audio();
+        let recognition = null;
+        let ttsActive = false;
+        let sttActive = false;
+        let sessionId = "";  // Will be obtained from URL or API
+        let apiPort = 5025;  // Default port
+        let lastAssistantMessage = "";
+        let isConnected = false;
+        let startTime = null;
+        let timerInterval = null;
+        let guideInfo = null;
+        let messageContainer = null;
+        let audioContext = null;
+        let analyser = null;
+        let microphone = null;
+        let audioLevelInterval = null;
+        let apiUrl = '';
+        
+        // UI Elements
+        let userInput = null;
+        let sendMessageBtn = null;
+        let startSpeakingBtn = null;
+        let stopSpeakingBtn = null;
+        let connectionStatus = null;
+        let connectionStatusText = null;
+        let endInterviewBtn = null;
+        
+        // Logger function to standardize logging
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            
+            // Create standard console message
+            console.log(`[${type}] ${message}`);
+            
+            // Add to debug log (in collapsible panel)
+            if (document.getElementById('debug-log')) {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `${timestamp} - ${message}`;
+                document.getElementById('debug-log').appendChild(entry);
+                
+                // Auto-scroll to bottom
+                const debugLog = document.getElementById('debug-log');
+                debugLog.scrollTop = debugLog.scrollHeight;
+            }
+            
+            // Add to always visible debug log
+            if (document.getElementById('debug-log-visible')) {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `${timestamp} - ${message}`;
+                document.getElementById('debug-log-visible').appendChild(entry);
+                
+                // Auto-scroll to bottom
+                const visibleLog = document.getElementById('debug-log-visible');
+                visibleLog.scrollTop = visibleLog.scrollHeight;
+            }
+        }
+        
+        // Initialize the audio element
+        function initTTSAudio() {
+            if (!ttsAudio) {
+                console.log('Initializing TTS Audio object');
+                ttsAudio = new Audio();
+                ttsAudio.autoplay = false; // Disable autoplay to prevent unexpected behavior
+            }
+            return ttsAudio;
+        }
+        
+        // DOM Content Loaded - Main Entry Point
+        document.addEventListener('DOMContentLoaded', function() {
+            log("Document loaded, initializing interview interface", 'info');
+            
+            // Initialize variables - FIXED: Using URL parameters directly rather than template variables
+            const urlParams = new URLSearchParams(window.location.search);
+            sessionId = urlParams.get('interview_id') || urlParams.get('session_id');
+            apiPort = urlParams.get('port') || 5025;
+            apiUrl = `http://${window.location.hostname}:${apiPort}`;
+            
+            // Get DOM elements
+            messageContainer = document.getElementById('message-container');
+            userInput = document.getElementById('message-input');
+            sendMessageBtn = document.getElementById('send-message');
+            copyConvoBtn = document.getElementById('copy-conversation');
+            endInterviewBtn = document.getElementById('end-interview');
+            connectionStatus = document.getElementById('connection-indicator');
+            connectionStatusText = document.getElementById('connection-status-text');
+            
+            // Display session ID
+            document.getElementById('session-id-display').textContent = sessionId || 'Not available';
+            
+            // Initialize UI
+            log("Initializing UI components", 'info');
+            
+            // Reset UI state
+            userInput.disabled = true;
+            sendMessageBtn.disabled = true;
+            endInterviewBtn.disabled = true;
+            
+            // Set placeholder text
+            userInput.placeholder = "Connecting to interview session...";
+            
+            // Clear message container
+            messageContainer.innerHTML = '<div class="message system-message">Connecting to interview session...</div>';
+            
+            // Initialize connection status
+            connectionStatus.className = 'status-indicator status-inactive';
+            connectionStatusText.textContent = 'Connecting...';
+            
+            log("UI components initialized", 'info');
+            
+            // Initialize TTS
+            log("Initializing TTS audio element", 'info');
+            initTTSAudio();
+            
+            // Setup the collapsible panels
+            setupCollapsiblePanels();
+            
+            // Initialize event listeners
+            log("Setting up event listeners", 'info');
+            setupEventListeners();
+            
+            // Check API services
+            log("Checking API services...", 'info');
+            checkServices().then(function(serviceStatus) {
+                if (serviceStatus.success) {
+                    log(`Services status - TTS: ${serviceStatus.tts_available ? 'Available' : 'Unavailable'}, STT: ${serviceStatus.stt_available ? 'Available' : 'Unavailable'}`, 'info');
+                    
+                    // Connect to server
+                    log("Connecting to API server on port " + apiPort, 'info');
+                    connectToServer();
+                } else {
+                    log('Service check failed', 'error');
+                }
+            }).catch(function(error) {
+                log(`Service check error: ${error.message}`, 'error');
+            });
+            
+            log("Initialization sequence complete", 'info');
+        });
+        
+        // Setup collapsible panels
+        function setupCollapsiblePanels() {
+            log("Setting up collapsible panels", 'info');
+            
+            const headers = document.querySelectorAll('.collapsible-header');
+            if (!headers || headers.length === 0) {
+                log("No collapsible headers found", 'warn');
+                return;
+            }
+            
+            log(`Found ${headers.length} collapsible panels`, 'info');
+            
+            headers.forEach((header, index) => {
+                log(`Setting up panel ${index + 1}: ${header.textContent.trim()}`, 'info');
+                
+                header.addEventListener('click', function() {
+                    log(`Panel clicked: ${this.textContent.trim()}`, 'info');
+                    
+                    // Get the content element that follows this header
+                    const content = this.nextElementSibling;
+                    if (!content) {
+                        log("No content element found for header", 'error');
+                        return;
+                    }
+                    
+                    // Get the toggle icon if present
+                    const toggleIcon = this.querySelector('.toggle-icon');
+                    
+                    // Check if panel is currently expanded
+                    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                        // Collapse panel
+                        log(`Collapsing panel: ${this.textContent.trim()}`, 'info');
+                        content.style.maxHeight = null;
+                        if (toggleIcon) toggleIcon.textContent = '+';
+                    } else {
+                        // Expand panel
+                        log(`Expanding panel: ${this.textContent.trim()}`, 'info');
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        if (toggleIcon) toggleIcon.textContent = '−';
+                    }
+                });
+            });
+            
+            log("Collapsible panels setup complete", 'info');
+        }
+        
+        // Setup event listeners
+        function setupEventListeners() {
+            log("Setting up event listeners", 'info');
+            
+            // Send button
+            if (sendMessageBtn) {
+                sendMessageBtn.addEventListener('click', function() {
+                    const message = userInput.value.trim();
+                    if (message) {
+                        sendMessage(message);
+                        userInput.value = '';
+                    }
+                });
+                log("Send button event listener added", 'info');
+            }
+            
+            // Copy conversation button
+            if (copyConvoBtn) {
+                copyConvoBtn.addEventListener('click', function() {
+                    copyConversation();
+                });
+                log("Copy conversation button event listener added", 'info');
+            }
+            
+            // End interview button
+            if (endInterviewBtn) {
+                endInterviewBtn.addEventListener('click', function() {
+                    endInterview();
+                });
+                log("End interview button event listener added", 'info');
+            }
+            
+            // Text input
+            if (userInput) {
+                userInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (sendMessageBtn && !sendMessageBtn.disabled) {
+                            sendMessageBtn.click();
+                        }
+                    }
+                });
+                log("Text input keypress event listener added", 'info');
+            }
+            
+            log("Event listeners setup complete", 'info');
+        }
+        
+        // Update connection status
+        function updateConnectionStatus(connected, message) {
+            if (connectionStatus) {
+                connectionStatus.className = `status-indicator ${connected ? 'status-connected' : 'status-inactive'}`;
+            }
+            if (connectionStatusText) {
+                connectionStatusText.textContent = message || (connected ? 'Connected' : 'Disconnected');
+            }
+            isConnected = connected;
+            log(`Connection status updated: ${connected ? 'Connected' : 'Disconnected'} - ${message || ''}`, 'info');
+        }
+        
+        // Check services
+        async function checkServices() {
+            log("Checking TTS and STT services", 'info');
+            try {
+                const response = await fetch(`${apiUrl}/api/check_services`);
+                if (!response.ok) {
+                    log(`Service check failed with status: ${response.status}`, 'error');
+                    return { success: false };
+                }
+                
+                const data = await response.json();
+                log(`Service check result: ${JSON.stringify(data)}`, 'info');
+                return data;
+            } catch (error) {
+                log(`Service check error: ${error.message}`, 'error');
+                return { success: false, error: error.message };
+            }
+        }
+        
+        // Connect to server
+        async function connectToServer() {
+            log("Connecting to server...", 'info');
+            updateConnectionStatus(false, 'Connecting...');
+            
+            try {
+                const response = await fetch(`${apiUrl}/api/health`);
+                if (!response.ok) {
+                    log(`Server health check failed: ${response.status}`, 'error');
+                    updateConnectionStatus(false, 'Connection Failed');
+                    return false;
+                }
+                
+                log("Server health check passed", 'info');
+                updateConnectionStatus(true, 'Connected');
+                
+                // Update UI
+                userInput.disabled = false;
+                sendMessageBtn.disabled = false;
+                copyConvoBtn.disabled = false;
+                endInterviewBtn.disabled = false;
+                userInput.placeholder = "Type your message here...";
+                
+                // Start timer
+                startTimer();
+                
+                return true;
+            } catch (error) {
+                log(`Connection error: ${error.message}`, 'error');
+                updateConnectionStatus(false, 'Connection Failed');
+                return false;
+            }
+        }
+        
+        // Start timer
+        function startTimer() {
+            log("Starting session timer", 'info');
+            startTime = new Date();
+            
+            timerInterval = setInterval(() => {
+                if (startTime) {
+                    const now = new Date();
+                    const diff = now - startTime;
+                    
+                    // Format time as mm:ss
+                    const minutes = Math.floor(diff / 60000);
+                    const seconds = Math.floor((diff % 60000) / 1000);
+                    
+                    // Update timer display if element exists
+                    const timerDisplay = document.getElementById('timer');
+                    if (timerDisplay) {
+                        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }
+            }, 1000);
+            
+            log("Timer started", 'info');
+        }
+        
+        // Copy conversation
+        function copyConversation() {
+            log("Copying conversation to clipboard", 'info');
+            
+            const messages = messageContainer.querySelectorAll('.message');
+            let text = "Interview Transcript:\n\n";
+            
+            messages.forEach((msg) => {
+                if (msg.classList.contains('system-message')) {
+                    text += `[System] ${msg.textContent}\n`;
+                } else if (msg.classList.contains('user-message')) {
+                    text += `You: ${msg.textContent}\n`;
+                } else if (msg.classList.contains('assistant-message')) {
+                    text += `Assistant: ${msg.textContent}\n`;
+                }
+                text += "\n";
+            });
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(text)
+                .then(() => {
+                    log("Conversation copied to clipboard", 'info');
+                    alert("Conversation copied to clipboard");
+                })
+                .catch(err => {
+                    log(`Error copying conversation: ${err.message}`, 'error');
+                    alert("Failed to copy conversation");
+                });
+        }
+        
+        // End interview
+        function endInterview() {
+            log("Ending interview", 'info');
+            
+            if (confirm("Are you sure you want to end this interview?")) {
+                // Disable UI
+                userInput.disabled = true;
+                sendMessageBtn.disabled = true;
+                endInterviewBtn.disabled = true;
+                
+                // Add system message
+                addMessage("Interview session ended", "system");
+                
+                // Stop timer
+                if (timerInterval) {
+                    clearInterval(timerInterval);
+                }
+                
+                log("Interview ended", 'info');
+            }
+        }
+        
+        // Add message
+        function addMessage(content, role) {
+            if (!content) {
+                log("Cannot add empty message", 'error');
+                return;
+            }
+            
+            log(`Adding ${role} message: "${content.substring(0, 30)}${content.length > 30 ? '...' : ''}"`, 'info');
+            
+            const messageElem = document.createElement('div');
+            messageElem.className = 'message ' + (role === 'assistant' ? 'assistant-message' : 
+                                    role === 'user' ? 'user-message' : 'system-message');
+            messageElem.textContent = content;
+            
+            if (!messageContainer) {
+                messageContainer = document.getElementById('message-container');
+            }
+            
+            messageContainer.appendChild(messageElem);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            
+            if (role === 'assistant') {
+                lastAssistantMessage = content;
+            }
+        }
+        
+        // Send message
+        function sendMessage(message) {
+            if (!message || !isConnected) {
+                return;
+            }
+            
+            log(`Sending message: "${message.substring(0, 30)}${message.length > 30 ? '...' : ''}"`, 'info');
+            
+            // Add to UI first
+            addMessage(message, 'user');
+            
+            // TODO: Implement actual message sending logic
+            // This is a placeholder for demo
+            setTimeout(() => {
+                addMessage("This is a placeholder response. The real implementation would send the message to the server and handle the response.", 'assistant');
+            }, 1000);
+        }
+    </script>
+</body>
+</html> 

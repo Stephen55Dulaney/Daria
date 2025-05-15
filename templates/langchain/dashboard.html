@@ -165,6 +165,20 @@
     document.addEventListener('DOMContentLoaded', function() {
         fetchInterviews();
         checkServices();
+        
+        // Initialize Bootstrap components
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+        
+        // Initialize any accordions/collapses
+        const collapseElementList = document.querySelectorAll('.collapse');
+        const collapseList = [...collapseElementList].map(collapseEl => new bootstrap.Collapse(collapseEl, {toggle: false}));
+        
+        // Auto-open debug log section if it exists
+        const debugLogSection = document.getElementById('debugLogSection');
+        if (debugLogSection) {
+            const bsCollapse = new bootstrap.Collapse(debugLogSection, {toggle: true});
+        }
     });
     
     // Function to ensure session ID is valid before navigating to monitor page

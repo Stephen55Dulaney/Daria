@@ -13,6 +13,52 @@ A research interview assistant that uses AI to conduct interviews with text-to-s
 - See `PROJECT_STATUS.md` for detailed status information
 - See `REMAINING_TASKS.md` for pending improvements
 
+## Remote Interview Updates
+
+The remote interview functionality has been updated to improve reliability and provide better error handling. Key updates include:
+
+1. **Welcome Message Generation**: The system now ensures welcome messages are properly displayed, even when there are issues with the remote connection or session initialization.
+
+2. **Text-to-Speech Enhancements**: 
+   - Added retry logic for TTS calls
+   - Implemented browser speech synthesis as a fallback when server TTS fails
+   - Better error handling and logging
+
+3. **Session Initialization**: Improved session initialization with better error handling and automatic recovery from common issues.
+
+4. **Error Recovery**: The system can recover from various error states and continue to function, providing a seamless experience for interviewees.
+
+### Using Remote Interviews
+
+To conduct a remote interview:
+
+1. Create a new discussion guide or select an existing one from the dashboard
+2. Start a new session
+3. In the session page, click "Start Remote Interview"
+4. Share the generated remote interview URL with your participant
+
+For debugging issues:
+1. Append `?debug=true` to the interview URL to enable detailed debug logging
+2. The debug panel (accessible via the gear icon) shows detailed logs of TTS, STT, and API communications
+3. Use the "Copy Logs" button to share logs when reporting issues
+
+### Troubleshooting Remote Interviews
+
+If the welcome message doesn't appear:
+- Check the debug log for any API errors
+- Verify that the TTS service is running correctly
+- Ensure the session ID in the URL is valid
+
+If audio doesn't play:
+- Check that your browser allows audio autoplay
+- Verify that the TTS service is running (check the logs)
+- Try using headphones to avoid audio feedback issues
+
+For server-side issues:
+- Check that the API server is running with appropriate permissions
+- Verify that OpenAI API keys are properly configured
+- Check for any error logs in the terminal where the server is running
+
 ## Overview
 
 Daria is a comprehensive research interview tool designed to facilitate and automate the interview process. It includes:

@@ -207,6 +207,29 @@
             color: #9C27B0;
         }
         
+        .system-log {
+            color: #009688;
+            font-weight: bold;
+        }
+        
+        /* Make message container scrollable */
+        .message-container {
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+        
+        /* Make sure buttons are visually responsive */
+        .debug-btn {
+            padding: 8px 12px;
+            margin: 5px;
+            transition: background-color 0.2s, transform 0.1s;
+        }
+        
+        .debug-btn:active {
+            transform: scale(0.98);
+        }
+        
         /* Hide the native audio controls */
         audio:not([controls]) {
             display: none;
@@ -238,6 +261,41 @@
         .debug-btn:active {
             background-color: #357a38;
         }
+        
+        /* Collapsible panel styles */
+        .collapsible-header {
+            background-color: #f1f1f1;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 5px;
+            margin-bottom: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: 0.3s;
+        }
+        
+        .collapsible-header:hover {
+            background-color: #e0e0e0;
+        }
+        
+        .collapsible-header h2 {
+            margin: 0;
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            background-color: #f9f9f9;
+            border-radius: 0 0 5px 5px;
+            padding: 0 15px;
+        }
+        
+        .toggle-icon {
+            font-size: 18px;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -246,174 +304,202 @@
     
     <div class="container">
         <div class="debug-panel">
-            <h2>Connection Settings</h2>
-            <div class="flex-row">
-                <div class="settings-item" style="flex: 1;">
-                    <label for="api-port">API Port:</label>
-                    <input type="number" id="api-port" min="1000" max="65535" value="5025">
-                </div>
-                <div class="settings-item" style="flex: 2;">
-                    <label for="session-id">Session ID (optional):</label>
-                    <input type="text" id="session-id" placeholder="Leave empty to create new session" style="width: 100%;">
-                </div>
-                <div style="display: flex; align-items: flex-end;">
-                    <button id="connect-btn">Connect</button>
-                </div>
+            <div class="collapsible-header" id="connection-settings-header">
+                <h2>Connection Settings</h2>
+                <span class="toggle-icon">+</span>
             </div>
-            <div>
-                <span>Connection Status: </span>
-                <span class="status-indicator status-inactive" id="connection-status"></span>
-                <span id="connection-status-text">Not Connected</span>
+            <div class="collapsible-content" id="connection-settings-content">
+                <div class="flex-row">
+                    <div class="settings-item" style="flex: 1;">
+                        <label for="api-port">API Port:</label>
+                        <input type="number" id="api-port" min="1000" max="65535" value="5025">
+                    </div>
+                    <div class="settings-item" style="flex: 2;">
+                        <label for="session-id">Session ID (optional):</label>
+                        <input type="text" id="session-id" placeholder="Leave empty to create new session" style="width: 100%;">
+                    </div>
+                    <div style="display: flex; align-items: flex-end;">
+                        <button id="connect-btn">Connect</button>
+                    </div>
+                </div>
+                <div>
+                    <span>Connection Status: </span>
+                    <span class="status-indicator status-inactive" id="connection-status"></span>
+                    <span id="connection-status-text">Not Connected</span>
+                </div>
             </div>
         </div>
         
         <div class="debug-panel">
-            <h2>Interview Conversation</h2>
-            <div class="message-container" id="message-container">
-                <!-- Messages will appear here -->
-                <div class="message assistant-message">Connect to start a conversation</div>
+            <div class="collapsible-header" id="interview-conversation-header">
+                <h2>Interview Conversation</h2>
+                <span class="toggle-icon">+</span>
             </div>
-            
-            <h3>Your Response:</h3>
-            <textarea id="user-input" placeholder="Type your response here..." disabled></textarea>
-            
-            <div class="control-panel">
-                <button id="send-message" disabled>Send Message</button>
-                <button id="skip-stt" disabled>Skip STT (Send Text Directly)</button>
-                <button id="reset-interview" disabled>Reset Interview</button>
+            <div class="collapsible-content" id="interview-conversation-content">
+                <div class="message-container" id="message-container">
+                    <!-- Messages will appear here -->
+                    <div class="message assistant-message">Connect to start a conversation</div>
+                </div>
+                
+                <h3>Your Response:</h3>
+                <textarea id="user-input" placeholder="Type your response here..." disabled></textarea>
+                
+                <div class="control-panel">
+                    <button id="send-message" disabled>Send Message</button>
+                    <button id="skip-stt" disabled>Skip STT (Send Text Directly)</button>
+                    <button id="reset-interview" disabled>Reset Interview</button>
+                </div>
             </div>
         </div>
 
         <div class="two-column">
             <div class="debug-panel">
-                <h2>TTS Settings</h2>
-                
-                <div class="settings-item">
-                    <label for="tts-voice">TTS Voice:</label>
-                    <select id="tts-voice">
-                        <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
-                        <option value="21m00Tcm4TlvDq8ikWAM">Adam (Male)</option>
-                        <option value="AZnzlk1XvdvUeBnXmlld">Domi (Female)</option>
-                        <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
-                        <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Male)</option>
-                        <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Male)</option>
-                    </select>
+                <div class="collapsible-header" id="tts-settings-header">
+                    <h2>TTS Settings</h2>
+                    <span class="toggle-icon">+</span>
                 </div>
-                
-                <div class="control-panel" style="margin-top: 10px;">
-                    <button id="play-last-tts" disabled>Replay Last Message</button>
-                    <button id="stop-tts" disabled>Stop TTS</button>
-                </div>
-                
-                <div style="margin-top: 10px;">
-                    <input type="checkbox" id="auto-tts" checked>
-                    <label for="auto-tts">Auto-play TTS for assistant messages</label>
-                </div>
-                
-                <div>
-                    <span>TTS Status: </span>
-                    <span class="status-indicator status-inactive" id="tts-status"></span>
-                    <span id="tts-status-text">Inactive</span>
+                <div class="collapsible-content" id="tts-settings-content">
+                    <div class="settings-item">
+                        <label for="tts-voice">TTS Voice:</label>
+                        <select id="tts-voice">
+                            <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
+                            <option value="21m00Tcm4TlvDq8ikWAM">Adam (Male)</option>
+                            <option value="AZnzlk1XvdvUeBnXmlld">Domi (Female)</option>
+                            <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
+                            <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Male)</option>
+                            <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Male)</option>
+                        </select>
+                    </div>
+                    
+                    <div class="control-panel" style="margin-top: 10px;">
+                        <button id="play-last-tts" disabled>Replay Last Message</button>
+                        <button id="stop-tts" disabled>Stop TTS</button>
+                    </div>
+                    
+                    <div style="margin-top: 10px;">
+                        <input type="checkbox" id="auto-tts" checked>
+                        <label for="auto-tts">Auto-play TTS for assistant messages</label>
+                    </div>
+                    
+                    <div>
+                        <span>TTS Status: </span>
+                        <span class="status-indicator status-inactive" id="tts-status"></span>
+                        <span id="tts-status-text">Inactive</span>
+                    </div>
                 </div>
             </div>
             
             <div class="debug-panel">
-                <h2>STT Settings</h2>
-                
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span class="slider-label">STT Timeout (ms):</span>
-                        <span class="slider-value" id="stt-timeout-value">5000</span>
-                    </div>
-                    <input type="range" id="stt-timeout" min="1000" max="20000" step="100" value="5000">
-                    <small>How long to wait for speech before timing out</small>
+                <div class="collapsible-header" id="stt-settings-header">
+                    <h2>STT Settings</h2>
+                    <span class="toggle-icon">+</span>
                 </div>
-                
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span class="slider-label">STT Restart Delay (ms):</span>
-                        <span class="slider-value" id="stt-restart-delay-value">500</span>
+                <div class="collapsible-content" id="stt-settings-content">
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span class="slider-label">STT Timeout (ms):</span>
+                            <span class="slider-value" id="stt-timeout-value">5000</span>
+                        </div>
+                        <input type="range" id="stt-timeout" min="1000" max="20000" step="100" value="5000">
+                        <small>How long to wait for speech before timing out</small>
                     </div>
-                    <input type="range" id="stt-restart-delay" min="100" max="2000" step="100" value="500">
-                    <small>Delay before restarting STT after an error</small>
-                </div>
-                
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span class="slider-label">TTS-STT Transition Delay (ms):</span>
-                        <span class="slider-value" id="tts-stt-delay-value">300</span>
+                    
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span class="slider-label">STT Restart Delay (ms):</span>
+                            <span class="slider-value" id="stt-restart-delay-value">500</span>
+                        </div>
+                        <input type="range" id="stt-restart-delay" min="100" max="2000" step="100" value="500">
+                        <small>Delay before restarting STT after an error</small>
                     </div>
-                    <input type="range" id="tts-stt-delay" min="0" max="2000" step="50" value="300">
-                    <small>Delay between TTS ending and STT starting</small>
-                </div>
-                
-                <div class="slider-container">
-                    <div class="slider-header">
-                        <span class="slider-label">STT to Submit Delay (ms):</span>
-                        <span class="slider-value" id="stt-submit-delay-value">500</span>
+                    
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span class="slider-label">TTS-STT Transition Delay (ms):</span>
+                            <span class="slider-value" id="tts-stt-delay-value">300</span>
+                        </div>
+                        <input type="range" id="tts-stt-delay" min="0" max="2000" step="50" value="300">
+                        <small>Delay between TTS ending and STT starting</small>
                     </div>
-                    <input type="range" id="stt-submit-delay" min="0" max="5000" step="100" value="500">
-                    <small>Delay between STT completion and auto-submitting message</small>
+                    
+                    <div class="slider-container">
+                        <div class="slider-header">
+                            <span class="slider-label">STT to Submit Delay (ms):</span>
+                            <span class="slider-value" id="stt-submit-delay-value">500</span>
+                        </div>
+                        <input type="range" id="stt-submit-delay" min="0" max="5000" step="100" value="500">
+                        <small>Delay between STT completion and auto-submitting message</small>
+                    </div>
+                    
+                    <div class="control-panel">
+                        <button id="start-stt" disabled>Start Listening</button>
+                        <button id="stop-stt" disabled>Stop Listening</button>
+                    </div>
+                    
+                    <div style="margin-top: 10px;">
+                        <input type="checkbox" id="auto-stop-stt" checked>
+                        <label for="auto-stop-stt">Auto-stop STT when TTS is active</label>
+                    </div>
+                    
+                    <div style="margin-top: 5px;">
+                        <input type="checkbox" id="auto-start-stt" checked>
+                        <label for="auto-start-stt">Auto-start STT after TTS completes</label>
+                    </div>
+                    
+                    <div style="margin-top: 5px;">
+                        <input type="checkbox" id="auto-submit-stt" checked>
+                        <label for="auto-submit-stt">Auto-submit message after STT completes</label>
+                    </div>
+                    
+                    <div style="margin-top: 10px;">
+                        <span>STT Status: </span>
+                        <span class="status-indicator status-inactive" id="stt-status"></span>
+                        <span id="stt-status-text">Inactive</span>
+                    </div>
                 </div>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <div class="collapsible-header" id="automation-header">
+                <h2>Full Automation</h2>
+                <span class="toggle-icon">+</span>
+            </div>
+            <div class="collapsible-content" id="automation-content">
+                <p>Complete hands-free interview cycle with automatic TTS, STT, and message submission.</p>
                 
                 <div class="control-panel">
-                    <button id="start-stt" disabled>Start Listening</button>
-                    <button id="stop-stt" disabled>Stop Listening</button>
+                    <button id="start-automation" disabled>Start Full Automation</button>
+                    <button id="stop-automation" disabled>Stop Automation</button>
+                    <button id="get-params" disabled>Get Timing Parameters</button>
                 </div>
                 
                 <div style="margin-top: 10px;">
-                    <input type="checkbox" id="auto-stop-stt" checked>
-                    <label for="auto-stop-stt">Auto-stop STT when TTS is active</label>
+                    <span>Automation Status: </span>
+                    <span class="status-indicator status-inactive" id="automation-status"></span>
+                    <span id="automation-status-text">Not Running</span>
                 </div>
                 
-                <div style="margin-top: 5px;">
-                    <input type="checkbox" id="auto-start-stt" checked>
-                    <label for="auto-start-stt">Auto-start STT after TTS completes</label>
-                </div>
-                
-                <div style="margin-top: 5px;">
-                    <input type="checkbox" id="auto-submit-stt" checked>
-                    <label for="auto-submit-stt">Auto-submit message after STT completes</label>
-                </div>
-                
-                <div style="margin-top: 10px;">
-                    <span>STT Status: </span>
-                    <span class="status-indicator status-inactive" id="stt-status"></span>
-                    <span id="stt-status-text">Inactive</span>
+                <div id="params-output" style="display: none; margin-top: 15px;">
+                    <h4>Timing Parameters:</h4>
+                    <pre id="params-text" style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;"></pre>
+                    <p><small>Copy these values to use in your main application.</small></p>
                 </div>
             </div>
         </div>
         
         <div class="debug-panel">
-            <h2>Full Automation</h2>
-            <p>Complete hands-free interview cycle with automatic TTS, STT, and message submission.</p>
-            
-            <div class="control-panel">
-                <button id="start-automation" disabled>Start Full Automation</button>
-                <button id="stop-automation" disabled>Stop Automation</button>
-                <button id="get-params" disabled>Get Timing Parameters</button>
+            <div class="collapsible-header" id="debug-log-header">
+                <h2>Debug Log</h2>
+                <span class="toggle-icon">+</span>
             </div>
-            
-            <div style="margin-top: 10px;">
-                <span>Automation Status: </span>
-                <span class="status-indicator status-inactive" id="automation-status"></span>
-                <span id="automation-status-text">Not Running</span>
+            <div class="collapsible-content" id="debug-log-content">
+                <div class="debug-controls">
+                    <button id="clear-log" class="debug-btn">Clear Log</button>
+                    <button id="copy-log" class="debug-btn">Copy All Logs</button>
+                </div>
+                <div id="log-container" class="log-container"></div>
             </div>
-            
-            <div id="params-output" style="display: none; margin-top: 15px;">
-                <h4>Timing Parameters:</h4>
-                <pre id="params-text" style="background-color: #f5f5f5; padding: 10px; border-radius: 4px; overflow-x: auto;"></pre>
-                <p><small>Copy these values to use in your main application.</small></p>
-            </div>
-        </div>
-        
-        <div class="debug-panel">
-            <h2>Debug Log</h2>
-            <div class="debug-controls">
-                <button id="clear-log" class="debug-btn">Clear Log</button>
-                <button id="copy-log" class="debug-btn">Copy All Logs</button>
-            </div>
-            <div id="log-container" class="log-container"></div>
         </div>
     </div>
 
@@ -483,13 +569,29 @@
         const copyLogBtn = document.getElementById('copy-log');
         const logContainer = document.getElementById('log-container');
         
+        // Add Copy Conversation button
+        const copyConversationBtn = document.createElement('button');
+        copyConversationBtn.id = 'copy-conversation';
+        copyConversationBtn.textContent = 'Copy Conversation';
+        copyConversationBtn.className = 'debug-btn';
+        copyConversationBtn.style.marginLeft = 'auto';
+        document.querySelector('.message-container').parentNode.insertBefore(copyConversationBtn, document.querySelector('.message-container').nextSibling);
+        
         // Get port from URL parameters if available
         const urlParams = new URLSearchParams(window.location.search);
         if (urlParams.has('port')) {
             apiPort = urlParams.get('port');
+            apiPortInput.value = apiPort;
         }
         
-        let apiUrl = `http://localhost:${apiPort}`;
+        // Initialize apiUrl properly
+        let apiUrl = `http://${window.location.hostname}:${apiPort}`;
+        
+        // Update apiUrl whenever apiPort changes
+        apiPortInput.addEventListener('change', () => {
+            apiPort = parseInt(apiPortInput.value);
+            apiUrl = `http://${window.location.hostname}:${apiPort}`;
+        });
         
         // Logging function
         function log(message, type = 'info') {
@@ -643,6 +745,9 @@
         async function connectToServer() {
             apiPort = parseInt(apiPortInput.value);
             const customSessionId = sessionIdInput.value.trim();
+            
+            // Update API URL with current port
+            apiUrl = `http://${window.location.hostname}:${apiPort}`;
             
             updateConnectionStatus(false, 'Connecting...');
             log(`Connecting to API server on port ${apiPort}`, 'info');
@@ -1715,6 +1820,25 @@
             ttsActive = false;
         });
         
+        // Copy Conversation button functionality
+        copyConversationBtn.addEventListener('click', function() {
+            // Get all messages
+            const messages = Array.from(messageContainer.children).map(msgElement => {
+                const role = msgElement.classList.contains('assistant-message') ? 'Assistant: ' : 'User: ';
+                const content = msgElement.textContent.trim();
+                return role + content;
+            }).join('\n\n');
+            
+            // Copy to clipboard
+            navigator.clipboard.writeText(messages)
+                .then(() => {
+                    log('Conversation copied to clipboard', 'system');
+                })
+                .catch(err => {
+                    log(`Failed to copy conversation: ${err}`, 'error');
+                });
+        });
+        
         // Allow sending messages with Enter key
         userInput.addEventListener('keypress', (e) => {
             if (e.key === 'Enter' && !e.shiftKey) {
@@ -1765,6 +1889,8 @@
             
             if (portParam) {
                 apiPortInput.value = portParam;
+                apiPort = parseInt(portParam);
+                apiUrl = `http://${window.location.hostname}:${apiPort}`;
             }
             
             if (sessionIdParam) {
@@ -1773,14 +1899,81 @@
             
             log('Debug interview flow tool initialized', 'info');
             
-            // Pre-check microphone permissions on page load
-            checkMicrophonePermission();
+            // Set up collapsible panels
+            setupCollapsiblePanels();
             
-            // Auto-connect if URL parameters are provided
-            if (portParam || sessionIdParam) {
-                connectToServer();
+            // Pre-check microphone permissions on page load
+            checkMicrophonePermission()
+                .then(() => {
+                    log('Microphone permission check completed', 'info');
+                    
+                    // Auto-connect if URL parameters are provided
+                    if (portParam || sessionIdParam) {
+                        connectToServer()
+                            .catch(err => {
+                                console.error('Connection error:', err);
+                                log(`Connection error: ${err.message}`, 'error');
+                                updateConnectionStatus(false, 'Connection Failed');
+                            });
+                    }
+                })
+                .catch(err => {
+                    log(`Microphone permission error: ${err.message}`, 'error');
+                });
+            
+            // Add event listener for Copy Conversation button if it doesn't already exist
+            if (!copyConversationBtn._hasEventListener) {
+                copyConversationBtn.addEventListener('click', function() {
+                    // Get all messages
+                    const messages = Array.from(messageContainer.children).map(msgElement => {
+                        const role = msgElement.classList.contains('assistant-message') ? 'Assistant: ' : 'User: ';
+                        const content = msgElement.textContent.trim();
+                        return role + content;
+                    }).join('\n\n');
+                    
+                    // Copy to clipboard
+                    navigator.clipboard.writeText(messages)
+                        .then(() => {
+                            log('Conversation copied to clipboard', 'system');
+                        })
+                        .catch(err => {
+                            log(`Failed to copy conversation: ${err}`, 'error');
+                        });
+                });
+                copyConversationBtn._hasEventListener = true;
             }
         });
+
+        // Function to set up collapsible panels
+        function setupCollapsiblePanels() {
+            const headers = document.querySelectorAll('.collapsible-header');
+            
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    const content = header.nextElementSibling;
+                    const icon = header.querySelector('.toggle-icon');
+                    const isExpanded = content.style.maxHeight && content.style.maxHeight !== '0px';
+                    
+                    if (isExpanded) {
+                        content.style.maxHeight = null;
+                        if (icon) icon.textContent = '+';
+                    } else {
+                        content.style.maxHeight = content.scrollHeight + "px";
+                        if (icon) icon.textContent = '−';
+                    }
+                });
+            });
+            
+            // Open the debug log panel by default
+            const debugLogHeader = document.getElementById('debug-log-header');
+            if (debugLogHeader) {
+                const debugLogContent = debugLogHeader.nextElementSibling;
+                const icon = debugLogHeader.querySelector('.toggle-icon');
+                
+                debugLogContent.style.maxHeight = debugLogContent.scrollHeight + "px";
+                if (icon) icon.textContent = '−';
+            }
+        }
 
         // Get timing parameters in a format usable for the main application
         function getTimingParameters() {

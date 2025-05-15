@@ -1,6 +1,6 @@
 {
   "id": "9e18577c-ac68-4b3a-946e-5826438b6328",
-  "guide_id": "764e3d36-2253-4618-a1bd-01d8fdad0267",
+  "guide_id": null,
   "interviewee": {
     "name": "John George",
     "email": "sdulaney@deloitte.com",
@@ -13,7 +13,7 @@
       "location": ""
     }
   },
-  "status": "analyzed",
+  "status": "orphaned",
   "messages": [
     {
       "role": "assistant",
@@ -64,5 +64,5 @@
     "generated_at": "2025-05-06T16:13:13.349568"
   },
   "created_at": "2025-05-06T15:17:53.964574",
-  "updated_at": "2025-05-06T16:13:13.349996"
+  "updated_at": "2025-05-14T12:52:05.984558"
 }

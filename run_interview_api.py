@@ -32,6 +32,7 @@ import traceback
 # Import user routes
 from user_routes import user_bp
 from auth_routes import auth_bp
+from routes.issue_routes import bp as issues_bp
 
 # Set up logging
 logging.basicConfig(
@@ -1282,7 +1283,7 @@ def join_interview(interview_id):
                                     discussion_service.update_session(interview_id, current_session)
                         
                         # Use the debug-based interview template for improved reliability
-                        return render_template('remote_interview_debug.html',
+                        return render_template('remote_interview_fixed.html',
                                               session_id=interview_id,
                                               guide=guide,
                                               character_name=character_name,
@@ -2885,6 +2886,7 @@ def handle_ping(data):
 # Register blueprints
 app.register_blueprint(user_bp, url_prefix='/user')
 app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(issues_bp)  # issues_bp already has url_prefix='/issues' set in its definition
 
 # ------ Upload Transcript Routes ------
 
@@ -3539,7 +3541,7 @@ def remote_interview():
                                  port=request.host.split(':')[-1] if ':' in request.host else '5025')
         
         # Render the interview page
-        return render_template('remote_interview.html',
+        return render_template('remote_interview_fixed.html',
                              session_id=session_id,
                              port=request.host.split(':')[-1] if ':' in request.host else '5025')
     except Exception as e:

@@ -367,34 +367,22 @@
                 </div>
             </div>
             
-            <!-- Debug Log Panel (Collapsible) -->
-            <div class="collapsible-panel">
+            <!-- Debug Information -->
+            <div class="collapsible-panel" id="debug-panel">
                 <div class="collapsible-header" id="debug-log-header">
                     <h3>Debug Log</h3>
-                    <span class="toggle-icon">+</span>
+                    <span class="toggle-icon">−</span>
                 </div>
-                <div class="collapsible-content" id="debug-log-content">
-                    <div class="debug-controls">
-                        <button id="clear-log" class="debug-btn">Clear Log</button>
-                        <button id="copy-log" class="debug-btn">Copy All Logs</button>
-                    </div>
-                    <div id="log-container" class="log-container"></div>
+                <div class="collapsible-content" style="max-height: 300px; overflow-y: auto;">
+                    <div id="debug-log" class="debug-log"></div>
                 </div>
             </div>
-            
-            <!-- Interview Prompt Panel (Collapsible) -->
-            <div class="collapsible-panel">
-                <div class="collapsible-header" id="prompt-header">
-                    <h3>Interview Prompt</h3>
-                    <span class="toggle-icon">+</span>
-                </div>
-                <div class="collapsible-content" id="prompt-content">
-                    <div class="debug-controls">
-                        <button id="copy-prompt" class="debug-btn">Copy Prompt</button>
-                    </div>
-                    <div id="prompt-container" class="log-container">
-                        <pre id="interview-prompt">Loading prompt...</pre>
-                    </div>
+
+            <!-- Add a scrollable debug log panel that's always visible -->
+            <div class="interview-panel" id="always-visible-debug">
+                <h3>Debug Log (Always Visible)</h3>
+                <div style="height: 300px; overflow-y: auto; background-color: #f8f9fa; padding: 10px; border: 1px solid #ddd; border-radius: 5px;">
+                    <div id="debug-log-visible" class="debug-log"></div>
                 </div>
             </div>
         </div>
@@ -423,238 +411,186 @@
         const endInterviewBtn = document.getElementById('end-interview');
         const timer = document.getElementById('timer');
         
-        // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
-            // Extract session ID from URL
-            const urlParams = new URLSearchParams(window.location.search);
-            apiPort = urlParams.get('port') || window.location.port || 5025;
+        // DOM Content Loaded - Main Entry Point
+        document.addEventListener('DOMContentLoaded', function() {
+            log("Document loaded, initializing interview interface", 'info');
             
-            // Get session ID from URL path
-            const pathSegments = window.location.pathname.split('/');
-            sessionId = pathSegments[pathSegments.length - 1].split('?')[0];
+            // Initialize variables
+            sessionId = "{{ session_id }}";
+            apiPort = {{ port|default(5025) }};
+            apiUrl = `http://${window.location.hostname}:${apiPort}`;
             
-            // Initialize audio element
+            // Get DOM elements
+            messageContainer = document.getElementById('message-container');
+            userInput = document.getElementById('message-input');
+            sendMessageBtn = document.getElementById('send-message');
+            copyConvoBtn = document.getElementById('copy-conversation');
+            endInterviewBtn = document.getElementById('end-interview');
+            connectionStatus = document.getElementById('connection-indicator');
+            connectionStatusText = document.getElementById('connection-status-text');
+            
+            // Initialize UI
+            initUI();
+            
+            // Initialize TTS
             initTTSAudio();
             
-            // Initialize the debug log
-            log(`Remote interview started for session: ${sessionId}`, 'info');
-            log(`Using API port: ${apiPort}`, 'info');
-            
-            // Connect to server
-            connectToServer();
-            
-            // Start timer
-            startTimer();
-            
-            // Set up collapsible panels
+            // Setup the collapsible panels
             setupCollapsiblePanels();
             
-            // Load session info if sessionId exists
-            if (sessionId) {
-                loadSessionInfo();
-            }
+            // Initialize event listeners
+            initEventListeners();
             
-            // Set up debug log buttons
-            const clearLogBtn = document.getElementById('clear-log');
-            const copyLogBtn = document.getElementById('copy-log');
-            
-            if (clearLogBtn) {
-                clearLogBtn.addEventListener('click', () => {
-                    const logContainer = document.getElementById('log-container');
-                    if (logContainer) {
-                        logContainer.innerHTML = '';
-                        log('Log cleared', 'info');
-                    }
-                });
-            }
-            
-            if (copyLogBtn) {
-                copyLogBtn.addEventListener('click', () => {
-                    const logContainer = document.getElementById('log-container');
-                    if (logContainer) {
-                        // Get all log entries
-                        const logTexts = Array.from(logContainer.children).map(entry => entry.textContent).join('\n');
-                        
-                        // Copy to clipboard
-                        navigator.clipboard.writeText(logTexts)
-                            .then(() => {
-                                log('Debug logs copied to clipboard', 'info');
-                            })
-                            .catch(err => {
-                                log(`Failed to copy logs: ${err}`, 'error');
-                            });
-                    }
-                });
-            }
-            
-            // Set up the copy conversation button
-            const copyConversationBtn = document.getElementById('copy-conversation');
-            if (copyConversationBtn) {
-                copyConversationBtn.addEventListener('click', () => {
-                    const messageContainer = document.getElementById('message-container');
-                    if (messageContainer) {
-                        // Get all message elements
-                        const messages = Array.from(messageContainer.children);
-                        
-                        // Format as conversation text
-                        const conversationText = messages.map(msg => {
-                            const role = msg.classList.contains('assistant-message') ? 'AI' : 'You';
-                            return `${role}: ${msg.textContent}`;
-                        }).join('\n\n');
-                        
-                        // Copy to clipboard
-                        navigator.clipboard.writeText(conversationText)
-                            .then(() => {
-                                log('Conversation copied to clipboard', 'info');
-                            })
-                            .catch(err => {
-                                log(`Failed to copy conversation: ${err}`, 'error');
-                            });
-                    }
-                });
-            }
-            
-            // Set up the copy session info button
-            const copySessionInfoBtn = document.getElementById('copy-session-info');
-            if (copySessionInfoBtn) {
-                copySessionInfoBtn.addEventListener('click', () => {
-                    // Gather all session information
-                    const sessionInfo = {
-                        'Guide': document.getElementById('guide-name').textContent,
-                        'Project': document.getElementById('project-name').textContent,
-                        'Type': document.getElementById('session-type').textContent,
-                        'AI Character': document.getElementById('ai-character').textContent,
-                        'Status': document.getElementById('session-status').textContent,
-                        'Date': document.getElementById('session-date').textContent,
-                        'Participant': document.getElementById('participant-name').textContent,
-                        'Session ID': document.getElementById('session-id-display').textContent
-                    };
+            // Check API services
+            checkServices().then(function(serviceStatus) {
+                if (serviceStatus.success) {
+                    log(`Services status - TTS: ${serviceStatus.tts_available ? 'Available' : 'Unavailable'}, STT: ${serviceStatus.stt_available ? 'Available' : 'Unavailable'}`, 'info');
                     
-                    // Format as text
-                    const sessionInfoText = Object.entries(sessionInfo)
-                        .map(([key, value]) => `${key}: ${value}`)
-                        .join('\n');
-                    
-                    // Copy to clipboard
-                    navigator.clipboard.writeText(sessionInfoText)
-                        .then(() => {
-                            log('Session information copied to clipboard', 'info');
-                        })
-                        .catch(err => {
-                            log(`Failed to copy session info: ${err}`, 'error');
-                        });
-                });
-            }
+                    // Connect to server
+                    connectToServer();
+                } else {
+                    log('Service check failed', 'error');
+                }
+            }).catch(function(error) {
+                log(`Service check error: ${error.message}`, 'error');
+            });
             
-            // Set up the copy session ID button
-            const copySessionIdBtn = document.getElementById('copy-session-id');
-            if (copySessionIdBtn) {
-                copySessionIdBtn.addEventListener('click', () => {
-                    const sessionId = document.getElementById('session-id-display').textContent;
-                    
-                    // Copy to clipboard
-                    navigator.clipboard.writeText(sessionId)
-                        .then(() => {
-                            log(`Session ID copied to clipboard: ${sessionId}`, 'info');
-                        })
-                        .catch(err => {
-                            log(`Failed to copy session ID: ${err}`, 'error');
-                        });
-                });
-            }
-            
-            // Set up the copy prompt button
-            const copyPromptBtn = document.getElementById('copy-prompt');
-            if (copyPromptBtn) {
-                copyPromptBtn.addEventListener('click', () => {
-                    const promptText = document.getElementById('interview-prompt').textContent;
-                    
-                    // Copy to clipboard
-                    navigator.clipboard.writeText(promptText)
-                        .then(() => {
-                            log('Interview prompt copied to clipboard', 'info');
-                        })
-                        .catch(err => {
-                            log(`Failed to copy prompt: ${err}`, 'error');
-                        });
-                });
-            }
+            log("Initialization sequence complete", 'info');
         });
+        
+        // Check API services
+        async function checkServices() {
+            try {
+                log('Checking API services...', 'info');
+                const response = await fetch(`http://${window.location.hostname}:${apiPort}/api/check_services`);
+                
+                if (!response.ok) {
+                    throw new Error(`Service check failed with status ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Convert API response format (tts_service, stt_service) to expected format (tts_available, stt_available)
+                const result = {
+                    success: true,
+                    tts_available: data.tts_service || false,
+                    stt_available: data.stt_service || false
+                };
+                
+                log(`Services status - TTS: ${result.tts_available ? 'Available' : 'Unavailable'}, STT: ${result.stt_available ? 'Available' : 'Unavailable'}`, 'info');
+                return result;
+            } catch (error) {
+                log(`Service check error: ${error.message}`, 'error');
+                return {
+                    success: false,
+                    tts_available: false,
+                    stt_available: false,
+                    error: error.message
+                };
+            }
+        }
         
         // Initialize TTS audio element
         function initTTSAudio() {
-            console.log("Initializing TTS audio element");
-            ttsAudio = new Audio();
-            
-            // Set audio properties
-            ttsAudio.autoplay = false; // We'll manually control playback
-            ttsAudio.preload = 'auto';
-            
-            // Add event listeners
-            ttsAudio.addEventListener('play', () => {
-                console.log("Audio playback started");
-                ttsActive = true;
-                updateStatus();
-            });
-            
-            ttsAudio.addEventListener('ended', () => {
-                console.log("Audio playback ended");
-                ttsActive = false;
-                updateStatus();
+            log("Initializing TTS audio element", 'info');
+            try {
+                ttsAudio = new Audio();
                 
-                // Start STT after TTS finishes with a short delay
-                setTimeout(() => {
-                    if (!sttActive) {
-                        console.log("Starting speech recognition after TTS");
-                        startSpeechRecognition();
+                // Set audio properties
+                ttsAudio.autoplay = false; // We'll manually control playback
+                ttsAudio.preload = 'auto';
+                
+                // Add event listeners
+                ttsAudio.addEventListener('play', () => {
+                    log("Audio playback started", 'tts');
+                    ttsActive = true;
+                    updateStatus();
+                });
+                
+                ttsAudio.addEventListener('ended', () => {
+                    log("Audio playback ended", 'tts');
+                    ttsActive = false;
+                    updateStatus();
+                    
+                    // Start STT after TTS finishes with a short delay
+                    setTimeout(() => {
+                        if (!sttActive) {
+                            log("Starting speech recognition after TTS", 'stt');
+                            startSpeechRecognition();
+                        }
+                    }, 300);
+                });
+                
+                ttsAudio.addEventListener('error', (error) => {
+                    let errorMessage = "Unknown audio error";
+                    
+                    // Get more detailed error information
+                    if (ttsAudio.error) {
+                        switch (ttsAudio.error.code) {
+                            case MediaError.MEDIA_ERR_ABORTED:
+                                errorMessage = "Audio playback aborted";
+                                break;
+                            case MediaError.MEDIA_ERR_NETWORK:
+                                errorMessage = "Network error during audio loading";
+                                break;
+                            case MediaError.MEDIA_ERR_DECODE:
+                                errorMessage = "Audio decoding error";
+                                break;
+                            case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                                errorMessage = "Audio format not supported";
+                                break;
+                            default:
+                                errorMessage = `Unknown error: ${ttsAudio.error.code}`;
+                        }
                     }
-                }, 300);
-            });
-            
-            ttsAudio.addEventListener('error', (error) => {
-                let errorMessage = "Unknown audio error";
+                    
+                    log(`TTS Audio error: ${errorMessage}`, 'error');
+                    ttsActive = false;
+                    updateStatus();
+                });
                 
-                // Get more detailed error information
-                if (ttsAudio.error) {
-                    switch (ttsAudio.error.code) {
-                        case MediaError.MEDIA_ERR_ABORTED:
-                            errorMessage = "Audio playback aborted";
-                            break;
-                        case MediaError.MEDIA_ERR_NETWORK:
-                            errorMessage = "Network error during audio loading";
-                            break;
-                        case MediaError.MEDIA_ERR_DECODE:
-                            errorMessage = "Audio decoding error";
-                            break;
-                        case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
-                            errorMessage = "Audio format not supported";
-                            break;
-                        default:
-                            errorMessage = `Unknown error: ${ttsAudio.error.code}`;
-                    }
-                }
+                // Test audio capabilities by loading a tiny silent audio clip
+                testAudioCapabilities();
                 
-                console.error('TTS Audio error:', errorMessage);
-                ttsActive = false;
-                updateStatus();
-            });
-            
-            // Test audio with a silent base64 encoded sound to ensure browser audio works
+                return true;
+            } catch (e) {
+                log(`Error initializing TTS audio: ${e.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Test browser audio capabilities
+        function testAudioCapabilities() {
             try {
                 // Create a small silent audio clip to test audio support
                 const silentAudio = new Audio("data:audio/mp3;base64,SUQzBAAAAAAAI1RTU0UAAAAPAAADTGF2ZjU4LjI5LjEwMAAAAAAAAAAAAAAA//tQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAWGluZwAAAA8AAAACAAADkADc3NwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD/+xDE3gAAANIAYAAAAA0gAAAAATEFMRTMuMTAwVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV/9A3MTnP/NSCB9lXcwsKCvH/9Sxf////////////pNJ3/+MYxOIALUGAeNAAQBDAKG0ABgAR////////+pKhVVf////oAgCAIB0T//0EAXv////6QQDon//8AgHAQBA5//5BAXP/0gQBgEAQDU//9AEAwCAIHRO//QBAP////0AQBAEAwdE7//QBAPggCAY//+gCAYBAEDon//1D/+xDE3gAOrN0YxgAAMKRcfEsOAgf////QBAMAgCB0T//0AQBAP////5AgP/////pAgGAQBA6J3/6AIBgEAQGU//0AQDAIBAPCY//0g/6L//UlQZFP//1OdIf//+GAAACAfD//8EPf/IICAQiRNBMJoQ");
                 
                 silentAudio.oncanplaythrough = () => {
-                    console.log("Browser audio capabilities verified");
+                    log("Browser audio capabilities verified", 'info');
                 };
                 
                 silentAudio.onerror = () => {
-                    console.warn("Browser audio test failed - may have issues with TTS playback");
+                    log("Browser audio test failed - may have issues with TTS playback", 'warn');
                 };
                 
+                // Start loading the audio
                 silentAudio.load();
+                
+                // Check Web Speech API availability
+                if (window.SpeechRecognition || window.webkitSpeechRecognition) {
+                    log("Speech Recognition API is available", 'info');
+                } else {
+                    log("Speech Recognition API not supported in this browser", 'warn');
+                }
+                
+                if (window.speechSynthesis) {
+                    log("Speech Synthesis API is available", 'info');
+                } else {
+                    log("Speech Synthesis API not supported in this browser", 'warn');
+                }
+                
             } catch (e) {
-                console.warn("Browser audio test exception:", e);
+                log(`Browser audio test exception: ${e.message}`, 'warn');
             }
         }
         
@@ -712,6 +648,16 @@
                 let found = false;
                 
                 if (data.messages && data.messages.length > 0) {
+                    // Check if we have any non-system messages
+                    const nonSystemMessages = data.messages.filter(m => m.role !== 'system');
+                    
+                    if (nonSystemMessages.length === 0) {
+                        // We only have system messages, so we should generate a welcome message
+                        log('Session only has system messages. Generating welcome message.', 'info');
+                        generateAndSendWelcomeMessage();
+                        return true;
+                    }
+                    
                     // Clear existing messages
                     messageContainer.innerHTML = '';
                     
@@ -758,99 +704,150 @@
                         }
                         lastAssistantMessage = mostRecentAssistantMessage;
                         playTTS(mostRecentAssistantMessage);
+                    } else {
+                        // No assistant messages found, but we have other messages
+                        // This is unusual but we should generate a welcome message
+                        log('No assistant messages found in session. Generating welcome message.', 'info');
+                        generateAndSendWelcomeMessage();
                     }
                 } else {
                     log('No messages found in session', 'warn');
-                    
                     // Auto-generate a welcome message when no messages exist
-                    if (guideInfo) {
-                        log('Auto-generating welcome message for empty session', 'info');
-                        
-                        // Get character information
-                        const character = guideInfo.character_select ? guideInfo.character_select.toLowerCase() : '';
-                        const characterName = character || guideInfo.ai_character || 'assistant';
-                        log(`Using character: ${characterName} for welcome message`, 'info');
-                        
-                        let welcomeMessage = "Hello! Thank you for joining me for this interview. I'm your AI assistant, and I'll be asking you some questions today. Let's begin when you're ready.";
-                        
-                        // Use character-specific welcome messages for better personality alignment
-                        if (character === 'eurekia') {
-                            welcomeMessage = "Hello! I'm Eurekia, your innovation interview assistant. I'm here to explore opportunities and insights with you. I'll be asking questions to help identify innovation potential and strategic insights. How are you doing today?";
-                        } else if (character === 'researcher') {
-                            welcomeMessage = "Hello! I'm your research assistant for today's session. I'll be asking you some questions to help gather valuable insights for our study. My approach is methodical and focused on collecting meaningful data. Shall we begin?";
-                        } else if (character === 'interviewer') {
-                            welcomeMessage = "Welcome to this interview session. I'll be guiding our conversation today to learn more about your experiences and perspectives. I aim to create a comfortable space for open dialogue. How are you feeling today?";
-                        } else if (character === 'skeptica') {
-                            welcomeMessage = "Hello there. I'm Skeptica, and I'll be conducting this interview with a critical eye. I believe in questioning assumptions and digging deeper into claims. I hope you're ready for some thought-provoking questions.";
-                        } else if (character === 'askia') {
-                            welcomeMessage = "Greetings! I'm Askia, your interview question specialist. I'm here to help refine and develop effective research questions. I'm particularly interested in how you approach research design and methodology. Shall we get started?";
-                        } else if (character === 'synthia') {
-                            welcomeMessage = "Hi there! I'm Synthia, and I'll be guiding our conversation today. I specialize in bringing together diverse perspectives to create comprehensive insights. I look forward to our discussion and hearing your thoughts.";
-                        } else if (character === 'thesea') {
-                            welcomeMessage = "Hello. I'm Thesea, and I'll be conducting this interview to explore big-picture themes and patterns. My focus is on identifying underlying currents and connections that might not be immediately obvious. Let's begin our exploration.";
-                        } else if (character === 'odessia') {
-                            welcomeMessage = "Welcome! I'm Odessia, your journey guide for this interview. I believe every conversation is a unique journey of discovery. I'll be asking questions that help us navigate toward meaningful insights about your experiences and perspectives.";
-                        } else if (character === 'daria') {
-                            welcomeMessage = "Hello! I'm Daria, your interview assistant. I'm designed to facilitate insightful conversations through thoughtful questions and active listening. I'm looking forward to our discussion today.";
-                        }
-                        
-                        log(`Created welcome message for character ${characterName}`, 'info');
-                        
-                        // Add welcome message to UI
-                        const messageElem = document.createElement('div');
-                        messageElem.className = 'message assistant-message';
-                        messageElem.textContent = welcomeMessage;
-                        messageContainer.appendChild(messageElem);
-                        
-                        // Save and play the welcome message
-                        lastAssistantMessage = welcomeMessage;
-                        playTTS(welcomeMessage);
-                        
-                        // Get the interview prompt to add as context for the AI
-                        const interviewPrompt = guideInfo.interview_prompt || guideInfo.prompt || "";
-                        log(`Using interview prompt: ${interviewPrompt.substring(0, 50)}...`, 'info');
-                        
-                        // First send a system message with the interview prompt to establish context
-                        if (interviewPrompt) {
-                            fetch(`http://${window.location.hostname}:${apiPort}/api/session/${sessionId}/add_message`, {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json'
-                                },
-                                body: JSON.stringify({
-                                    content: interviewPrompt,
-                                    role: 'system'
-                                })
-                            }).then(response => {
-                                if (!response.ok) {
-                                    throw new Error(`Error saving system prompt: ${response.status}`);
-                                }
-                                return response.json();
-                            }).then(data => {
-                                log('System prompt message saved to session', 'info');
-                                
-                                // Now send the welcome message as assistant
-                                sendWelcomeMessage(welcomeMessage);
-                            }).catch(error => {
-                                log(`Failed to save system prompt: ${error.message}`, 'error');
-                                
-                                // Still try to send welcome message even if system message fails
-                                sendWelcomeMessage(welcomeMessage);
-                            });
-                        } else {
-                            // If no prompt, just send welcome message
-                            sendWelcomeMessage(welcomeMessage);
-                        }
-                        
-                        found = true;
-                    }
+                    generateAndSendWelcomeMessage();
                 }
                 
                 return found;
             } catch (error) {
                 log(`Error fetching latest messages: ${error.message}`, 'error');
-                return false;
+                // Even on error, try to generate a welcome message to ensure the interview can continue
+                try {
+                    generateAndSendWelcomeMessage();
+                    return true;
+                } catch (welcomeError) {
+                    log(`Failed to generate welcome message after error: ${welcomeError.message}`, 'error');
+                    return false;
+                }
             }
+        }
+        
+        // Generate and send a welcome message based on character
+        function generateAndSendWelcomeMessage() {
+            if (!guideInfo) {
+                // If we don't have guide info yet, try to load it first
+                loadSessionInfo().then(() => {
+                    if (guideInfo) {
+                        createAndSendWelcomeMessage();
+                    } else {
+                        // Still no guide info, use a generic welcome message
+                        const genericWelcome = "Hello! Thank you for joining me for this interview. I'm your AI assistant, and I'll be asking you some questions today. Let's begin when you're ready.";
+                        createAndDisplayWelcomeMessage(genericWelcome, 'assistant');
+                    }
+                }).catch(error => {
+                    log(`Error loading session info for welcome message: ${error.message}`, 'error');
+                    // Use generic welcome message on error
+                    const genericWelcome = "Hello! Thank you for joining me for this interview. I'm your AI assistant, and I'll be asking you some questions today. Let's begin when you're ready.";
+                    createAndDisplayWelcomeMessage(genericWelcome, 'assistant');
+                });
+            } else {
+                createAndSendWelcomeMessage();
+            }
+        }
+        
+        // Create and send a welcome message using the guide info
+        function createAndSendWelcomeMessage() {
+            log('Creating welcome message for session', 'info');
+            
+            // Get character information
+            const character = guideInfo.character_select ? guideInfo.character_select.toLowerCase() : '';
+            const characterName = character || guideInfo.ai_character || 'assistant';
+            log(`Using character: ${characterName} for welcome message`, 'info');
+            
+            let welcomeMessage = "Hello! Thank you for joining me for this interview. I'm your AI assistant, and I'll be asking you some questions today. Let's begin when you're ready.";
+            
+            // Use character-specific welcome messages for better personality alignment
+            if (character === 'eurekia') {
+                welcomeMessage = "Hello! I'm Eurekia, your innovation interview assistant. I'm here to explore opportunities and insights with you. I'll be asking questions to help identify innovation potential and strategic insights. How are you doing today?";
+            } else if (character === 'researcher') {
+                welcomeMessage = "Hello! I'm your research assistant for today's session. I'll be asking you some questions to help gather valuable insights for our study. My approach is methodical and focused on collecting meaningful data. Shall we begin?";
+            } else if (character === 'interviewer') {
+                welcomeMessage = "Welcome to this interview session. I'll be guiding our conversation today to learn more about your experiences and perspectives. I aim to create a comfortable space for open dialogue. How are you feeling today?";
+            } else if (character === 'skeptica') {
+                welcomeMessage = "Hello there. I'm Skeptica, and I'll be conducting this interview with a critical eye. I believe in questioning assumptions and digging deeper into claims. I hope you're ready for some thought-provoking questions.";
+            } else if (character === 'askia') {
+                welcomeMessage = "Greetings! I'm Askia, your interview question specialist. I'm here to help refine and develop effective research questions. I'm particularly interested in how you approach research design and methodology. Shall we get started?";
+            } else if (character === 'synthia') {
+                welcomeMessage = "Hi there! I'm Synthia, and I'll be guiding our conversation today. I specialize in bringing together diverse perspectives to create comprehensive insights. I look forward to our discussion and hearing your thoughts.";
+            } else if (character === 'thesea') {
+                welcomeMessage = "Hello. I'm Thesea, and I'll be conducting this interview to explore big-picture themes and patterns. My focus is on identifying underlying currents and connections that might not be immediately obvious. Let's begin our exploration.";
+            } else if (character === 'odessia') {
+                welcomeMessage = "Welcome! I'm Odessia, your journey guide for this interview. I believe every conversation is a unique journey of discovery. I'll be asking questions that help us navigate toward meaningful insights about your experiences and perspectives.";
+            } else if (character === 'daria') {
+                welcomeMessage = "Hello! I'm Daria, your interview assistant. I'm designed to facilitate insightful conversations through thoughtful questions and active listening. I'm looking forward to our discussion today.";
+            }
+            
+            log(`Created welcome message for character ${characterName}`, 'info');
+            
+            // Get the interview prompt to add as context for the AI
+            const interviewPrompt = guideInfo.interview_prompt || guideInfo.prompt || "";
+            log(`Using interview prompt: ${interviewPrompt.substring(0, 50)}...`, 'info');
+            
+            // First display welcome message in UI for immediate feedback
+            createAndDisplayWelcomeMessage(welcomeMessage, characterName);
+            
+            // First send a system message with the interview prompt to establish context
+            if (interviewPrompt) {
+                fetch(`http://${window.location.hostname}:${apiPort}/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: interviewPrompt,
+                        role: 'system'
+                    })
+                }).then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Error saving system prompt: ${response.status}`);
+                    }
+                    return response.json();
+                }).then(data => {
+                    log('System prompt message saved to session', 'info');
+                    
+                    // Now send the welcome message as assistant
+                    sendWelcomeMessage(welcomeMessage);
+                }).catch(error => {
+                    log(`Failed to save system prompt: ${error.message}`, 'error');
+                    
+                    // Still try to send welcome message even if system message fails
+                    sendWelcomeMessage(welcomeMessage);
+                });
+            } else {
+                // If no prompt, just send welcome message
+                sendWelcomeMessage(welcomeMessage);
+            }
+        }
+        
+        // Create and display a welcome message in the UI
+        function createAndDisplayWelcomeMessage(welcomeMessage, characterName) {
+            // Add welcome message to UI
+            const messageElem = document.createElement('div');
+            messageElem.className = 'message assistant-message';
+            messageElem.textContent = welcomeMessage;
+            
+            // Clear any existing messages if this is the first message
+            if (messageContainer.childElementCount === 0 || 
+                (messageContainer.childElementCount === 1 && messageContainer.firstChild.textContent === "Connect to start a conversation")) {
+                messageContainer.innerHTML = '';
+            }
+            
+            messageContainer.appendChild(messageElem);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            
+            // Save and play the welcome message
+            lastAssistantMessage = welcomeMessage;
+            playTTS(welcomeMessage);
+            
+            log(`Displayed welcome message from ${characterName} in UI`, 'info');
         }
         
         // Send message to API server
@@ -1145,64 +1142,8 @@
                 ttsActive = true;
                 updateStatus();
                 
-                // Get ElevenLabs TTS
-                log(`Sending TTS request to ${window.location.hostname}:${apiPort}/api/text_to_speech_elevenlabs`, 'tts');
-                const response = await fetch(`http://${window.location.hostname}:${apiPort}/api/text_to_speech_elevenlabs`, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({ 
-                        text: text,
-                        voice_id: 'EXAVITQu4vr4xnSDxMaL' // Rachel voice
-                    })
-                });
-                
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    log(`TTS API error ${response.status}: ${errorText}`, 'error');
-                    ttsActive = false;
-                    updateStatus();
-                    return false;
-                }
-                
-                log('Got successful TTS response, processing audio...', 'tts');
-                const audioBlob = await response.blob();
-                const audioUrl = URL.createObjectURL(audioBlob);
-                
-                log('Audio blob created, setting up audio element...', 'tts');
-                ttsAudio.src = audioUrl;
-                
-                // Wait for metadata to load
-                ttsAudio.addEventListener('loadedmetadata', function onMetadataLoaded() {
-                    log(`ElevenLabs audio metadata loaded, duration: ${ttsAudio.duration}`, 'tts');
-                    ttsAudio.removeEventListener('loadedmetadata', onMetadataLoaded);
-                });
-                
-                // When ready to play
-                ttsAudio.addEventListener('canplaythrough', function onCanPlayThrough() {
-                    log('ElevenLabs audio ready to play, attempting playback...', 'tts');
-                    ttsAudio.removeEventListener('canplaythrough', onCanPlayThrough);
-                    
-                    // Play the audio
-                    const playPromise = ttsAudio.play();
-                    
-                    if (playPromise !== undefined) {
-                        playPromise
-                            .then(() => {
-                                log('ElevenLabs playback started successfully', 'tts');
-                            })
-                            .catch(error => {
-                                log(`ElevenLabs playback failed: ${error}`, 'error');
-                                ttsActive = false;
-                                updateStatus();
-                            });
-                    } else {
-                        log('Play method did not return a promise, assuming playback started', 'warn');
-                    }
-                }, { once: true });
-                
-                return true;
+                // Try ElevenLabs TTS with retry mechanism
+                return await tryTTSWithRetry(text);
             } catch (error) {
                 log(`Error playing TTS: ${error.message}`, 'error');
                 ttsActive = false;
@@ -1211,495 +1152,245 @@
             }
         }
         
-        // Stop text-to-speech
+        // Try TTS with retry mechanism
+        async function tryTTSWithRetry(text, maxRetries = 3) {
+            let attempt = 0;
+            let lastError = null;
+            
+            while (attempt < maxRetries) {
+                try {
+                    attempt++;
+                    log(`TTS attempt ${attempt}/${maxRetries} for text: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`, 'tts');
+                    
+                    // Get ElevenLabs TTS
+                    log(`Sending TTS request to ${window.location.hostname}:${apiPort}/api/text_to_speech_elevenlabs`, 'tts');
+                    const response = await fetch(`http://${window.location.hostname}:${apiPort}/api/text_to_speech_elevenlabs`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            text: text
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`TTS request failed with status ${response.status}`);
+                    }
+                    
+                    const audioData = await response.arrayBuffer();
+                    
+                    // Create a Blob from the audio data
+                    const audioBlob = new Blob([audioData], { type: 'audio/mpeg' });
+                    
+                    // Create a URL for the Blob
+                    const audioUrl = URL.createObjectURL(audioBlob);
+                    
+                    // Create a new Audio element
+                    const newTtsAudio = new Audio(audioUrl);
+                    
+                    // Set up event listeners for the new Audio element
+                    newTtsAudio.autoplay = true;
+                    newTtsAudio.controls = false;
+                    newTtsAudio.muted = false;
+                    newTtsAudio.volume = 1;
+                    
+                    newTtsAudio.addEventListener('play', () => {
+                        log("Audio playback started", 'tts');
+                        ttsActive = true;
+                        updateStatus();
+                    });
+                    
+                    newTtsAudio.addEventListener('ended', () => {
+                        log("Audio playback ended", 'tts');
+                        ttsActive = false;
+                        updateStatus();
+                    });
+                    
+                    newTtsAudio.addEventListener('error', (event) => {
+                        let errorMessage = "Unknown audio error";
+                        
+                        // Get more detailed error information
+                        if (event.error) {
+                            switch (event.error.code) {
+                                case MediaError.MEDIA_ERR_ABORTED:
+                                    errorMessage = "Audio playback aborted";
+                                    break;
+                                case MediaError.MEDIA_ERR_NETWORK:
+                                    errorMessage = "Network error during audio loading";
+                                    break;
+                                case MediaError.MEDIA_ERR_DECODE:
+                                    errorMessage = "Audio decoding error";
+                                    break;
+                                case MediaError.MEDIA_ERR_SRC_NOT_SUPPORTED:
+                                    errorMessage = "Audio format not supported";
+                                    break;
+                                default:
+                                    errorMessage = `Unknown error: ${event.error.code}`;
+                            }
+                        }
+                        
+                        log(`TTS Audio error: ${errorMessage}`, 'error');
+                        ttsActive = false;
+                        updateStatus();
+                    });
+                    
+                    return true;
+                } catch (error) {
+                    log(`TTS attempt ${attempt}/${maxRetries} failed: ${error.message}`, 'error');
+                    lastError = error;
+                }
+            }
+            
+            log(`All TTS attempts failed: ${lastError.message}`, 'error');
+            ttsActive = false;
+            updateStatus();
+            return false;
+        }
+        
+        // Stop TTS
         function stopTTS() {
-            try {
-                if (ttsAudio) {
-                    ttsAudio.pause();
-                    ttsAudio.currentTime = 0;
-                }
-                ttsActive = false;
-                updateStatus();
+            if (ttsAudio) {
+                ttsAudio.pause();
+                ttsAudio.currentTime = 0;
+                ttsAudio = null;
                 log('TTS stopped', 'tts');
-            } catch (error) {
-                log(`Error stopping TTS: ${error.message}`, 'error');
             }
         }
         
-        // Add message to UI
-        function addMessage(content, role, autoTTS = true) {
-            const messageElem = document.createElement('div');
-            messageElem.className = 'message ' + (role === 'assistant' ? 'assistant-message' : 'user-message');
-            messageElem.textContent = content;
+        // Log a message to the console
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
             
-            messageContainer.appendChild(messageElem);
-            messageContainer.scrollTop = messageContainer.scrollHeight;
+            // Create standard console message
+            console.log(`[${type}] ${message}`);
             
-            // If assistant message, play TTS if autoTTS is true
-            if (role === 'assistant') {
-                lastAssistantMessage = content;
+            // Add to debug log (inside collapsible panel)
+            if (document.getElementById('debug-log')) {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `${timestamp} - ${message}`;
+                document.getElementById('debug-log').appendChild(entry);
                 
-                if (autoTTS) {
-                    log(`Playing TTS for assistant message: "${content.substring(0, 30)}${content.length > 30 ? '...' : ''}"`, 'tts');
-                    playTTS(content);
-                }
+                // Auto-scroll to bottom
+                const debugLog = document.getElementById('debug-log');
+                debugLog.scrollTop = debugLog.scrollHeight;
+            }
+            
+            // Add to always visible debug log
+            if (document.getElementById('debug-log-visible')) {
+                const entry = document.createElement('div');
+                entry.className = `log-entry ${type}`;
+                entry.textContent = `${timestamp} - ${message}`;
+                document.getElementById('debug-log-visible').appendChild(entry);
+                
+                // Auto-scroll to bottom
+                const visibleLog = document.getElementById('debug-log-visible');
+                visibleLog.scrollTop = visibleLog.scrollHeight;
             }
         }
         
-        // Update status indicators
-        function updateStatus() {
-            // Connection status
-            if (isConnected) {
-                connectionStatus.className = 'status-indicator status-connected';
-                connectionStatusText.textContent = 'Connected';
-            } else {
-                connectionStatus.className = 'status-indicator status-inactive';
-                connectionStatusText.textContent = 'Disconnected';
-            }
+        // Initialize UI components
+        function initUI() {
+            log("Initializing UI components", 'info');
             
-            // TTS status indicator in text
-            if (ttsActive) {
-                connectionStatusText.textContent = 'AI Speaking';
-                connectionStatus.className = 'status-indicator status-active';
-            } else if (sttActive) {
-                connectionStatusText.textContent = 'Microphone active';
-                connectionStatus.className = 'status-indicator status-active';
-            } else if (isConnected) {
-                connectionStatusText.textContent = 'Connected';
-                connectionStatus.className = 'status-indicator status-connected';
-            }
-        }
-        
-        // Start the timer
-        function startTimer() {
-            startTime = new Date();
-            timerInterval = setInterval(updateTimer, 1000);
-            updateTimer();
-        }
-        
-        // Update the timer display
-        function updateTimer() {
-            if (!startTime) return;
-            
-            const elapsed = Math.floor((new Date() - startTime) / 1000);
-            const minutes = Math.floor(elapsed / 60).toString().padStart(2, '0');
-            const seconds = (elapsed % 60).toString().padStart(2, '0');
-            timer.textContent = `${minutes}:${seconds}`;
-        }
-        
-        // End the interview
-        function endInterview() {
-            // Stop all ongoing processes
-            stopTTS();
-            stopSpeechRecognition();
-            
-            // Disable controls
+            // Reset UI state
             userInput.disabled = true;
             sendMessageBtn.disabled = true;
             endInterviewBtn.disabled = true;
             
-            // Clear timer
-            if (timerInterval) {
-                clearInterval(timerInterval);
+            // Set placeholder text
+            userInput.placeholder = "Connecting to interview session...";
+            
+            // Clear message container
+            messageContainer.innerHTML = '<div class="message system-message">Connecting to interview session...</div>';
+            
+            // Initialize connection status
+            connectionStatus.className = 'status-indicator status-inactive';
+            connectionStatusText.textContent = 'Connecting...';
+            
+            // Initialize any other UI components
+            if (document.getElementById('tts-status')) {
+                document.getElementById('tts-status').className = 'status-indicator status-inactive';
+                document.getElementById('tts-status-text').textContent = 'Inactive';
             }
             
-            log('Interview ended', 'info');
+            if (document.getElementById('stt-status')) {
+                document.getElementById('stt-status').className = 'status-indicator status-inactive';
+                document.getElementById('stt-status-text').textContent = 'Inactive';
+            }
+            
+            log("UI components initialized", 'info');
         }
         
-        // Set up event listeners
-        sendMessageBtn.addEventListener('click', () => {
-            const message = userInput.value.trim();
-            if (message) {
-                sendMessage(message);
-                userInput.value = '';
-            } else {
-                console.warn('No message to send');
-            }
-        });
-        
-        endInterviewBtn.addEventListener('click', () => {
-            addMessage("Thank you for participating in this interview! Your insights are valuable to our research.", 'assistant');
-            playTTS("Thank you for participating in this interview! Your insights are valuable to our research.");
-            endInterview();
-        });
-        
-        // Allow sending messages with Enter key
-        userInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                const message = userInput.value.trim();
-                if (message) {
-                    sendMessage(message);
-                }
-            }
-        });
-        
-        // Set up collapsible panels
+        // Setup collapsible panels
         function setupCollapsiblePanels() {
-            const sessionInfoHeader = document.getElementById('session-info-header');
-            const sessionInfoContent = document.getElementById('session-info-content');
-            const debugLogHeader = document.getElementById('debug-log-header');
-            const debugLogContent = document.getElementById('debug-log-content');
-            const promptHeader = document.getElementById('prompt-header');
-            const promptContent = document.getElementById('prompt-content');
+            log("Setting up collapsible panels", 'info');
             
-            function togglePanel(header, content) {
-                header.addEventListener('click', () => {
-                    const icon = header.querySelector('.toggle-icon');
-                    
-                    if (content.style.maxHeight) {
-                        content.style.maxHeight = null;
-                        icon.textContent = '+';
-                    } else {
-                        content.style.maxHeight = content.scrollHeight + 'px';
-                        icon.textContent = '−';
-                    }
-                });
-            }
-            
-            togglePanel(sessionInfoHeader, sessionInfoContent);
-            togglePanel(debugLogHeader, debugLogContent);
-            togglePanel(promptHeader, promptContent);
-            
-            // Initially expand the debug log panel by default
-            debugLogContent.style.maxHeight = debugLogContent.scrollHeight + 'px';
-            debugLogHeader.querySelector('.toggle-icon').textContent = '−';
-        }
-        
-        // Logging function
-        function log(message, type = 'info') {
-            // Get the log container
-            const logContainer = document.getElementById('log-container');
-            
-            if (!logContainer) return; // Safety check
-            
-            const entry = document.createElement('div');
-            entry.className = 'log-entry';
-            
-            const timestamp = document.createElement('span');
-            timestamp.className = 'timestamp';
-            timestamp.textContent = new Date().toLocaleTimeString() + ' - ';
-            
-            const content = document.createElement('span');
-            content.className = type + '-log';
-            content.textContent = message;
-            
-            entry.appendChild(timestamp);
-            entry.appendChild(content);
-            
-            logContainer.appendChild(entry);
-            logContainer.scrollTop = logContainer.scrollHeight;
-            
-            // Also log to console for debugging
-            console.log(`[${type}] ${message}`);
-        }
-        
-        // Add this function after connectToServer
-        async function loadSessionInfo() {
-            if (!sessionId) {
-                console.error("No session ID to load info for");
-                log("No session ID to load info for", "error");
+            const headers = document.querySelectorAll('.collapsible-header');
+            if (!headers || headers.length === 0) {
+                log("No collapsible headers found", 'warn');
                 return;
             }
             
-            try {
-                log(`Fetching session info for ${sessionId}`, 'info');
-                const response = await fetch(`http://${window.location.hostname}:${apiPort}/api/session/${sessionId}`);
+            log(`Found ${headers.length} collapsible panels`, 'info');
+            
+            headers.forEach((header, index) => {
+                log(`Setting up panel ${index + 1}: ${header.textContent.trim()}`, 'info');
                 
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    console.error("Failed to fetch session info:", errorText);
-                    log(`Failed to fetch session info: ${errorText}`, "error");
-                    return;
-                }
-                
-                const data = await response.json();
-                log(`Session API response: ${JSON.stringify(data).substring(0, 200)}...`, 'info');
-                
-                if (data.success) {
-                    const session = data.session;
+                header.addEventListener('click', function() {
+                    log(`Panel clicked: ${this.textContent.trim()}`, 'info');
                     
-                    // Even without guide info, set what we know about the session
-                    document.getElementById('session-status').textContent = session.status || "Active";
-                    document.getElementById('session-date').textContent = new Date().toLocaleDateString();
-                    
-                    // Participant info if available
-                    if (session.interviewee) {
-                        const participantName = session.interviewee.name || "Anonymous";
-                        document.getElementById('participant-name').textContent = participantName;
+                    // Get the content element that follows this header
+                    const content = this.nextElementSibling;
+                    if (!content) {
+                        log("No content element found for header", 'error');
+                        return;
                     }
                     
-                    // Session ID
-                    document.getElementById('session-id-display').textContent = session.id || sessionId;
+                    // Get the toggle icon if present
+                    const toggleIcon = this.querySelector('.toggle-icon');
                     
-                    // Now fetch the guide details
-                    if (session.guide_id) {
-                        log(`Fetching guide info for guide_id: ${session.guide_id}`, 'info');
-                        const guideResponse = await fetch(`http://${window.location.hostname}:${apiPort}/api/discussion_guide/${session.guide_id}`);
-                        
-                        if (!guideResponse.ok) {
-                            const guideErrorText = await guideResponse.text();
-                            console.error("Failed to fetch guide info:", guideErrorText);
-                            log(`Failed to fetch guide info: ${guideErrorText}`, "error");
-                        } else {
-                            const guideData = await guideResponse.json();
-                            log(`Guide API response: ${JSON.stringify(guideData).substring(0, 200)}...`, 'info');
-                            
-                            if (guideData.success) {
-                                guideInfo = guideData.guide;
-                                
-                                // Log the complete guide object to see its structure
-                                console.log("Guide info object:", guideInfo);
-                                log(`Guide object keys: ${Object.keys(guideInfo).join(', ')}`, 'info');
-                                
-                                // Update the UI with the guide info - use direct field references
-                                // and fallback to finding fields case-insensitively if needed
-                                const getName = (obj, field) => {
-                                    // Try direct access first
-                                    if (obj[field] !== undefined) return obj[field];
-                                    
-                                    // Try case-insensitive match
-                                    const lowerField = field.toLowerCase();
-                                    const keys = Object.keys(obj);
-                                    for (const key of keys) {
-                                        if (key.toLowerCase() === lowerField) {
-                                            return obj[key];
-                                        }
-                                    }
-                                    
-                                    // Try with some common variations
-                                    if (field === 'name' && obj.title !== undefined) return obj.title;
-                                    if (field === 'character' && obj.ai_character !== undefined) return obj.ai_character;
-                                    if (field === 'character' && obj.agent !== undefined) return obj.agent;
-                                    if (field === 'character' && obj.character_select !== undefined) return obj.character_select;
-                                    if (field === 'type' && obj.interview_type !== undefined) return obj.interview_type;
-                                    
-                                    return "Not available";
-                                };
-                                
-                                // Set values with enhanced field detection
-                                document.getElementById('guide-name').textContent = getName(guideInfo, 'name');
-                                document.getElementById('project-name').textContent = getName(guideInfo, 'project');
-                                document.getElementById('session-type').textContent = getName(guideInfo, 'type');
-                                document.getElementById('ai-character').textContent = getName(guideInfo, 'character');
-                                
-                                // Display the interview prompt
-                                const promptElement = document.getElementById('interview-prompt');
-                                if (promptElement) {
-                                    let promptText = "";
-                                    
-                                    if (guideInfo.interview_prompt) {
-                                        promptText = guideInfo.interview_prompt;
-                                    } else if (guideInfo.prompt) {
-                                        promptText = guideInfo.prompt;
-                                    }
-                                    
-                                    if (promptText) {
-                                        // Try to find any instruction about how to respond to prompt questions
-                                        const promptQuestion = promptText.match(/when.*?ask.*?about.*?prompt|when.*?asked.*?prompt|if.*?ask.*?prompt/i);
-                                        let highlightedPrompt = promptText;
-                                        
-                                        if (promptQuestion) {
-                                            // Extract the sentence containing the prompt instruction
-                                            const promptInstruction = findSentence(promptText, promptQuestion[0]);
-                                            
-                                            // Highlight the instruction about how to respond to prompt questions
-                                            if (promptInstruction) {
-                                                highlightedPrompt = promptText.replace(
-                                                    promptInstruction, 
-                                                    `<div class="prompt-highlight">${promptInstruction}</div>`
-                                                );
-                                            }
-                                        }
-                                        
-                                        // Format the prompt with line breaks and paragraph styling
-                                        const formattedPrompt = highlightedPrompt
-                                            .replace(/\n\n/g, '</p><p>') // Double line breaks become paragraph breaks
-                                            .replace(/\n([0-9]+\.)/g, '</p><p>$1') // Numbered lists become paragraph breaks
-                                            .replace(/\n\-/g, '</p><p>-') // Bullet points become paragraph breaks
-                                            .replace(/\n/g, '<br>'); // Single line breaks become <br>
-                                        
-                                        // Add the formatted prompt with CSS styling
-                                        promptElement.innerHTML = `<p>${formattedPrompt}</p>`;
-                                        
-                                        // Add CSS styles for the prompt highlighting
-                                        const style = document.createElement('style');
-                                        style.textContent = `
-                                            #prompt-container {
-                                                background-color: #1e1e1e;
-                                                color: #d4d4d4;
-                                                font-family: 'Consolas', 'Monaco', monospace;
-                                                padding: 15px;
-                                                white-space: pre-wrap;
-                                                overflow-wrap: break-word;
-                                                line-height: 1.5;
-                                            }
-                                            
-                                            #interview-prompt {
-                                                font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                                                white-space: pre-wrap;
-                                            }
-                                            
-                                            #interview-prompt p {
-                                                margin-bottom: 12px;
-                                            }
-                                            
-                                            .prompt-highlight {
-                                                background-color: #264f78;
-                                                color: #ffffff;
-                                                padding: 5px;
-                                                margin: 5px 0;
-                                                border-radius: 3px;
-                                                font-weight: bold;
-                                                display: block;
-                                            }
-                                        `;
-                                        document.head.appendChild(style);
-                                        
-                                        log('Loaded and formatted interview prompt in UI', 'info');
-                                    } else {
-                                        promptElement.textContent = "No interview prompt available.";
-                                    }
-                                }
-                                
-                                log(`Updated guide info fields in UI`, 'info');
-                                
-                                // Log success with actual values
-                                log(`Guide name: ${document.getElementById('guide-name').textContent}`, 'info');
-                                log(`Project: ${document.getElementById('project-name').textContent}`, 'info');
-                                log(`Type: ${document.getElementById('session-type').textContent}`, 'info');
-                                log(`AI Character: ${document.getElementById('ai-character').textContent}`, 'info');
-                            } else {
-                                log(`Guide data not successful: ${JSON.stringify(guideData)}`, 'error');
-                            }
-                        }
+                    // Check if panel is currently expanded
+                    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                        // Collapse panel
+                        log(`Collapsing panel: ${this.textContent.trim()}`, 'info');
+                        content.style.maxHeight = null;
+                        if (toggleIcon) toggleIcon.textContent = '+';
                     } else {
-                        log("No guide_id found in session data", "warn");
-                        
-                        // Set default values when no guide is available
-                        document.getElementById('guide-name').textContent = "Not available";
-                        document.getElementById('project-name').textContent = "Not available";
-                        document.getElementById('session-type').textContent = "Not available";
-                        document.getElementById('ai-character').textContent = "Not available";
+                        // Expand panel
+                        log(`Expanding panel: ${this.textContent.trim()}`, 'info');
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        if (toggleIcon) toggleIcon.textContent = '−';
                     }
-                    
-                    // Also open the session info panel to make information visible
-                    const sessionInfoContent = document.getElementById('session-info-content');
-                    const sessionInfoHeader = document.getElementById('session-info-header');
-                    if (sessionInfoContent && sessionInfoHeader) {
-                        sessionInfoContent.style.maxHeight = sessionInfoContent.scrollHeight + 'px';
-                        const icon = sessionInfoHeader.querySelector('.toggle-icon');
-                        if (icon) icon.textContent = '−';
-                    }
-                    
-                    log(`Completed loading session info for ${sessionId}`, 'info');
-                } else {
-                    log(`Session data not successful: ${JSON.stringify(data)}`, 'error');
-                }
-            } catch (error) {
-                console.error("Error loading session info:", error);
-                log(`Error loading session info: ${error.message}`, "error");
-            }
-        }
-        
-        // Send an automated welcome message to start the conversation
-        async function sendAutoWelcomeMessage(text) {
-            try {
-                // Check if we have a valid session
-                if (!sessionId) {
-                    log("No session ID available - cannot send welcome message", 'error');
-                    return;
-                }
-                
-                log(`Sending automated welcome message: "${text.substring(0, 30)}${text.length > 30 ? '...' : ''}"`, 'info');
-                
-                // Send to API endpoint
-                const addMessageEndpoint = `http://${window.location.hostname}:${apiPort}/api/session/${sessionId}/add_message`;
-                
-                const response = await fetch(addMessageEndpoint, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        content: text,
-                        role: 'assistant'
-                    })
                 });
-                
-                // Check if the response was successful
-                if (!response.ok) {
-                    const errorText = await response.text();
-                    log(`API error ${response.status}: ${errorText}`, 'error');
-                    throw new Error(`API error ${response.status}: ${errorText}`);
-                }
-                
-                const responseData = await response.json();
-                
-                if (!responseData.success) {
-                    log(`API returned error: ${responseData.error || 'Unknown error'}`, 'error');
-                    throw new Error(responseData.error || 'API reported failure');
-                }
-                
-                log('Welcome message sent successfully', 'info');
-                
-                // Poll for the message to appear
-                setTimeout(() => {
-                    fetchLatestMessages();
-                }, 1000);
-                
-                return true;
-            } catch (error) {
-                log(`Error sending welcome message: ${error.message}`, 'error');
-                return false;
-            }
-        }
-        
-        // Function to send welcome message to the API
-        function sendWelcomeMessage(message) {
-            // Also save the welcome message to the session
-            fetch(`http://${window.location.hostname}:${apiPort}/api/session/${sessionId}/add_message`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    content: message,
-                    role: 'assistant'
-                })
-            }).then(response => {
-                if (!response.ok) {
-                    throw new Error(`Error saving welcome message: ${response.status}`);
-                }
-                return response.json();
-            }).then(data => {
-                log('Welcome message saved to session', 'info');
-            }).catch(error => {
-                log(`Failed to save welcome message: ${error.message}`, 'error');
             });
-        }
-        
-        // Helper function to find a complete sentence containing a substring
-        function findSentence(text, substring) {
-            // Simple sentence detection using common sentence endings
-            const sentences = text.split(/(?<=[.!?])\s+/);
             
-            for (const sentence of sentences) {
-                if (sentence.toLowerCase().includes(substring.toLowerCase())) {
-                    return sentence.trim();
+            // Expand the debug log panel by default
+            try {
+                const debugLogHeader = document.getElementById('debug-log-header');
+                if (debugLogHeader) {
+                    log("Attempting to expand debug log panel by default", 'info');
+                    const content = debugLogHeader.nextElementSibling;
+                    const toggleIcon = debugLogHeader.querySelector('.toggle-icon');
+                    
+                    // Force expand
+                    if (content) {
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        if (toggleIcon) toggleIcon.textContent = '−';
+                        log("Debug log panel expanded by default", 'info');
+                    } else {
+                        log("Could not find content element for debug log header", 'warn');
+                    }
+                } else {
+                    log("Debug log header not found", 'warn');
                 }
+            } catch (error) {
+                log(`Error expanding debug panel: ${error.message}`, 'error');
             }
             
-            // If no sentence is found, return a portion around the substring
-            const index = text.toLowerCase().indexOf(substring.toLowerCase());
-            if (index !== -1) {
-                const start = Math.max(0, index - 50);
-                const end = Math.min(text.length, index + substring.length + 50);
-                return text.substring(start, end).trim();
-            }
-            
-            return null;
+            log("Collapsible panels setup complete", 'info');
         }
     </script>
 </body>
-</html> 
+</html>

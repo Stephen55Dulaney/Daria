@@ -1,6 +1,6 @@
 {
   "id": "eeeceeeb-9fd7-42f7-b8d1-05d0db7a701b",
-  "guide_id": "764e3d36-2253-4618-a1bd-01d8fdad0267",
+  "guide_id": null,
   "interviewee": {
     "name": "Stephen Dulaney",
     "email": "sdulaney@deloitte.com",
@@ -13,7 +13,7 @@
       "location": ""
     }
   },
-  "status": "analyzed",
+  "status": "orphaned",
   "messages": [
     {
       "role": "assistant",
@@ -304,5 +304,5 @@
     "generated_at": "2025-05-06T20:53:55.095696"
   },
   "created_at": "2025-05-06T14:45:23.738868",
-  "updated_at": "2025-05-06T20:53:55.096326"
+  "updated_at": "2025-05-14T12:52:05.984018"
 }
