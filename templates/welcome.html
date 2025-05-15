@@ -67,7 +67,7 @@
         <p>
             By continuing, you agree to participate in this research session.
         </p>
-        <a href="/remote_interview?session_id={{ session_id }}&accepted=true" class="button">Accept & Continue</a>
+        <a href="/remote_interview?session_id={{ session_id }}&accepted=true{% if character %}&character={{ character }}{% endif %}" class="button">Accept & Continue</a>
     </div>
 </body>
 </html> 

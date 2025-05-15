@@ -2001,6 +2001,16 @@ def create_session():
         session_id = discussion_service.create_session(guide_id, interviewee)
         if not session_id:
             return jsonify({'success': False, 'error': 'Failed to create session'}), 500
+            
+        # If character was provided in the request, update it in the session
+        if 'character' in data:
+            character = data.get('character')
+            session = discussion_service.get_session(session_id)
+            if session:
+                session['character'] = character
+                session['character_select'] = character
+                discussion_service.update_session(session_id, session)
+                logger.info(f"Updated character for new session {session_id} to {character}")
         
         return jsonify({
             'success': True, 
@@ -3519,6 +3529,7 @@ def remote_interview():
         # Get session ID from query parameter
         session_id = request.args.get('session_id')
         accepted = request.args.get('accepted', 'false').lower() == 'true'
+        character = request.args.get('character')  # Get character parameter from URL
         
         if not session_id:
             error_msg = "No session ID provided"
@@ -3543,7 +3554,8 @@ def remote_interview():
             return render_template('welcome.html', 
                                  session_id=session_id,
                                  guide_name=guide_name,
-                                 port=request.host.split(':')[-1] if ':' in request.host else '5025')
+                                 port=request.host.split(':')[-1] if ':' in request.host else '5025',
+                                 character=character)  # Pass character to template
         
         # Render the interview page
         return render_template('remote_interview_fixed.html',
@@ -3552,6 +3564,49 @@ def remote_interview():
     except Exception as e:
         logger.exception(f"Error rendering remote interview: {str(e)}")
         return render_template('error.html', message=f"Error rendering interview: {str(e)}")
+
+@app.route('/api/session/<session_id>/set_character', methods=['POST'])
+def set_session_character(session_id):
+    """Set or update the character for a session."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        data = request.json
+        if not data or 'character' not in data:
+            return jsonify({'success': False, 'error': 'Missing character parameter'}), 400
+        
+        character = data['character']
+        logger.info(f"Setting character for session {session_id} to {character}")
+        print(f"Debug: API call to set_character for session {session_id} with character {character}")
+        
+        # Get current session data
+        session = discussion_service.get_session(session_id)
+        if not session:
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
+            
+        # Update session with new character
+        session['character'] = character
+        session['character_select'] = character  # Update both fields for consistency
+        
+        # Add system message to reinforce character identity
+        system_msg = f"""SYSTEM: Character set to {character}. 
+        IMPORTANT: You are {character}. Your name is {character}.
+        You MUST always respond as {character}. Never break character or reveal you are an AI.
+        When asked "who are you" or "what is your name", you MUST respond with "I am {character}."
+        If character is Thomas, always respond to identity questions with "My name is Thomas."
+        """
+        
+        # Use add_message_to_session instead of add_message with incorrect parameters
+        discussion_service.add_message_to_session(session_id, system_msg, "system")
+        
+        # Save session
+        discussion_service.update_session(session_id, session)
+        
+        return jsonify({'success': True, 'character': character})
+    except Exception as e:
+        logger.error(f"Error setting character: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 # Start the app
 if __name__ == '__main__':
