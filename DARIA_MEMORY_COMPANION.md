@@ -31,6 +31,66 @@ The Memory Companion can connect to different LLM providers:
 
 The system prompt provides Daria with context about the project, including its history, current sprint, timeline, and opportunities, allowing her to give contextually relevant responses.
 
+## Technical Implementation - Recent Fixes
+
+### Character Identity and Context Leakage (May 15, 2025)
+
+#### Problem Summary
+The DARIA interview tool experienced two critical issues:
+1. **Character Identity Issues**: AI characters weren't maintaining consistent identity across interview sessions
+2. **Context Data Leakage**: Raw internal context data was appearing in LLM responses
+
+#### Root Causes
+- **Character Identity Issues**:
+  - Character information wasn't properly passed between pages (session → remote interview)
+  - Custom characters like "Thomas" weren't properly registered in the system
+  - Character information wasn't persisted in URL parameters when transitioning between pages
+  - LangChain response generation wasn't consistently using character information
+  
+- **Context Data Leakage**:
+  - Insufficient sanitization regex patterns couldn't detect all formats of leaked context
+  - LLM responses containing raw context data (e.g., "I am {'Topic': 'General Interview'...}")
+  - No fallback detection for suspicious content patterns
+
+#### Implemented Fixes
+1. **Enhanced Context Data Sanitization**:
+   - Created more robust regex patterns to detect various context data formats
+   - Added fallback detection for suspicious content patterns
+   - Improved cleaning of responses after context removal
+  
+2. **Character Identity Persistence**:
+   - Modified URL handling to preserve character between pages
+   - Added character parameter to remote interview links
+   - Updated identity response handling to be character-aware
+   - Added all standard characters to direct mapping dictionaries
+  
+3. **Debug Tools Improvements**:
+   - Added character passing between debug_character_test.html and debug_interview_flow.html
+   - Enhanced character detection in debug tools
+   - Added test guide with Thomas character for verification
+
+4. **Session Handling Improvements**:
+   - Modified LangChain integration to properly retrieve and use character information
+   - Fixed session creation to copy character information from guides
+   - Added explicit character information to system messages
+
+#### Implementation Details
+- **Key Files Modified**:
+  - `langchain_features/services/interview_service.py`: Enhanced sanitization and identity response handling
+  - `static/debug_character_test.html`: Added character mapping and URL parameter passing 
+  - `static/debug_interview_flow.html`: Added character parameter handling
+  - `templates/langchain/session.html`: Updated remote interview links to include character
+  - `templates/langchain/interview_welcome.html`: Added character parameter preservation
+  - `langchain_features/services/discussion_service.py`: Fixed character copying during session creation
+  - `run_interview_api.py`: Updated API to pass character information to LangChain
+  - `data/discussions/thomas_test_guide.json`: Created test guide for verification
+
+#### Lessons Learned
+- Character state needs to be explicitly passed and maintained across all transitions
+- Robust sanitization requires multiple layers of pattern detection
+- Test guides with specific characters are valuable for verification
+- Custom character handling requires explicit mapping in multiple places
+
 ## Setup and Installation
 
 1. Run the setup script: `./setup_memory_companion.sh`

@@ -58,6 +58,32 @@ The Project Journal Utility works together with the Memory Companion feature:
 2. The Memory Companion reads this journal when started to maintain context
 3. This creates the "50 First Dates" experience where Daria remembers past work
 
+## Recent Major Fixes
+
+### Character Identity and Context Leakage Fix (May 15, 2025)
+
+A critical update was made to address two persistent issues in the interview system:
+
+#### Issues Fixed:
+1. **Character Identity Persistence** - Characters like Thomas, Synthia, etc. now maintain consistent identity across all transitions between pages and through entire interview sessions.
+2. **Context Data Leakage** - Fixed the problem where internal context data (e.g. "I am {'Topic': 'General Interview'...}") leaked into agent responses.
+
+#### Key Improvements:
+- Enhanced regex patterns for sanitizing responses
+- Added URL parameter passing between pages to maintain character selection
+- Fixed character handling in debug tools and production pages
+- Modified session creation to properly copy character information
+- Added suspicious content detection as a fallback for improved sanitization
+- Created test guide with Thomas character for verification
+
+To verify the fix:
+1. Use the debug character test tool: http://localhost:5025/static/debug_character_test.html
+2. Select different characters and test their identity responses
+3. Try moving between debug_character_test and debug_interview_flow pages
+4. Verify remote interview sessions maintain character identity
+
+Full technical details are available in `DARIA_PROJECT_JOURNAL.md` under Session 5.
+
 ## Memory Companion Setup
 
 The Memory Companion can be accessed in two ways:

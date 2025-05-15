@@ -53,12 +53,12 @@
         
         <div class="card">
             <h3>Standard Interview</h3>
-            <p><a href="/interview/{{ session_id }}?remote=true&accepted=true" target="_blank">{{ request.host_url }}interview/{{ session_id }}?remote=true&accepted=true</a></p>
+            <p><a href="/interview/{{ session_id }}?remote=true&accepted=true{% if character %}&character={{ character }}{% endif %}" target="_blank">{{ request.host_url }}interview/{{ session_id }}?remote=true&accepted=true{% if character %}&character={{ character }}{% endif %}</a></p>
         </div>
         
         <div class="card highlight">
             <h3>Simplified Remote Interview (Recommended)</h3>
-            <p><a href="/remote_interview?session_id={{ session_id }}" target="_blank">{{ request.host_url }}remote_interview?session_id={{ session_id }}</a></p>
+            <p><a href="/remote_interview?session_id={{ session_id }}{% if character %}&character={{ character }}{% endif %}" target="_blank">{{ request.host_url }}remote_interview?session_id={{ session_id }}{% if character %}&character={{ character }}{% endif %}</a></p>
             <p><small>New simplified interface designed for better remote accessibility</small></p>
         </div>
     </div>

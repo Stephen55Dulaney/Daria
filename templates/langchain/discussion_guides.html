@@ -503,76 +503,63 @@
             
             const guideId = this.getAttribute('data-guide-id');
             
-            // Create a temporary textarea element to handle the copy
-            const tempTextArea = document.createElement('textarea');
-            tempTextArea.value = guideId;
-            tempTextArea.setAttribute('readonly', ''); // Make it readonly to avoid focus and keyboard appearing
-            tempTextArea.style.position = 'absolute';
-            tempTextArea.style.left = '-9999px'; // Move outside the screen
-            document.body.appendChild(tempTextArea);
-            
-            // Select the text and copy
-            const selected = document.getSelection().rangeCount > 0 ? 
-                document.getSelection().getRangeAt(0) : false;
-            
-            tempTextArea.select();
-            
-            let successful = false;
-            try {
-                successful = document.execCommand('copy');
-            } catch (err) {
-                console.error('Fallback copy failed:', err);
-            }
-            
-            // Remove the temporary element
-            document.body.removeChild(tempTextArea);
-            
-            // Restore the original selection if there was one
-            if (selected) {
-                document.getSelection().removeAllRanges();
-                document.getSelection().addRange(selected);
-            }
-            
-            // Show visual feedback based on success
-            const originalHTML = this.innerHTML;
-            
-            if (successful) {
-                // Indicate success
-                this.innerHTML = '<i class="bi bi-check"></i>';
-                this.classList.add('btn-success');
-                this.classList.remove('btn-outline-secondary');
-                
-                setTimeout(() => {
-                    this.innerHTML = originalHTML;
-                    this.classList.remove('btn-success');
-                    this.classList.add('btn-outline-secondary');
-                }, 1500);
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(guideId)
+                    .then(() => {
+                        // Show a notification alert
+                        const alertHtml = `
+                            <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 9999;">
+                                <strong>Success!</strong> Guide ID copied to clipboard.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', alertHtml);
+                        
+                        // Auto-dismiss after 3 seconds
+                        setTimeout(() => {
+                            const alertElement = document.querySelector('.alert');
+                            if (alertElement) {
+                                const bsAlert = new bootstrap.Alert(alertElement);
+                                bsAlert.close();
+                            }
+                        }, 3000);
+                        
+                        // Visual feedback on button
+                        const originalHTML = this.innerHTML;
+                        this.innerHTML = '<i class="bi bi-check"></i>';
+                        this.classList.add('btn-success');
+                        this.classList.remove('btn-outline-primary');
+                        
+                        setTimeout(() => {
+                            this.innerHTML = originalHTML;
+                            this.classList.remove('btn-success');
+                            this.classList.add('btn-outline-primary');
+                        }, 1500);
+                    })
+                    .catch(err => {
+                        console.error('Error copying to clipboard:', err);
+                        alert('Failed to copy to clipboard. Please try again.');
+                    });
             } else {
-                // Try the modern clipboard API as a backup
-                navigator.clipboard.writeText(guideId).then(() => {
-                    // Indicate success
-                    this.innerHTML = '<i class="bi bi-check"></i>';
-                    this.classList.add('btn-success');
-                    this.classList.remove('btn-outline-secondary');
-                    
-                    setTimeout(() => {
-                        this.innerHTML = originalHTML;
-                        this.classList.remove('btn-success');
-                        this.classList.add('btn-outline-secondary');
-                    }, 1500);
-                }).catch(err => {
-                    console.error('Modern clipboard API failed:', err);
-                    // Indicate failure
-                    this.innerHTML = '<i class="bi bi-x"></i>';
-                    this.classList.add('btn-danger');
-                    this.classList.remove('btn-outline-secondary');
-                    
-                    setTimeout(() => {
-                        this.innerHTML = originalHTML;
-                        this.classList.remove('btn-danger');
-                        this.classList.add('btn-outline-secondary');
-                    }, 1500);
-                });
+                // Fallback for browsers that don't support clipboard API
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = guideId;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        alert('Guide ID copied to clipboard');
+                    } else {
+                        alert('Failed to copy to clipboard');
+                    }
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    alert('Failed to copy to clipboard. Please try again.');
+                }
+                
+                document.body.removeChild(tempTextArea);
             }
         });
     });
