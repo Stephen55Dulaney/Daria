@@ -4,6 +4,7 @@ from langchain_features.services.interview_service import InterviewService
 from langchain_features.services.discovery_service import DiscoveryService
 from langchain_features.services.research_service import ResearchService
 from langchain_features.models import InterviewSession
+from langchain_features.services.discussion_service import DiscussionService
 import logging
 import traceback
 import uuid
@@ -24,12 +25,13 @@ def index():
 def dashboard():
     """Render the dashboard with interview statistics"""
     # Get all interview sessions
-    sessions = InterviewService.list_sessions()
+    discussion_service = DiscussionService(data_dir="data/interviews")
+    sessions = discussion_service.get_all_sessions()
     
     # Count active, completed, and in-progress interviews
-    active_count = sum(1 for session in sessions if session.status == 'active')
-    completed_count = sum(1 for session in sessions if session.status == 'completed')
-    in_progress_count = sum(1 for session in sessions if session.status == 'in_progress')
+    active_count = sum(1 for session in sessions if session.get('status') == 'active')
+    completed_count = sum(1 for session in sessions if session.get('status') == 'completed')
+    in_progress_count = sum(1 for session in sessions if session.get('status') == 'in_progress')
     
     return render_template('langchain/dashboard.html',
                           interviews=sessions,

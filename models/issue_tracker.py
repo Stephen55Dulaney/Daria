@@ -42,7 +42,8 @@ class Issue:
                 created_at=None,
                 updated_at=None,
                 environment=None,
-                tags=None):
+                tags=None,
+                comments=None):
         """Initialize a new issue."""
         self.id = id if id else str(uuid.uuid4())
         self.title = title
@@ -58,6 +59,7 @@ class Issue:
         self.environment = environment or {}  # Dict with browser, OS, etc.
         self.tags = tags or []
         self.history = []  # List of history entries
+        self.comments = comments or []  # List of comments
         self._record_history("Issue created")
     
     def _record_history(self, action, user_id=None, details=None):
@@ -125,6 +127,23 @@ class Issue:
             details={"from": prev_status}
         )
     
+    def add_comment(self, user_id, content, attachments=None):
+        """Add a comment to the issue"""
+        comment = {
+            "id": str(uuid.uuid4()),
+            "user_id": user_id,
+            "content": content,
+            "attachments": attachments or [],
+            "timestamp": datetime.datetime.now().isoformat()
+        }
+        self.comments.append(comment)
+        self._record_history(
+            "Comment added", 
+            user_id=user_id,
+            details={"comment_id": comment["id"]}
+        )
+        return comment["id"]
+    
     def to_dict(self) -> Dict:
         """Convert issue to dictionary for serialization"""
         return {
@@ -141,7 +160,8 @@ class Issue:
             "updated_at": self.updated_at,
             "environment": self.environment,
             "tags": self.tags,
-            "history": self.history
+            "history": self.history,
+            "comments": self.comments
         }
     
     @classmethod
@@ -160,7 +180,8 @@ class Issue:
             created_at=data.get("created_at"),
             updated_at=data.get("updated_at"),
             environment=data.get("environment"),
-            tags=data.get("tags")
+            tags=data.get("tags"),
+            comments=data.get("comments")
         )
         issue.history = data.get("history", [])
         return issue

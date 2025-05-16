@@ -311,7 +311,7 @@
                             <thead>
                                 <tr>
                                     <th>Question</th>
-                                    <th>Priority</th>
+                                    <th>Minutes</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -319,12 +319,12 @@
                                 <tr>
                                     <td>{{ question.text if question is mapping and question.text is defined else question }}</td>
                                     <td>
-                                        {% if question is mapping and question.priority is defined %}
-                                        <span class="badge bg-{{ 'danger' if question.priority == 'high' else 'warning' if question.priority == 'medium' else 'info' }}">
-                                            {{ question.priority|title }}
+                                        {% if question is mapping and question.minutes is defined %}
+                                        <span class="badge bg-info">
+                                            {{ question.minutes }} minutes
                                         </span>
                                         {% else %}
-                                        <span class="badge bg-info">Normal</span>
+                                        <span class="badge bg-info">5 minutes</span>
                                         {% endif %}
                                     </td>
                                 </tr>

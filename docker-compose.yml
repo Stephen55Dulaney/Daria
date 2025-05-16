@@ -1,0 +1,12 @@
+version: '3'
+
+services:
+  daria:
+    build: .
+    ports:
+      - "5025:5025"
+    volumes:
+      - ./data:/app/data
+    environment:
+      - OPENAI_API_KEY=${OPENAI_API_KEY}
+    restart: unless-stopped 

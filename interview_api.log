@@ -1,0 +1,300 @@
+/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/langchain/chat_models/__init__.py:31: LangChainDeprecationWarning: Importing chat models from langchain is deprecated. Importing from langchain will no longer be supported as of langchain==0.2.0. Please import from langchain-community instead:
+
+`from langchain_community.chat_models import ChatOpenAI`.
+
+To install langchain-community run `pip install -U langchain-community`.
+  warnings.warn(
+INFO:__main__:CORS enabled for all origins with extended header support
+INFO:__main__:SocketIO initialized for real-time communication
+INFO:__main__:Initialized PromptManager with prompt_dir=/Users/sdulaney/DariaInterviewTool/tools/prompt_manager/prompts
+INFO:langchain_features.services.discussion_service:Initialized DiscussionService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:Discussion service initialized successfully
+INFO:__main__:Observer service initialized successfully
+INFO:langchain_features.services.interview_service:Initialized InterviewService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:LangChain interview service initialized successfully
+WARNING:werkzeug:Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+Starting DARIA Interview API on port 5025
+Health check endpoint: http://127.0.0.1:5025/api/health
+Interview start endpoint: http://127.0.0.1:5025/api/interview/start
+Monitor interviews: http://127.0.0.1:5025/monitor_interview
+ * Serving Flask app 'run_interview_api'
+ * Debug mode: off
+INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5025
+ * Running on http://192.168.86.42:5025
+INFO:werkzeug:[33mPress CTRL+C to quit[0m
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:19] "GET /socket.io/?EIO=4&transport=polling&t=PRRHz4I HTTP/1.1" 200 -
+INFO:__main__:Client connected: g74MvBbed-FFS9nlAAAB
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:19] "POST /socket.io/?EIO=4&transport=polling&t=PRRHz4U&sid=kn3DtN1MibqEi-glAAAA HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:19] "GET /socket.io/?EIO=4&transport=polling&t=PRRHz4U.0&sid=kn3DtN1MibqEi-glAAAA HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:19] "GET /socket.io/?EIO=4&transport=polling&t=PRRHz4j&sid=kn3DtN1MibqEi-glAAAA HTTP/1.1" 200 -
+INFO:__main__:Client g74MvBbed-FFS9nlAAAB joined session room for session 58a7f663-f1e8-41fa-be98-de629f834ee3
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:19] "POST /socket.io/?EIO=4&transport=polling&t=PRRHz4l&sid=kn3DtN1MibqEi-glAAAA HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:__main__:Loaded prompt config for synthia: Synthia
+INFO:__main__:Loaded prompt config for eurekia: eurekia
+INFO:__main__:Loaded prompt config for skeptica: Skeptica
+INFO:__main__:Loaded prompt config for thomas: thomas
+INFO:__main__:Loaded prompt config for askia: askia
+INFO:__main__:Loaded prompt config for odessia: odessia
+INFO:__main__:Loaded prompt config for interviewer: interviewer
+INFO:__main__:Loaded prompt config for researcher: researcher
+INFO:__main__:Loaded prompt config for thesea: Thesea
+INFO:__main__:Loaded prompt config for daria: Daria
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:25] "GET /api/health HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:34] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:44] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:47] "GET /discussion_guide/e74ac1f3-7acc-4929-b48c-f545d43404f5 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:47] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:47] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:48] "GET /discussion_guide/e74ac1f3-7acc-4929-b48c-f545d43404f5 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:48] "[33mGET /.well-known/appspecific/com.chrome.devtools.json HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:47:48] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:48:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:48:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:48:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:48:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:48:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:49:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:49:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:49:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:49:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:49:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:22] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:23] "[36mGET /static/debug_interview_flow.html?port=5025 HTTP/1.1[0m" 304 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:28] "GET /api/health HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Created session 4c3056f9-69a6-472f-9381-a77014648e83 for guide 6484f57f-7fef-4bb7-8e9d-16ec498073a9 with character thomas
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:28] "POST /api/session/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:28] "GET /api/session/4c3056f9-69a6-472f-9381-a77014648e83/messages HTTP/1.1" 200 -
+INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 62 chars, voice: EXAVITQu4vr4xnSDxMaL
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:29] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:29] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:__main__:Session message request for 4c3056f9-69a6-472f-9381-a77014648e83: {'content': 'regression testing 1 2 3', 'role': 'user'}
+INFO:langchain_features.services.discussion_service:Added message to session 4c3056f9-69a6-472f-9381-a77014648e83
+INFO:__main__:Added message 06da0062-4050-44c1-8d19-75ab64283848 to session 4c3056f9-69a6-472f-9381-a77014648e83 via WebSocket: True
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:__main__:Emitted AI Observer analysis for message 06da0062-4050-44c1-8d19-75ab64283848
+INFO:__main__:Generating AI response for session 4c3056f9-69a6-472f-9381-a77014648e83
+WARNING:__main__:Missing context or goals in guide 6484f57f-7fef-4bb7-8e9d-16ec498073a9 for session 4c3056f9-69a6-472f-9381-a77014648e83
+INFO:__main__:Using topic: General Interview, context length: 34, goals: 1 items
+INFO:langchain_features.services.interview_service:generate_response: Using topic: General Interview, context length: 34, goals: 1 items
+INFO:langchain_features.services.interview_service:generate_response: Loading session with ID 4c3056f9-69a6-472f-9381-a77014648e83
+WARNING:langchain_features.services.interview_service:No conversation history found for session 4c3056f9-69a6-472f-9381-a77014648e83
+INFO:langchain_features.services.interview_service:Using LLM model: gpt-3.5-turbo with temperature: 0.7
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:langchain_features.services.interview_service:Generated response of 159 characters
+INFO:langchain_features.services.discussion_service:Added message to session 4c3056f9-69a6-472f-9381-a77014648e83
+INFO:__main__:Added AI response (159 chars) to session 4c3056f9-69a6-472f-9381-a77014648e83
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:41] "POST /api/session/4c3056f9-69a6-472f-9381-a77014648e83/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:43] "GET /api/session/4c3056f9-69a6-472f-9381-a77014648e83/messages HTTP/1.1" 200 -
+INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 159 chars, voice: EXAVITQu4vr4xnSDxMaL
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:45] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:50:50] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 97 chars, voice: EXAVITQu4vr4xnSDxMaL
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:03] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:20] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:29] "GET /api/health HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:29] "GET /api/discussion_guide/e74ac1f3-7acc-4929-b48c-f545d43404f5 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:29] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:29] "[33mGET /api/prompts HTTP/1.1[0m" 404 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:50] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:52] "GET /api/discussion_guide/e74ac1f3-7acc-4929-b48c-f545d43404f5 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:55] "GET /api/discussion_guide/e74ac1f3-7acc-4929-b48c-f545d43404f5 HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Created session be884ce4-2845-4542-8783-0c43ba49df18 for guide e74ac1f3-7acc-4929-b48c-f545d43404f5 with character daria
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:55] "POST /api/session/create HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:55] "GET /api/session/be884ce4-2845-4542-8783-0c43ba49df18 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:51:55] "GET /api/session/be884ce4-2845-4542-8783-0c43ba49df18/messages HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:52:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:52:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:52:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:52:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:52:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:53:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:53:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:53:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:53:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:53:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:54:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:54:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:54:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:54:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:54:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:55:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:55:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:55:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:55:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:55:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:56:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:56:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:56:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:56:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:56:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:57:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:57:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:57:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:57:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:57:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:58:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:58:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:58:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:58:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:58:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:59:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:59:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:59:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:59:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:59:29] "GET /api/check_services HTTP/1.1" 200 -

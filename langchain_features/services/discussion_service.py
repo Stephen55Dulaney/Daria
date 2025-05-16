@@ -219,6 +219,9 @@ class DiscussionService:
             logger.error(f"Error getting all sessions: {str(e)}")
             return []
     
+    # Alias list_sessions to get_all_sessions for compatibility with InterviewService
+    list_sessions = get_all_sessions
+    
     # Session Methods
     
     def create_session(self, guide_id: str, interviewee_data: Dict[str, Any] = None) -> Optional[str]:
@@ -256,6 +259,12 @@ class DiscussionService:
             session_data["project"] = guide["project"]
         if "interview_type" in guide:
             session_data["interview_type"] = guide["interview_type"]
+        if "topic" in guide:
+            session_data["topic"] = guide["topic"]
+        if "context" in guide:
+            session_data["context"] = guide["context"]
+        if "goals" in guide:
+            session_data["goals"] = guide["goals"]
         if "character_select" in guide:
             session_data["character"] = guide["character_select"]
             session_data["character_select"] = guide["character_select"]

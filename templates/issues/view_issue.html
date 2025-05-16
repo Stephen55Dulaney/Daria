@@ -206,6 +206,68 @@
             </ul>
         </div>
     </div>
+    
+    <!-- Comments Section -->
+    <div class="card shadow-sm mt-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Comments</h5>
+        </div>
+        <div class="card-body">
+            {% if issue.comments %}
+            <ul class="list-group list-group-flush mb-4">
+                {% for comment in issue.comments %}
+                <li class="list-group-item">
+                    <div class="d-flex justify-content-between">
+                        <div>
+                            <strong>{{ comment.user_id }}</strong>
+                        </div>
+                        <div class="text-muted">
+                            {{ comment.timestamp.split('T')[0] if 'T' in comment.timestamp else comment.timestamp }}
+                        </div>
+                    </div>
+                    <div class="mt-2">
+                        {{ comment.content|replace("\n", "<br>")|safe }}
+                    </div>
+                    {% if comment.attachments %}
+                    <div class="mt-2">
+                        <div class="d-flex flex-wrap gap-2">
+                            {% for attachment in comment.attachments %}
+                            <a href="{{ url_for('issues.get_attachment', filename=attachment.path) }}" 
+                               class="btn btn-sm btn-outline-secondary" 
+                               target="_blank">
+                                <i class="fas fa-paperclip me-1"></i>
+                                {{ attachment.filename }}
+                            </a>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    {% endif %}
+                </li>
+                {% endfor %}
+            </ul>
+            {% else %}
+            <p class="text-muted">No comments yet</p>
+            {% endif %}
+            
+            <!-- Add Comment Form -->
+            <form action="{{ url_for('issues.add_comment', issue_id=issue.id) }}" method="POST" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="commentContent" class="form-label">Add a comment</label>
+                    <textarea class="form-control" id="commentContent" name="content" rows="3" required></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="commentAttachments" class="form-label">Attachments (optional)</label>
+                    <input class="form-control" type="file" id="commentAttachments" name="attachments" multiple>
+                    <div class="form-text">
+                        Supported file types: images, PDF, Office docs, text files, zip archives
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-comment me-1"></i> Add Comment
+                </button>
+            </form>
+        </div>
+    </div>
 </div>
 
 <!-- Assignment Modal -->
