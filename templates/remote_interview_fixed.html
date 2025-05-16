@@ -3,10 +3,11 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' http://127.0.0.1:*; media-src 'self' blob:; font-src 'self' https://cdn.jsdelivr.net;">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://code.jquery.com https://cdn.socket.io; style-src 'self' 'unsafe-inline' https://cdn.jsdelivr.net; connect-src 'self' http://127.0.0.1:*; media-src 'self' blob:; font-src 'self' https://cdn.jsdelivr.net;">
     <title>DARIA Interview</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -476,6 +477,9 @@
             transcriptLength: 0
         };
         
+        // Queue to store pending suggestions
+        let pendingSuggestions = [];
+        
         // Initialize session info
         function initializeSessionInfo() {
             try {
@@ -492,25 +496,140 @@
                 log(`Initialized session ID: ${sessionId}`, 'info');
                 log(`API URL set to: ${apiUrl}`, 'info');
                 
-                // Display session ID in UI
-                const sessionIdDisplay = document.getElementById('session-id-display');
-                const sessionIdFull = document.getElementById('session-id-full');
-                
-                if (sessionIdDisplay) sessionIdDisplay.textContent = sessionId ? sessionId.substring(0, 8) + '...' : 'Not available';
-                if (sessionIdFull) sessionIdFull.textContent = sessionId || 'Not available';
-                
-                // Set date
-                const sessionDateElem = document.getElementById('session-date');
-                if (sessionDateElem) {
-                    const today = new Date();
-                    sessionDateElem.textContent = today.toISOString().split('T')[0];
+                // Get character from URL
+                characterParam = urlParams.get('character');
+                if (characterParam) {
+                    log(`Character parameter found in URL: ${characterParam}`, 'info');
+                    sessionDetails.character = characterParam;
                 }
                 
-                return true;
+                return Boolean(sessionId);
             } catch (error) {
                 log(`Error initializing session info: ${error.message}`, 'error');
                 return false;
             }
+        }
+
+        // Function to initialize WebSocket connection
+        function initializeWebSocket() {
+            // Only initialize if socket.io is loaded
+            if (typeof io === 'undefined') {
+                log('Socket.io library not found', 'warning');
+                return false;
+            }
+            
+            try {
+                log('Starting WebSocket initialization...', 'debug');
+                window.socket = io();
+                
+                // Debug listener for all events
+                const originalOnevent = window.socket.onevent;
+                window.socket.onevent = function(packet) {
+                    const args = packet.data || [];
+                    console.log(`Socket event received: ${args[0]}`, args.slice(1));
+                    log(`Socket event received: ${args[0]} ${JSON.stringify(args.slice(1) || [])}`, 'debug');
+                    originalOnevent.call(this, packet);
+                };
+                
+                // Set up event handlers
+                window.socket.on('connect', function() {
+                    log(`WebSocket connected with ID: ${window.socket.id}`, 'socket');
+                    
+                    // Join session room
+                    log(`Attempting to join session room for ${sessionId}...`, 'socket');
+                    window.socket.emit('join_session', { session_id: sessionId }, function(response) {
+                        if (response && response.success) {
+                            log(`Successfully joined session room: session_${sessionId}`, 'socket');
+                        } else {
+                            log(`Failed to join session room: ${response?.error || 'Unknown error'}`, 'error');
+                        }
+                    });
+                });
+                
+                window.socket.on('disconnect', function() {
+                    log('WebSocket disconnected', 'socket');
+                });
+                
+                window.socket.on('connect_error', function(error) {
+                    log(`WebSocket connection error: ${error.message || error}`, 'error');
+                });
+                
+                window.socket.on('error', function(error) {
+                    log(`WebSocket error: ${error}`, 'error');
+                });
+                
+                window.socket.on('new_message', function(data) {
+                    log(`Received new message via WebSocket: ${JSON.stringify(data)}`, 'socket');
+                    if (data && data.message) {
+                        addMessage(data.message.content, data.message.role);
+                    }
+                });
+                
+                // Handle suggestions from monitor
+                window.socket.on('new_suggestion', function(data) {
+                    log(`Received suggestion from monitor: ${JSON.stringify(data)}`, 'socket');
+                    if (data && data.suggestion && data.suggestion.content) {
+                        // Add suggestion to the queue
+                        pendingSuggestions.push(data.suggestion.content);
+                        log(`Added suggestion to queue: ${data.suggestion.content}`, 'info');
+                        
+                        // Show a subtle notification to the interviewer
+                        showSuggestionNotification(data.suggestion.content);
+                    }
+                });
+                
+                log('WebSocket event handlers initialized', 'debug');
+                return true;
+            } catch (error) {
+                log(`Error initializing WebSocket: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Display suggestion notification
+        function showSuggestionNotification(suggestion) {
+            // Create a notification element if it doesn't exist
+            let notificationArea = document.getElementById('suggestion-notifications');
+            if (!notificationArea) {
+                notificationArea = document.createElement('div');
+                notificationArea.id = 'suggestion-notifications';
+                notificationArea.className = 'suggestion-notifications';
+                notificationArea.style.position = 'fixed';
+                notificationArea.style.bottom = '20px';
+                notificationArea.style.right = '20px';
+                notificationArea.style.zIndex = '1000';
+                notificationArea.style.maxWidth = '300px';
+                document.body.appendChild(notificationArea);
+            }
+            
+            // Create the notification
+            const notification = document.createElement('div');
+            notification.className = 'suggestion-notification';
+            notification.style.backgroundColor = 'rgba(25, 118, 210, 0.9)';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 15px';
+            notification.style.marginBottom = '10px';
+            notification.style.borderRadius = '5px';
+            notification.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+            notification.style.transition = 'all 0.3s ease';
+            
+            notification.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 5px;">Suggestion from Researcher:</div>
+                <div>${suggestion}</div>
+            `;
+            
+            // Add to notification area
+            notificationArea.appendChild(notification);
+            
+            // Remove after 10 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 10000);
         }
         
         // Fetch session details from API
@@ -531,7 +650,10 @@
                     log(`Received session data from API: ${JSON.stringify(sessionData)}`, 'info');
                     
                     // Extract character and interview type from session data
-                    if (sessionData.character_name) {
+                    if (sessionData.character) {
+                        log(`Character name from session: ${sessionData.character}`, 'info');
+                        sessionDetails.character = sessionData.character;
+                    } else if (sessionData.character_name) {
                         log(`Character name from session: ${sessionData.character_name}`, 'info');
                         sessionDetails.character = sessionData.character_name;
                     }
@@ -577,108 +699,37 @@
                             const html = await fullSessionResponse.text();
                             log("Successfully fetched session page HTML", 'info');
                             
-                            // Extract AI character
-                            const characterMatch = html.match(/<dt>AI Character<\/dt>\s*<dd[^>]*>(.*?)<\/dd>/i);
-                            if (characterMatch && characterMatch[1]) {
-                                sessionDetails.character = characterMatch[1].trim();
-                                log(`Found character in HTML: ${sessionDetails.character}`, 'info');
-                            }
+                            // Create a temporary div to parse the HTML
+                            const tempDiv = document.createElement('div');
+                            tempDiv.innerHTML = html;
                             
-                            // Extract interview type
-                            const typeMatch = html.match(/<dt>Interview Type<\/dt>\s*<dd[^>]*>(.*?)<\/dd>/i);
-                            if (typeMatch && typeMatch[1]) {
-                                sessionDetails.type = typeMatch[1].trim();
-                                log(`Found interview type in HTML: ${sessionDetails.type}`, 'info');
-                            }
-                            
-                            // Extract guide name
-                            const guideMatch = html.match(/<dt>Guide<\/dt>\s*<dd[^>]*>(.*?)<\/dd>/i);
-                            if (guideMatch && guideMatch[1]) {
-                                sessionDetails.guide = guideMatch[1].trim();
-                                log(`Found guide in HTML: ${sessionDetails.guide}`, 'info');
-                            }
-                            
-                            // Extract participant name
-                            const participantMatch = html.match(/<dt>Participant<\/dt>\s*<dd[^>]*>(.*?)<\/dd>/i);
-                            if (participantMatch && participantMatch[1]) {
-                                sessionDetails.participant = participantMatch[1].trim();
-                                log(`Found participant in HTML: ${sessionDetails.participant}`, 'info');
-                            }
-                        }
-                    } catch (e) {
-                        log(`Error fetching session HTML: ${e.message}`, 'warn');
-                    }
-                }
-                
-                // If we still don't have a character, try the details endpoint
-                if (!sessionDetails.character || sessionDetails.character === 'Assistant') {
-                    log("Still no character found, trying details endpoint", 'info');
-                    
-                    try {
-                        const detailsResponse = await fetch(`${apiUrl}/api/session/${sessionId}/details`);
-                        if (detailsResponse.ok) {
-                            const detailsData = await detailsResponse.json();
-                            log(`Received session details: ${JSON.stringify(detailsData)}`, 'info');
-                            
-                            if (detailsData.ai_character) {
-                                sessionDetails.character = detailsData.ai_character;
-                                log(`Found character in details: ${sessionDetails.character}`, 'info');
-                            }
-                            
-                            if (detailsData.interview_type) {
-                                sessionDetails.type = detailsData.interview_type;
-                                log(`Found interview type in details: ${sessionDetails.type}`, 'info');
-                            }
-                            
-                            if (detailsData.guide) {
-                                sessionDetails.guide = detailsData.guide;
-                            }
-                            
-                            if (detailsData.participant_name) {
-                                sessionDetails.participant = detailsData.participant_name;
-                            }
-                        }
-                    } catch (e) {
-                        log(`Error fetching session details: ${e.message}`, 'warn');
-                    }
-                }
-                
-                // Last resort - fetch all prompts and try to match by session ID patterns
-                if (!sessionDetails.character || sessionDetails.character === 'Assistant') {
-                    log("Trying to match character from prompts list", 'info');
-                    
-                    try {
-                        const promptsResponse = await fetch(`${apiUrl}/api/prompts`);
-                        if (promptsResponse.ok) {
-                            const promptsData = await promptsResponse.json();
-                            log(`Fetched ${promptsData.length} prompts from API`, 'info');
-                            
-                            // Use hard-coded session ID mapping if it exists
-                            const sessionCharacterMap = {
-                                // Add known session ID to character mappings
-                                "a9f9567a-35bb-475e-9b54-6f542729d007": "Askia"
-                            };
-                            
-                            if (sessionId in sessionCharacterMap) {
-                                const characterName = sessionCharacterMap[sessionId];
-                                log(`Found character ${characterName} in hardcoded map for session ${sessionId}`, 'info');
-                                sessionDetails.character = characterName;
-                                
-                                // Find matching prompt
-                                const characterPrompt = promptsData.find(p => 
-                                    p.name.toLowerCase().includes(characterName.toLowerCase())
-                                );
-                                
-                                if (characterPrompt) {
-                                    log(`Found prompt for ${characterName}: ${characterPrompt.name}`, 'info');
-                                    sessionDetails.character_prompt = characterPrompt.content;
+                            // Look for character info in the session info section
+                            const characterElement = tempDiv.querySelector('.character-info') || tempDiv.querySelector('#character-info');
+                            if (characterElement) {
+                                const characterName = characterElement.textContent.trim();
+                                if (characterName && characterName !== 'Assistant') {
+                                    log(`Found character "${characterName}" in session page`, 'info');
+                                    sessionDetails.character = characterName;
                                 }
                             }
                         }
                     } catch (e) {
-                        log(`Error fetching prompts: ${e.message}`, 'warn');
+                        log(`Error scraping session page: ${e.message}`, 'warn');
                     }
                 }
+                
+                // If we still don't have a character, try the URL parameter again
+                if (!sessionDetails.character || sessionDetails.character === 'Assistant') {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const characterParam = urlParams.get('character');
+                    if (characterParam) {
+                        log(`Using character from URL parameter: ${characterParam}`, 'info');
+                        sessionDetails.character = characterParam;
+                    }
+                }
+                
+                // If we still don't have a character, try the prompts API
+                // ... existing prompts API code ...
                 
                 // Update UI with what we have
                 updateSessionInfoDisplay();
@@ -1088,6 +1139,18 @@
                             }
                         }
                         
+                        // Check if we have a pending suggestion to incorporate into the next AI response
+                        if (pendingSuggestions.length > 0 && lastAssistantMsg) {
+                            // Get the next suggestion
+                            const nextSuggestion = pendingSuggestions.shift();
+                            
+                            // Send a message to the AI to integrate the suggestion
+                            await incorporateSuggestion(nextSuggestion);
+                            
+                            // We'll let the normal polling pick up the AI's response
+                            return true;
+                        }
+                        
                         // Play TTS for new assistant message
                         if (lastAssistantMsg && !ttsActive) {
                             playTTS(lastAssistantMsg.content).catch(err => {
@@ -1106,6 +1169,46 @@
                 }
             } catch (error) {
                 log(`Error fetching messages: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Function to incorporate suggestion into AI's next response
+        async function incorporateSuggestion(suggestion) {
+            if (!sessionId || !isConnected) {
+                log("Cannot incorporate suggestion - not connected", 'error');
+                return false;
+            }
+            
+            log(`Incorporating suggestion into AI response: ${suggestion}`, 'info');
+            
+            try {
+                // Send a system message to the AI to incorporate the suggestion
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: `IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: "${suggestion}". Make it sound like you had this thought yourself by saying something like "That's a good point, now I'd like to ask: ${suggestion}" or similar natural phrasing.`,
+                        role: 'system'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API returned status ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.success) {
+                    log("Successfully sent suggestion incorporation message", 'info');
+                    return true;
+                } else {
+                    throw new Error(data.error || "Unknown error incorporating suggestion");
+                }
+            } catch (error) {
+                log(`Error incorporating suggestion: ${error.message}`, 'error');
                 return false;
             }
         }
@@ -1293,71 +1396,47 @@
                 return false;
             }
             
+            // Get character from URL parameter if available
+            const urlParams = new URLSearchParams(window.location.search);
+            const characterParam = urlParams.get('character');
+            
             // Only proceed if we have character info
-            if (!sessionDetails.character || sessionDetails.character === 'Assistant') {
+            if (!characterParam && (!sessionDetails.character || sessionDetails.character === 'Assistant')) {
                 log("No custom character to set initially", 'warn');
                 return false;
             }
             
-            log(`Setting up initial character: ${sessionDetails.character}`, 'info');
+            // If we have a character from URL parameter, use it
+            if (characterParam) {
+                log(`Setting character from URL parameter: ${characterParam}`, 'info');
+                sessionDetails.character = characterParam;
+                // Update the UI immediately
+                document.getElementById('session-character').textContent = characterParam;
+            }
+            
+            log(`Setting initial conversation character to ${sessionDetails.character}`, 'info');
             
             try {
-                // First try the set_character API
-                await updateConversationCharacter();
-                
-                // Then send a very explicit system message
-                const systemMessage = `IMPORTANT: You are ${sessionDetails.character}. Always respond as ${sessionDetails.character}. 
-                When asked about your name, say "I am ${sessionDetails.character}".
-                When asked about your prompt or role, explain your specific purpose as ${sessionDetails.character}.
-                Never identify yourself as "Assistant" or any other name.
-                Maintain the ${sessionDetails.character} persona throughout the entire conversation.`;
-                
-                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                // Send the set_character API call
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/set_character`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        content: systemMessage,
-                        role: 'system'
+                        character: sessionDetails.character
                     })
                 });
                 
                 if (response.ok) {
-                    log(`Successfully sent character setup message for ${sessionDetails.character}`, 'info');
-                    
-                    // Also add a forced first message from the AI introducing itself as the character
-                    try {
-                        const forceFirstMessageResponse = await fetch(`${apiUrl}/api/session/${sessionId}/update_message`, {
-                            method: 'POST',
-                            headers: {
-                                'Content-Type': 'application/json'
-                            },
-                            body: JSON.stringify({
-                                message_index: 0,
-                                content: `Hello, I am ${sessionDetails.character}. How can I assist you today?`,
-                                role: 'assistant'
-                            })
-                        });
-                        
-                        if (forceFirstMessageResponse.ok) {
-                            log(`Successfully forced first message as ${sessionDetails.character}`, 'info');
-                        } else {
-                            log(`Failed to force first message: ${forceFirstMessageResponse.status}`, 'warn');
-                            // Not critical if this fails
-                        }
-                    } catch (e) {
-                        log(`Error forcing first message: ${e.message}`, 'warn');
-                        // Not critical if this fails
-                    }
-                    
+                    log(`Successfully set character to ${sessionDetails.character}`, 'info');
                     return true;
                 } else {
-                    log(`Failed to send character setup message: ${response.status}`, 'error');
+                    log(`Error setting character: ${response.status}`, 'error');
                     return false;
                 }
             } catch (error) {
-                log(`Error during character setup: ${error.message}`, 'error');
+                log(`Error in setupInitialCharacter: ${error.message}`, 'error');
                 return false;
             }
         }
@@ -1719,6 +1798,9 @@
             
             // Initialize session info display with defaults
             updateSessionInfoDisplay();
+            
+            // Initialize WebSocket for real-time communication with monitor
+            initializeWebSocket();
             
             // Connect to server
             connectToServer().then(success => {

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>DARIA Interview</title>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -320,7 +321,9 @@
         let sttActive = false;
         let apiPort = 5025;
         let sessionId = null;
-        let lastAssistantMessage = "";
+        let characterParam = null;
+        let lastAssistantMessage = null;
+        let lastMessageTimestamp = 0;
         let isConnected = false;
         let startTime = null;
         let timerInterval = null;
@@ -330,8 +333,12 @@
         let analyser = null;
         let microphone = null;
         let audioLevelInterval = null;
-        let apiUrl = '';
-        
+        let apiUrl = `http://${window.location.hostname}:${apiPort}`;
+        let promptedForMic = false;
+        let pollInterval = null;
+        let socket = null;
+        let pendingSuggestions = [];
+
         // UI Elements
         let userInput = null;
         let sendMessageBtn = null;
@@ -400,7 +407,7 @@
         const urlParams = new URLSearchParams(window.location.search);
         sessionId = urlParams.get('session_id') || "{{ session_id }}";
         const port = urlParams.get('port') || "{{ port }}" || '5025';
-        const characterParam = urlParams.get('character'); // Get character parameter
+        characterParam = urlParams.get('character'); // Get character parameter
         apiUrl = `http://${window.location.hostname}:${port}`;
         
         // Log character info for debugging
@@ -719,104 +726,96 @@
                 return Promise.resolve(false);
             }
             
-            console.log(`fetchLatestMessages: Fetching messages for session ${sessionId}`);
+            if (!messageContainer) {
+                console.error('fetchLatestMessages: Message container not found');
+                return Promise.resolve(false);
+            }
             
             try {
+                console.log(`fetchLatestMessages: Requesting messages for session ${sessionId}`);
                 const response = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
                 
                 if (!response.ok) {
-                    console.error(`fetchLatestMessages: Failed with status ${response.status}`);
-                    throw new Error(`Failed to fetch messages: ${response.status}`);
+                    throw new Error(`API returned status ${response.status}`);
                 }
                 
                 const data = await response.json();
+                let hasNewMessages = false;
                 
-                if (!data.success) {
-                    console.error('fetchLatestMessages: API returned error:', data.error);
-                    throw new Error(data.error || 'Unknown error fetching messages');
-                }
-                
-                // Process messages if there are any
                 if (data.messages && data.messages.length > 0) {
                     console.log(`fetchLatestMessages: Received ${data.messages.length} messages`);
-                    let hasNewMessages = false;
                     
-                    // Get existing message IDs for comparison
-                    const messageElems = messageContainer.querySelectorAll('.message');
-                    const existingIds = Array.from(messageElems)
-                        .map(elem => elem.dataset.messageId)
-                        .filter(Boolean);
+                    // Filter messages by role for easier processing
+                    const userMessages = data.messages.filter(msg => msg.role === 'user');
+                    const assistantMessages = data.messages.filter(msg => msg.role === 'assistant');
                     
-                    console.log('fetchLatestMessages: Existing message IDs:', existingIds);
-                    
-                    // Process each message
-                    for (const msg of data.messages) {
-                        console.log(`fetchLatestMessages: Processing message ID ${msg.id}, role ${msg.role}`);
+                    if (assistantMessages.length > 0) {
+                        const latestAssistantMsg = assistantMessages[assistantMessages.length - 1];
                         
-                        // If message already exists, skip it
-                        if (existingIds.includes(msg.id)) {
-                            console.log(`fetchLatestMessages: Skipping existing message ID ${msg.id}`);
-                            continue;
-                        }
-                        
-                        // Add new message
-                        const messageElem = document.createElement('div');
-                        messageElem.className = `message ${msg.role}-message`;
-                        messageElem.dataset.messageId = msg.id;
-                        messageElem.textContent = msg.content;
-                        
-                        // Only add if not a duplicate
-                        let isDuplicate = false;
-                        messageElems.forEach(elem => {
-                            if (elem.textContent === msg.content && 
-                                elem.className.includes(msg.role)) {
-                                isDuplicate = true;
-                            }
-                        });
-                        
-                        if (!isDuplicate) {
-                            console.log(`fetchLatestMessages: Adding new message: "${msg.content.substring(0, 30)}..."`);
-                            messageContainer.appendChild(messageElem);
+                        // Skip if we've already displayed this exact message
+                        if (lastAssistantMessage !== latestAssistantMsg.content) {
+                            console.log(`fetchLatestMessages: New assistant message detected`);
+                            lastAssistantMessage = latestAssistantMsg.content;
+                            
+                            // Clear and rebuild message display
+                            messageContainer.innerHTML = '';
                             hasNewMessages = true;
                             
-                            // Play assistant message audio
-                            if (msg.role === 'assistant') {
-                                console.log('fetchLatestMessages: Found assistant message, will attempt TTS');
-                                lastAssistantMessage = msg.content;
-                                
-                                // SAFETY: Make sure TTS audio element is initialized
-                                if (!ttsAudio) {
-                                    console.log('fetchLatestMessages: TTS Audio not initialized, creating new audio element');
-                                    ttsAudio = new Audio();
+                            // Re-add all messages in order
+                            data.messages.forEach(msg => {
+                                if (msg.role === 'user') {
+                                    addUserMessage(msg.content);
+                                } else if (msg.role === 'assistant') {
+                                    addAssistantMessage(msg.content);
                                 }
+                                // Skip system messages
+                            });
+                            
+                            // Check if we have pending suggestions to incorporate into the next AI response
+                            if (pendingSuggestions.length > 0 && latestAssistantMsg) {
+                                // Get the next suggestion
+                                const nextSuggestion = pendingSuggestions.shift();
                                 
-                                // Add small delay before TTS to ensure DOM is updated
-                                setTimeout(() => {
-                                    console.log('fetchLatestMessages: Starting TTS after delay');
-                                    
-                                    // SAFETY: Safely call playTTS with error handling
-                                    try {
-                                        const ttsPromise = playTTS(msg.content);
-                                        
-                                        // Verify we have a valid promise before calling then
-                                        if (ttsPromise && typeof ttsPromise.then === 'function') {
-                                            console.log('fetchLatestMessages: Valid promise returned from playTTS');
-                                            
-                                            ttsPromise
-                                                .then(() => {
-                                                    console.log("fetchLatestMessages: TTS completed successfully");
-                                                })
-                                                .catch(err => {
-                                                    console.error("fetchLatestMessages: TTS playback error:", err);
-                                                });
-                                        } else {
-                                            console.error('fetchLatestMessages: Invalid promise returned from playTTS');
-                                        }
-                                    } catch (err) {
-                                        console.error('fetchLatestMessages: Error calling playTTS:', err);
-                                    }
-                                }, 500);
+                                // Send a message to the AI to integrate the suggestion
+                                await incorporateSuggestion(nextSuggestion);
+                                
+                                // We'll let the normal polling pick up the AI's response
+                                return true;
                             }
+                            
+                            // Play TTS for latest message
+                            setTimeout(() => {
+                                try {
+                                    console.log(`fetchLatestMessages: Playing TTS for latest assistant message`);
+                                    const msg = latestAssistantMsg;
+                                    
+                                    // Skip if TTS is already playing
+                                    if (ttsActive) {
+                                        console.log('fetchLatestMessages: TTS already active, skipping');
+                                        return;
+                                    }
+                                    
+                                    // Call playTTS with proper error handling
+                                    const ttsPromise = playTTS(msg.content);
+                                    
+                                    // Verify we have a valid promise before calling then
+                                    if (ttsPromise && typeof ttsPromise.then === 'function') {
+                                        console.log('fetchLatestMessages: Valid promise returned from playTTS');
+                                        
+                                        ttsPromise
+                                            .then(() => {
+                                                console.log("fetchLatestMessages: TTS completed successfully");
+                                            })
+                                            .catch(err => {
+                                                console.error("fetchLatestMessages: TTS playback error:", err);
+                                            });
+                                    } else {
+                                        console.error('fetchLatestMessages: Invalid promise returned from playTTS');
+                                    }
+                                } catch (err) {
+                                    console.error('fetchLatestMessages: Error calling playTTS:', err);
+                                }
+                            }, 500);
                         } else {
                             console.log(`fetchLatestMessages: Skipping duplicate message`);
                         }
@@ -1758,6 +1757,10 @@
                     log(`Character specified in URL: ${characterParam}`, 'info');
                 }
                 
+                // Initialize WebSocket connection
+                const socketInitialized = initializeWebSocket();
+                log(`WebSocket initialization ${socketInitialized ? 'successful' : 'failed'}`, 'info');
+                
                 // Initialize event listeners
                 log('Initializing event listeners', 'info');
                 setupEventListeners();
@@ -1866,6 +1869,152 @@
             setInterval(async () => {
                 await checkAudioServices();
             }, 30000);
+        }
+
+        // Initialize socket.io connection
+        function initializeWebSocket() {
+            try {
+                if (typeof io === 'undefined') {
+                    console.log('Socket.io library not found');
+                    return false;
+                }
+                
+                socket = io();
+                console.log('Socket.io initialized');
+                
+                // Set up event handlers
+                socket.on('connect', function() {
+                    console.log('WebSocket connected');
+                    
+                    // Join session room
+                    socket.emit('join_session', { session_id: sessionId }, function(response) {
+                        if (response && response.success) {
+                            console.log(`Joined session room for session: ${sessionId}`);
+                        } else {
+                            console.error(`Failed to join session room: ${response?.error || 'Unknown error'}`);
+                        }
+                    });
+                });
+                
+                socket.on('disconnect', function() {
+                    console.log('WebSocket disconnected');
+                });
+                
+                socket.on('new_message', function(data) {
+                    console.log(`Received new message via WebSocket:`, data);
+                    if (data && data.message) {
+                        if (data.message.role === 'user') {
+                            addUserMessage(data.message.content);
+                        } else if (data.message.role === 'assistant') {
+                            addAssistantMessage(data.message.content);
+                        }
+                    }
+                });
+                
+                // Handle suggestions from monitor
+                socket.on('new_suggestion', function(data) {
+                    console.log(`Received suggestion from monitor:`, data);
+                    if (data && data.suggestion && data.suggestion.content) {
+                        // Add suggestion to the queue
+                        pendingSuggestions.push(data.suggestion.content);
+                        console.log(`Added suggestion to queue: ${data.suggestion.content}`);
+                        
+                        // Show a subtle notification to the interviewer
+                        showSuggestionNotification(data.suggestion.content);
+                    }
+                });
+                
+                return true;
+            } catch (error) {
+                console.error(`Error initializing WebSocket: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // Display suggestion notification
+        function showSuggestionNotification(suggestion) {
+            // Create a notification element if it doesn't exist
+            let notificationArea = document.getElementById('suggestion-notifications');
+            if (!notificationArea) {
+                notificationArea = document.createElement('div');
+                notificationArea.id = 'suggestion-notifications';
+                notificationArea.className = 'suggestion-notifications';
+                notificationArea.style.position = 'fixed';
+                notificationArea.style.bottom = '20px';
+                notificationArea.style.right = '20px';
+                notificationArea.style.zIndex = '1000';
+                notificationArea.style.maxWidth = '300px';
+                document.body.appendChild(notificationArea);
+            }
+            
+            // Create the notification
+            const notification = document.createElement('div');
+            notification.className = 'suggestion-notification';
+            notification.style.backgroundColor = 'rgba(25, 118, 210, 0.9)';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 15px';
+            notification.style.marginBottom = '10px';
+            notification.style.borderRadius = '5px';
+            notification.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+            notification.style.transition = 'all 0.3s ease';
+            
+            notification.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 5px;">Suggestion from Researcher:</div>
+                <div>${suggestion}</div>
+            `;
+            
+            // Add to notification area
+            notificationArea.appendChild(notification);
+            
+            // Remove after 10 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 10000);
+        }
+
+        // Function to incorporate suggestion into AI's next response
+        async function incorporateSuggestion(suggestion) {
+            if (!sessionId || !isConnected) {
+                log("Cannot incorporate suggestion - not connected", 'error');
+                return false;
+            }
+            
+            log(`Incorporating suggestion into AI response: ${suggestion}`, 'info');
+            
+            try {
+                // Send a system message to the AI to incorporate the suggestion
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: `IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: "${suggestion}". Make it sound like you had this thought yourself by saying something like "That's a good point, now I'd like to ask: ${suggestion}" or similar natural phrasing.`,
+                        role: 'system'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API returned status ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Unknown API error');
+                }
+                
+                log("Suggestion instruction sent successfully", 'info');
+                return true;
+            } catch (error) {
+                log(`Error incorporating suggestion: ${error.message}`, 'error');
+                return false;
+            }
         }
     </script>
 </body>

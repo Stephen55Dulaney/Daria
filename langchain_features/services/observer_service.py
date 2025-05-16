@@ -591,6 +591,21 @@ class ObserverService:
             logger.error(f"Error analyzing mood timeline: {str(e)}")
             return "Error analyzing mood timeline."
     
+    def _update_state(self, session_id: str, state: Dict[str, Any]) -> None:
+        """
+        Update the observer state for a session.
+        
+        Args:
+            session_id: The session ID
+            state: The updated state dictionary
+        """
+        try:
+            # Store the updated state in the observer_states dictionary
+            self.observer_states[session_id] = state
+            logger.info(f"Updated observer state for session {session_id}")
+        except Exception as e:
+            logger.error(f"Error updating observer state for session {session_id}: {str(e)}")
+    
     def get_suggested_questions(self, session_id: str) -> List[Dict[str, Any]]:
         """
         Get the current suggested follow-up questions.
@@ -602,7 +617,107 @@ class ObserverService:
             List of suggested questions
         """
         state = self.get_observer_state(session_id)
-        return state['suggested_questions']
+        questions = state.get('suggested_questions', [])
+        
+        # Add enhanced debug logging
+        logger.info(f"Returning {len(questions)} suggested questions for session {session_id}")
+        
+        # If no questions exist, generate some immediately
+        if not questions:
+            logger.info(f"No questions available - generating questions for session {session_id}")
+            try:
+                # Get recent messages from the session
+                from langchain_features.services.discussion_service import DiscussionService
+                discussion_service = DiscussionService.get_instance()
+                messages = discussion_service.get_session_messages(session_id, limit=10)
+                
+                # Log what we found
+                logger.info(f"Found {len(messages)} messages for question generation in session {session_id}")
+                
+                # Generate questions from the recent messages
+                if len(messages) > 2:
+                    self._generate_question_suggestions(session_id, messages)
+                    
+                    # Get the newly generated questions
+                    state = self.get_observer_state(session_id)  # Refresh state after generation
+                    questions = state.get('suggested_questions', [])
+                    logger.info(f"Generated {len(questions)} new questions for session {session_id}")
+                else:
+                    logger.info(f"Not enough messages ({len(messages)}) to generate meaningful questions")
+                
+                # If still no questions, add generic fallback questions
+                if not questions:
+                    logger.warning(f"Still no questions available after generation - adding fallback questions for {session_id}")
+                    fallback_questions = [
+                        "Could you tell me more about your experience with that?",
+                        "How did that make you feel?",
+                        "What challenges did you face during that process?",
+                        "Can you provide an example or specific situation?",
+                        "What would you change or improve about that?",
+                        "Why do you think that happened?",
+                        "How does this compare to your previous experiences?"
+                    ]
+                    
+                    # Format the fallback questions
+                    questions = []
+                    for q in fallback_questions:
+                        questions.append({
+                            'id': str(uuid.uuid4()),
+                            'timestamp': datetime.datetime.now().isoformat(),
+                            'text': q
+                        })
+                    
+                    # Save to state for future reference
+                    state['suggested_questions'] = questions
+                    self._update_state(session_id, state)  # Make sure state is saved
+                    logger.info(f"Added {len(questions)} fallback questions for session {session_id}")
+            except Exception as e:
+                logger.error(f"Error generating suggested questions on demand: {str(e)}")
+                # Add fallback questions even on error
+                fallback_questions = [
+                    "Can you elaborate on that point?",
+                    "What specific aspects would you like to discuss further?",
+                    "How has this affected your workflow or process?"
+                ]
+                questions = []
+                for q in fallback_questions:
+                    questions.append({
+                        'id': str(uuid.uuid4()),
+                        'timestamp': datetime.datetime.now().isoformat(),
+                        'text': q
+                    })
+                logger.info(f"Added {len(questions)} emergency fallback questions after error")
+                
+                # Try to save the emergency questions to state
+                try:
+                    state['suggested_questions'] = questions
+                    self._update_state(session_id, state)
+                except Exception as inner_e:
+                    logger.error(f"Error saving emergency questions to state: {str(inner_e)}")
+        
+        # Log what we're returning
+        if questions:
+            logger.info(f"Returning {len(questions)} questions for session {session_id}")
+            for q in questions[:3]:  # Log just the first 3 to avoid verbosity
+                logger.info(f"Question: {q.get('text', 'NO TEXT FOUND')}")
+        else:
+            # If we still have no questions after all efforts, ensure we return fallback questions
+            # This is a last resort to guarantee questions are always returned
+            logger.warning(f"Still no questions after all attempts - returning emergency fallbacks for {session_id}")
+            questions = [
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Could you share more about what you're thinking?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "What other thoughts or feedback do you have?"
+                }
+            ]
+            
+        return questions
     
     def get_key_insights(self, session_id: str) -> List[Dict[str, Any]]:
         """

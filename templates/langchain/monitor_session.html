@@ -650,21 +650,15 @@
                 window.socket.on('connect', function() {
                     console.log('WebSocket connected');
                     
-                    // Join the monitoring room for this session
-                    window.socket.emit('join_monitor', { session_id: sessionId }, function(response) {
-                        if (response && response.success) {
-                            console.log('Joined monitoring room for session:', sessionId);
-                            updateConnectionStatus(true);
-                            
-                            // Debug request suggested questions upon connection
-                            console.log('Requesting suggested questions and insights');
-                            window.socket.emit('request_suggested_questions', { session_id: sessionId });
-                            window.socket.emit('request_insights', { session_id: sessionId });
-                        } else {
-                            console.error('Failed to join monitoring room:', response?.error || 'Unknown error');
-                            updateConnectionStatus(false);
-                        }
-                    });
+                    // Join the monitor room for this session
+                    window.socket.emit('join_monitor_room', { session_id: sessionId });
+                    console.log('Joined monitoring room for session:', sessionId);
+                    updateConnectionStatus(true);
+                    
+                    // Request suggested questions and insights
+                    console.log('Requesting suggested questions and insights');
+                    window.socket.emit('request_suggested_questions', { session_id: sessionId });
+                    window.socket.emit('request_insights', { session_id: sessionId });
                 });
                 
                 window.socket.on('disconnect', function() {
@@ -717,33 +711,7 @@
                 window.socket.on('insights_update', function(data) {
                     console.log('Received insights update:', data);
                     if (data && data.insights) {
-                        // Update insights display
-                        const insightsContainer = document.getElementById('key-insights');
-                        if (insightsContainer) {
-                            insightsContainer.innerHTML = '';
-                            
-                            if (data.insights.length === 0) {
-                                insightsContainer.innerHTML = `
-                                    <div class="text-center text-muted py-2">
-                                        <small>No insights available yet</small>
-                                    </div>
-                                `;
-                                return;
-                            }
-                            
-                            data.insights.forEach(insight => {
-                                const insightItem = document.createElement('div');
-                                insightItem.className = 'insight-item';
-                                insightItem.innerHTML = `
-                                    <i class="bi bi-lightbulb"></i>
-                                    <div>
-                                        <div>${insight.text}</div>
-                                        <small class="text-muted">${insight.importance} importance</small>
-                                    </div>
-                                `;
-                                insightsContainer.appendChild(insightItem);
-                            });
-                        }
+                        updateInsights(data.insights);
                     }
                 });
                 
@@ -760,6 +728,74 @@
             }
         }
         
+        // Update insights UI
+        function updateInsights(insights) {
+            const container = document.getElementById('key-insights');
+            if (!container) return;
+            
+            // Clear placeholder if present
+            const placeholder = container.querySelector('.text-center.text-muted');
+            if (placeholder) {
+                placeholder.remove();
+            }
+            
+            if (!insights || insights.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-muted py-2">
+                        <small>No insights available yet</small>
+                    </div>
+                `;
+                return;
+            }
+            
+            // Add each insight
+            insights.slice(0, 3).forEach(insight => {
+                // Skip if this insight already exists
+                if (document.querySelector(`.insight-item[data-id="${insight.id}"]`)) {
+                    return;
+                }
+                
+                // Create insight element
+                const insightElem = document.createElement('div');
+                insightElem.className = 'insight-item mb-3';
+                insightElem.setAttribute('data-id', insight.id);
+                
+                // Format importance badge
+                let importanceClass = 'bg-secondary';
+                let importanceIcon = 'info-circle';
+                
+                if (insight.importance) {
+                    const importance = insight.importance.toUpperCase();
+                    if (importance.includes('HIGH')) {
+                        importanceClass = 'bg-danger';
+                        importanceIcon = 'exclamation-circle';
+                    } else if (importance.includes('MEDIUM')) {
+                        importanceClass = 'bg-warning text-dark';
+                        importanceIcon = 'asterisk';
+                    }
+                }
+                
+                insightElem.innerHTML = `
+                    <div class="d-flex align-items-start">
+                        <i class="bi bi-lightbulb-fill text-primary me-2 mt-1"></i>
+                        <div class="flex-grow-1">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <span class="fw-medium">${insight.text}</span>
+                                <span class="badge ${importanceClass} ms-2">
+                                    <i class="bi bi-${importanceIcon} me-1"></i>
+                                    ${insight.importance || 'MEDIUM'}
+                                </span>
+                            </div>
+                            ${insight.evidence ? `<div class="text-muted small mt-1">${insight.evidence}</div>` : ''}
+                        </div>
+                    </div>
+                `;
+                
+                // Insert at the top
+                container.insertBefore(insightElem, container.firstChild);
+            });
+        }
+        
         // Update connection status indicator
         function updateConnectionStatus(connected) {
             if (statusIndicator) {
@@ -773,37 +809,112 @@
             }
         }
         
-        // Load initial messages
-        fetch(`/api/session/${sessionId}/messages`)
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.messages) {
-                    // Check if transcriptContainer exists before using it
-                    if (!transcriptContainer) {
-                        console.error('Error loading messages: transcriptContainer element not found');
-                        return;
+        // Session timer for duration calculation
+        let sessionStartTime = Date.now();
+        let sessionStatsUpdateInterval = null;
+        
+        // Function to calculate and update session statistics
+        function updateSessionStats() {
+            // Get all messages
+            const messages = document.querySelectorAll('.interviewer-message, .participant-message');
+            
+            // Update message count
+            const messageCount = document.getElementById('message-count');
+            if (messageCount) {
+                messageCount.textContent = messages.length;
+            }
+            
+            // Calculate session duration if we have messages
+            if (messages.length > 0) {
+                const sessionDuration = document.getElementById('session-duration');
+                if (sessionDuration) {
+                    // Get timestamps from first and last messages
+                    let firstTimestamp = Date.now() - 60000; // Default to 1 minute ago
+                    let lastTimestamp = Date.now();
+                    
+                    // Try to get timestamps from message attributes
+                    if (messages[0].hasAttribute('data-timestamp')) {
+                        firstTimestamp = new Date(messages[0].getAttribute('data-timestamp')).getTime();
                     }
                     
-                    // Clear existing messages
-                    transcriptContainer.innerHTML = '';
+                    if (messages[messages.length-1].hasAttribute('data-timestamp')) {
+                        lastTimestamp = new Date(messages[messages.length-1].getAttribute('data-timestamp')).getTime();
+                    }
                     
-                    // Add each message to the transcript
-                    data.messages.forEach(message => {
-                        addMessageToTranscript(message);
-                    });
+                    // Calculate duration
+                    const durationMs = lastTimestamp - firstTimestamp;
+                    const durationSec = Math.floor(durationMs / 1000);
+                    const hours = Math.floor(durationSec / 3600);
+                    const minutes = Math.floor((durationSec % 3600) / 60);
+                    const seconds = durationSec % 60;
                     
-                    console.log(`Loaded ${data.messages.length} messages`);
-                } else {
-                    throw new Error(data.error || 'Failed to load messages');
+                    // Format as HH:MM:SS
+                    sessionDuration.textContent = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
                 }
-            })
-            .catch(error => {
-                console.error('Error loading messages:', error);
-                if (transcriptContainer) {
-                    transcriptContainer.innerHTML = `<div class="alert alert-danger">Failed to load messages: ${error.message}</div>`;
+                
+                // Calculate average response time
+                const avgResponseTime = document.getElementById('avg-response-time');
+                if (avgResponseTime && messages.length >= 2) {
+                    let totalResponseTime = 0;
+                    let responseCount = 0;
+                    
+                    // Get timestamps and calculate time between messages
+                    for (let i = 1; i < messages.length; i++) {
+                        const currentMsg = messages[i];
+                        const prevMsg = messages[i-1];
+                        
+                        // Only calculate when roles change (e.g., user->assistant or assistant->user)
+                        if (currentMsg.className !== prevMsg.className) {
+                            let currentTime = Date.now();
+                            let prevTime = currentTime - 5000; // Default 5 seconds
+                            
+                            if (currentMsg.hasAttribute('data-timestamp')) {
+                                currentTime = new Date(currentMsg.getAttribute('data-timestamp')).getTime();
+                            }
+                            
+                            if (prevMsg.hasAttribute('data-timestamp')) {
+                                prevTime = new Date(prevMsg.getAttribute('data-timestamp')).getTime();
+                            }
+                            
+                            const responseTime = currentTime - prevTime;
+                            if (responseTime > 0 && responseTime < 300000) { // Ignore responses over 5 minutes
+                                totalResponseTime += responseTime;
+                                responseCount++;
+                            }
+                        }
+                    }
+                    
+                    // Format and display average
+                    if (responseCount > 0) {
+                        const avgTimeMs = Math.floor(totalResponseTime / responseCount);
+                        const avgTimeSec = Math.floor(avgTimeMs / 1000);
+                        
+                        if (avgTimeSec < 60) {
+                            avgResponseTime.textContent = `${avgTimeSec} sec`;
+                        } else {
+                            const minutes = Math.floor(avgTimeSec / 60);
+                            const seconds = avgTimeSec % 60;
+                            avgResponseTime.textContent = `${minutes}:${seconds.toString().padStart(2, '0')} min`;
+                        }
+                    }
                 }
-            });
-            
+                
+                // Calculate interviewer talk percentage
+                const interviewerTalkPercent = document.getElementById('interviewer-talk-percent');
+                if (interviewerTalkPercent) {
+                    const interviewerMessages = document.querySelectorAll('.interviewer-message');
+                    const interviewerPercent = Math.round((interviewerMessages.length / messages.length) * 100);
+                    interviewerTalkPercent.textContent = `${interviewerPercent}%`;
+                }
+            }
+        }
+        
+        // Set an interval to update session stats every 10 seconds
+        setInterval(updateSessionStats, 10000);
+        
+        // Call once at startup
+        setTimeout(updateSessionStats, 1000);
+        
         // Add message to transcript
         function addMessageToTranscript(message) {
             // Check if transcriptContainer exists before using it
@@ -813,27 +924,24 @@
             }
             
             const messageElement = document.createElement('div');
-            messageElement.className = `message ${message.role}-message`;
+            messageElement.className = `${message.role === 'assistant' ? 'interviewer-message' : 'participant-message'}`;
             messageElement.setAttribute('data-message-id', message.id);
-            
-            const timestamp = new Date().toLocaleTimeString();
-            const roleLabel = message.role === 'assistant' ? 'Assistant' : 'Participant';
+            messageElement.setAttribute('data-timestamp', message.timestamp || Date.now());
             
             messageElement.innerHTML = `
-                <div class="message-header">
-                    <span class="message-role">${roleLabel}</span>
-                    <span class="message-time">${timestamp}</span>
-                </div>
-                <div class="message-content">${message.content}</div>
+                <strong>${message.role === 'assistant' ? 'AI Interviewer' : 'Participant'}:</strong> ${message.content}
             `;
             
             transcriptContainer.appendChild(messageElement);
             transcriptContainer.scrollTop = transcriptContainer.scrollHeight;
+            
+            // Update session stats
+            updateSessionStats();
         }
         
         // Highlight the most recent message
         function highlightLatestMessage() {
-            const messages = document.querySelectorAll('.message');
+            const messages = document.querySelectorAll('.interviewer-message, .participant-message');
             messages.forEach(msg => msg.classList.remove('highlight'));
             
             const lastMessage = messages[messages.length - 1];
@@ -891,10 +999,16 @@
                 }
             }
             
-            // Add note to key insights if it's an important insight
-            if (observation.insight_types && observation.insight_types.includes('KEY_INSIGHT')) {
+            // Add note to key insights if it's an important type
+            if (observation.insight_types && (observation.insight_types.includes('KEY_POINT') || observation.insight_types.includes('KEY_INSIGHT'))) {
                 const keyInsights = document.getElementById('key-insights');
                 if (keyInsights) {
+                    // Clear placeholder if present
+                    const placeholder = keyInsights.querySelector('.text-center.text-muted');
+                    if (placeholder) {
+                        placeholder.remove();
+                    }
+                    
                     const insight = document.createElement('div');
                     insight.className = 'insight-item';
                     insight.innerHTML = `
@@ -902,12 +1016,6 @@
                         <div>${observation.note}</div>
                     `;
                     keyInsights.appendChild(insight);
-                    
-                    // Clear placeholder if present
-                    const placeholder = keyInsights.querySelector('.text-muted');
-                    if (placeholder) {
-                        placeholder.remove();
-                    }
                 }
             }
         }
@@ -917,136 +1025,184 @@
             const text = messageInput.value.trim();
             if (!text) return;
             
-            const data = {
-                session_id: sessionId,
-                suggestion: {
-                    content: text,
-                    type: 'suggestion'
-                }
-            };
+            console.log('Preparing suggestion:', text);
             
-            // Try to send via socket if connected
+            // First, just save the suggestion on the monitor side, don't send to remote interview yet
             if (window.socket && window.socket.connected) {
-                try {
-                    window.socket.emit('send_suggestion', data, function(response) {
-                        if (response && response.success) {
-                            console.log('Suggestion sent successfully');
-                            messageInput.value = '';
-                        } else {
-                            console.error('Error sending suggestion via socket', response);
-                            sendSuggestionViaAPI(data.suggestion); // Fallback to API
-                        }
-                    });
-                } catch (error) {
-                    console.error('Error sending suggestion via socket:', error);
-                    sendSuggestionViaAPI(data.suggestion); // Fallback to API
+                window.socket.emit('send_suggestion', { 
+                    session_id: sessionId,
+                    suggestion: text
+                });
+                console.log('Suggestion prepared; ready for confirmation');
+                
+                // Find suggestion container - make sure it exists
+                const suggestionInputContainer = document.querySelector('.suggestion-input-container');
+                if (!suggestionInputContainer) {
+                    console.error('Error: Could not find suggestion input container');
+                    // Create a floating toast notification instead
+                    showToastNotification('Suggestion prepared. Click to send to interview.', text);
+                    messageInput.value = '';
+                    return;
                 }
+                
+                // Create a suggestion element with a confirmation button
+                const suggestionArea = document.getElementById('pending-suggestions') || document.createElement('div');
+                if (!document.getElementById('pending-suggestions')) {
+                    suggestionArea.id = 'pending-suggestions';
+                    suggestionArea.className = 'suggestions-area mt-3';
+                    suggestionInputContainer.appendChild(suggestionArea);
+                }
+                
+                const suggestionElement = document.createElement('div');
+                suggestionElement.className = 'alert alert-info d-flex justify-content-between align-items-center';
+                suggestionElement.innerHTML = `
+                    <div class="flex-grow-1 me-2">
+                        <strong>Prepared Suggestion:</strong> ${text}
+                    </div>
+                    <button class="btn btn-primary btn-sm confirm-suggestion">Send to Interview</button>
+                `;
+                
+                suggestionArea.appendChild(suggestionElement);
+                
+                // Add event listener to confirmation button
+                const confirmButton = suggestionElement.querySelector('.confirm-suggestion');
+                confirmButton.addEventListener('click', function() {
+                    sendConfirmedSuggestion(text);
+                    suggestionElement.remove();
+                });
+                
+                messageInput.value = '';
             } else {
-                console.warn('Socket not connected, using API fallback');
-                sendSuggestionViaAPI(data.suggestion);
+                // Fallback to REST API for initial suggestion
+                fetch(`/api/session/${sessionId}/suggestion`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: text,
+                        type: 'suggestion'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('Suggestion prepared on server side');
+                        
+                        // Find suggestion container - make sure it exists
+                        const suggestionInputContainer = document.querySelector('.suggestion-input-container');
+                        if (!suggestionInputContainer) {
+                            console.error('Error: Could not find suggestion input container');
+                            // Create a floating toast notification instead
+                            showToastNotification('Suggestion prepared. Click to send to interview.', text);
+                            messageInput.value = '';
+                            return;
+                        }
+                        
+                        // Create a suggestion element with confirmation button
+                        const suggestionArea = document.getElementById('pending-suggestions') || document.createElement('div');
+                        if (!document.getElementById('pending-suggestions')) {
+                            suggestionArea.id = 'pending-suggestions';
+                            suggestionArea.className = 'suggestions-area mt-3';
+                            suggestionInputContainer.appendChild(suggestionArea);
+                        }
+                        
+                        const suggestionElement = document.createElement('div');
+                        suggestionElement.className = 'alert alert-info d-flex justify-content-between align-items-center';
+                        suggestionElement.innerHTML = `
+                            <div class="flex-grow-1 me-2">
+                                <strong>Prepared Suggestion:</strong> ${text}
+                            </div>
+                            <button class="btn btn-primary btn-sm confirm-suggestion">Send to Interview</button>
+                        `;
+                        
+                        suggestionArea.appendChild(suggestionElement);
+                        
+                        // Add event listener to confirmation button
+                        const confirmButton = suggestionElement.querySelector('.confirm-suggestion');
+                        confirmButton.addEventListener('click', function() {
+                            sendConfirmedSuggestion(text);
+                            suggestionElement.remove();
+                        });
+                        
+                        messageInput.value = '';
+                    } else {
+                        console.error('Failed to prepare suggestion:', data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error preparing suggestion:', error);
+                });
             }
         }
         
-        // Fallback to send suggestion via API
-        function sendSuggestionViaAPI(data) {
-            fetch(`/api/session/${sessionId}/suggestion`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Suggestion sent successfully via API');
-                    messageInput.value = '';
-                } else {
-                    console.error('API Error sending suggestion:', data.error);
-                    alert('Failed to send suggestion. Please try again.');
-                }
-            })
-            .catch(error => {
-                console.error('Network error sending suggestion:', error);
-                alert('Failed to send suggestion due to network error. Please try again.');
+        // Helper function to show a floating toast notification if the container doesn't exist
+        function showToastNotification(title, text) {
+            // Create a floating toast that will be appended to the body
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background-color: white;
+                border-left: 4px solid #4f46e5;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                padding: 15px;
+                border-radius: 4px;
+                z-index: 1050;
+                max-width: 350px;
+            `;
+            
+            toast.innerHTML = `
+                <div class="d-flex flex-column">
+                    <div class="d-flex justify-content-between align-items-center mb-2">
+                        <strong>${title}</strong>
+                        <button type="button" class="btn-close btn-sm toast-close" aria-label="Close"></button>
+                    </div>
+                    <div class="toast-body mb-2">${text}</div>
+                    <div class="d-flex justify-content-end">
+                        <button class="btn btn-primary btn-sm toast-confirm">Send to Interview</button>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(toast);
+            
+            // Add event listeners
+            const closeBtn = toast.querySelector('.toast-close');
+            const confirmBtn = toast.querySelector('.toast-confirm');
+            
+            closeBtn.addEventListener('click', function() {
+                document.body.removeChild(toast);
             });
+            
+            confirmBtn.addEventListener('click', function() {
+                sendConfirmedSuggestion(text);
+                document.body.removeChild(toast);
+            });
+            
+            // Auto remove after 10 seconds
+            setTimeout(() => {
+                if (document.body.contains(toast)) {
+                    document.body.removeChild(toast);
+                }
+            }, 10000);
         }
         
         // Event listeners
-        sendBtn.addEventListener('click', sendSuggestion);
+        if (sendBtn) {
+            sendBtn.addEventListener('click', sendSuggestion);
+        }
         
-        messageInput.addEventListener('keypress', function(e) {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                sendSuggestion();
-            }
-        });
-        
-        addNoteBtn.addEventListener('click', function() {
-            document.getElementById('note-modal').style.display = 'flex';
-        });
-        
-        saveNoteBtn.addEventListener('click', function() {
-            const noteContent = document.getElementById('note-input').value.trim();
-            if (!noteContent) return;
-            
-            // Save note
-            fetch(`/api/session/${sessionId}/note`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ content: noteContent })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    document.getElementById('note-input').value = '';
-                    document.getElementById('note-modal').style.display = 'none';
-                    
-                    // Add note to sidebar
-                    addObservationNote({ content: noteContent, title: 'Manual Note' });
-                } else {
-                    alert('Failed to save note: ' + (data.error || 'Unknown error'));
+        if (messageInput) {
+            messageInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendSuggestion();
                 }
-            })
-            .catch(error => {
-                console.error('Error saving note:', error);
-                alert('Failed to save note due to network error');
             });
-        });
-        
-        document.querySelectorAll('.close-modal').forEach(btn => {
-            btn.addEventListener('click', function() {
-                this.closest('.modal').style.display = 'none';
-            });
-        });
-        
-        endInterviewBtn.addEventListener('click', function() {
-            document.getElementById('end-interview-modal').style.display = 'flex';
-        });
-        
-        confirmEndInterviewBtn.addEventListener('click', function() {
-            fetch(`/api/session/${sessionId}/end`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    alert('Interview ended. Redirecting to dashboard...');
-                    window.location.href = '/dashboard';
-                } else {
-                    alert('Failed to end interview: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error ending interview:', error);
-                alert('Failed to end interview due to network error');
-            });
-        });
-        
-        // Set up WebSocket connection
-        setupWebSocket();
+        }
         
         // Set up event listeners for quick suggestions
         document.querySelectorAll('.quick-suggestion').forEach(button => {
@@ -1064,71 +1220,38 @@
             button.addEventListener('click', function() {
                 const interventionType = this.getAttribute('data-intervention');
                 if (interventionType) {
-                    fetch(`/api/session/${sessionId}/intervention`, {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        },
-                        body: JSON.stringify({
+                    // Socket.io emission
+                    if (window.socket && window.socket.connected) {
+                        window.socket.emit('intervention', {
+                            session_id: sessionId,
                             type: interventionType
+                        });
+                        console.log(`Applied intervention: ${interventionType}`);
+                    } else {
+                        // Fallback to REST API
+                        fetch(`/api/session/${sessionId}/intervention`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({
+                                type: interventionType
+                            })
                         })
-                    })
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.success) {
-                            console.log(`Applied intervention: ${interventionType}`);
-                        } else {
-                            console.error('Error applying intervention:', data.error);
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Network error applying intervention:', error);
-                    });
-                }
-            });
-        });
-        
-        // Set up refresh button handler
-        document.getElementById('refresh-btn')?.addEventListener('click', function() {
-            fetch(`/api/session/${sessionId}/messages`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.messages) {
-                        const transcriptContent = document.getElementById('transcript-content');
-                        if (transcriptContent) {
-                            transcriptContent.innerHTML = '';
-                            data.messages.forEach(message => {
-                                addMessageToTranscript(message);
-                            });
-                        }
+                        .then(response => response.json())
+                        .then(data => {
+                            if (data.success) {
+                                console.log(`Applied intervention: ${interventionType}`);
+                            } else {
+                                console.error('Error applying intervention:', data.error);
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Network error applying intervention:', error);
+                        });
                     }
-                })
-                .catch(error => {
-                    console.error('Error refreshing messages:', error);
-                });
-        });
-        
-        // Generate AI insights
-        document.getElementById('generate-summary-btn')?.addEventListener('click', function() {
-            fetch(`/api/observer/${sessionId}/summary`, {
-                method: 'POST'
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    console.log('Generated observer summary');
                 }
-            })
-            .catch(error => {
-                console.error('Error generating summary:', error);
             });
-        });
-        
-        // Refresh AI suggested questions
-        document.getElementById('refresh-questions-btn')?.addEventListener('click', function() {
-            if (window.socket && window.socket.connected) {
-                window.socket.emit('request_suggested_questions', { session_id: sessionId });
-            }
         });
         
         // Update function for suggested questions
@@ -1159,49 +1282,86 @@
             });
         }
         
-        // Initialize - request suggested questions upon loading
-        function initializeMonitoring() {
-            // Load initial messages
-            fetch(`/api/session/${sessionId}/messages`)
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success && data.messages) {
-                        // Check if transcriptContainer exists before using it
-                        if (!transcriptContainer) {
-                            console.error('Error loading messages: transcriptContainer element not found');
-                            return;
-                        }
-                        
-                        // Clear existing messages
-                        transcriptContainer.innerHTML = '';
-                        
-                        // Add each message to the transcript
-                        data.messages.forEach(message => {
-                            addMessageToTranscript(message);
-                        });
-                        
-                        console.log(`Loaded ${data.messages.length} messages`);
-                        
-                        // Request AI observer data
-                        if (window.socket && window.socket.connected) {
-                            window.socket.emit('request_suggested_questions', { session_id: sessionId });
-                            window.socket.emit('request_insights', { session_id: sessionId });
-                        }
-                    } else {
-                        throw new Error(data.error || 'Failed to load messages');
-                    }
-                })
-                .catch(error => {
-                    console.error('Error loading messages:', error);
-                    if (transcriptContainer) {
-                        transcriptContainer.innerHTML = `<div class="alert alert-danger">Failed to load messages: ${error.message}</div>`;
-                    }
-                });
+        // Refresh AI suggested questions
+        const refreshQuestionsBtn = document.getElementById('refresh-questions-btn');
+        if (refreshQuestionsBtn) {
+            refreshQuestionsBtn.addEventListener('click', function() {
+                if (window.socket && window.socket.connected) {
+                    window.socket.emit('request_suggested_questions', { session_id: sessionId });
+                    console.log('Requesting new question suggestions...');
+                }
+            });
         }
         
-        // Setup the websocket and initialize
+        // Generate AI insights
+        const generateSummaryBtn = document.getElementById('generate-summary-btn');
+        if (generateSummaryBtn) {
+            generateSummaryBtn.addEventListener('click', function() {
+                if (window.socket && window.socket.connected) {
+                    window.socket.emit('request_insights', { session_id: sessionId });
+                    console.log('Requesting new insights...');
+                }
+            });
+        }
+        
+        // Function to send a confirmed suggestion to the remote interview
+        function sendConfirmedSuggestion(suggestionText) {
+            console.log('Sending confirmed suggestion to remote interview:', suggestionText);
+            
+            // Make API call to send the suggestion to the remote interview
+            fetch(`/api/session/${sessionId}/send_confirmed_suggestion`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    suggestion: suggestionText
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Suggestion sent to remote interview successfully');
+                    
+                    // Show success notification
+                    const notification = document.createElement('div');
+                    notification.className = 'alert alert-success mt-2';
+                    notification.innerHTML = `
+                        <i class="bi bi-check-circle me-2"></i>
+                        Suggestion sent to the interviewer
+                    `;
+                    document.querySelector('.suggestion-input-container').appendChild(notification);
+                    
+                    // Remove notification after 5 seconds
+                    setTimeout(() => {
+                        if (notification.parentNode) {
+                            notification.parentNode.removeChild(notification);
+                        }
+                    }, 5000);
+                } else {
+                    console.error('Failed to send suggestion to remote interview:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error sending suggestion to remote interview:', error);
+            });
+        }
+        
+        // Socket events for suggestion flow
+        window.socket.on('suggestion_sent', function(data) {
+            if (data && data.suggestion) {
+                console.log('Got confirmation that suggestion was prepared:', data.suggestion.content);
+            }
+        });
+        
+        window.socket.on('suggestion_confirmed', function(data) {
+            if (data && data.suggestion) {
+                console.log('Suggestion was confirmed and sent to remote interview:', data.suggestion.content);
+            }
+        });
+        
+        // Set up WebSocket connection
         setupWebSocket();
-        initializeMonitoring();
     });
 </script>
 {% endblock %} 

@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Suggestion Debugging Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        .card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        input[type="text"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .log-container {
+            background-color: #f5f5f5;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 10px;
+            height: 300px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin: 5px 0;
+            padding: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        .log-entry.error {
+            color: #d32f2f;
+        }
+        .log-entry.success {
+            color: #388e3c;
+        }
+        .log-entry.info {
+            color: #1976d2;
+        }
+        .options {
+            display: flex;
+            gap: 10px;
+        }
+        .quick-suggestion {
+            background-color: #f0f8ff;
+            border: 1px solid #b3e5fc;
+            color: #0277bd;
+            padding: 5px 10px;
+            margin: 5px;
+            border-radius: 5px;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .quick-suggestion:hover {
+            background-color: #e3f2fd;
+        }
+        .radio-group {
+            margin: 10px 0;
+        }
+        .radio-group label {
+            display: inline;
+            margin-right: 15px;
+            font-weight: normal;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Suggestion Debugging Tool</h1>
+        
+        <div class="card">
+            <h2>WebSocket Connection Test</h2>
+            <div class="form-group">
+                <label for="session-id">Session ID:</label>
+                <input type="text" id="session-id" placeholder="Enter session ID">
+            </div>
+            <div class="options">
+                <button id="test-connect">Test Connection</button>
+                <button id="test-join-monitor">Join Monitor Room</button>
+                <button id="test-join-session">Join Session Room</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Send Suggestion Test</h2>
+            <div class="form-group">
+                <label for="suggestion-text">Suggestion Text:</label>
+                <input type="text" id="suggestion-text" placeholder="Enter suggestion text">
+            </div>
+            <div class="radio-group">
+                <label>Method:</label>
+                <label><input type="radio" name="send-method" value="socket" checked> Socket.io</label>
+                <label><input type="radio" name="send-method" value="api"> API</label>
+            </div>
+            <div class="quick-suggestions">
+                <h3>Quick Suggestions:</h3>
+                <span class="quick-suggestion">Ask why</span>
+                <span class="quick-suggestion">Please elaborate</span>
+                <span class="quick-suggestion">Provide an example</span>
+                <span class="quick-suggestion">How does that feel?</span>
+            </div>
+            <div class="options">
+                <button id="send-suggestion">Send Suggestion</button>
+            </div>
+        </div>
+        
+        <div class="card">
+            <h2>Log</h2>
+            <button id="clear-log">Clear Log</button>
+            <div class="log-container" id="log">
+                <div class="log-entry info">Ready to test...</div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Include socket.io client -->
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    
+    <script>
+        let socket = null;
+        const sessionIdInput = document.getElementById('session-id');
+        const suggestionInput = document.getElementById('suggestion-text');
+        const logContainer = document.getElementById('log');
+        
+        // Add log entry
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            entry.textContent = `${new Date().toLocaleTimeString()} - ${message}`;
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // Clear log
+        document.getElementById('clear-log').addEventListener('click', function() {
+            logContainer.innerHTML = '';
+            log('Log cleared', 'info');
+        });
+        
+        // Test connection
+        document.getElementById('test-connect').addEventListener('click', function() {
+            if (socket) {
+                socket.disconnect();
+                socket = null;
+            }
+            
+            try {
+                log('Attempting to connect to WebSocket server...', 'info');
+                socket = io();
+                
+                socket.on('connect', function() {
+                    log(`Connected to WebSocket server (socket ID: ${socket.id})`, 'success');
+                    
+                    // Set up debug listener for any event
+                    const originalOnevent = socket.onevent;
+                    socket.onevent = function(packet) {
+                        const args = packet.data || [];
+                        log(`Received socket event: ${args[0]} ${JSON.stringify(args.slice(1))}`, 'info');
+                        originalOnevent.call(this, packet);
+                    };
+                });
+                
+                socket.on('connect_error', function(error) {
+                    log(`Connection error: ${error.message}`, 'error');
+                });
+                
+                socket.on('disconnect', function() {
+                    log('Disconnected from WebSocket server', 'info');
+                });
+                
+                socket.on('new_suggestion', function(data) {
+                    log(`Received suggestion: ${JSON.stringify(data)}`, 'success');
+                });
+            } catch (error) {
+                log(`Error initializing socket: ${error.message}`, 'error');
+            }
+        });
+        
+        // Join monitor room
+        document.getElementById('test-join-monitor').addEventListener('click', function() {
+            const sessionId = sessionIdInput.value.trim();
+            if (!sessionId) {
+                log('Please enter a session ID', 'error');
+                return;
+            }
+            
+            if (!socket || !socket.connected) {
+                log('Socket not connected. Please test connection first.', 'error');
+                return;
+            }
+            
+            log(`Attempting to join monitor room for session ${sessionId}...`, 'info');
+            socket.emit('join_monitor', { session_id: sessionId }, function(response) {
+                if (response && response.success) {
+                    log(`Successfully joined monitor room for session ${sessionId}`, 'success');
+                } else {
+                    log(`Failed to join monitor room: ${response ? response.error : 'Unknown error'}`, 'error');
+                }
+            });
+        });
+        
+        // Join session room
+        document.getElementById('test-join-session').addEventListener('click', function() {
+            const sessionId = sessionIdInput.value.trim();
+            if (!sessionId) {
+                log('Please enter a session ID', 'error');
+                return;
+            }
+            
+            if (!socket || !socket.connected) {
+                log('Socket not connected. Please test connection first.', 'error');
+                return;
+            }
+            
+            log(`Attempting to join session room for session ${sessionId}...`, 'info');
+            socket.emit('join_session', { session_id: sessionId }, function(response) {
+                if (response && response.success) {
+                    log(`Successfully joined session room for session ${sessionId}`, 'success');
+                } else {
+                    log(`Failed to join session room: ${response ? response.error : 'Unknown error'}`, 'error');
+                }
+            });
+        });
+        
+        // Send suggestion
+        document.getElementById('send-suggestion').addEventListener('click', function() {
+            const sessionId = sessionIdInput.value.trim();
+            const suggestionText = suggestionInput.value.trim();
+            
+            if (!sessionId) {
+                log('Please enter a session ID', 'error');
+                return;
+            }
+            
+            if (!suggestionText) {
+                log('Please enter suggestion text', 'error');
+                return;
+            }
+            
+            const method = document.querySelector('input[name="send-method"]:checked').value;
+            
+            if (method === 'socket') {
+                if (!socket || !socket.connected) {
+                    log('Socket not connected. Please test connection first.', 'error');
+                    return;
+                }
+                
+                const data = {
+                    session_id: sessionId,
+                    suggestion: {
+                        content: suggestionText,
+                        type: 'suggestion'
+                    }
+                };
+                
+                log(`Sending suggestion via socket: ${JSON.stringify(data)}`, 'info');
+                socket.emit('send_suggestion', data, function(response) {
+                    if (response && response.success) {
+                        log('Suggestion sent successfully via socket', 'success');
+                    } else {
+                        log(`Error sending suggestion via socket: ${response ? response.error : 'Unknown error'}`, 'error');
+                    }
+                });
+            } else {
+                // Send via API
+                log(`Sending suggestion via API for session ${sessionId}`, 'info');
+                fetch(`/api/session/${sessionId}/suggestion`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: suggestionText,
+                        type: 'suggestion'
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        log('Suggestion sent successfully via API', 'success');
+                    } else {
+                        log(`API Error: ${data.error || 'Unknown error'}`, 'error');
+                    }
+                })
+                .catch(error => {
+                    log(`Network error: ${error.message}`, 'error');
+                });
+            }
+        });
+        
+        // Quick suggestions
+        document.querySelectorAll('.quick-suggestion').forEach(button => {
+            button.addEventListener('click', function() {
+                suggestionInput.value = this.textContent;
+            });
+        });
+    </script>
+</body>
+</html> 

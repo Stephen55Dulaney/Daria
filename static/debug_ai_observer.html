@@ -1,0 +1,785 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Observer Debug Tool</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <style>
+        body {
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .card {
+            margin-bottom: 20px;
+        }
+        .log-container {
+            height: 200px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        .conversation-container {
+            max-height: 400px;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            max-width: 75%;
+        }
+        .user-message {
+            background-color: #e9ecef;
+            margin-left: auto;
+        }
+        .assistant-message {
+            background-color: #d1e7ff;
+        }
+        .system-message {
+            background-color: #f8d7da;
+            font-style: italic;
+            margin: 10px 0;
+            max-width: 100%;
+        }
+        .observation {
+            background-color: rgba(79, 70, 229, 0.05);
+            border-left: 3px solid rgba(79, 70, 229, 0.5);
+            padding: 8px 12px;
+            margin-top: 5px;
+            font-size: 0.9rem;
+            color: #495057;
+        }
+        .semantic-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-top: 5px;
+        }
+        .tag {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: #4f46e5;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+        }
+        .mood-indicator {
+            margin-top: 10px;
+            font-size: 0.8rem;
+            color: #6c757d;
+        }
+        #mood-timeline {
+            height: 100px;
+            background-color: #f8f9fa;
+            border-radius: 5px;
+            border: 1px solid #dee2e6;
+            margin: 15px 0;
+            position: relative;
+        }
+        .mood-point {
+            position: absolute;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #4f46e5;
+            transform: translate(-50%, -50%);
+        }
+        .timeline-baseline {
+            position: absolute;
+            width: 100%;
+            height: 1px;
+            background-color: rgba(0,0,0,0.1);
+            top: 50%;
+        }
+        #topics-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin: 15px 0;
+        }
+        .controls-row {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        .observations-container {
+            max-height: 300px;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 10;
+        }
+        .card-header {
+            position: relative;
+        }
+        .timestamp {
+            font-size: 0.7rem;
+            color: #6c757d;
+            margin-top: 2px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="mt-3 mb-4">AI Observer Debug Tool</h1>
+        
+        <div class="row">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>AI Observer Test Console</h5>
+                        <button id="copy-conversation-btn" class="btn btn-sm btn-outline-secondary copy-btn">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="controls-row">
+                            <div class="form-group flex-grow-1">
+                                <label for="session-id">Session ID:</label>
+                                <div class="input-group">
+                                    <input type="text" id="session-id" class="form-control" placeholder="Enter session ID or leave empty to create new">
+                                    <button id="create-session-btn" class="btn btn-primary">Create/Connect</button>
+                                </div>
+                            </div>
+                        </div>
+
+                        <h6>Conversation:</h6>
+                        <div id="conversation" class="conversation-container"></div>
+                        
+                        <div class="mb-3">
+                            <div class="input-group">
+                                <select id="message-role" class="form-select" style="max-width: 150px;">
+                                    <option value="user">User</option>
+                                    <option value="assistant">Assistant</option>
+                                    <option value="system">System</option>
+                                </select>
+                                <input type="text" id="message-text" class="form-control" placeholder="Enter message...">
+                                <button id="send-message-btn" class="btn btn-primary">Send</button>
+                            </div>
+                            <div class="form-text">Enter message to analyze with AI Observer</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card">
+                    <div class="card-header">
+                        <h5>Debug Log</h5>
+                        <button id="copy-log-btn" class="btn btn-sm btn-outline-secondary copy-btn">
+                            <i class="bi bi-clipboard"></i> Copy
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="log" class="log-container"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header">
+                        <h5>AI Observer Results</h5>
+                    </div>
+                    <div class="card-body">
+                        <h6>Current Mood:</h6>
+                        <div id="current-mood">Neutral (0)</div>
+                        
+                        <h6 class="mt-3">Mood Timeline:</h6>
+                        <div id="mood-timeline">
+                            <div class="timeline-baseline"></div>
+                            <!-- Mood points will be added by JavaScript -->
+                        </div>
+                        
+                        <h6>Detected Topics:</h6>
+                        <div id="topics-list">
+                            <!-- Tags will be added by JavaScript -->
+                            <span class="tag">No topics yet</span>
+                        </div>
+                        
+                        <h6>Observations:</h6>
+                        <div id="observations-container" class="observations-container">
+                            <div id="latest-analysis" class="observation">
+                                No observations yet
+                            </div>
+                        </div>
+                        
+                        <button id="generate-summary-btn" class="btn btn-primary mt-3">Generate Summary</button>
+                        <div id="summary" class="mt-3 p-3 border rounded" style="display: none;">
+                            <!-- Summary will be inserted here -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let sessionId = null;
+        let socket = null;
+        let apiUrl = `http://${window.location.hostname}:5025`;
+        let moodHistory = [];
+        let topicsList = [];
+        let knownMessageIds = new Set(); // Track message IDs to prevent duplicates
+        
+        // Initialize on page load
+        $(document).ready(function() {
+            logMessage('AI Observer Debug Tool initialized');
+            logMessage(`API URL: ${apiUrl}`);
+            
+            // Event handlers
+            $('#create-session-btn').click(createOrConnectSession);
+            $('#send-message-btn').click(sendMessage);
+            $('#message-text').keypress(function(e) {
+                if (e.which === 13) sendMessage();
+            });
+            $('#generate-summary-btn').click(generateSummary);
+            
+            // Copy button handlers
+            $('#copy-conversation-btn').click(copyConversation);
+            $('#copy-log-btn').click(copyLog);
+        });
+        
+        // Create or connect to a session
+        async function createOrConnectSession() {
+            try {
+                const inputSessionId = $('#session-id').val().trim();
+                
+                if (inputSessionId) {
+                    // Use provided session ID
+                    sessionId = inputSessionId;
+                    logMessage(`Using provided session ID: ${sessionId}`);
+                } else {
+                    // Create a new session
+                    const response = await fetch(`${apiUrl}/api/session/create`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            guide_id: '29358345-e541-4dfc-9db7-d9c84a578d50', // Default guide ID
+                            character: 'odessia' // Default character
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to create session: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    sessionId = data.session_id;
+                    logMessage(`Created new session with ID: ${sessionId}`);
+                }
+                
+                // Update UI
+                $('#session-id').val(sessionId);
+                
+                // Initialize WebSocket connection
+                initializeWebSocket();
+                
+                // Fetch existing messages if any
+                fetchMessages();
+                
+                // Enable message sending
+                $('#message-text').prop('disabled', false);
+                $('#send-message-btn').prop('disabled', false);
+                $('#message-role').prop('disabled', false);
+                
+            } catch (error) {
+                logMessage(`Error: ${error.message}`, 'error');
+            }
+        }
+        
+        // Initialize WebSocket connection
+        function initializeWebSocket() {
+            try {
+                if (typeof io === 'undefined') {
+                    logMessage('Socket.io library not found', 'error');
+                    return false;
+                }
+                
+                // Close existing connection if any
+                if (socket) {
+                    socket.close();
+                }
+                
+                // Create new connection
+                socket = io(`http://${window.location.hostname}:5025`, {
+                    transports: ['websocket', 'polling']
+                });
+                
+                // Socket event handlers
+                socket.on('connect', function() {
+                    logMessage('WebSocket connected');
+                    
+                    // Join the monitor room for this session
+                    socket.emit('join_monitor', { session_id: sessionId }, function(response) {
+                        if (response && response.success) {
+                            logMessage(`Joined monitoring room for session: ${sessionId}`);
+                        } else {
+                            logMessage(`Failed to join monitoring room: ${response?.error || 'Unknown error'}`, 'error');
+                        }
+                    });
+                });
+                
+                socket.on('disconnect', function() {
+                    logMessage('WebSocket disconnected', 'warn');
+                });
+                
+                socket.on('connect_error', function(error) {
+                    logMessage(`Connection error: ${error.message}`, 'error');
+                });
+                
+                socket.on('new_message', function(data) {
+                    logMessage(`Received new message: ${JSON.stringify(data)}`);
+                    if (data.message && !knownMessageIds.has(data.message.id)) {
+                        addMessageToConversation(data.message);
+                        knownMessageIds.add(data.message.id);
+                    }
+                });
+                
+                socket.on('new_observation', function(data) {
+                    logMessage(`Received observation: ${JSON.stringify(data)}`);
+                    if (data.observation) {
+                        processObservation(data.observation);
+                    }
+                });
+                
+                socket.on('observer_summary', function(data) {
+                    logMessage(`Received socket.io event: observer_summary ${JSON.stringify(data)}`);
+                    if (data.summary) {
+                        processSummary(data.summary);
+                    }
+                });
+                
+                // Log any socket events for debugging
+                const originalOnevent = socket.onevent;
+                socket.onevent = function(packet) {
+                    const args = packet.data || [];
+                    logMessage(`Received socket.io event: ${args[0]} ${JSON.stringify(args.slice(1))}`);
+                    originalOnevent.call(this, packet);
+                };
+                
+                logMessage('WebSocket initialized successfully');
+                return true;
+                
+            } catch (error) {
+                logMessage(`Error initializing WebSocket: ${error.message}`, 'error');
+                return false;
+            }
+        }
+        
+        // Fetch existing messages for the session
+        async function fetchMessages() {
+            try {
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
+                if (!response.ok) {
+                    throw new Error(`Failed to fetch messages: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                // Clear current conversation
+                $('#conversation').empty();
+                knownMessageIds.clear();
+                
+                // Add messages to conversation
+                if (data.messages && data.messages.length > 0) {
+                    data.messages.forEach(message => {
+                        if (message.id) {
+                            knownMessageIds.add(message.id);
+                        }
+                        addMessageToConversation(message);
+                    });
+                    logMessage(`Loaded ${data.messages.length} messages`);
+                    
+                    // Request analysis for the most recent message
+                    if (data.messages.length > 0) {
+                        const lastMessage = data.messages[data.messages.length - 1];
+                        requestMessageAnalysis(lastMessage);
+                    }
+                } else {
+                    logMessage('No existing messages found');
+                }
+                
+            } catch (error) {
+                logMessage(`Error fetching messages: ${error.message}`, 'error');
+            }
+        }
+        
+        // Request analysis for a message
+        async function requestMessageAnalysis(message) {
+            try {
+                logMessage(`Requesting analysis for message: ${message.id}`);
+                
+                const response = await fetch(`${apiUrl}/api/observer/${sessionId}/analyze_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: message
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to analyze message: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                if (data.observation) {
+                    processObservation(data.observation);
+                    logMessage(`Received analysis for message: ${message.id}`);
+                }
+                
+            } catch (error) {
+                logMessage(`Error analyzing message: ${error.message}`, 'error');
+            }
+        }
+        
+        // Send a message
+        async function sendMessage() {
+            try {
+                if (!sessionId) {
+                    logMessage('Please create or connect to a session first', 'error');
+                    return;
+                }
+                
+                const messageText = $('#message-text').val().trim();
+                if (!messageText) {
+                    logMessage('Please enter a message', 'warn');
+                    return;
+                }
+                
+                const messageRole = $('#message-role').val();
+                
+                // Create message object
+                const message = {
+                    role: messageRole,
+                    content: messageText
+                };
+                
+                // Clear input first to prevent double-sending
+                $('#message-text').val('');
+                
+                // Send to API (WebSocket will add it to the UI when received)
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(message)
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to send message: ${response.status}`);
+                }
+                
+                logMessage('Message sent successfully');
+                
+            } catch (error) {
+                logMessage(`Error sending message: ${error.message}`, 'error');
+            }
+        }
+        
+        // Generate summary
+        async function generateSummary() {
+            try {
+                if (!sessionId) {
+                    logMessage('Please create or connect to a session first', 'error');
+                    return;
+                }
+                
+                const response = await fetch(`${apiUrl}/api/observer/${sessionId}/summary`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`Failed to generate summary: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                logMessage('Summary generated successfully');
+                
+                // Display summary
+                if (data.summary) {
+                    try {
+                        const summaryContent = typeof data.summary === 'string' 
+                            ? data.summary 
+                            : (data.summary.content || JSON.stringify(data.summary));
+                        
+                        $('#summary').html(summaryContent.replace(/\n/g, '<br>')).show();
+                    } catch (error) {
+                        logMessage(`Error generating summary: ${error.message}`, 'error');
+                    }
+                }
+                
+            } catch (error) {
+                logMessage(`Error generating summary: ${error.message}`, 'error');
+            }
+        }
+        
+        // Process observation from AI Observer
+        function processObservation(observation) {
+            // Create a new observation element
+            const observationDiv = $('<div>').addClass('observation mb-3');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            // Add observation note
+            if (observation.note) {
+                observationDiv.html(observation.note);
+                
+                // Add timestamp
+                const timestampDiv = $('<div>').addClass('timestamp').text(timestamp);
+                observationDiv.append(timestampDiv);
+                
+                // Add tags if available
+                if (observation.tags && observation.tags.length > 0) {
+                    const tagsDiv = $('<div>').addClass('semantic-tags');
+                    observation.tags.forEach(tag => {
+                        tagsDiv.append($('<span>').addClass('tag').text(tag));
+                    });
+                    observationDiv.append(tagsDiv);
+                }
+                
+                // Add mood indicator if available
+                if (observation.mood !== undefined) {
+                    const moodValue = typeof observation.mood === 'object' ? observation.mood.value : observation.mood;
+                    const moodLabel = getMoodLabel(moodValue);
+                    const moodDiv = $('<div>').addClass('mood-indicator')
+                        .text(`Mood: ${moodLabel} (${moodValue})`);
+                    observationDiv.append(moodDiv);
+                }
+                
+                // Add the new observation at the top
+                $('#observations-container').prepend(observationDiv);
+            }
+            
+            // Update mood
+            if (observation.mood !== undefined) {
+                const moodValue = typeof observation.mood === 'object' ? observation.mood.value : observation.mood;
+                const moodLabel = getMoodLabel(moodValue);
+                $('#current-mood').text(`${moodLabel} (${moodValue})`);
+                
+                // Add to mood history
+                moodHistory.push({
+                    value: moodValue,
+                    timestamp: new Date().getTime()
+                });
+                
+                // Update mood timeline
+                updateMoodTimeline();
+            }
+            
+            // Update tags
+            if (observation.tags && observation.tags.length > 0) {
+                // Add new tags to the list
+                observation.tags.forEach(tag => {
+                    if (!topicsList.includes(tag)) {
+                        topicsList.push(tag);
+                    }
+                });
+                
+                // Update topics list
+                updateTopicsList();
+            }
+        }
+        
+        // Process summary from observer
+        function processSummary(summary) {
+            if (summary) {
+                try {
+                    const summaryContent = typeof summary === 'string' 
+                        ? summary 
+                        : (summary.content || JSON.stringify(summary));
+                    
+                    $('#summary').html(summaryContent.replace(/\n/g, '<br>')).show();
+                } catch (error) {
+                    logMessage(`Error processing summary: ${error.message}`, 'error');
+                }
+            }
+        }
+        
+        // Update mood timeline visualization
+        function updateMoodTimeline() {
+            const timeline = $('#mood-timeline');
+            timeline.empty();
+            
+            // Add baseline
+            timeline.append('<div class="timeline-baseline"></div>');
+            
+            if (moodHistory.length === 0) return;
+            
+            // Find earliest and latest timestamp
+            const startTime = moodHistory[0].timestamp;
+            const endTime = moodHistory[moodHistory.length - 1].timestamp;
+            const timeRange = endTime - startTime;
+            
+            // Add each mood point
+            moodHistory.forEach((mood, index) => {
+                // Calculate position
+                let xPos = 0;
+                if (index === 0) {
+                    xPos = 5; // Start point
+                } else if (index === moodHistory.length - 1) {
+                    xPos = 95; // End point
+                } else {
+                    // Position based on timestamp
+                    const timeOffset = mood.timestamp - startTime;
+                    xPos = (timeOffset / timeRange) * 90 + 5; // 5% to 95% of width
+                }
+                
+                // Y position based on mood value (-10 to +10 scale)
+                // Convert to 10% to 90% of height (inverted because top=0 in CSS)
+                const yPos = 50 - (mood.value * 4); // 50% is neutral, -10 goes to 90%, +10 goes to 10%
+                
+                // Create point
+                const point = $('<div class="mood-point"></div>').css({
+                    left: `${xPos}%`,
+                    top: `${yPos}%`
+                });
+                
+                timeline.append(point);
+            });
+        }
+        
+        // Update topics list
+        function updateTopicsList() {
+            const topicsContainer = $('#topics-list');
+            topicsContainer.empty();
+            
+            if (topicsList.length === 0) {
+                topicsContainer.append('<span class="tag">No topics yet</span>');
+                return;
+            }
+            
+            // Add each topic
+            topicsList.forEach(topic => {
+                topicsContainer.append(`<span class="tag">${topic}</span>`);
+            });
+        }
+        
+        // Add message to conversation UI
+        function addMessageToConversation(message) {
+            const conversationContainer = $('#conversation');
+            
+            const messageDiv = $('<div>').addClass('message');
+            
+            // Determine message type
+            if (message.role === 'user') {
+                messageDiv.addClass('user-message');
+                messageDiv.text(message.content);
+            } else if (message.role === 'assistant') {
+                messageDiv.addClass('assistant-message');
+                messageDiv.text(message.content);
+            } else if (message.role === 'system') {
+                messageDiv.addClass('system-message');
+                messageDiv.text(`[System] ${message.content}`);
+            }
+            
+            // Add message to container
+            conversationContainer.append(messageDiv);
+            
+            // Scroll to bottom
+            conversationContainer.scrollTop(conversationContainer[0].scrollHeight);
+        }
+        
+        // Convert mood value to label
+        function getMoodLabel(value) {
+            if (value <= -8) return "Very Negative";
+            if (value <= -5) return "Negative";
+            if (value <= -2) return "Slightly Negative";
+            if (value <= 2) return "Neutral";
+            if (value <= 5) return "Slightly Positive";
+            if (value <= 8) return "Positive";
+            return "Very Positive";
+        }
+        
+        // Add a message to the log
+        function logMessage(message, type = 'info') {
+            const logContainer = $('#log');
+            const timestamp = new Date().toLocaleTimeString();
+            
+            let className = '';
+            switch (type) {
+                case 'error':
+                    className = 'text-danger';
+                    break;
+                case 'warn':
+                    className = 'text-warning';
+                    break;
+                case 'success':
+                    className = 'text-success';
+                    break;
+                default:
+                    className = 'text-secondary';
+            }
+            
+            const logEntry = $('<div>').addClass(className).text(`${timestamp} - ${message}`);
+            logContainer.prepend(logEntry);
+        }
+        
+        // Copy conversation to clipboard
+        function copyConversation() {
+            const conversationContainer = $('#conversation');
+            let conversationText = '';
+            
+            conversationContainer.children().each(function() {
+                const message = $(this);
+                let role = 'Unknown';
+                
+                if (message.hasClass('user-message')) {
+                    role = 'User';
+                } else if (message.hasClass('assistant-message')) {
+                    role = 'Assistant';
+                } else if (message.hasClass('system-message')) {
+                    role = 'System';
+                }
+                
+                conversationText += `${role}: ${message.text()}\n\n`;
+            });
+            
+            copyToClipboard(conversationText, 'Conversation copied to clipboard!');
+        }
+        
+        // Copy log to clipboard
+        function copyLog() {
+            const logContainer = $('#log');
+            let logText = '';
+            
+            logContainer.children().each(function() {
+                logText += $(this).text() + '\n';
+            });
+            
+            copyToClipboard(logText, 'Debug log copied to clipboard!');
+        }
+        
+        // Copy text to clipboard
+        function copyToClipboard(text, successMessage) {
+            navigator.clipboard.writeText(text).then(
+                function() {
+                    logMessage(successMessage, 'success');
+                },
+                function(err) {
+                    logMessage(`Error copying to clipboard: ${err}`, 'error');
+                }
+            );
+        }
+    </script>
+</body>
+</html> 

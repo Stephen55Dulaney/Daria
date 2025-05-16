@@ -12,7 +12,7 @@ import datetime
 import uuid
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
-from flask import Flask, request, jsonify, render_template, redirect, Response, flash, send_file, url_for, session
+from flask import Flask, request, jsonify, render_template, redirect, Response, flash, send_file, url_for, session, send_from_directory
 from flask_cors import CORS
 import yaml
 import requests
@@ -1332,7 +1332,7 @@ def dashboard():
 
 @app.route('/interview_setup')
 def interview_setup():
-    """Render interview setup page with proper title and character data."""
+    """Render discussion guide setup page with proper title and character data."""
     try:
         # Load available characters/prompts
         characters = []
@@ -1354,7 +1354,7 @@ def interview_setup():
         # Render the template with data
         return render_template(
             'langchain/interview_setup.html', 
-            title="Discussion Guide Setup",
+            title="Create New Discussion Guide",
             characters=characters,
             interview_prompt=interview_prompt,
             analysis_prompt=analysis_prompt
@@ -2057,6 +2057,30 @@ def api_add_session_message(session_id):
         
         logger.info(f"Added message {message_id} to session {session_id} via WebSocket: True")
         
+        # Process the message with AI Observer if available
+        if observer_service:
+            try:
+                # Get context from the session
+                context = []
+                session = discussion_service.get_session(session_id)
+                if session:
+                    messages = session.get('messages', [])
+                    # Get the last few messages for context
+                    context = messages[-5:] if len(messages) > 5 else messages
+                
+                # Analyze the message
+                observation = observer_service.analyze_message(session_id, message_data, context)
+                
+                # Emit the observation to the monitoring room
+                socketio.emit('new_observation', {
+                    'session_id': session_id,
+                    'observation': observation
+                }, room=f"monitor_{session_id}")
+                
+                logger.info(f"Emitted AI Observer analysis for message {message_id}")
+            except Exception as e:
+                logger.error(f"Error processing message with AI Observer: {str(e)}")
+        
         # If LangChain is enabled, generate response for user messages
         if role == 'user' and use_langchain:
             # Generate AI response
@@ -2466,7 +2490,7 @@ def discussion_guide_details(guide_id):
             return render_template('langchain/error.html', error="Discussion guide not found"), 404
         
         sessions = discussion_service.list_guide_sessions(guide_id)
-        return render_template('langchain/discussion_guide.html', guide=guide, sessions=sessions, guide_id=guide_id)
+        return render_template('langchain/discussion_guide_details.html', guide=guide, sessions=sessions, guide_id=guide_id)
     except Exception as e:
         logger.error(f"Error loading discussion guide page: {str(e)}")
         return render_template('langchain/error.html', error=str(e))
@@ -2615,19 +2639,63 @@ def handle_disconnect():
     """Handle client disconnect event."""
     logger.info(f"Client disconnected: {request.sid}")
 
-@socketio.on('join_monitor')
+@socketio.on('join_monitor_room')
 def handle_join_monitor(data):
-    """Event handler when a client joins a monitoring room for a specific session."""
-    if not data or 'session_id' not in data:
-        return {'success': False, 'error': 'No session ID provided'}
-    
-    session_id = data['session_id']
-    
-    # Join the room specific to this session
-    join_room(f"monitor_{session_id}")
-    logger.info(f"Client {request.sid} joined monitoring room for session {session_id}")
-    
-    return {'success': True}
+    """Handle a client joining a monitoring room for an interview."""
+    try:
+        session_id = data.get('session_id')
+        if not session_id:
+            return
+        
+        # Join the socket room for this monitoring session
+        room = f"monitor_{session_id}"
+        join_room(room)
+        logger.info(f"Client {request.sid} joined monitoring room for session {session_id}")
+        
+        # Immediately trigger question generation and insights on join
+        if observer_service:
+            # Request suggested questions
+            socketio.emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': observer_service.get_suggested_questions(session_id)
+            }, room=request.sid)
+            logger.info(f"Sent initial suggested questions to new monitor client for session {session_id}")
+            
+            # Also generate insights if available
+            try:
+                insights = observer_service.get_key_insights(session_id)
+                socketio.emit('insights_update', {
+                    'session_id': session_id,
+                    'insights': insights
+                }, room=request.sid)
+                logger.info(f"Sent initial insights to new monitor client for session {session_id}")
+            except Exception as insight_error:
+                logger.error(f"Error getting initial insights: {str(insight_error)}")
+        
+        # Emit connection confirmation
+        emit('monitor_joined', {'session_id': session_id, 'joined_at': datetime.datetime.now().isoformat()})
+        
+    except Exception as e:
+        logger.error(f"Error in join_monitor_room: {str(e)}")
+        emit('error', {'message': str(e)})
+
+@socketio.on('join_session')
+def handle_join_session(data):
+    """Handle interview client joining its session room."""
+    try:
+        session_id = data.get('session_id')
+        if not session_id:
+            return {'success': False, 'error': 'No session_id provided'}
+        
+        # Join the specific room for this interview session
+        room = f"session_{session_id}"
+        join_room(room)
+        
+        logger.info(f"Client {request.sid} joined session room for session {session_id}")
+        return {'success': True}
+    except Exception as e:
+        logger.error(f"Error in join_session: {str(e)}")
+        return {'success': False, 'error': str(e)}
 
 @socketio.on('new_message')
 def handle_new_message(data):
@@ -2653,6 +2721,30 @@ def handle_new_message(data):
         # Update that it was emitted via WebSocket
         logger.info(f"Added message {message.get('id')} to session {session_id} via WebSocket: True")
         
+        # Process the message with AI Observer if available
+        if observer_service:
+            try:
+                # Get context from the session
+                context = []
+                session = discussion_service.get_session(session_id)
+                if session:
+                    messages = session.get('messages', [])
+                    # Get the last few messages for context
+                    context = messages[-5:] if len(messages) > 5 else messages
+                
+                # Analyze the message
+                observation = observer_service.analyze_message(session_id, message, context)
+                
+                # Emit the observation to the monitoring room
+                emit('new_observation', {
+                    'session_id': session_id,
+                    'observation': observation
+                }, room=f"monitor_{session_id}")
+                
+                logger.info(f"Emitted AI Observer analysis for message {message.get('id')}")
+            except Exception as e:
+                logger.error(f"Error processing message with AI Observer: {str(e)}")
+        
         return {'success': True}
     except Exception as e:
         logger.error(f"Error adding message to session: {str(e)}")
@@ -2660,27 +2752,51 @@ def handle_new_message(data):
 
 @socketio.on('send_suggestion')
 def handle_send_suggestion(data):
-    """Event handler when a researcher sends a suggestion to the AI."""
-    if not data or 'session_id' not in data or 'suggestion' not in data:
-        return {'success': False, 'error': 'Invalid suggestion data'}
+    """Handle suggestion from monitor."""
+    session_id = data.get('session_id')
+    suggestion = data.get('suggestion')
     
-    session_id = data['session_id']
-    suggestion = data['suggestion']
-    
-    # Add the suggestion to the session
-    try:
-        # Process the suggestion - this could be storing it or sending it to the AI
-        # Emit to all clients in the room - use the session room for the remote interview client
-        emit('new_suggestion', {
-            'session_id': session_id,
-            'suggestion': suggestion
-        }, room=f"session_{session_id}")
+    if not session_id or not suggestion:
+        emit('error', {'message': 'Missing session_id or suggestion'})
+        return
         
-        logger.info(f"Suggestion sent to session {session_id}")
+    try:
+        # Create a formatted message for the suggestion
+        message = {
+            'id': str(uuid.uuid4()),
+            'role': 'system',
+            'content': suggestion,
+            'type': 'suggestion',
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        
+        # Only notify the monitor - don't send to the remote interview UI
+        # This prevents popups from appearing to the interviewee
+        socketio.emit('suggestion_sent', {
+            'session_id': session_id,
+            'suggestion': message
+        }, room=f"monitor_{session_id}")
+        
+        logger.info(f"Suggestion sent to monitor for session {session_id}: {suggestion}")
+        
+        # Store the suggestion in the session for later reference
+        if discussion_service:
+            try:
+                # Add as a special type of message that won't be shown to participants
+                message['visible_to_participant'] = False
+                discussion_service.add_message_to_session(
+                    session_id, 
+                    message['content'], 
+                    'system', 
+                    message.get('id'),
+                    metadata={'type': 'monitor_suggestion'}
+                )
+            except Exception as e:
+                logger.warning(f"Could not store suggestion in session history: {str(e)}")
         
         return {'success': True}
     except Exception as e:
-        logger.error(f"Error processing suggestion: {str(e)}")
+        logger.error(f"Error sending suggestion: {str(e)}")
         return {'success': False, 'error': str(e)}
 
 @socketio.on('request_suggested_questions')
@@ -2688,27 +2804,102 @@ def handle_request_suggested_questions(data):
     """Handle a request for AI-suggested interview questions."""
     session_id = data.get('session_id')
     if not session_id:
+        logger.warning("No session_id provided to request_suggested_questions")
         emit('error', {'message': 'No session_id provided'})
         return
+        
+    logger.info(f"Received request for suggested questions for session {session_id}")
         
     try:
         if observer_service:
             # Get suggested questions from observer service
+            logger.info(f"Requesting suggested questions from observer service for session {session_id}")
             questions = observer_service.get_suggested_questions(session_id)
+            
+            # Ensure questions are properly formatted
+            formatted_questions = []
+            for q in questions:
+                # Make sure each question has the expected format
+                if isinstance(q, dict) and 'text' in q:
+                    formatted_questions.append(q)
+                elif isinstance(q, str):
+                    # If it's just a string, convert to proper format
+                    formatted_questions.append({
+                        'id': str(uuid.uuid4()),
+                        'timestamp': datetime.datetime.now().isoformat(),
+                        'text': q
+                    })
+            
+            logger.info(f"Sending {len(formatted_questions)} suggested questions for session {session_id}")
+            
+            # Debug the questions we're sending
+            for q in formatted_questions[:3]:  # Log first 3 for brevity
+                q_text = q.get('text', 'NO TEXT FOUND')
+                logger.info(f"Question being sent: {q_text[:50]}...")
             
             # Send back to client
             emit('suggested_questions', {
                 'session_id': session_id,
-                'questions': questions
+                'questions': formatted_questions
             })
+            
+            logger.info(f"Sent suggested questions for session {session_id}")
         else:
-            # Send empty list if observer service not available
+            logger.warning("Observer service not available for generating questions")
+            # Generate some static fallback questions if observer is not available
+            fallback_questions = [
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Could you tell me more about that?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "How did that make you feel?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Can you provide a specific example?"
+                }
+            ]
+            
+            logger.info(f"Sending {len(fallback_questions)} fallback questions for session {session_id}")
+            
+            # Send fallback questions
             emit('suggested_questions', {
                 'session_id': session_id,
-                'questions': []
+                'questions': fallback_questions
             })
+            
+            logger.info(f"Sent fallback questions for session {session_id}")
     except Exception as e:
-        logger.error(f"Error getting suggested questions: {str(e)}")
+        logger.error(f"Error getting suggested questions: {str(e)}", exc_info=True)
+        # Try to send some emergency fallback questions even after error
+        try:
+            emergency_questions = [
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Can you explain more about your experience?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "What else would you like to share?"
+                }
+            ]
+            
+            emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': emergency_questions
+            })
+            
+            logger.info(f"Sent emergency questions after error for session {session_id}")
+        except Exception as inner_e:
+            logger.error(f"Failed to send emergency questions: {str(inner_e)}", exc_info=True)
+            
         emit('error', {'message': f"Error getting suggested questions: {str(e)}"})
 
 @socketio.on('leave_monitor_room')
@@ -2897,6 +3088,87 @@ def handle_ping(data):
     except Exception as e:
         logger.error(f"Error in ping handler: {str(e)}")
         emit('error', {'error': f'Ping error: {str(e)}'})
+
+@socketio.on('intervention')
+def handle_intervention(data):
+    """Handle direct intervention request from monitor."""
+    session_id = data.get('session_id')
+    intervention_type = data.get('type')
+    
+    if not session_id or not intervention_type:
+        emit('error', {'message': 'Missing session_id or intervention type'})
+        return
+        
+    try:
+        # Forward the intervention to the interview session
+        socketio.emit('intervention', {
+            'session_id': session_id,
+            'type': intervention_type,
+            'timestamp': datetime.datetime.now().isoformat()
+        }, room=f"session_{session_id}")
+        
+        # Log the intervention for the monitor too
+        socketio.emit('intervention', {
+            'session_id': session_id,
+            'type': intervention_type,
+            'timestamp': datetime.datetime.now().isoformat()
+        }, room=f"monitor_{session_id}")
+        
+        logger.info(f"Applied intervention: {intervention_type} to session {session_id}")
+        
+        return {'success': True}
+    except Exception as e:
+        logger.error(f"Error applying intervention: {str(e)}")
+        return {'success': False, 'error': str(e)}
+
+@socketio.on('send_suggestion')
+def handle_send_suggestion(data):
+    """Handle suggestion from monitor."""
+    session_id = data.get('session_id')
+    suggestion = data.get('suggestion')
+    
+    if not session_id or not suggestion:
+        emit('error', {'message': 'Missing session_id or suggestion'})
+        return
+        
+    try:
+        # Create a formatted message for the suggestion
+        message = {
+            'id': str(uuid.uuid4()),
+            'role': 'system',
+            'content': suggestion,
+            'type': 'suggestion',
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        
+        # Only notify the monitor - don't send to the remote interview UI
+        # This prevents popups from appearing to the interviewee
+        socketio.emit('suggestion_sent', {
+            'session_id': session_id,
+            'suggestion': message
+        }, room=f"monitor_{session_id}")
+        
+        logger.info(f"Suggestion sent to monitor for session {session_id}: {suggestion}")
+        
+        # Store the suggestion in the session for later reference
+        if discussion_service:
+            try:
+                # Add as a special type of message that won't be shown to participants
+                message['visible_to_participant'] = False
+                discussion_service.add_message_to_session(
+                    session_id, 
+                    message['content'], 
+                    'system', 
+                    message.get('id'),
+                    metadata={'type': 'monitor_suggestion'}
+                )
+            except Exception as e:
+                logger.warning(f"Could not store suggestion in session history: {str(e)}")
+        
+        return {'success': True}
+    except Exception as e:
+        logger.error(f"Error sending suggestion: {str(e)}")
+        return {'success': False, 'error': str(e)}
 
 # Register blueprints
 app.register_blueprint(user_bp, url_prefix='/user')
@@ -3543,6 +3815,20 @@ def remote_interview():
             error_msg = f"Session {session_id} not found"
             logger.error(error_msg)
             return render_template('error.html', message=error_msg)
+        
+        # If character parameter is provided, set it on the session immediately
+        if character and accepted:
+            try:
+                logger.info(f"Setting character for session {session_id} to {character} from URL parameter")
+                session_info['character'] = character
+                discussion_service.update_session(session_id, session_info)
+                
+                # Add system message to reinforce character identity
+                system_msg = f"IMPORTANT: You are {character}. Always respond as {character}. When asked about your name, say 'I am {character}'."
+                discussion_service.add_message_to_session(session_id, system_msg, "system")
+                logger.info(f"Character {character} set for session {session_id} from URL parameter")
+            except Exception as e:
+                logger.error(f"Error setting character from URL parameter: {str(e)}")
             
         # If not accepted, show welcome page first
         if not accepted:
@@ -3607,6 +3893,191 @@ def set_session_character(session_id):
     except Exception as e:
         logger.error(f"Error setting character: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/debug_suggestion')
+def debug_suggestion_tool():
+    """Debug page for testing suggestions between monitor and remote interview pages."""
+    return render_template('debug_suggestion_tool.html')
+
+# Add the API endpoint for suggestions as a fallback method
+@app.route('/api/session/<session_id>/suggestion', methods=['POST'])
+def handle_api_suggestion(session_id):
+    """API endpoint for handling suggestions (fallback method)."""
+    if not request.json:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+    
+    try:
+        suggestion = request.json
+        logger.info(f"Handling API suggestion for session {session_id}: {suggestion}")
+        
+        # Emit to all clients in the room
+        socketio.emit('new_suggestion', {
+            'session_id': session_id,
+            'suggestion': suggestion
+        }, room=f"session_{session_id}")
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error handling API suggestion: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Add a test endpoint for WebSocket connections
+@app.route('/api/test_monitor_suggestion/<session_id>', methods=['GET'])
+def test_monitor_suggestion(session_id):
+    """Test endpoint to send a suggestion to a session via Socket.IO."""
+    try:
+        test_suggestion = {
+            'content': 'This is a test suggestion from the API',
+            'type': 'suggestion'
+        }
+        
+        # Emit to the session room
+        socketio.emit('new_suggestion', {
+            'session_id': session_id,
+            'suggestion': test_suggestion
+        }, room=f"session_{session_id}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Test suggestion sent to session {session_id}',
+            'details': 'If the remote interview page is open and connected to the socket, it should receive this suggestion.'
+        })
+    except Exception as e:
+        logger.error(f"Error in test_monitor_suggestion: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# New endpoint to explicitly generate questions
+@app.route('/api/observer/<session_id>/generate_questions', methods=['POST'])
+def generate_observer_questions(session_id):
+    """
+    Force generation of question suggestions for a session.
+    """
+    try:
+        # Make sure we have observer service
+        if not observer_service:
+            return jsonify({
+                'success': False,
+                'error': 'Observer service not available'
+            }), 500
+        
+        logger.info(f"Manually generating questions for session {session_id}")
+        
+        # Get the latest messages for context
+        if discussion_service:
+            messages = discussion_service.get_session_messages(session_id, limit=10)
+            logger.info(f"Found {len(messages)} messages for question generation")
+        else:
+            logger.warning("No discussion service available for fetching messages")
+            messages = []
+        
+        # Call the internal method to generate questions
+        observer_service._generate_question_suggestions(session_id, messages)
+        
+        # Get the newly generated questions
+        questions = observer_service.get_suggested_questions(session_id)
+        
+        # Log what's been generated
+        logger.info(f"Generated {len(questions)} questions for session {session_id}")
+        
+        # Emit to all clients watching this session
+        if len(questions) > 0:
+            socketio.emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': questions
+            }, room=f"monitor_{session_id}")
+            logger.info(f"Emitted {len(questions)} questions to monitor room")
+        
+        return jsonify({
+            'success': True,
+            'count': len(questions),
+            'message': f"Generated {len(questions)} questions"
+        })
+    except Exception as e:
+        logger.error(f"Error generating questions: {str(e)}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# ------ Static Debug Routes ------
+
+@app.route('/static/debug_character_test.html')
+def debug_character_test():
+    """Serve the debug character test page."""
+    return send_from_directory('static', 'debug_character_test.html')
+
+@app.route('/static/debug_ai_observer.html')
+def debug_ai_observer():
+    """Serve the AI Observer debug tool page."""
+    return send_from_directory('static', 'debug_ai_observer.html')
+
+@app.route('/api/session/<session_id>/send_confirmed_suggestion', methods=['POST'])
+def send_confirmed_suggestion(session_id):
+    """API endpoint for sending a confirmed suggestion to the remote interview."""
+    try:
+        if not request.json or 'suggestion' not in request.json:
+            return jsonify({'success': False, 'error': 'Missing suggestion content'}), 400
+        
+        suggestion = request.json['suggestion']
+        logger.info(f"Sending confirmed suggestion to session {session_id}: {suggestion}")
+        
+        # Create a formatted message for the suggestion
+        message = {
+            'id': str(uuid.uuid4()),
+            'role': 'system',
+            'content': suggestion,
+            'type': 'suggestion',
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        
+        # Emit to the remote interview session
+        socketio.emit('new_suggestion', {'suggestion': message}, room=f"session_{session_id}")
+        
+        # Also notify the monitor session
+        socketio.emit('suggestion_sent', {
+            'session_id': session_id,
+            'suggestion': message
+        }, room=f"monitor_{session_id}")
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error sending confirmed suggestion: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/debug/observer/<session_id>/state', methods=['GET'])
+def debug_observer_state(session_id):
+    """
+    Debug endpoint to return the raw observer state for a session.
+    This is helpful for troubleshooting observer issues.
+    """
+    try:
+        if not observer_service:
+            return jsonify({
+                'success': False,
+                'error': 'Observer service not available'
+            }), 500
+        
+        # Get the raw observer state
+        state = observer_service.get_observer_state(session_id)
+        
+        # Log what we're returning
+        logger.info(f"Debug: Returning observer state for session {session_id}")
+        
+        # Extract the suggested_questions specifically for easier debugging
+        questions = state.get('suggested_questions', [])
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'state': state,
+            'suggested_questions': questions
+        })
+    except Exception as e:
+        logger.error(f"Error getting observer state: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
 
 # Start the app
 if __name__ == '__main__':
