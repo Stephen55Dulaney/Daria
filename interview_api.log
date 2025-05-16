@@ -298,3 +298,18 @@ INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:59:29] "GET /api/check_services HTTP
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
 INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:59:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 18:00:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 18:00:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 18:00:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 18:00:29] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 18:00:29] "GET /api/check_services HTTP/1.1" 200 -
