@@ -84,6 +84,24 @@
                     </div>
                     
                     <div class="mb-3">
+                        <label for="topic" class="form-label">Topic</label>
+                        <div class="form-text mb-2">The main topic of the interview (used in prompts with {topic} placeholder)</div>
+                        <input type="text" id="topic" name="topic" class="form-control" placeholder="E.g., Product Feedback, User Experience, etc.">
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="context" class="form-label">Context</label>
+                        <div class="form-text mb-2">Background information for the interview (used in prompts with {context} placeholder)</div>
+                        <textarea id="context" name="context" rows="3" class="form-control" placeholder="Provide background information or context for the interview..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="goals" class="form-label">Goals</label>
+                        <div class="form-text mb-2">Specific goals for this interview (used in prompts with {goals} placeholder)</div>
+                        <textarea id="goals" name="goals" rows="3" class="form-control" placeholder="List specific goals or objectives for this interview, one per line..."></textarea>
+                    </div>
+                    
+                    <div class="mb-3">
                         <label for="interview_prompt" class="form-label">Interview Prompt <span class="text-danger">*</span></label>
                         <div class="form-text mb-2">This will guide the AI interviewer's behavior and questions</div>
                         <textarea id="interview_prompt" name="interview_prompt" rows="5" class="form-control" placeholder="Enter instructions for the AI interviewer..." required>{{ interview_prompt }}</textarea>
@@ -112,11 +130,10 @@
                                     <input type="text" class="custom-question form-control" placeholder="Enter a specific question...">
                                 </div>
                                 <div class="col-md-4 mb-2 mb-md-0">
-                                    <select class="question-priority form-select">
-                                        <option value="high">High Priority</option>
-                                        <option value="medium" selected>Medium</option>
-                                        <option value="low">Low Priority</option>
-                                    </select>
+                                    <div class="input-group">
+                                        <input type="number" min="1" max="30" value="5" class="question-minutes form-control" placeholder="Minutes">
+                                        <span class="input-group-text">minutes</span>
+                                    </div>
                                 </div>
                                 <div class="col-md-1">
                                     <button type="button" class="remove-question btn btn-outline-danger">
@@ -253,11 +270,10 @@ document.addEventListener('DOMContentLoaded', function() {
                     <input type="text" class="custom-question form-control" placeholder="Enter a specific question...">
                 </div>
                 <div class="col-md-4 mb-2 mb-md-0">
-                    <select class="question-priority form-select">
-                        <option value="high">High Priority</option>
-                        <option value="medium" selected>Medium</option>
-                        <option value="low">Low Priority</option>
-                    </select>
+                    <div class="input-group">
+                        <input type="number" min="1" max="30" value="5" class="question-minutes form-control" placeholder="Minutes">
+                        <span class="input-group-text">minutes</span>
+                    </div>
                 </div>
                 <div class="col-md-1">
                     <button type="button" class="remove-question btn btn-outline-danger">
@@ -395,12 +411,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const customQuestions = [];
         document.querySelectorAll('.custom-question-row').forEach(row => {
             const questionText = row.querySelector('.custom-question').value.trim();
-            const priority = row.querySelector('.question-priority').value;
+            const minutes = row.querySelector('.question-minutes').value;
             
             if (questionText) {
                 customQuestions.push({
                     text: questionText,
-                    priority: priority
+                    minutes: parseInt(minutes) || 5
                 });
             }
         });
@@ -415,6 +431,9 @@ document.addEventListener('DOMContentLoaded', function() {
             analysis_prompt: formData.get('analysis_prompt'),
             character_select: formData.get('character_select'), // Include selected character
             voice_id: formData.get('voice_id'), // Include selected voice
+            topic: formData.get('topic') || 'General Interview',
+            context: formData.get('context') || 'This is an interview conversation.',
+            goals: formData.get('goals') || 'Gather information from the participant',
             interviewee: {
                 name: formData.get('interviewee_name') || 'Anonymous',
                 role: formData.get('interviewee_role') || '',

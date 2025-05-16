@@ -73,6 +73,18 @@
         background-color: #f8f9fa;
         border: 1px solid #e9ecef;
     }
+    
+    .guide-id-container {
+        display: flex;
+        align-items: center;
+        margin-top: 0.5rem;
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+    
+    .guide-id-text {
+        margin-right: 0.5rem;
+    }
 </style>
 
 <div class="container-fluid">
@@ -82,6 +94,12 @@
                 <i class="bi bi-arrow-left"></i> All Discussion Guides
             </a>
             <h1 class="h3">{{ guide.title }}</h1>
+            <div class="guide-id-container">
+                <span class="guide-id-text">Guide ID: {{ guide_id }}</span>
+                <button class="btn btn-sm btn-outline-secondary" id="copy-guide-id-btn" data-id="{{ guide_id }}">
+                    <i class="bi bi-clipboard"></i> Copy ID
+                </button>
+            </div>
         </div>
         <div class="d-flex gap-2">
             <button type="button" class="btn btn-primary" id="startNewSessionBtn">
@@ -170,25 +188,39 @@
                         </div>
                     </div>
                     
-                    {% if guide.custom_questions and guide.custom_questions|length > 0 %}
+                    <!-- New section for Topic, Context, Goals -->
                     <div class="mb-4">
-                        <h5 class="text-muted">Custom Questions</h5>
-                        <ul class="list-group list-group-flush">
-                            {% for question in guide.custom_questions %}
-                            <li class="list-group-item px-0">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <div>
-                                        <div class="mb-1">{{ question.text }}</div>
-                                        <span class="badge bg-{{ 'danger' if question.priority == 'high' else 'warning' if question.priority == 'normal' else 'secondary' }}">
-                                            {{ question.priority|capitalize }} Priority
-                                        </span>
-                                    </div>
-                                </div>
-                            </li>
-                            {% endfor %}
-                        </ul>
+                        <h5 class="text-muted">Interview Information</h5>
+                        
+                        {% if guide.topic %}
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1"><i class="bi bi-tag me-1"></i> Topic</h6>
+                            <p class="mb-0">{{ guide.topic }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if guide.context %}
+                        <div class="mb-3">
+                            <h6 class="text-muted mb-1"><i class="bi bi-info-circle me-1"></i> Context</h6>
+                            <p class="mb-0">{{ guide.context }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if guide.goals %}
+                        <div>
+                            <h6 class="text-muted mb-1"><i class="bi bi-bullseye me-1"></i> Goals</h6>
+                            {% if guide.goals is string %}
+                                <p class="mb-0">{{ guide.goals }}</p>
+                            {% else %}
+                                <ul class="mb-0">
+                                {% for goal in guide.goals %}
+                                    <li>{{ goal }}</li>
+                                {% endfor %}
+                                </ul>
+                            {% endif %}
+                        </div>
+                        {% endif %}
                     </div>
-                    {% endif %}
                 </div>
             </div>
             
@@ -204,6 +236,11 @@
                         <li class="nav-item" role="presentation">
                             <button class="nav-link" id="analysis-tab" data-bs-toggle="tab" data-bs-target="#analysis" type="button" role="tab" aria-controls="analysis" aria-selected="false">
                                 Analysis Prompt
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="custom-questions-tab" data-bs-toggle="tab" data-bs-target="#custom-questions" type="button" role="tab" aria-controls="custom-questions" aria-selected="false">
+                                Custom Questions
                             </button>
                         </li>
                     </ul>
@@ -234,6 +271,43 @@
                             <div class="border rounded p-3 bg-light">
                                 <pre class="mb-0" id="analysis-prompt">{{ guide.analysis_prompt }}</pre>
                             </div>
+                        </div>
+                        
+                        <!-- Custom Questions Tab -->
+                        <div class="tab-pane fade" id="custom-questions" role="tabpanel" aria-labelledby="custom-questions-tab">
+                            <div class="d-flex justify-content-between align-items-center mb-3">
+                                <h5 class="card-title mb-0">Custom Questions</h5>
+                            </div>
+                            {% if guide.custom_questions and guide.custom_questions|length > 0 %}
+                            <div class="table-responsive">
+                                <table class="table">
+                                    <thead>
+                                        <tr>
+                                            <th>Question</th>
+                                            <th width="15%">Minutes</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for question in guide.custom_questions %}
+                                        <tr>
+                                            <td>{{ question.text if question is mapping and question.text is defined else question }}</td>
+                                            <td>
+                                                {% if question is mapping and question.minutes is defined %}
+                                                <span class="badge bg-info">
+                                                    {{ question.minutes }} minutes
+                                                </span>
+                                                {% else %}
+                                                <span class="badge bg-info">5 minutes</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            </div>
+                            {% else %}
+                            <div class="alert alert-info">No custom questions have been configured for this guide.</div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -505,6 +579,25 @@
                         console.error('Error copying text: ', err);
                     });
             });
+        });
+        
+        // Copy guide ID functionality
+        document.getElementById('copy-guide-id-btn').addEventListener('click', function() {
+            const guideId = this.getAttribute('data-id');
+            
+            navigator.clipboard.writeText(guideId)
+                .then(() => {
+                    const originalText = this.innerHTML;
+                    this.innerHTML = '<i class="bi bi-check"></i> Copied!';
+                    
+                    // Reset button text after 2 seconds
+                    setTimeout(() => {
+                        this.innerHTML = originalText;
+                    }, 2000);
+                })
+                .catch(err => {
+                    console.error('Error copying text: ', err);
+                });
         });
         
         // Copy functionality for share links

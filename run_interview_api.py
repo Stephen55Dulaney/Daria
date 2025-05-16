@@ -33,6 +33,7 @@ import traceback
 from user_routes import user_bp
 from auth_routes import auth_bp
 from routes.issue_routes import bp as issues_bp
+from langchain_features import langchain_blueprint
 
 # Set up logging
 logging.basicConfig(
@@ -1190,6 +1191,9 @@ def create_interview():
             'title': data.get('title', 'Untitled Interview'),
             'project': data.get('project', ''),
             'interview_type': data.get('interview_type', 'custom_interview'),
+            'topic': data.get('topic', 'General Interview'),
+            'context': data.get('context', 'This is an interview conversation.'),
+            'goals': data.get('goals', 'Gather information from the participant'),
             'prompt': data.get('prompt', ''),
             'interview_prompt': data.get('interview_prompt', ''),
             'analysis_prompt': data.get('analysis_prompt', ''),
@@ -1205,7 +1209,13 @@ def create_interview():
             'last_updated': now,
             'expiration_date': now + datetime.timedelta(days=30),
             'status': 'active',
-            'conversation_history': []
+            'conversation_history': [],
+            'custom_questions': data.get('custom_questions', []),
+            'options': data.get('options', {
+                'record_transcript': True,
+                'analysis': True,
+                'use_tts': True
+            })
         }
         
         # Save the interview data
@@ -3171,9 +3181,10 @@ def handle_send_suggestion(data):
         return {'success': False, 'error': str(e)}
 
 # Register blueprints
-app.register_blueprint(user_bp, url_prefix='/user')
-app.register_blueprint(auth_bp, url_prefix='/auth')
-app.register_blueprint(issues_bp)  # issues_bp already has url_prefix='/issues' set in its definition
+app.register_blueprint(user_bp)
+app.register_blueprint(auth_bp)
+app.register_blueprint(issues_bp, url_prefix='/issues')
+app.register_blueprint(langchain_blueprint)
 
 # ------ Upload Transcript Routes ------
 
