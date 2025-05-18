@@ -66,6 +66,12 @@ def save_attachment(file):
     return os.path.join('uploads', 'attachments', new_filename)
 
 # Routes
+@bp.route('/help', methods=['GET'])
+@login_required
+def help_guide():
+    """Display the help guide for using the Issue Tracker"""
+    return render_template('issues/help_guide.html')
+
 @bp.route('/', methods=['GET'])
 @login_required
 def issues_list():

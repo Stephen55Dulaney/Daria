@@ -8,7 +8,7 @@ import os
 import argparse
 import logging
 import json
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response
 from flask_cors import CORS
 import random
 
@@ -29,10 +29,10 @@ CORS(app)  # Enable CORS for all routes
 @app.route('/health', methods=['GET'])
 def health_check():
     """Health check endpoint for the service."""
-    return jsonify({
-        'status': 'ok',
-        'service': 'stt'
-    })
+    # Return a simple response directly as string to avoid any processing overhead
+    return Response('{"status":"ok","service":"stt"}', 
+                   mimetype='application/json',
+                   status=200)
 
 @app.route('/speech_to_text', methods=['POST'])
 def speech_to_text():
@@ -117,4 +117,9 @@ if __name__ == '__main__':
     print(f"Starting STT service on port {args.port}")
     print(f"Health check: http://localhost:{args.port}/health")
     print(f"Speech-to-text endpoint: http://localhost:{args.port}/speech_to_text")
-    app.run(host='0.0.0.0', port=args.port, debug=True) 
+    
+    # Configure Flask for better performance in this use case
+    # Use threaded=True to handle concurrent requests better
+    # Keep debug=True but use a faster response model
+    app.config['PROPAGATE_EXCEPTIONS'] = True
+    app.run(host='0.0.0.0', port=args.port, debug=True, threaded=True) 

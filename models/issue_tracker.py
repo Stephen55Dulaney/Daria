@@ -12,12 +12,18 @@ class IssueStatus(str, Enum):
     RESOLVED = "resolved" 
     CLOSED = "closed"
     BACKLOG = "backlog"
+    DESIGN = "in_design"
+    READY_FOR_CURSOR = "ready_for_cursor"
+    PROTOTYPED = "prototyped"
 
 class IssueType(str, Enum):
     BUG = "bug"
     FEATURE = "feature"
     IMPROVEMENT = "improvement"
     TASK = "task"
+    OPPORTUNITY = "opportunity"
+    EPIC = "epic"
+    USER_STORY = "user_story"
 
 class IssuePriority(str, Enum):
     LOW = "low"
@@ -27,7 +33,7 @@ class IssuePriority(str, Enum):
 
 class Issue:
     """
-    Issue model for bug tracking and feature requests
+    Issue model for bug tracking, feature requests, and research-to-prototype pipeline
     """
     def __init__(self, 
                 id=None, 
@@ -43,7 +49,16 @@ class Issue:
                 updated_at=None,
                 environment=None,
                 tags=None,
-                comments=None):
+                comments=None,
+                # Research-to-prototype fields
+                linked_persona=None,
+                journey_stage=None,
+                insights=None,
+                ethics=None,
+                root_cause=None,
+                parent_id=None,
+                linked_prototype_prompt=None,
+                cursor_prompt_template=None):
         """Initialize a new issue."""
         self.id = id if id else str(uuid.uuid4())
         self.title = title
@@ -60,6 +75,17 @@ class Issue:
         self.tags = tags or []
         self.history = []  # List of history entries
         self.comments = comments or []  # List of comments
+        
+        # Research-to-prototype fields
+        self.linked_persona = linked_persona  # Name or ID of associated persona
+        self.journey_stage = journey_stage  # Stage in journey map
+        self.insights = insights or []  # List of key insights
+        self.ethics = ethics or []  # List of ethical considerations
+        self.root_cause = root_cause  # Root cause of problem (for opportunities)
+        self.parent_id = parent_id  # ID of parent issue (epic for stories, opportunity for epics)
+        self.linked_prototype_prompt = linked_prototype_prompt  # Link to generated prototype prompt
+        self.cursor_prompt_template = cursor_prompt_template  # Template for Cursor AI prompt
+        
         self._record_history("Issue created")
     
     def _record_history(self, action, user_id=None, details=None):
@@ -161,7 +187,16 @@ class Issue:
             "environment": self.environment,
             "tags": self.tags,
             "history": self.history,
-            "comments": self.comments
+            "comments": self.comments,
+            # Research-to-prototype fields
+            "linked_persona": self.linked_persona,
+            "journey_stage": self.journey_stage,
+            "insights": self.insights,
+            "ethics": self.ethics,
+            "root_cause": self.root_cause,
+            "parent_id": self.parent_id,
+            "linked_prototype_prompt": self.linked_prototype_prompt,
+            "cursor_prompt_template": self.cursor_prompt_template
         }
     
     @classmethod
@@ -181,7 +216,16 @@ class Issue:
             updated_at=data.get("updated_at"),
             environment=data.get("environment"),
             tags=data.get("tags"),
-            comments=data.get("comments")
+            comments=data.get("comments"),
+            # Research-to-prototype fields
+            linked_persona=data.get("linked_persona"),
+            journey_stage=data.get("journey_stage"),
+            insights=data.get("insights"),
+            ethics=data.get("ethics"),
+            root_cause=data.get("root_cause"),
+            parent_id=data.get("parent_id"),
+            linked_prototype_prompt=data.get("linked_prototype_prompt"),
+            cursor_prompt_template=data.get("cursor_prompt_template")
         )
         issue.history = data.get("history", [])
         return issue

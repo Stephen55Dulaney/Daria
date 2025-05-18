@@ -6,9 +6,14 @@
 <div class="container mt-4">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h1>Issues Tracker</h1>
-        <a href="{{ url_for('issues.create_issue') }}" class="btn btn-primary">
-            <i class="fas fa-plus"></i> New Issue
-        </a>
+        <div>
+            <a href="{{ url_for('issues.help_guide') }}" class="btn btn-outline-info me-2">
+                <i class="fas fa-question-circle"></i> How to Use
+            </a>
+            <a href="{{ url_for('issues.create_issue') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Issue
+            </a>
+        </div>
     </div>
 
     <div class="card mb-4">
@@ -27,6 +32,9 @@
                             <option value="resolved" {% if request.args.get('status') == 'resolved' %}selected{% endif %}>Resolved</option>
                             <option value="closed" {% if request.args.get('status') == 'closed' %}selected{% endif %}>Closed</option>
                             <option value="backlog" {% if request.args.get('status') == 'backlog' %}selected{% endif %}>Backlog</option>
+                            <option value="in_design" {% if request.args.get('status') == 'in_design' %}selected{% endif %}>In Design</option>
+                            <option value="ready_for_cursor" {% if request.args.get('status') == 'ready_for_cursor' %}selected{% endif %}>Ready for Cursor</option>
+                            <option value="prototyped" {% if request.args.get('status') == 'prototyped' %}selected{% endif %}>Prototyped</option>
                         </select>
                     </div>
                     <div class="col-md-3 mb-3">
@@ -37,6 +45,9 @@
                             <option value="feature" {% if request.args.get('type') == 'feature' %}selected{% endif %}>Feature</option>
                             <option value="improvement" {% if request.args.get('type') == 'improvement' %}selected{% endif %}>Improvement</option>
                             <option value="task" {% if request.args.get('type') == 'task' %}selected{% endif %}>Task</option>
+                            <option value="opportunity" {% if request.args.get('type') == 'opportunity' %}selected{% endif %}>Opportunity</option>
+                            <option value="epic" {% if request.args.get('type') == 'epic' %}selected{% endif %}>Epic</option>
+                            <option value="user_story" {% if request.args.get('type') == 'user_story' %}selected{% endif %}>User Story</option>
                         </select>
                     </div>
                     <div class="col-md-3 mb-3">
@@ -87,6 +98,12 @@
                         <span class="badge bg-success">Feature</span>
                         {% elif issue.issue_type == 'improvement' %}
                         <span class="badge bg-info">Improvement</span>
+                        {% elif issue.issue_type == 'opportunity' %}
+                        <span class="badge bg-warning">Opportunity</span>
+                        {% elif issue.issue_type == 'epic' %}
+                        <span class="badge bg-primary">Epic</span>
+                        {% elif issue.issue_type == 'user_story' %}
+                        <span class="badge bg-dark">User Story</span>
                         {% else %}
                         <span class="badge bg-secondary">Task</span>
                         {% endif %}
@@ -100,6 +117,12 @@
                         <span class="badge bg-warning">Resolved</span>
                         {% elif issue.status == 'closed' %}
                         <span class="badge bg-success">Closed</span>
+                        {% elif issue.status == 'in_design' %}
+                        <span class="badge bg-purple">In Design</span>
+                        {% elif issue.status == 'ready_for_cursor' %}
+                        <span class="badge bg-dark">Ready for Cursor</span>
+                        {% elif issue.status == 'prototyped' %}
+                        <span class="badge bg-info text-dark">Prototyped</span>
                         {% else %}
                         <span class="badge bg-secondary">Backlog</span>
                         {% endif %}

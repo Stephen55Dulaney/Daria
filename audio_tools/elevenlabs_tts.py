@@ -12,6 +12,7 @@ from flask_cors import CORS
 import requests
 from dotenv import load_dotenv
 import io
+import time
 
 # Load environment variables
 load_dotenv()
@@ -55,8 +56,30 @@ def health_check():
         response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
         response.headers.add('Access-Control-Allow-Methods', 'GET')
         return response
+    
+    # Test API connectivity
+    api_status = "ok"
+    if ELEVENLABS_API_KEY:
+        try:
+            # Quick test API call with short timeout
+            test_response = requests.get(
+                f"{ELEVENLABS_API_URL}/voices", 
+                headers={"xi-api-key": ELEVENLABS_API_KEY},
+                timeout=2
+            )
+            if test_response.status_code != 200:
+                api_status = f"error: {test_response.status_code}"
+        except Exception as e:
+            api_status = f"error: {str(e)}"
+    else:
+        api_status = "no key configured"
         
-    return jsonify({"status": "ok", "service": "ElevenLabs TTS Service", "api_key_configured": bool(ELEVENLABS_API_KEY)})
+    return jsonify({
+        "status": "ok", 
+        "service": "ElevenLabs TTS Service", 
+        "api_key_configured": bool(ELEVENLABS_API_KEY),
+        "api_status": api_status
+    })
 
 @app.route('/text_to_speech', methods=['POST', 'OPTIONS'])
 def text_to_speech():
@@ -92,19 +115,43 @@ def text_to_speech():
         # Call ElevenLabs API if key is configured
         if ELEVENLABS_API_KEY:
             logger.info(f"Calling ElevenLabs API for voice_id: {voice_id}")
-            audio_data = call_elevenlabs_api(text, voice_id, model_id, voice_settings)
-            if audio_data:
-                logger.info(f"Successfully received audio data ({len(audio_data)} bytes)")
-                response = Response(audio_data, mimetype='audio/mpeg')
-                response.headers.add('Access-Control-Allow-Origin', '*')
-                return response
-            else:
-                # Fallback to mock response
-                logger.error("Failed to get audio from ElevenLabs API")
-                return jsonify({
-                    'success': False,
-                    'error': 'Failed to get audio from ElevenLabs API'
-                }), 500
+            
+            # Set a maximum retry count
+            max_retries = 1
+            retry_count = 0
+            
+            while retry_count <= max_retries:
+                try:
+                    start_time = time.time()
+                    audio_data = call_elevenlabs_api(text, voice_id, model_id, voice_settings)
+                    end_time = time.time()
+                    
+                    logger.info(f"API call completed in {end_time - start_time:.2f} seconds")
+                    
+                    if audio_data:
+                        logger.info(f"Successfully received audio data ({len(audio_data)} bytes)")
+                        response = Response(audio_data, mimetype='audio/mpeg')
+                        response.headers.add('Access-Control-Allow-Origin', '*')
+                        return response
+                    
+                    # If no data but no exception, increment retry and continue
+                    retry_count += 1
+                    if retry_count <= max_retries:
+                        logger.warning(f"Retrying ElevenLabs API call ({retry_count}/{max_retries})")
+                    
+                except Exception as e:
+                    logger.error(f"Error in ElevenLabs API call: {str(e)}")
+                    retry_count += 1
+                    if retry_count <= max_retries:
+                        logger.warning(f"Retrying ElevenLabs API call ({retry_count}/{max_retries})")
+                    
+            # Fallback to mock response if all retries failed
+            logger.error("All retries failed for ElevenLabs API")
+            return jsonify({
+                'success': False,
+                'error': 'Failed to get audio from ElevenLabs API after retries'
+            }), 500
+            
         else:
             # Mock response if no API key is configured
             logger.warning("No ElevenLabs API key configured, returning mock response")
@@ -147,7 +194,9 @@ def call_elevenlabs_api(
         }
         
         logger.info(f"Sending request to ElevenLabs API: voice_id={voice_id}, model_id={model_id}, text_length={len(text)}")
-        response = requests.post(url, json=data, headers=headers, timeout=15)
+        
+        # Use shorter timeout for better responsiveness
+        response = requests.post(url, json=data, headers=headers, timeout=8)
         
         if response.status_code == 200:
             logger.info(f"Successfully converted text to speech, received {len(response.content)} bytes")
@@ -156,6 +205,12 @@ def call_elevenlabs_api(
             logger.error(f"ElevenLabs API error: {response.status_code} - {response.text}")
             return None
     
+    except requests.exceptions.Timeout:
+        logger.error("ElevenLabs API request timed out")
+        return None
+    except requests.exceptions.ConnectionError:
+        logger.error("Connection error when calling ElevenLabs API")
+        return None
     except Exception as e:
         logger.error(f"Error calling ElevenLabs API: {str(e)}")
         return None
@@ -180,7 +235,8 @@ def list_voices():
         url = f"{ELEVENLABS_API_URL}/voices"
         headers = {"xi-api-key": ELEVENLABS_API_KEY}
         
-        response = requests.get(url, headers=headers)
+        # Use shorter timeout
+        response = requests.get(url, headers=headers, timeout=5)
         
         if response.status_code == 200:
             return jsonify(response.json())
@@ -203,4 +259,7 @@ if __name__ == '__main__':
     print(f"Health check endpoint: http://127.0.0.1:{args.port}/health")
     print(f"API endpoint: http://127.0.0.1:{args.port}/text_to_speech")
     
-    app.run(host='0.0.0.0', port=args.port, debug=True) 
+    # Configure Flask to be more responsive
+    app.config['PROPAGATE_EXCEPTIONS'] = True
+    
+    app.run(host='0.0.0.0', port=args.port, debug=True, threaded=True) 
