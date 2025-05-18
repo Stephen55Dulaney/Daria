@@ -120,3 +120,18 @@ INFO:werkzeug:127.0.0.1 - - [17/May/2025 21:59:35] "GET /api/memory_companion/pr
 INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
 INFO:werkzeug:127.0.0.1 - - [17/May/2025 22:00:01] "POST /api/memory_companion/chat HTTP/1.1" 200 -
 INFO:werkzeug:127.0.0.1 - - [17/May/2025 22:00:01] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/Users/sdulaney/DariaInterviewTool/models/issue_tracker.py', reloading
+Successfully registered Memory Companion blueprint
+Starting Memory Companion Debug Server...
+Available routes:
+  * /api/memory_companion/test
+  * /api/memory_companion/project_data
+  * /api/memory_companion/chat (POST)
+  * /static/daria_memory_companion.html
+
+Open http://localhost:5030/ in your browser to test the API
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 124-683-066
+/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/multiprocessing/resource_tracker.py:277: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown: {'/mp-tgug4tny'}
+  warnings.warn(

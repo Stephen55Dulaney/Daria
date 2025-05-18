@@ -2584,3 +2584,219 @@ INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:26:28] "GET /api/check_services HTTP
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
 INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:26:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:27:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:27:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:27:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:28:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:28:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:28:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:29:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:29:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:29:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:30:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:30:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:30:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:31:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:31:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:31:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:32:09] "[36mGET /static/debug_toolkit.html HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:32:09] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:32:13] "GET /issues/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:32:13] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:32:13] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:32:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:32:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:32:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:32:40] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:33:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:33:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:33:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:33:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:33:40] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:34:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:34:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:34:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:34:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:34:40] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:35:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:35:22] "[32mGET /issues/ HTTP/1.1[0m" 302 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:35:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:35:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:35:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:36:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:36:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:36:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:36:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:37:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:37:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:37:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:37:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:37:53] "[36mGET /static/debug_toolkit.html HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:37:53] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:37:56] "GET /issues/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:37:56] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:37:56] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:38:23] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:38:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:38:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:38:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:38:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:38:53] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:11] "GET /issues/16a20619-3bb3-4416-b144-77955cb753f0 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:11] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:11] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:20] "GET /issues/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:20] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:20] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:21] "GET /issues/new HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:21] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:21] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:23] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:39:53] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:40:23] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:40:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:40:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:40:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:40:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:40:53] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:41:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:41:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:41:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:41:28] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [18/May/2025 09:41:28] "GET /api/check_services HTTP/1.1" 200 -
