@@ -52,26 +52,6 @@
   ],
   "conversation_history": [
     {
-      "timestamp": "2025-05-15T13:49:36.684979",
-      "user_message": "Hello! I've just booted up. Can you remind me what we're working on?",
-      "daria_response": "Hello! Welcome back! We're currently in the **Database Implementation and AWS Deployment (Phase 2)** sprint for the **Daria Interview Tool** project.\n\nHere\u2019s a quick summary of our focus areas:\n\n- Implementing the database migration.\n- Troubleshooting the remote interview template.\n- Addressing challenges with the monitoring feature.\n\nIf there's something specific you want to tackle today or any questions you have, just let me know!"
-    },
-    {
-      "timestamp": "2025-05-15T13:51:54.238648",
-      "user_message": "Hello! I've just booted up. Can you remind me what we're working on?",
-      "daria_response": "Hello! Welcome back! We're currently focused on the **Database Implementation and AWS Deployment (Phase 2)** sprint for the **Daria Interview Tool** project.\n\nHere\u2019s a brief overview of our key tasks:\n\n- Implementing the database migration.\n- Troubleshooting the remote interview template.\n- Addressing challenges with the monitoring feature.\n\nIf there's anything specific you'd like to work on today or any questions you have, just let me know!"
-    },
-    {
-      "timestamp": "2025-05-15T13:52:09.430067",
-      "user_message": "do you see any updates for May 15",
-      "daria_response": "I don't have any specific updates for May 15 in my records. The most recent entries I have are up to May 12, 2025, where we began testing AWS deployment with simple components. If there have been updates or progress made since then, feel free to share, and I can help incorporate that into our ongoing tasks!"
-    },
-    {
-      "timestamp": "2025-05-15T13:52:21.923004",
-      "user_message": "How do I update your memory?",
-      "daria_response": "Currently, I don\u2019t have the ability to update my memory directly. My memory is based on the project details and timeline we've established together. However, you can share updates or changes, and I can incorporate that information into our ongoing conversation. \n\nIf you have new information or updates about the project that you want to remember for our future discussions, just let me know, and I'll make sure to reference it in our chats!"
-    },
-    {
       "timestamp": "2025-05-15T13:54:17.663222",
       "user_message": "Hello! I've just booted up. Can you remind me what we're working on?",
       "daria_response": "Hello! Welcome back! We're currently focused on the **Database Implementation and AWS Deployment (Phase 2)** sprint for the **Daria Interview Tool** project.\n\nHere's a quick overview of our tasks:\n\n- Implementing the database migration.\n- Troubleshooting the remote interview template.\n- Addressing challenges with the monitoring feature.\n\nIf there's anything specific you'd like to work on today or any questions you have, just let me know!"
@@ -150,6 +130,26 @@
       "timestamp": "2025-05-15T19:04:30.368251",
       "user_message": "Hello! I've just booted up. Can you remind me what we're working on?",
       "daria_response": "Hello! Welcome back! We're currently focused on the **Database Implementation and AWS Deployment (Phase 2)** sprint for the **Daria Interview Tool** project.\n\nHere\u2019s a brief summary of our key tasks:\n\n- Implementing the database migration.\n- Troubleshooting the remote interview template.\n- Addressing challenges with the monitoring feature.\n\nIf there's anything specific you'd like to dive into today or any questions you have, just let me know!"
+    },
+    {
+      "timestamp": "2025-05-17T19:49:13.322869",
+      "user_message": "Hello! I've just booted up. Can you remind me what we're working on?",
+      "daria_response": "Hello! Welcome back! We're currently in the **Database Implementation and AWS Deployment (Phase 2)** sprint for the **Daria Interview Tool** project.\n\nHere's a quick recap of our focus areas:\n\n- Implementing the database migration.\n- Troubleshooting the remote interview template.\n- Addressing challenges with the monitoring feature.\n\nIf there's something specific you'd like to work on today or any questions you have, just let me know!"
+    },
+    {
+      "timestamp": "2025-05-17T21:59:17.228840",
+      "user_message": "Hello! I've just booted up. Can you remind me what we're working on?",
+      "daria_response": "Hello! Welcome back! We're currently focused on the **Database Implementation and AWS Deployment (Phase 2)** sprint for the **Daria Interview Tool** project.\n\nHere\u2019s a brief summary of what we\u2019re working on:\n\n- Implementing the database migration.\n- Troubleshooting the remote interview template.\n- Addressing challenges with the monitoring feature.\n\nIf there's anything specific you'd like to tackle today or any questions you have, just let me know!"
+    },
+    {
+      "timestamp": "2025-05-17T21:59:35.763043",
+      "user_message": "Hi daria how are things going today?",
+      "daria_response": "Hi there! I'm doing well, thank you! Things are progressing with the **Daria Interview Tool** project as we continue with the **Database Implementation and AWS Deployment (Phase 2)** sprint. We're currently focusing on implementing the database migration, troubleshooting the remote interview template, and addressing challenges with the monitoring feature.\n\nHow about you? Is there anything specific you'd like to work on today or any questions you have?"
+    },
+    {
+      "timestamp": "2025-05-17T22:00:01.886736",
+      "user_message": "I'm still working on the database feature. We did get AWS delpoyment",
+      "daria_response": "That's great to hear! It's fantastic that you've made progress on the AWS deployment. So now, focusing on the database feature, we can continue with the implementation of the database migration to replace the JSON file storage.\n\nSince we have identified the opportunity for a persistent database for interview data (OPP-001), it might be a good time to review the database schema you\u2019re working on and ensure it aligns with our requirements. \n\nWould you like to discuss any specific aspects of the database implementation, or do you need help troubleshooting any issues?"
     }
   ]
 }

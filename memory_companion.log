@@ -17,4 +17,106 @@ INFO:werkzeug:[33mPress CTRL+C to quit[0m
 INFO:werkzeug: * Restarting with stat
 WARNING:werkzeug: * Debugger is active!
 INFO:werkzeug: * Debugger PIN: 124-683-066
-INFO:werkzeug:127.0.0.1 - - [16/May/2025 17:48:03] "GET /api/memory_companion/test HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 19:35:12] "GET /api/memory_companion/test HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [16/May/2025 19:36:22] "GET /api/memory_companion/test HTTP/1.1" 200 -
+INFO:werkzeug: * Detected change in '/Users/sdulaney/DariaInterviewTool/TestSHH/test_openai.py', reloading
+Successfully registered Memory Companion blueprint
+Starting Memory Companion Debug Server...
+Available routes:
+  * /api/memory_companion/test
+  * /api/memory_companion/project_data
+  * /api/memory_companion/chat (POST)
+  * /static/daria_memory_companion.html
+
+Open http://localhost:5030/ in your browser to test the API
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 124-683-066
+INFO:werkzeug: * Detected change in '/Users/sdulaney/DariaInterviewTool/TestSHH/test_langchain.py', reloading
+Successfully registered Memory Companion blueprint
+Starting Memory Companion Debug Server...
+Available routes:
+  * /api/memory_companion/test
+  * /api/memory_companion/project_data
+  * /api/memory_companion/chat (POST)
+  * /static/daria_memory_companion.html
+
+Open http://localhost:5030/ in your browser to test the API
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 124-683-066
+INFO:werkzeug: * Detected change in '/Users/sdulaney/DariaInterviewTool/TestSHH/initialize_observer.py', reloading
+Successfully registered Memory Companion blueprint
+Starting Memory Companion Debug Server...
+Available routes:
+  * /api/memory_companion/test
+  * /api/memory_companion/project_data
+  * /api/memory_companion/chat (POST)
+  * /static/daria_memory_companion.html
+
+Open http://localhost:5030/ in your browser to test the API
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 124-683-066
+INFO:werkzeug: * Detected change in '/Users/sdulaney/DariaInterviewTool/run_interview_api.py', reloading
+Successfully registered Memory Companion blueprint
+Starting Memory Companion Debug Server...
+Available routes:
+  * /api/memory_companion/test
+  * /api/memory_companion/project_data
+  * /api/memory_companion/chat (POST)
+  * /static/daria_memory_companion.html
+
+Open http://localhost:5030/ in your browser to test the API
+INFO:werkzeug: * Restarting with stat
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 124-683-066
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 19:49:05] "[36mGET /static/daria_memory_companion.html HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 19:49:05] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 19:49:06] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 19:49:13] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 21:59:09] "[36mGET /static/daria_memory_companion.html HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 21:59:09] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 21:59:17] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+ERROR:asyncio:Task exception was never retrieved
+future: <Task finished name='Task-4' coro=<AsyncClient.aclose() done, defined at /Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/anyio/streams/tls.py", line 193, in aclose
+    await self.transport_stream.aclose()
+  File "/Users/sdulaney/DariaInterviewTool/venv/lib/python3.13/site-packages/anyio/_backends/_asyncio.py", line 1261, in aclose
+    self._transport.close()
+    ~~~~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/asyncio/selector_events.py", line 1205, in close
+    super().close()
+    ~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/asyncio/selector_events.py", line 865, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+    ~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/asyncio/base_events.py", line 833, in call_soon
+    self._check_closed()
+    ~~~~~~~~~~~~~~~~~~^^
+  File "/opt/homebrew/Cellar/python@3.13/3.13.2/Frameworks/Python.framework/Versions/3.13/lib/python3.13/asyncio/base_events.py", line 556, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 21:59:35] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 21:59:35] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 22:00:01] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [17/May/2025 22:00:01] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
