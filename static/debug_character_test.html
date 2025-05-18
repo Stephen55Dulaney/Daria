@@ -1105,7 +1105,12 @@
                 guide.custom_questions.forEach((question, index) => {
                     const li = document.createElement('li');
                     li.className = 'list-group-item';
-                    li.innerHTML = `<strong>${index + 1}.</strong> ${question}`;
+                    
+                    // Handle both string questions and object questions with text property
+                    const questionText = typeof question === 'object' && question.text ? question.text : question;
+                    const minutes = typeof question === 'object' && question.minutes ? ` (${question.minutes} min)` : '';
+                    
+                    li.innerHTML = `<strong>${index + 1}.</strong> ${questionText}${minutes}`;
                     customQuestionsList.appendChild(li);
                 });
             } else {

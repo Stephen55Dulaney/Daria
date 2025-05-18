@@ -3838,6 +3838,24 @@ def remote_interview():
                 system_msg = f"IMPORTANT: You are {character}. Always respond as {character}. When asked about your name, say 'I am {character}'."
                 discussion_service.add_message_to_session(session_id, system_msg, "system")
                 logger.info(f"Character {character} set for session {session_id} from URL parameter")
+                
+                # Check if there are any existing assistant messages
+                messages = discussion_service.get_session_messages(session_id)
+                has_assistant_msg = any(msg.get('role') == 'assistant' for msg in messages if isinstance(msg, dict))
+                
+                # If no assistant messages yet, add a welcome message
+                if not has_assistant_msg:
+                    logger.info(f"Adding welcome message for remote session {session_id} as character {character}")
+                    # Choose appropriate welcome message based on character
+                    welcome_msg = f"Hello! I'm {character}, your interview assistant. Thank you for joining me today to talk about {session_info.get('topic', 'this topic')}. I'd love to hear more about your interest in this activity. Can you share with me what initially drew you to {session_info.get('topic', 'this')}?"
+                    
+                    # Use character-specific welcome messages for better engagement
+                    if character.lower() == 'odessia':
+                        welcome_msg = f"Welcome! I'm Odessia, your journey guide for this interview. I believe every conversation is a unique journey of discovery. I'd love to hear more about your interest in {session_info.get('topic', 'this topic')}. Can you share with me what initially drew you to it?"
+                    
+                    # Add the welcome message
+                    discussion_service.add_message_to_session(session_id, welcome_msg, "assistant")
+                    logger.info(f"Welcome message added for session {session_id}")
             except Exception as e:
                 logger.error(f"Error setting character from URL parameter: {str(e)}")
             
