@@ -110,7 +110,7 @@ class MemoryIssueIntegration:
             
             # Use the base issues API endpoint (without "/create")
             response = requests.post(
-                self.issue_api_url,
+                f"{self.issue_api_url}/new",
                 json=issue_data
             )
             
@@ -126,38 +126,47 @@ class MemoryIssueIntegration:
     
     def sync_all_opportunities(self, specific_id=None):
         """Sync all opportunities with the Issue Tracker or a specific one by ID"""
-        project_data = self.get_project_data()
-        if "error" in project_data:
-            return project_data
-        
-        results = []
-        opportunities = project_data.get("opportunities", [])
-        
-        # If a specific ID is provided, only sync that opportunity
-        if specific_id:
-            for opportunity in opportunities:
-                if opportunity["id"] == specific_id:
-                    result = self.create_issue_from_opportunity(opportunity)
-                    results.append({
-                        "opportunity": opportunity["id"],
-                        "result": result
-                    })
-                    break
+        try:
+            project_data = self.get_project_data()
+            if "error" in project_data:
+                return project_data
+            
+            results = []
+            opportunities = project_data.get("opportunities", [])
+            
+            # If a specific ID is provided, only sync that opportunity
+            if specific_id:
+                for opportunity in opportunities:
+                    if opportunity["id"] == specific_id:
+                        result = self.create_issue_from_opportunity(opportunity)
+                        results.append({
+                            "opportunity": opportunity["id"],
+                            "result": result
+                        })
+                        break
+                else:
+                    return {"error": f"Opportunity with ID {specific_id} not found"}
             else:
-                return {"error": f"Opportunity with ID {specific_id} not found"}
-        else:
-            # Otherwise sync all opportunities
-            for opportunity in opportunities:
-                result = self.create_issue_from_opportunity(opportunity)
-                results.append({
-                    "opportunity": opportunity["id"],
-                    "result": result
-                })
-        
-        return {
-            "success": True,
-            "synced": results
-        }
+                # Otherwise sync all opportunities
+                for opportunity in opportunities:
+                    try:
+                        result = self.create_issue_from_opportunity(opportunity)
+                        results.append({
+                            "opportunity": opportunity["id"],
+                            "result": result
+                        })
+                    except Exception as e:
+                        results.append({
+                            "opportunity": opportunity["id"],
+                            "result": {"error": f"Error: {str(e)}"}
+                        })
+            
+            return {
+                "success": True,
+                "synced": results
+            }
+        except Exception as e:
+            return {"error": f"Sync failed: {str(e)}"}
 
 # Create integration instance
 integration = MemoryIssueIntegration(MEMORY_COMPANION_API, ISSUE_TRACKER_API)
@@ -203,6 +212,52 @@ def sync_opportunities():
     specific_id = data.get('id') if data else None
     result = integration.sync_all_opportunities(specific_id)
     return jsonify(result)
+
+@app.route('/api/migrate_opportunities', methods=['POST'])
+def migrate_opportunities():
+    """API endpoint to migrate existing opportunities to Issue Tracker"""
+    try:
+        # Get project data
+        project_data = integration.get_project_data()
+        if "error" in project_data:
+            return jsonify({"error": f"Failed to get project data: {project_data['error']}"})
+        
+        opportunities = project_data.get("opportunities", [])
+        if not opportunities:
+            return jsonify({"error": "No opportunities found to migrate"})
+        
+        # Migrate each opportunity to Issue Tracker
+        migrated_count = 0
+        for opp in opportunities:
+            # Create issue format
+            issue_data = {
+                "title": opp["title"],
+                "description": opp["description"],
+                "priority": opp["priority"].lower(),
+                "type": "opportunity",
+                "creator_id": "system",
+                "tags": ["migrated", "memory_companion", f"id:{opp['id']}"]
+            }
+            
+            # Send to Issue Tracker
+            response = requests.post(
+                f"{ISSUE_TRACKER_API}/new",
+                json=issue_data
+            )
+            
+            if response.status_code == 200:
+                migrated_count += 1
+            else:
+                error_text = ""
+                try:
+                    error_text = response.text
+                except:
+                    pass
+                return jsonify({"error": f"Failed to migrate opportunity {opp['id']}: {response.status_code} - {error_text}"})
+        
+        return jsonify({"success": True, "count": migrated_count})
+    except Exception as e:
+        return jsonify({"error": f"Error migrating opportunities: {str(e)}"})
 
 def create_template():
     """Create the template file if it doesn't exist"""

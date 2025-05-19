@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DARIA Memory Companion Integration</title>
+    <title>DARIA Memory Companion Management</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -109,19 +109,53 @@
         .tab-content.active {
             display: block;
         }
+        .info-box {
+            background-color: #e8f4f8;
+            border-left: 4px solid #3498db;
+            padding: 10px 15px;
+            margin-bottom: 15px;
+        }
+        .badge {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: bold;
+            color: white;
+            margin-left: 5px;
+        }
+        .badge-high {
+            background-color: #e74c3c;
+        }
+        .badge-medium {
+            background-color: #f39c12;
+        }
+        .badge-low {
+            background-color: #2ecc71;
+        }
+        .readonly-list {
+            background-color: #f9f9f9;
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 10px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>DARIA Memory Companion Integration</h1>
+        <h1>DARIA Memory Companion Management</h1>
         
         <div id="messageArea"></div>
+        
+        <div class="info-box">
+            <p><strong>Note:</strong> This page is for managing DARIA's memory. Opportunities are now managed in the Issue Tracker and automatically synced to DARIA.</p>
+        </div>
         
         <div class="tabs">
             <button class="tab active" onclick="openTab('dashboard')">Dashboard</button>
             <button class="tab" onclick="openTab('timeline')">Timeline</button>
-            <button class="tab" onclick="openTab('opportunities')">Opportunities</button>
             <button class="tab" onclick="openTab('settings')">Settings</button>
+            <button class="tab" onclick="openTab('sync')">Sync</button>
         </div>
         
         <!-- Dashboard Tab -->
@@ -132,9 +166,8 @@
                 <p>{{ project_data.overview }}</p>
                 
                 <div class="action-buttons">
-                    <button onclick="syncOpportunities()">Sync All Opportunities to Issue Tracker</button>
+                    <button onclick="manualSync()">Sync Now</button>
                     <button onclick="openTab('timeline')">Add Timeline Event</button>
-                    <button onclick="openTab('opportunities')">Add Opportunity</button>
                 </div>
             </div>
             
@@ -151,11 +184,13 @@
                 </div>
                 
                 <div class="panel">
-                    <h3>Key Opportunities</h3>
-                    <div id="opportunityList">
+                    <h3>Opportunities (Read-only)</h3>
+                    <p class="info-box">Opportunities are now managed in the Issue Tracker.</p>
+                    <div id="opportunityList" class="readonly-list">
                         {% for opp in project_data.opportunities %}
                         <div class="opportunity-item {{ opp.priority.lower() }}-priority">
-                            <strong>{{ opp.id }}:</strong> {{ opp.title }} ({{ opp.priority }})
+                            <strong>{{ opp.id }}:</strong> {{ opp.title }} 
+                            <span class="badge badge-{{ opp.priority.lower() }}">{{ opp.priority }}</span>
                             <p>{{ opp.description }}</p>
                         </div>
                         {% endfor %}
@@ -191,48 +226,6 @@
             </div>
         </div>
         
-        <!-- Opportunities Tab -->
-        <div id="opportunities" class="tab-content">
-            <div class="panel">
-                <h2>Add Opportunity</h2>
-                <form id="opportunityForm">
-                    <label for="opportunityTitle">Title:</label>
-                    <input type="text" id="opportunityTitle" placeholder="Opportunity title" required>
-                    
-                    <label for="opportunityDescription">Description:</label>
-                    <textarea id="opportunityDescription" rows="3" placeholder="Detailed description" required></textarea>
-                    
-                    <label for="opportunityPriority">Priority:</label>
-                    <select id="opportunityPriority">
-                        <option value="High">High</option>
-                        <option value="Medium" selected>Medium</option>
-                        <option value="Low">Low</option>
-                    </select>
-                    
-                    <div class="action-buttons">
-                        <button type="submit">Add Opportunity</button>
-                        <button type="button" onclick="createIssueAndOpportunity()">Add to Both Memory & Issues</button>
-                        <button type="button" onclick="clearForm('opportunityForm')">Clear</button>
-                    </div>
-                </form>
-            </div>
-            
-            <div class="panel">
-                <h3>All Opportunities</h3>
-                <div id="fullOpportunityList">
-                    {% for opp in project_data.opportunities %}
-                    <div class="opportunity-item {{ opp.priority.lower() }}-priority">
-                        <strong>{{ opp.id }}:</strong> {{ opp.title }} ({{ opp.priority }})
-                        <p>{{ opp.description }}</p>
-                        <button onclick="createIssueFrom('{{ opp.id }}', '{{ opp.title }}', '{{ opp.description }}', '{{ opp.priority }}')">
-                            Create Issue from this Opportunity
-                        </button>
-                    </div>
-                    {% endfor %}
-                </div>
-            </div>
-        </div>
-        
         <!-- Settings Tab -->
         <div id="settings" class="tab-content">
             <div class="panel">
@@ -245,6 +238,30 @@
                         <button type="submit">Update Sprint</button>
                     </div>
                 </form>
+            </div>
+        </div>
+        
+        <!-- Sync Tab -->
+        <div id="sync" class="tab-content">
+            <div class="panel">
+                <h2>Synchronization Settings</h2>
+                <p>The Issue Tracker is the source of truth for opportunities. DARIA's Memory Companion is regularly updated with the latest information.</p>
+                
+                <div class="action-buttons">
+                    <button onclick="manualSync()">Sync Now</button>
+                </div>
+                
+                <div id="syncStatus" class="info-box" style="margin-top: 15px;">
+                    <p>Last sync status will appear here</p>
+                </div>
+            </div>
+            
+            <div class="panel">
+                <h2>Migrate Legacy Opportunities</h2>
+                <p>This is a one-time operation to migrate existing opportunities from Memory Companion to the Issue Tracker.</p>
+                <div class="action-buttons">
+                    <button onclick="migrateOpportunities()">Migrate All Opportunities</button>
+                </div>
             </div>
         </div>
     </div>
@@ -317,38 +334,6 @@
             });
         });
         
-        document.getElementById('opportunityForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const title = document.getElementById('opportunityTitle').value;
-            const description = document.getElementById('opportunityDescription').value;
-            const priority = document.getElementById('opportunityPriority').value;
-            
-            fetch('/api/opportunity', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    title: title,
-                    description: description,
-                    priority: priority
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showMessage(`Error: ${data.error}`, true);
-                } else {
-                    showMessage('Opportunity added successfully!');
-                    clearForm('opportunityForm');
-                    setTimeout(() => location.reload(), 1000);
-                }
-            })
-            .catch(error => {
-                showMessage(`Error: ${error.message}`, true);
-            });
-        });
-        
         document.getElementById('sprintForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const sprintName = document.getElementById('sprintName').value;
@@ -374,82 +359,11 @@
             });
         });
         
-        // Create issue from opportunity
-        function createIssueFrom(id, title, description, priority) {
-            fetch('/api/sync', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ id: id })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showMessage(`Error: ${data.error}`, true);
-                } else {
-                    showMessage(`Created issue from opportunity ${id}`);
-                }
-            })
-            .catch(error => {
-                showMessage(`Error: ${error.message}`, true);
-            });
-        }
-        
-        // Create both issue and opportunity
-        function createIssueAndOpportunity() {
-            const title = document.getElementById('opportunityTitle').value;
-            const description = document.getElementById('opportunityDescription').value;
-            const priority = document.getElementById('opportunityPriority').value;
+        // Manual sync function
+        function manualSync() {
+            showMessage('Syncing with Issue Tracker...');
+            document.getElementById('syncStatus').innerHTML = '<p>Sync in progress...</p>';
             
-            if (!title || !description) {
-                showMessage('Please fill in all fields', true);
-                return;
-            }
-            
-            // First create opportunity
-            fetch('/api/opportunity', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({ 
-                    title: title,
-                    description: description,
-                    priority: priority
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showMessage(`Error: ${data.error}`, true);
-                } else {
-                    // Then sync to issue tracker
-                    return fetch('/api/sync', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json'
-                        }
-                    });
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.error) {
-                    showMessage(`Error: ${data.error}`, true);
-                } else {
-                    showMessage('Created opportunity and issue successfully!');
-                    clearForm('opportunityForm');
-                    setTimeout(() => location.reload(), 1000);
-                }
-            })
-            .catch(error => {
-                showMessage(`Error: ${error.message}`, true);
-            });
-        }
-        
-        // Sync all opportunities
-        function syncOpportunities() {
             fetch('/api/sync', {
                 method: 'POST',
                 headers: {
@@ -460,8 +374,36 @@
             .then(data => {
                 if (data.error) {
                     showMessage(`Error: ${data.error}`, true);
+                    document.getElementById('syncStatus').innerHTML = `<p>Sync failed: ${data.error}</p>`;
                 } else {
-                    showMessage('Synced all opportunities to Issue Tracker!');
+                    showMessage('Synced successfully with Issue Tracker!');
+                    document.getElementById('syncStatus').innerHTML = `<p>Last sync: ${new Date().toLocaleString()}<br>Status: Success</p>`;
+                    setTimeout(() => location.reload(), 1500);
+                }
+            })
+            .catch(error => {
+                showMessage(`Error: ${error.message}`, true);
+                document.getElementById('syncStatus').innerHTML = `<p>Sync failed: ${error.message}</p>`;
+            });
+        }
+        
+        // Migrate opportunities to Issue Tracker
+        function migrateOpportunities() {
+            showMessage('Migrating opportunities to Issue Tracker...');
+            
+            fetch('/api/migrate_opportunities', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    showMessage(`Error: ${data.error}`, true);
+                } else {
+                    showMessage(`Successfully migrated ${data.count} opportunities to Issue Tracker!`);
+                    setTimeout(() => location.reload(), 1500);
                 }
             })
             .catch(error => {
