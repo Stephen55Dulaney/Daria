@@ -1,0 +1,131 @@
+2025-05-18 19:16:49,384 - py313_patcher - INFO - Applied ForwardRef._evaluate patch for Python 3.13.2 (main, Feb  4 2025, 14:51:09) [Clang 16.0.0 (clang-1600.0.26.6)]
+/Users/sdulaney/DariaInterviewTool/py313_patch.py:30: DeprecationWarning: Failing to pass a value to the 'type_params' parameter of 'typing.ForwardRef._evaluate' is deprecated, as it leads to incorrect behaviour when calling typing.ForwardRef._evaluate on a stringified annotation that references a PEP 695 type parameter. It will be disallowed in Python 3.15.
+  return original_evaluate(self, globalns, localns, recursive_guard=args[0])
+2025-05-18 19:16:50,262 - numexpr.utils - INFO - NumExpr defaulting to 14 threads.
+/Users/sdulaney/DariaInterviewTool/py313_patch.py:30: DeprecationWarning: Failing to pass a value to the 'type_params' parameter of 'typing.ForwardRef._evaluate' is deprecated, as it leads to incorrect behaviour when calling typing.ForwardRef._evaluate on a stringified annotation that references a PEP 695 type parameter. It will be disallowed in Python 3.15.
+  return original_evaluate(self, globalns, localns, recursive_guard=args[0])
+2025-05-18 19:16:50,635 - __main__ - INFO - CORS enabled for all origins with extended header support
+2025-05-18 19:16:50,648 - __main__ - INFO - SocketIO initialized for real-time communication
+2025-05-18 19:16:50,649 - __main__ - INFO - Initialized PromptManager with prompt_dir=/Users/sdulaney/DariaInterviewTool/tools/prompt_manager/prompts
+2025-05-18 19:16:50,649 - langchain_features.services.discussion_service - INFO - Initialized DiscussionService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+2025-05-18 19:16:50,649 - __main__ - INFO - Discussion service initialized successfully
+2025-05-18 19:16:50,677 - __main__ - ERROR - Error initializing observer service: 1 validation error for LLMChain
+llm
+  Can't instantiate abstract class BaseLanguageModel without an implementation for abstract methods 'agenerate_prompt', 'apredict', 'apredict_messages', 'generate_prompt', 'invoke', 'predict', 'predict_messages' (type=type_error)
+2025-05-18 19:16:50,677 - langchain_features.services.interview_service - INFO - Initialized InterviewService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+2025-05-18 19:16:50,677 - __main__ - INFO - LangChain interview service initialized successfully
+2025-05-18 19:16:50,690 - werkzeug - WARNING - Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+Starting DARIA Interview API on port 5025
+Health check endpoint: http://127.0.0.1:5025/api/health
+Interview start endpoint: http://127.0.0.1:5025/api/interview/start
+Monitor interviews: http://127.0.0.1:5025/monitor_interview
+ * Serving Flask app 'py313_patch'
+ * Debug mode: off
+2025-05-18 19:16:50,695 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5025
+ * Running on http://192.168.86.42:5025
+2025-05-18 19:16:50,695 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-18 19:17:28,793 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:17:28,797 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:17:28,798 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:17:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:17:28,890 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:17:28,895 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:17:28,895 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:17:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:18:27,149 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:27] "GET /dashboard HTTP/1.1" 200 -
+2025-05-18 19:18:27,161 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:27] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 19:18:27,197 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:27] "GET /api/discussion_guides HTTP/1.1" 200 -
+2025-05-18 19:18:27,284 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:18:27,287 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:18:27,287 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:27] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:18:27,875 - __main__ - INFO - Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+2025-05-18 19:18:27,881 - __main__ - INFO - Loaded prompt config for synthia: Synthia
+2025-05-18 19:18:27,886 - __main__ - INFO - Loaded prompt config for eurekia: eurekia
+2025-05-18 19:18:27,890 - __main__ - INFO - Loaded prompt config for skeptica: Skeptica
+2025-05-18 19:18:27,893 - __main__ - INFO - Loaded prompt config for thomas: thomas
+2025-05-18 19:18:27,897 - __main__ - INFO - Loaded prompt config for askia: askia
+2025-05-18 19:18:27,900 - __main__ - INFO - Loaded prompt config for odessia: odessia
+2025-05-18 19:18:27,902 - __main__ - INFO - Loaded prompt config for interviewer: interviewer
+2025-05-18 19:18:27,904 - __main__ - INFO - Loaded prompt config for researcher: researcher
+2025-05-18 19:18:27,906 - __main__ - INFO - Loaded prompt config for thesea: Thesea
+2025-05-18 19:18:27,908 - __main__ - INFO - Loaded prompt config for daria: Daria
+2025-05-18 19:18:27,913 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:27] "GET /interview_setup HTTP/1.1" 200 -
+2025-05-18 19:18:27,921 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:27] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 19:18:28,785 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:18:28,791 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:18:28,791 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:18:28,856 - langchain_features.services.discussion_service - ERROR - Error loading session 013151c2-1bd7-4f89-bd73-d4e70f0b29e6: Invalid control character at: line 88 column 5433 (char 13412)
+2025-05-18 19:18:28,862 - langchain_features.services.discussion_service - ERROR - Error loading session f9702e70-9db8-4232-8a35-dc3ebebd6002: Extra data: line 28 column 2 (char 708)
+2025-05-18 19:18:28,887 - langchain_features.services.discussion_service - ERROR - Error loading session 8bfbce4f-4104-4c4f-9aab-af350a20332d: Extra data: line 131 column 2 (char 11508)
+2025-05-18 19:18:28,897 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:18:28,900 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:18:28,900 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:18:28,919 - langchain_features.services.discussion_service - ERROR - Error loading session 5bb96a8c-781b-4276-ae12-25e0dd6809db: Extra data: line 641 column 2 (char 43740)
+2025-05-18 19:18:28,966 - langchain_features.services.discussion_service - INFO - Loaded 467 sessions across all guides
+2025-05-18 19:18:28,974 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:28] "GET /monitor_interview HTTP/1.1" 200 -
+2025-05-18 19:18:28,989 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:28] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 19:18:47,946 - __main__ - INFO - Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+2025-05-18 19:18:47,946 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:47] "GET /api/health HTTP/1.1" 200 -
+2025-05-18 19:18:50,146 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:50] "GET /api/discussion_guides HTTP/1.1" 200 -
+2025-05-18 19:18:50,153 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:50] "OPTIONS /api/session/create HTTP/1.1" 200 -
+2025-05-18 19:18:50,156 - langchain_features.services.discussion_service - INFO - Created session ef90161d-06a9-47b7-ab03-c5bcd84f477f for guide b926091f-faf0-4a74-b253-33e5d5bb68d9 with character researcher
+2025-05-18 19:18:50,156 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:50] "POST /api/session/create HTTP/1.1" 200 -
+2025-05-18 19:18:50,159 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:50] "GET /api/session/ef90161d-06a9-47b7-ab03-c5bcd84f477f/messages HTTP/1.1" 200 -
+2025-05-18 19:18:50,180 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:50] "OPTIONS /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+2025-05-18 19:18:50,182 - __main__ - INFO - Forwarding TTS request to http://localhost:5015/text_to_speech: 62 chars, voice: EXAVITQu4vr4xnSDxMaL
+2025-05-18 19:18:51,055 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:51] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+2025-05-18 19:19:06,877 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:06] "OPTIONS /api/session/create HTTP/1.1" 200 -
+2025-05-18 19:19:06,885 - langchain_features.services.discussion_service - INFO - Created session b2d1ea59-c04f-4d3d-9232-86aba5cc4213 for guide b926091f-faf0-4a74-b253-33e5d5bb68d9 with character researcher
+2025-05-18 19:19:06,886 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:06] "POST /api/session/create HTTP/1.1" 200 -
+2025-05-18 19:19:06,891 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:06] "GET /api/session/b2d1ea59-c04f-4d3d-9232-86aba5cc4213/messages HTTP/1.1" 200 -
+2025-05-18 19:19:06,895 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:06] "OPTIONS /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+2025-05-18 19:19:06,897 - __main__ - INFO - Forwarding TTS request to http://localhost:5015/text_to_speech: 62 chars, voice: EXAVITQu4vr4xnSDxMaL
+2025-05-18 19:19:07,757 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:07] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+2025-05-18 19:19:16,738 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:16] "GET /api/session/b2d1ea59-c04f-4d3d-9232-86aba5cc4213/messages HTTP/1.1" 200 -
+2025-05-18 19:19:28,776 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:19:28,781 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:19:28,782 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:19:28,885 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:19:28,888 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:19:28,888 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:19:38,889 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:38] "GET /api/session/b2d1ea59-c04f-4d3d-9232-86aba5cc4213/messages HTTP/1.1" 200 -
+2025-05-18 19:20:28,776 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:20:28,780 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:20:28,780 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:20:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:20:28,876 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:20:28,883 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:20:28,883 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:20:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:21:10,944 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:21:10,945 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:21:10,945 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:10] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:21:18,778 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:21:18,781 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:21:18,781 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:18] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:21:26,706 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:26] "GET /issues/ HTTP/1.1" 200 -
+2025-05-18 19:21:26,715 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:26] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 19:21:26,717 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:26] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 19:21:28,764 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:21:28,769 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:21:28,769 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:21:48,765 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:21:48,769 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:21:48,769 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:48] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:22:09,882 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:22:09] "[36mGET /static/debug_ai_observer_with_controls.html HTTP/1.1[0m" 304 -
+2025-05-18 19:22:18,781 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:22:18,784 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:22:18,784 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:22:18] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:22:28,837 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:22:28,844 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:22:28,844 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:22:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:22:41,412 - __main__ - INFO - Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+2025-05-18 19:22:41,415 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:22:41] "GET /interview_setup HTTP/1.1" 200 -
+2025-05-18 19:22:41,426 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:22:41] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 19:22:48,788 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:22:48,793 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:22:48,794 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:22:48] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:23:18,768 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:23:18,771 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:23:18,772 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:23:18] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:23:28,774 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:23:28,779 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:23:28,780 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:23:28] "GET /api/check_services HTTP/1.1" 200 -

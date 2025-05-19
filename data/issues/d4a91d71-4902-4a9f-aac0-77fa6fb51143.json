@@ -1,0 +1,35 @@
+{
+  "id": "d4a91d71-4902-4a9f-aac0-77fa6fb51143",
+  "title": "Fix langchain warning at startup",
+  "description": "\r\nNow would be a good time to address this deprecation warning, since it indicates that future versions of LangChain will break your code when you upgrade. Ideal times to fix it are:\r\n\r\n1. During your next planned maintenance cycle\r\n2. Before upgrading LangChain to v0.2.0\r\n3. If you're currently seeing these warnings but everything works, schedule it as a technical debt item for your next sprint\r\n\r\nThe fix requires:\r\n1. Installing langchain-community: `pip install -U langchain-community`\r\n2. Updating imports in your code from `langchain.chat_models` to `langchain_community.chat_models`\r\n\r\nWould you like me to help locate the files that need updating?\r\n\r\nFix langchain warning at startup \r\n\r\nLangChainDeprecationWarning: Importing chat models from langchain is deprecated. Importing from langchain will no longer be supported as of langchain==0.2.0. Please import from langchain-community instead:\r\n\r\n`from langchain_community.chat_models import ChatOpenAI`.\r\n\r\nTo install langchain-community run `pip install -U langchain-community`.\r\n  warnings.warn(\r\nINFO:__main__:CORS enabled for all origins with extended header support\r\n",
+  "issue_type": "task",
+  "status": "open",
+  "priority": "high",
+  "creator_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+  "assigned_to": null,
+  "screenshots": [],
+  "created_at": "2025-05-18T13:52:01.101095",
+  "updated_at": "2025-05-18T13:52:01.101107",
+  "environment": {
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "remote_addr": "127.0.0.1"
+  },
+  "tags": [],
+  "history": [
+    {
+      "timestamp": "2025-05-18T13:52:01.101107",
+      "action": "Issue created",
+      "user_id": null,
+      "details": null
+    }
+  ],
+  "comments": [],
+  "linked_persona": null,
+  "journey_stage": null,
+  "insights": [],
+  "ethics": [],
+  "root_cause": null,
+  "parent_id": null,
+  "linked_prototype_prompt": null,
+  "cursor_prompt_template": null
+}

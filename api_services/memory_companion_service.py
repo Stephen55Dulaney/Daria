@@ -204,14 +204,9 @@ Answer questions about the project status, help the user decide what to work on 
             messages.append({"role": "user", "content": user_message})
             
             if llm_provider == "openai":
-                client = openai.AsyncOpenAI(api_key=self.openai_api_key)
-                response = await client.chat.completions.create(
-                    model=model_name,
-                    messages=messages,
-                    temperature=0.7,
-                    max_tokens=800
-                )
-                daria_response = response.choices[0].message.content
+                # Use the older OpenAI API pattern for 0.28.1
+                response = await self._call_openai_async(model_name, messages)
+                daria_response = response["choices"][0]["message"]["content"]
                 
             elif llm_provider == "anthropic":
                 from anthropic import AsyncAnthropic
@@ -247,6 +242,31 @@ Answer questions about the project status, help the user decide what to work on 
         except Exception as e:
             logger.error(f"Error getting LLM response: {str(e)}")
             return f"I'm having trouble connecting to my memory systems. Please try again later. (Error: {str(e)})"
+            
+    async def _call_openai_async(self, model: str, messages: List[Dict[str, str]]) -> Dict[str, Any]:
+        """Make an async call to the OpenAI API using the older 0.28.1 version pattern"""
+        import aiohttp
+        
+        api_key = self.openai_api_key
+        headers = {
+            "Content-Type": "application/json",
+            "Authorization": f"Bearer {api_key}"
+        }
+        
+        data = {
+            "model": model,
+            "messages": messages,
+            "temperature": 0.7,
+            "max_tokens": 800
+        }
+        
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "https://api.openai.com/v1/chat/completions",
+                headers=headers,
+                json=data
+            ) as response:
+                return await response.json()
 
 
 # Create Flask Blueprint

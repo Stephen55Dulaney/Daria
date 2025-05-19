@@ -1,0 +1,21 @@
+2025-05-18 19:16:47,434 - __main__ - INFO - Starting STT service on port 5016
+2025-05-18 19:16:47,434 - __main__ - INFO - Health check: http://localhost:5016/health
+2025-05-18 19:16:47,434 - __main__ - INFO - Speech-to-text endpoint: http://localhost:5016/speech_to_text
+2025-05-18 19:17:28,796 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:17:28,894 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:18:27,286 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:18:28,790 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:18:28,899 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:19:28,780 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:19:28,887 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:20:28,779 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:20:28,882 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:21:10,945 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:21:18,780 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:21:28,768 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:21:48,768 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:22:18,783 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:22:28,842 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:22:48,792 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:23:18,770 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -
+2025-05-18 19:23:28,778 - __main__ - INFO - 127.0.0.1 - "GET /health HTTP/1.1" 200 -

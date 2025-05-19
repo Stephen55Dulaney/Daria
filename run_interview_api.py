@@ -2655,7 +2655,9 @@ def handle_join_monitor(data):
     try:
         session_id = data.get('session_id')
         if not session_id:
-            return
+            logger.warning(f"Client {request.sid} tried to join monitoring room without session_id")
+            # Return error response via callback
+            return {'success': False, 'error': 'No session_id provided'}
         
         # Join the socket room for this monitoring session
         room = f"monitor_{session_id}"
@@ -2665,9 +2667,10 @@ def handle_join_monitor(data):
         # Immediately trigger question generation and insights on join
         if observer_service:
             # Request suggested questions
+            questions = observer_service.get_suggested_questions(session_id)
             socketio.emit('suggested_questions', {
                 'session_id': session_id,
-                'questions': observer_service.get_suggested_questions(session_id)
+                'questions': questions
             }, room=request.sid)
             logger.info(f"Sent initial suggested questions to new monitor client for session {session_id}")
             
@@ -2685,9 +2688,13 @@ def handle_join_monitor(data):
         # Emit connection confirmation
         emit('monitor_joined', {'session_id': session_id, 'joined_at': datetime.datetime.now().isoformat()})
         
+        # Return success response via callback
+        return {'success': True, 'message': f'Joined monitor room for {session_id}'}
+        
     except Exception as e:
         logger.error(f"Error in join_monitor_room: {str(e)}")
-        emit('error', {'message': str(e)})
+        # Return error response via callback
+        return {'success': False, 'error': str(e)}
 
 @socketio.on('join_session')
 def handle_join_session(data):
@@ -4107,6 +4114,92 @@ def debug_observer_state(session_id):
             'success': False,
             'error': str(e)
         }), 500
+
+# Add the API endpoint for suggested questions
+@app.route('/api/session/<session_id>/suggested_questions', methods=['GET'])
+def get_suggested_questions_api(session_id):
+    """API endpoint for getting AI-suggested interview questions."""
+    try:
+        # Make sure we have observer service
+        if not observer_service:
+            # Return fallback questions if observer service is not available
+            fallback_questions = [
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Could you tell me more about that?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "How did that make you feel?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Can you provide a specific example?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "What would you change or improve about that?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Why do you think that happened?"
+                }
+            ]
+            
+            logger.warning(f"Observer service not available - returning fallback questions for session {session_id}")
+            return jsonify({
+                'session_id': session_id,
+                'questions': fallback_questions
+            })
+        
+        logger.info(f"Getting suggested questions for session {session_id}")
+        questions = observer_service.get_suggested_questions(session_id)
+        
+        # Ensure questions are properly formatted
+        formatted_questions = []
+        for q in questions:
+            # Make sure each question has the expected format
+            if isinstance(q, dict) and 'text' in q:
+                formatted_questions.append(q)
+            elif isinstance(q, str):
+                # If it's just a string, convert to proper format
+                formatted_questions.append({
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': q
+                })
+        
+        logger.info(f"Returning {len(formatted_questions)} suggested questions for session {session_id}")
+        return jsonify({
+            'session_id': session_id,
+            'questions': formatted_questions
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting suggested questions via API: {str(e)}", exc_info=True)
+        # Return emergency fallback questions on error
+        emergency_questions = [
+            {
+                'id': str(uuid.uuid4()),
+                'timestamp': datetime.datetime.now().isoformat(),
+                'text': "Can you explain more about your experience?"
+            },
+            {
+                'id': str(uuid.uuid4()),
+                'timestamp': datetime.datetime.now().isoformat(),
+                'text': "What else would you like to share?"
+            }
+        ]
+        
+        return jsonify({
+            'session_id': session_id,
+            'questions': emergency_questions
+        })
 
 # Start the app
 if __name__ == '__main__':

@@ -1,0 +1,47 @@
+2025-05-18 19:16:47,524 - __main__ - INFO - ElevenLabs API key is configured
+Starting ElevenLabs TTS Service on port 5015
+Health check endpoint: http://127.0.0.1:5015/health
+API endpoint: http://127.0.0.1:5015/text_to_speech
+ * Serving Flask app 'elevenlabs_tts'
+ * Debug mode: on
+2025-05-18 19:16:47,550 - werkzeug - INFO - [31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
+ * Running on all addresses (0.0.0.0)
+ * Running on http://127.0.0.1:5015
+ * Running on http://192.168.86.42:5015
+2025-05-18 19:16:47,550 - werkzeug - INFO - [33mPress CTRL+C to quit[0m
+2025-05-18 19:16:47,551 - werkzeug - INFO -  * Restarting with stat
+2025-05-18 19:16:47,663 - __main__ - INFO - ElevenLabs API key is configured
+2025-05-18 19:16:47,680 - werkzeug - WARNING -  * Debugger is active!
+2025-05-18 19:16:47,686 - werkzeug - INFO -  * Debugger PIN: 124-683-066
+2025-05-18 19:17:28,792 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:17:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:17:28,888 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:17:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:18:27,283 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:27] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:18:28,781 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:18:28,896 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:18:50,185 - __main__ - INFO - TTS Request: 62 chars, voice_id: EXAVITQu4vr4xnSDxMaL
+2025-05-18 19:18:50,185 - __main__ - INFO - Calling ElevenLabs API for voice_id: EXAVITQu4vr4xnSDxMaL
+2025-05-18 19:18:50,185 - __main__ - INFO - Sending request to ElevenLabs API: voice_id=EXAVITQu4vr4xnSDxMaL, model_id=eleven_monolingual_v1, text_length=62
+2025-05-18 19:18:51,051 - __main__ - INFO - Successfully converted text to speech, received 52707 bytes
+2025-05-18 19:18:51,052 - __main__ - INFO - API call completed in 0.87 seconds
+2025-05-18 19:18:51,052 - __main__ - INFO - Successfully received audio data (52707 bytes)
+2025-05-18 19:18:51,052 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:18:51] "POST /text_to_speech HTTP/1.1" 200 -
+2025-05-18 19:19:06,903 - __main__ - INFO - TTS Request: 62 chars, voice_id: EXAVITQu4vr4xnSDxMaL
+2025-05-18 19:19:06,903 - __main__ - INFO - Calling ElevenLabs API for voice_id: EXAVITQu4vr4xnSDxMaL
+2025-05-18 19:19:06,903 - __main__ - INFO - Sending request to ElevenLabs API: voice_id=EXAVITQu4vr4xnSDxMaL, model_id=eleven_monolingual_v1, text_length=62
+2025-05-18 19:19:07,754 - __main__ - INFO - Successfully converted text to speech, received 49782 bytes
+2025-05-18 19:19:07,755 - __main__ - INFO - API call completed in 0.85 seconds
+2025-05-18 19:19:07,755 - __main__ - INFO - Successfully received audio data (49782 bytes)
+2025-05-18 19:19:07,755 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:07] "POST /text_to_speech HTTP/1.1" 200 -
+2025-05-18 19:19:28,775 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:19:28,883 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:19:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:20:28,773 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:20:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:20:28,873 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:20:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:21:10,943 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:10] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:21:18,777 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:18] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:21:28,763 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:21:48,763 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:21:48] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:22:18,779 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:22:18] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:22:28,835 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:22:28] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:22:48,786 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:22:48] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:23:18,766 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:23:18] "GET /health HTTP/1.1" 200 -
+2025-05-18 19:23:28,772 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:23:28] "GET /health HTTP/1.1" 200 -
