@@ -129,3 +129,773 @@ Monitor interviews: http://127.0.0.1:5025/monitor_interview
 2025-05-18 19:23:28,774 - root - INFO - TTS service check: True, response: 200
 2025-05-18 19:23:28,779 - root - INFO - STT service check: True, response: 200
 2025-05-18 19:23:28,780 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:23:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:24:28,795 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:24:28,799 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:24:28,800 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:24:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:24:28,895 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:24:28,897 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:24:28,897 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:24:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:25:28,782 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:25:28,790 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:25:28,790 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:25:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:25:28,890 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:25:28,894 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:25:28,895 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:25:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:26:28,778 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:26:28,783 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:26:28,783 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:26:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:26:28,879 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:26:28,881 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:26:28,882 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:26:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:27:28,780 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:27:28,784 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:27:28,785 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:27:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:27:28,886 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:27:28,892 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:27:28,892 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:27:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:28:28,778 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:28:28,783 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:28:28,783 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:28:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:28:28,886 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:28:28,893 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:28:28,893 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:28:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:29:28,792 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:29:28,796 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:29:28,796 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:29:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:29:28,894 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:29:28,901 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:29:28,902 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:29:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:30:28,806 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:30:28,812 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:30:28,812 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:30:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:30:28,917 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:30:28,922 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:30:28,923 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:30:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:31:28,785 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:31:28,790 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:31:28,791 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:31:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:31:28,890 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:31:28,895 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:31:28,896 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:31:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:32:28,784 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:32:28,788 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:32:28,788 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:32:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:32:28,897 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:32:28,900 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:32:28,900 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:32:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:33:28,819 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:33:28,826 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:33:28,827 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:33:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:33:28,919 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:33:28,923 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:33:28,923 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:33:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:34:28,806 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:34:28,813 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:34:28,813 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:34:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:34:28,926 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:34:28,932 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:34:28,933 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:34:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:35:28,784 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:35:28,788 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:35:28,788 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:35:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:35:28,897 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:35:28,903 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:35:28,903 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:35:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:36:28,793 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:36:28,800 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:36:28,800 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:36:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:36:28,915 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:36:28,919 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:36:28,920 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:36:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:37:28,788 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:37:28,792 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:37:28,792 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:37:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:37:28,909 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:37:28,913 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:37:28,913 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:37:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:38:28,794 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:38:28,799 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:38:28,799 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:38:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:38:28,902 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:38:28,905 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:38:28,906 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:38:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:39:28,817 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:39:28,820 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:39:28,821 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:39:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:39:28,931 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:39:28,938 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:39:28,938 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:39:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:40:28,793 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:40:28,796 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:40:28,797 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:40:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:40:28,921 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:40:28,927 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:40:28,928 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:40:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:41:28,792 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:41:28,797 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:41:28,797 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:41:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:41:28,901 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:41:28,906 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:41:28,906 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:41:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:42:28,787 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:42:28,792 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:42:28,792 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:42:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:42:28,906 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:42:28,910 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:42:28,910 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:42:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:43:28,791 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:43:28,796 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:43:28,796 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:43:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:43:28,908 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:43:28,912 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:43:28,912 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:43:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:44:28,832 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:44:28,838 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:44:28,838 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:44:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:44:28,944 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:44:28,949 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:44:28,950 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:44:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:45:28,769 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:45:28,774 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:45:28,774 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:45:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:45:28,887 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:45:28,891 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:45:28,892 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:45:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:46:28,769 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:46:28,773 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:46:28,773 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:46:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:46:28,885 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:46:28,890 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:46:28,890 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:46:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:47:04,114 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:47:04] "[32mGET /issues/ HTTP/1.1[0m" 302 -
+2025-05-18 19:47:28,767 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:47:28,771 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:47:28,772 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:47:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:47:28,882 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:47:28,886 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:47:28,886 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:47:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:48:28,761 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:48:28,765 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:48:28,765 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:48:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:48:28,924 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:48:28,927 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:48:28,928 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:48:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:49:28,767 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:49:28,771 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:49:28,771 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:49:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:49:28,881 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:49:28,885 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:49:28,885 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:49:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:50:29,668 - root - ERROR - TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Read timed out. (read timeout=1)
+2025-05-18 19:50:29,677 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:50:29,678 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:50:29] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:50:29,792 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:50:29,795 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:50:29,795 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:50:29] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:51:28,785 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:51:28,792 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:51:28,795 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:51:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:51:28,884 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:51:28,890 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:51:28,890 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:51:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:52:28,750 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:52:28,754 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:52:28,754 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:52:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:52:28,850 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:52:28,854 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:52:28,854 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:52:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:53:28,756 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:53:28,761 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:53:28,761 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:53:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:53:28,857 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:53:28,860 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:53:28,861 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:53:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:54:28,759 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:54:28,766 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:54:28,766 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:54:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:54:28,867 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:54:28,872 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:54:28,872 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:54:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:55:28,756 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:55:28,763 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:55:28,763 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:55:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:55:28,869 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:55:28,876 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:55:28,878 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:55:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:56:29,663 - root - ERROR - TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Read timed out. (read timeout=1)
+2025-05-18 19:56:29,668 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:56:29,668 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:56:29] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:56:29,811 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:56:29,816 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:56:29,816 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:56:29] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:57:28,778 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:57:28,783 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:57:28,783 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:57:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:57:28,879 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:57:28,882 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:57:28,883 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:57:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:58:28,753 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:58:28,756 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:58:28,757 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:58:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:58:28,847 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:58:28,852 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:58:28,852 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:58:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:59:28,794 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:59:28,798 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:59:28,798 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:59:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 19:59:28,890 - root - INFO - TTS service check: True, response: 200
+2025-05-18 19:59:28,894 - root - INFO - STT service check: True, response: 200
+2025-05-18 19:59:28,894 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:59:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:00:28,755 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:00:28,761 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:00:28,762 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:00:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:00:28,860 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:00:28,865 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:00:28,865 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:00:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:01:28,761 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:01:28,765 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:01:28,765 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:01:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:01:28,860 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:01:28,866 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:01:28,867 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:01:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:02:28,770 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:02:28,776 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:02:28,776 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:02:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:02:28,888 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:02:28,892 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:02:28,893 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:02:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:03:28,755 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:03:28,760 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:03:28,760 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:03:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:03:28,862 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:03:28,868 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:03:28,869 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:03:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:04:28,753 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:04:28,756 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:04:28,756 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:04:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:04:28,864 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:04:28,871 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:04:28,872 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:04:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:04:49,147 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:04:49] "GET /issues/?status=&type=opportunity&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:04:49,167 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:04:49] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:04:49,167 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:04:49] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:05:28,761 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:05:28,766 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:05:28,766 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:05:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:05:28,875 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:05:28,881 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:05:28,881 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:05:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:06:28,749 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:06:28,755 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:06:28,755 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:06:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:06:28,860 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:06:28,864 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:06:28,864 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:06:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:07:04,209 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:04] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:04,213 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:04] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:04,217 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:04] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:04,221 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:04] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:04,224 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:04] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:04,227 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:04] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:12,277 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:12] "GET /issues/?status=&type=opportunity&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:07:12,292 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:12] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:07:12,293 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:12] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:07:12,340 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:12] "[36mGET /static/images/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-18 20:07:15,348 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:15] "GET /issues/?status=&type=task&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:07:15,357 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:15] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:07:15,358 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:15] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:07:17,704 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:17] "GET /issues/?status=&type=opportunity&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:07:17,714 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:17] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:07:17,715 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:17] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:07:28,768 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:07:28,776 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:07:28,777 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:07:28,878 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:07:28,884 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:07:28,885 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:07:41,510 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:41] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:41,514 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:41] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:41,518 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:41] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:41,522 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:41] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:41,526 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:41] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:41,529 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:41] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:43,982 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:43] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:43,988 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:43] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:43,994 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:43] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:43,999 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:43] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,003 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,006 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,234 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,239 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,244 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,249 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,252 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,256 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,470 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,473 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,478 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,481 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,485 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:07:44,488 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "[33mPOST /api/issues/create HTTP/1.1[0m" 404 -
+2025-05-18 20:08:28,741 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:08:28,746 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:08:28,747 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:08:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:08:28,848 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:08:28,852 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:08:28,853 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:08:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:09:28,744 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:09:28,749 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:09:28,750 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:09:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:09:28,843 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:09:28,845 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:09:28,845 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:09:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:10:28,742 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:10:28,756 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:10:28,756 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:10:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:10:28,855 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:10:28,859 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:10:28,860 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:10:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:11:28,749 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:11:28,753 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:11:28,754 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:11:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:11:28,888 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:11:28,894 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:11:28,894 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:11:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:12:28,744 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:12:28,750 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:12:28,750 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:12:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:12:28,847 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:12:28,852 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:12:28,852 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:12:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:13:28,762 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:13:28,768 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:13:28,768 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:13:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:13:28,864 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:13:28,868 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:13:28,868 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:13:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:14:28,753 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:14:28,759 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:14:28,759 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:14:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:14:28,858 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:14:28,861 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:14:28,862 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:14:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:15:28,742 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:15:28,747 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:15:28,747 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:15:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:15:28,853 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:15:28,858 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:15:28,858 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:15:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:16:29,579 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:16:29,585 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:16:29,585 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:16:29] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:16:29,683 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:16:29,688 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:16:29,688 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:16:29] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:17:14,766 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:14] "[33mPOST /api/issues HTTP/1.1[0m" 404 -
+2025-05-18 20:17:18,751 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:18] "GET /issues/?status=&type=opportunity&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:17:18,764 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:18] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:18,765 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:18] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:18,870 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:18] "[36mGET /static/images/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-18 20:17:20,288 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:20] "GET /issues/?status=&type=opportunity&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:17:20,306 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:20] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:20,306 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:20] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:20,347 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:20] "[36mGET /static/images/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-18 20:17:20,507 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:20] "GET /issues/?status=&type=opportunity&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:17:20,519 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:20] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:20,519 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:20] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:20,563 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:20] "[36mGET /static/images/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-18 20:17:24,289 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:24] "GET /issues/?status=&type=task&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:17:24,309 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:24] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:24,310 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:24] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:26,875 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:26] "GET /issues/?status=&type=&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:17:26,888 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:26] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:26,889 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:26] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:17:28,733 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:17:28,739 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:17:28,739 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:17:28,829 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:17:28,835 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:17:28,835 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:17:32,267 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:32] "[33mPOST /api/issues HTTP/1.1[0m" 404 -
+2025-05-18 20:18:06,078 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:06] "[33mPOST /api/issues HTTP/1.1[0m" 404 -
+2025-05-18 20:18:14,236 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:14] "GET /issues/?status=&type=opportunity&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:18:14,248 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:14] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:18:14,249 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:14] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:18:16,736 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:16] "GET /issues/bdc2de11-a3aa-40a0-9de2-9d43f93a1cad HTTP/1.1" 200 -
+2025-05-18 20:18:16,751 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:16] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:18:16,752 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:16] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:18:21,846 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:21] "GET /issues/bdc2de11-a3aa-40a0-9de2-9d43f93a1cad HTTP/1.1" 200 -
+2025-05-18 20:18:21,867 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:21] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:18:21,867 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:21] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:18:21,913 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:21] "[36mGET /static/images/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-18 20:18:28,746 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:18:28,751 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:18:28,751 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:18:28,860 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:18:28,864 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:18:28,865 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:18:59,654 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:59] "[33mPOST /api/issues HTTP/1.1[0m" 404 -
+2025-05-18 20:19:00,401 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:00] "[33mPOST /api/issues HTTP/1.1[0m" 404 -
+2025-05-18 20:19:00,595 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:00] "[33mPOST /api/issues HTTP/1.1[0m" 404 -
+2025-05-18 20:19:12,692 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:12] "[33mPOST /api/issues HTTP/1.1[0m" 404 -
+2025-05-18 20:19:18,545 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:18] "GET /issues/bdc2de11-a3aa-40a0-9de2-9d43f93a1cad HTTP/1.1" 200 -
+2025-05-18 20:19:18,565 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:18] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:19:18,566 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:18] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:19:18,612 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:18] "[36mGET /static/images/favicon.ico HTTP/1.1[0m" 304 -
+2025-05-18 20:19:21,043 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:21] "GET /issues/ HTTP/1.1" 200 -
+2025-05-18 20:19:21,057 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:21] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:19:21,059 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:21] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:19:28,742 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:19:28,749 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:19:28,749 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:19:28,846 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:19:28,852 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:19:28,852 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:20:28,738 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:20:28,744 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:20:28,744 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:20:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:20:28,838 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:20:28,841 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:20:28,842 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:20:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:21:13,277 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:21:13] "GET /issues/?status=&type=opportunity&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:21:13,293 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:21:13] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:21:13,293 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:21:13] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:21:28,798 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:21:28,804 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:21:28,805 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:21:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:21:28,940 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:21:28,944 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:21:28,944 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:21:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:21:48,624 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:21:48] "GET /issues/?status=&type=&assigned_to= HTTP/1.1" 200 -
+2025-05-18 20:21:48,643 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:21:48] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+2025-05-18 20:21:48,649 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:21:48] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
+2025-05-18 20:22:28,749 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:22:28,753 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:22:28,754 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:22:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:22:28,857 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:22:28,864 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:22:28,864 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:22:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:23:28,769 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:23:28,775 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:23:28,775 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:23:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:23:28,869 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:23:28,876 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:23:28,877 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:23:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:24:28,742 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:24:28,748 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:24:28,748 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:24:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:24:28,842 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:24:28,847 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:24:28,847 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:24:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:25:28,735 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:25:28,739 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:25:28,740 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:25:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:25:29,336 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:25:29,343 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:25:29,344 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:25:29] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:26:28,758 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:26:28,762 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:26:28,763 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:26:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:26:28,862 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:26:28,866 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:26:28,866 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:26:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:27:28,742 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:27:28,746 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:27:28,746 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:27:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:27:28,849 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:27:28,853 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:27:28,854 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:27:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:28:29,654 - root - ERROR - TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Read timed out. (read timeout=1)
+2025-05-18 20:28:29,662 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:28:29,663 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:28:29] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:28:29,775 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:28:29,780 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:28:29,781 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:28:29] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:29:28,740 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:29:28,746 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:29:28,746 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:29:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:29:28,879 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:29:28,885 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:29:28,886 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:29:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:30:28,739 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:30:28,743 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:30:28,744 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:30:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:30:28,839 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:30:28,842 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:30:28,842 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:30:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:31:28,764 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:31:28,770 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:31:28,770 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:31:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:31:28,866 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:31:28,870 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:31:28,871 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:31:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:32:28,759 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:32:28,764 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:32:28,764 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:32:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:32:28,864 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:32:28,870 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:32:28,870 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:32:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:33:28,739 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:33:28,744 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:33:28,744 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:33:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:33:28,838 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:33:28,841 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:33:28,841 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:33:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:34:28,771 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:34:28,777 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:34:28,777 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:34:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:34:28,889 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:34:28,892 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:34:28,892 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:34:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:35:28,740 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:35:28,745 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:35:28,745 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:35:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:35:28,844 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:35:28,850 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:35:28,850 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:35:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:36:28,854 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:36:28,859 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:36:28,859 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:36:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:36:28,951 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:36:28,954 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:36:28,955 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:36:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:37:28,741 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:37:28,745 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:37:28,745 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:37:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:37:28,841 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:37:28,845 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:37:28,846 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:37:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:38:28,742 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:38:28,744 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:38:28,745 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:38:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:38:28,828 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:38:28,830 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:38:28,831 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:38:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:39:28,775 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:39:28,780 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:39:28,780 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:39:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:39:28,881 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:39:28,887 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:39:28,888 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:39:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:40:28,778 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:40:28,783 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:40:28,783 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:40:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:40:28,875 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:40:28,880 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:40:28,880 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:40:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:41:28,764 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:41:28,767 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:41:28,768 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:41:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:41:28,863 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:41:28,868 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:41:28,869 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:41:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:42:28,769 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:42:28,773 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:42:28,773 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:42:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:42:28,892 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:42:28,900 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:42:28,901 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:42:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:43:28,758 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:43:28,760 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:43:28,760 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:43:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:43:28,850 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:43:28,853 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:43:28,854 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:43:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:44:28,770 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:44:28,777 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:44:28,778 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:44:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:44:28,892 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:44:28,896 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:44:28,897 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:44:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:45:28,774 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:45:28,779 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:45:28,779 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:45:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:45:28,888 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:45:28,894 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:45:28,894 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:45:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:46:28,758 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:46:28,762 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:46:28,762 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:46:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:46:28,854 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:46:28,859 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:46:28,860 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:46:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:47:28,771 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:47:28,776 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:47:28,777 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:47:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:47:28,884 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:47:28,888 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:47:28,888 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:47:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:48:28,775 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:48:28,779 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:48:28,780 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:48:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:48:28,880 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:48:28,884 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:48:28,884 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:48:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:49:28,786 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:49:28,790 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:49:28,790 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:49:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:49:28,888 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:49:28,892 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:49:28,893 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:49:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:50:28,786 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:50:28,792 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:50:28,792 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:50:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:50:28,888 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:50:28,891 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:50:28,892 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:50:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:51:28,777 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:51:28,784 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:51:28,784 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:51:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:51:28,881 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:51:28,889 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:51:28,890 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:51:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:52:28,758 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:52:28,762 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:52:28,762 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:52:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:52:28,873 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:52:28,877 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:52:28,878 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:52:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:53:28,815 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:53:28,819 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:53:28,819 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:53:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:53:28,914 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:53:28,920 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:53:28,920 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:53:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:54:28,780 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:54:28,787 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:54:28,787 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:54:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:54:28,893 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:54:28,899 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:54:28,899 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:54:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:55:28,794 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:55:28,799 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:55:28,800 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:55:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:55:28,898 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:55:28,902 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:55:28,902 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:55:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:56:28,789 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:56:28,793 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:56:28,794 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:56:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:56:28,893 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:56:28,899 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:56:28,899 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:56:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:57:28,803 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:57:28,809 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:57:28,809 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:57:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:57:28,901 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:57:28,904 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:57:28,905 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:57:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:58:28,759 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:58:28,763 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:58:28,764 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:58:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:58:28,857 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:58:28,861 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:58:28,861 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:58:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:59:28,776 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:59:28,781 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:59:28,781 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:59:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 20:59:28,888 - root - INFO - TTS service check: True, response: 200
+2025-05-18 20:59:28,893 - root - INFO - STT service check: True, response: 200
+2025-05-18 20:59:28,894 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:59:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:00:28,775 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:00:28,781 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:00:28,781 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:00:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:00:28,886 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:00:28,891 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:00:28,891 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:00:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:01:28,765 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:01:28,770 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:01:28,771 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:01:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:01:28,870 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:01:28,877 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:01:28,877 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:01:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:02:28,751 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:02:28,762 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:02:28,762 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:02:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:02:28,858 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:02:28,864 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:02:28,865 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:02:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:03:28,757 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:03:28,763 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:03:28,763 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:03:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:03:28,874 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:03:28,880 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:03:28,880 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:03:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:04:28,744 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:04:28,748 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:04:28,748 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:04:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:04:28,845 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:04:28,850 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:04:28,850 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:04:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:05:28,753 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:05:28,761 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:05:28,762 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:05:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:05:28,870 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:05:28,873 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:05:28,874 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:05:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:06:28,761 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:06:28,767 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:06:28,768 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:06:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:06:28,869 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:06:28,875 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:06:28,876 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:06:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:07:28,744 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:07:28,752 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:07:28,752 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:07:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:07:28,851 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:07:28,855 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:07:28,855 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:07:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:08:28,739 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:08:28,744 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:08:28,744 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:08:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:08:28,839 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:08:28,843 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:08:28,843 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:08:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:09:28,751 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:09:28,757 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:09:28,757 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:09:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:09:28,864 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:09:28,870 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:09:28,871 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:09:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:10:28,743 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:10:28,748 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:10:28,748 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:10:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:10:28,841 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:10:28,845 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:10:28,845 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:10:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:11:28,779 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:11:28,782 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:11:28,783 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:11:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:11:28,876 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:11:28,880 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:11:28,880 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:11:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:12:28,756 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:12:28,759 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:12:28,759 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:12:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:12:28,849 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:12:28,852 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:12:28,852 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:12:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:13:28,738 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:13:28,742 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:13:28,743 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:13:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:13:28,839 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:13:28,844 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:13:28,844 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:13:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:14:28,753 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:14:28,762 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:14:28,762 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:14:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:14:28,866 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:14:28,871 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:14:28,871 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:14:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:15:28,762 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:15:28,768 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:15:28,769 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:15:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:15:28,876 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:15:28,880 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:15:28,881 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:15:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:16:28,748 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:16:28,755 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:16:28,755 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:16:28] "GET /api/check_services HTTP/1.1" 200 -
+2025-05-18 21:16:28,848 - root - INFO - TTS service check: True, response: 200
+2025-05-18 21:16:28,851 - root - INFO - STT service check: True, response: 200
+2025-05-18 21:16:28,851 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 21:16:28] "GET /api/check_services HTTP/1.1" 200 -

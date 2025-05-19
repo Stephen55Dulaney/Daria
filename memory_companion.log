@@ -22,3 +22,71 @@ Open http://localhost:5030/ in your browser to test the API
 2025-05-18 19:16:54,618 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:16:54] "[36mGET /static/daria_memory_companion.html HTTP/1.1[0m" 304 -
 2025-05-18 19:16:54,652 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:16:54] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
 2025-05-18 19:17:02,894 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:17:02] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:27:09,939 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:27:09] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:27:42,152 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:27:42] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:27:42,162 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:27:42] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 19:28:00,728 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:28:00] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:28:00,737 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:28:00] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 19:28:18,548 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:28:18] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:28:18,563 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:28:18] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 19:29:50,813 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:29:50] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:29:50,826 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:29:50] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 19:33:09,030 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:33:09] "POST /api/memory_companion/timeline HTTP/1.1" 200 -
+2025-05-18 19:33:16,610 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:33:16] "POST /api/memory_companion/opportunity HTTP/1.1" 200 -
+2025-05-18 19:33:25,865 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:33:25] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:35:51,880 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:35:51] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:35:51,896 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:35:51] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 19:37:59,937 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:37:59] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:37:59,946 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:37:59] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 19:38:28,388 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:38:28] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 19:38:28,398 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:38:28] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 19:48:23,142 - werkzeug - INFO -  * Detected change in '/Users/sdulaney/DariaInterviewTool/memory_companion_ui.py', reloading
+Successfully registered Memory Companion blueprint
+Starting Memory Companion Debug Server...
+Available routes:
+  * /api/memory_companion/test
+  * /api/memory_companion/project_data
+  * /api/memory_companion/chat (POST)
+  * /static/daria_memory_companion.html
+
+Open http://localhost:5030/ in your browser to test the API
+2025-05-18 19:48:23,178 - werkzeug - INFO -  * Restarting with stat
+2025-05-18 19:48:23,223 - py313_patcher - INFO - Applied ForwardRef._evaluate patch for Python 3.13.2 (main, Feb  4 2025, 14:51:09) [Clang 16.0.0 (clang-1600.0.26.6)]
+2025-05-18 19:48:23,537 - werkzeug - WARNING -  * Debugger is active!
+2025-05-18 19:48:23,544 - werkzeug - INFO -  * Debugger PIN: 124-683-066
+2025-05-18 19:50:58,556 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 19:50:58] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:04:46,864 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:04:46] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 20:04:46,878 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:04:46] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:07:04,192 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:04] "POST /api/memory_companion/opportunity HTTP/1.1" 200 -
+2025-05-18 20:07:04,203 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:04] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:07:05,254 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:05] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:07:41,503 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:41] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:07:43,975 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:43] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:07:44,228 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:07:44,465 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:07:44] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:12:25,988 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:12:25] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 20:15:38,419 - werkzeug - INFO -  * Detected change in '/Users/sdulaney/DariaInterviewTool/memory_companion_ui.py', reloading
+Successfully registered Memory Companion blueprint
+Starting Memory Companion Debug Server...
+Available routes:
+  * /api/memory_companion/test
+  * /api/memory_companion/project_data
+  * /api/memory_companion/chat (POST)
+  * /static/daria_memory_companion.html
+
+Open http://localhost:5030/ in your browser to test the API
+2025-05-18 20:15:38,464 - werkzeug - INFO -  * Restarting with stat
+2025-05-18 20:15:38,493 - py313_patcher - INFO - Applied ForwardRef._evaluate patch for Python 3.13.2 (main, Feb  4 2025, 14:51:09) [Clang 16.0.0 (clang-1600.0.26.6)]
+2025-05-18 20:15:38,781 - werkzeug - WARNING -  * Debugger is active!
+2025-05-18 20:15:38,787 - werkzeug - INFO -  * Debugger PIN: 124-683-066
+2025-05-18 20:17:07,768 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:07] "[36mGET /static/daria_memory_companion.html HTTP/1.1[0m" 304 -
+2025-05-18 20:17:07,793 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:07] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:17:14,761 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:14] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:17:19,973 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:19] "POST /api/memory_companion/chat HTTP/1.1" 200 -
+2025-05-18 20:17:32,260 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:17:32] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:18:06,072 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:06] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:18:47,621 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:47] "POST /api/memory_companion/opportunity HTTP/1.1" 200 -
+2025-05-18 20:18:59,650 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:18:59] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:19:00,396 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:00] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:19:00,588 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:00] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
+2025-05-18 20:19:12,686 - werkzeug - INFO - 127.0.0.1 - - [18/May/2025 20:19:12] "GET /api/memory_companion/project_data HTTP/1.1" 200 -
