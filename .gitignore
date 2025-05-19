@@ -71,3 +71,19 @@ tools/prompt_manager/prompts/.history/
 .env.development.local
 .env.test.local
 .env.production.local
+
+# Log files
+*.log
+
+# Large data files
+DariaInterviewTool.tar.gz
+*.dylib
+
+# Duplicate repository
+DariaInterviewTool_new/
+
+# Cache files
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
