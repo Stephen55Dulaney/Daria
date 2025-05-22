@@ -287,24 +287,16 @@ class InterviewService:
             The generated analysis text
         """
         try:
-            # Import the necessary LangChain components
-            try:
-                from langchain_community.chat_models import ChatOpenAI
-            except ImportError:
-                from langchain.chat_models import ChatOpenAI
-                
-            from langchain.chains import LLMChain
-            from langchain.prompts import PromptTemplate
+            # Use OpenAI directly instead of through LangChain
+            from openai import OpenAI
+            import os
             
-            # Initialize the language model
-            llm = ChatOpenAI(
-                temperature=0.3,  # Lower temperature for more focused/analytical responses
-                model_name="gpt-4" if os.environ.get("USE_GPT4", "").lower() == "true" else "gpt-3.5-turbo-16k",
-            )
+            # Initialize OpenAI client
+            client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
             
-            # Create a prompt template for analysis
-            template = """
-            {analysis_prompt}
+            # Create the full prompt
+            full_prompt = f"""
+            {prompt}
             
             INTERVIEW TRANSCRIPT:
             {transcript}
@@ -312,16 +304,18 @@ class InterviewService:
             ANALYSIS:
             """
             
-            prompt_template = PromptTemplate(
-                input_variables=["analysis_prompt", "transcript"],
-                template=template
+            # Call OpenAI API directly with v1.0+ syntax
+            response = client.chat.completions.create(
+                model="gpt-4" if os.environ.get("USE_GPT4", "").lower() == "true" else "gpt-3.5-turbo-16k",
+                messages=[
+                    {"role": "system", "content": "You are an expert interview analyst."},
+                    {"role": "user", "content": full_prompt}
+                ],
+                temperature=0.3,
             )
             
-            # Create the LLM chain
-            chain = LLMChain(llm=llm, prompt=prompt_template)
-            
-            # Generate the analysis
-            analysis = chain.run(analysis_prompt=prompt, transcript=transcript)
+            # Extract the analysis text
+            analysis = response.choices[0].message.content.strip()
             
             logger.info(f"Successfully generated analysis of {len(transcript)} characters")
             return analysis
