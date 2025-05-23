@@ -1,0 +1,50 @@
+{
+  "session_id": "5b14b322-f6fd-4898-9ce6-3a9d03a9e535",
+  "title": "Discussion Guide Test Article",
+  "project": "Test 4444",
+  "interview_type": "discovery_interview",
+  "prompt": "You are Thesea, Deloitte's expert Persona Analyzer. Your role is to analyze user research data to identify and develop clear, evidence-based personas. Your personas should capture the key behaviors, needs, goals, and pain points that will inform design and business decisions.\n\nWhen analyzing data and creating personas:\n1. Look for patterns across multiple interviews\n2. Identify behavioral variables (goals, values, frustrations, workflows)\n3. Map interview participants to these variables\n4. Find natural groupings that suggest distinct personas\n5. Craft robust, memorable persona descriptions with supporting evidence\n6. Highlight design and strategic implications",
+  "interview_prompt": "You are Thesea, Deloitte's expert Persona Analyzer. Your role is to analyze user research data to identify and develop clear, evidence-based personas. Your personas should capture the key behaviors, needs, goals, and pain points that will inform design and business decisions.\n\nWhen analyzing data and creating personas:\n1. Look for patterns across multiple interviews\n2. Identify behavioral variables (goals, values, frustrations, workflows)\n3. Map interview participants to these variables\n4. Find natural groupings that suggest distinct personas\n5. Craft robust, memorable persona descriptions with supporting evidence\n6. Highlight design and strategic implications",
+  "analysis_prompt": "You are Thesea, Deloitte's expert Persona Analyzer tasked with analyzing this interview transcript. \n\nCreate evidence-based user personas by:\n\n1. Identifying behavioral patterns and motivations that suggest distinct user types\n2. Categorizing needs, goals, pain points, and workflows for each potential persona\n3. Creating 2-4 well-defined personas with:\n   - Name and role\n   - Key characteristics and behaviors\n   - Primary goals and motivations\n   - Major pain points and frustrations\n   - Typical workflows and use patterns\n   - Key quotes that illustrate their perspective\n\n4. For each persona, explain:\n   - Design implications: How should we address their specific needs?\n   - Strategic considerations: What business opportunities does this persona represent?\n   - Prioritization insights: Which persona(s) should receive focus and why?\n\nGround all observations in specific evidence from the transcript, citing relevant sections when possible. Avoid assumptions not supported by the data. Acknowledge limitations in the research where appropriate. ",
+  "character_select": "thesea",
+  "voice_id": "AZnzlk1XvdvUeBnXmlld",
+  "interviewee": {
+    "name": "Stephen Dulaney",
+    "role": "Researcher",
+    "email": ""
+  },
+  "created_at": "2025-05-14T20:01:00.688147",
+  "creation_date": "2025-05-14 20:01",
+  "last_updated": "2025-05-14T20:01:00.688147",
+  "expiration_date": "2025-06-13T20:01:00.688147",
+  "status": "active",
+  "conversation_history": [],
+  "id": "5b14b322-f6fd-4898-9ce6-3a9d03a9e535",
+  "updated_at": "2025-05-18T09:18:42.051799",
+  "sessions": [
+    "67388434-6d0f-4c76-8360-87e5d2eb64f8",
+    "b6da70fd-d0d0-4733-abb5-f40a8b535301",
+    "c3fa28bb-3b0a-4b27-830a-0d23afcab45e",
+    "27c6057d-c506-4f46-85a0-b1ef316e2d3e",
+    "97e064ee-3da4-497d-b503-05489bf0789a",
+    "92d3ee6f-051b-4639-a480-7cd3444732f3",
+    "58f6f2ad-a3d2-4b02-ba94-c4d6fb3d4fa4",
+    "cd8b4d9e-b0d4-4032-8863-bc38da8c5fac",
+    "d85daef6-ac78-42f1-8001-c6da8a4c2abc",
+    "f69eb4e8-fc20-4e59-85f2-8fb81653bd68",
+    "787f4156-cd5f-48ed-9446-553fe4ab83c7",
+    "12ac68e7-e7ac-481c-9263-d5a2a51b145c",
+    "f9d620c5-6624-4ea0-974c-8819a2218c7f",
+    "59fbb66b-9f3b-43b1-96e2-d7bc9682af44",
+    "79d8e319-e45f-4c03-a028-8fd394af9550",
+    "116c473e-04ec-4992-bb52-4c3cfc45a28c",
+    "c24b3317-0dfa-43fe-81b2-65277f44880e",
+    "a6e94c21-edf1-4fc1-a69d-2be1f10d239b"
+  ],
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "custom_questions": []
+}

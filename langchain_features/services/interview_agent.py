@@ -11,6 +11,7 @@ from typing import List, Dict, Any, Optional
 import json
 import uuid
 
+from openai_langchain_adapter import OpenAILangChainAdapter
 from langchain.prompts import ChatPromptTemplate, SystemMessagePromptTemplate, HumanMessagePromptTemplate
 from langchain.chains import ConversationChain, LLMChain
 from langchain.memory import ConversationBufferMemory
@@ -64,11 +65,7 @@ class InterviewAgent:
         except ImportError:
             from langchain.chat_models import ChatOpenAI
             
-        self.llm = ChatOpenAI(
-            model_name=self.model_name,
-            temperature=self.temperature,
-            verbose=self.verbose
-        )
+        self.llm = OpenAILangChainAdapter(model_name="gpt-4", temperature=0.7)
         
         # Fix prompt and memory compatibility
         from langchain.chains import LLMChain

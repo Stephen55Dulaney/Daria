@@ -1,0 +1,38 @@
+{
+  "id": "78e412b3-34e3-4e40-9d2d-3909eb69d7e1",
+  "guide_id": "8522dd18-cd96-4acb-84ca-fbbb68133b63",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "393ce0bc-8c1f-4ade-b8d8-169a80a58e68",
+      "content": "to make sure we did not accidentally break you",
+      "role": "user",
+      "timestamp": "2025-05-14T15:55:12.374663"
+    },
+    {
+      "id": "f114514f-f828-4b7a-bf6b-72f7f6fef552",
+      "content": "Could you please provide some context or clarify what you mean by \"to make sure we did not accidentally break you\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T15:55:13.030737"
+    },
+    {
+      "id": "a7209e50-effd-42af-856d-c03cca8c7576",
+      "content": "well anytime we make changes to the system there is a chance  that this debug interview flow page will not work after the changes",
+      "role": "user",
+      "timestamp": "2025-05-14T15:55:35.029717"
+    },
+    {
+      "id": "2a75423c-926b-4b6c-abd0-e74719595ed7",
+      "content": "It sounds like there might be some concerns about the functionality of the debug interview flow page after system changes. Can you tell me more about the specific changes that are being made and how they might impact the debug interview flow page?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T15:55:35.795818"
+    }
+  ],
+  "transcript": "\n\nParticipant: to make sure we did not accidentally break you\n\nModerator: Could you please provide some context or clarify what you mean by \"to make sure we did not accidentally break you\"?\n\nParticipant: well anytime we make changes to the system there is a chance  that this debug interview flow page will not work after the changes\n\nModerator: It sounds like there might be some concerns about the functionality of the debug interview flow page after system changes. Can you tell me more about the specific changes that are being made and how they might impact the debug interview flow page?",
+  "analysis": null,
+  "created_at": "2025-05-14T15:55:02.195015",
+  "updated_at": "2025-05-14T15:55:35.796278"
+}

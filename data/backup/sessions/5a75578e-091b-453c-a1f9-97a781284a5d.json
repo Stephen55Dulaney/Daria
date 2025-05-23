@@ -1,0 +1,57 @@
+{
+  "id": "5a75578e-091b-453c-a1f9-97a781284a5d",
+  "guide_id": "b926091f-faf0-4a74-b253-33e5d5bb68d9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "7bc7ced1-f0b7-4f2f-a9bf-438ed3e5d28f",
+      "content": "SYSTEM: Character set to researcher. \n                                IMPORTANT: You are researcher. Your name is researcher.\n                                You MUST always respond as researcher. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am researcher.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"",
+      "role": "system",
+      "timestamp": "2025-05-19T08:51:55.650538"
+    },
+    {
+      "id": "8eb80639-4a37-4e09-ad55-d50cacfdae8d",
+      "content": "Hello, I am researcher. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-19T08:51:55.654397"
+    },
+    {
+      "id": "81edf3f6-436f-4a9a-a2a3-20d8d347f4b5",
+      "content": "I am here to work with you on an interview",
+      "role": "user",
+      "timestamp": "2025-05-19T08:52:24.063337"
+    },
+    {
+      "id": "d0a6cd3b-26b4-4299-8b92-84367c570249",
+      "content": "Great, thank you for participating in this interview. Let's get started. Can you tell me about your experience with fishing on a fly rod?",
+      "role": "assistant",
+      "timestamp": "2025-05-19T08:52:25.454212"
+    },
+    {
+      "id": "68d7a74d-ce9e-44f6-a9fd-a1cd6ef8ce5f",
+      "content": "fishing on a fly rod is amazing you can see you're walking in the water like a kid flashing and playing around you're looking at rocks you're kind of hiking in the most beautiful part of the forest and then you're casting this thing over and over here so there's a little bit of skill and you  land your fly and it floats and then smack  just gets it",
+      "role": "user",
+      "timestamp": "2025-05-19T08:53:09.973452"
+    },
+    {
+      "id": "26b69084-3fd7-4ea5-9e7d-c7cfafa3d000",
+      "content": "That sounds like a wonderful experience! It seems like you find fishing on a fly rod to be quite engaging and enjoyable. Could you share more about what specifically draws you to this activity? What do you find most rewarding about it?",
+      "role": "assistant",
+      "timestamp": "2025-05-19T08:53:11.247477"
+    }
+  ],
+  "transcript": "\n\nParticipant: SYSTEM: Character set to researcher. \n                                IMPORTANT: You are researcher. Your name is researcher.\n                                You MUST always respond as researcher. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am researcher.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n\nModerator: Hello, I am researcher. How can I assist you today?\n\nParticipant: I am here to work with you on an interview\n\nModerator: Great, thank you for participating in this interview. Let's get started. Can you tell me about your experience with fishing on a fly rod?\n\nParticipant: fishing on a fly rod is amazing you can see you're walking in the water like a kid flashing and playing around you're looking at rocks you're kind of hiking in the most beautiful part of the forest and then you're casting this thing over and over here so there's a little bit of skill and you  land your fly and it floats and then smack  just gets it\n\nModerator: That sounds like a wonderful experience! It seems like you find fishing on a fly rod to be quite engaging and enjoyable. Could you share more about what specifically draws you to this activity? What do you find most rewarding about it?",
+  "analysis": null,
+  "created_at": "2025-05-19T08:51:38.770324",
+  "updated_at": "2025-05-19T08:53:11.247824",
+  "title": "Testing Goals",
+  "project": "Test 4444",
+  "interview_type": "persona_interview",
+  "topic": "Fly Fishing",
+  "context": "To teach the interviewee how to catch a fish on a fly rod.",
+  "goals": "understand why men fish.",
+  "character": "researcher",
+  "character_select": "researcher",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL"
+}

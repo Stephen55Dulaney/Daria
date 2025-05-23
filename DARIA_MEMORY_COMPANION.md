@@ -33,6 +33,63 @@ The system prompt provides Daria with context about the project, including its h
 
 ## Technical Implementation - Recent Fixes
 
+### LangChain Dependencies and Text Parsing Issues (May 22, 2025)
+
+#### Problem Summary
+The DARIA interview tool experienced compatibility issues with Python 3.13 and LangChain:
+1. **Pydantic ForwardRef Error**: Python 3.13 compatibility issue with LangChain's dependency on Pydantic
+2. **Session Handling Problems**: Test sessions were not being properly created or accessed
+3. **Text Parsing Complexity**: Many issues were related to complex text parsing approaches
+
+#### Root Causes
+- **Pydantic ForwardRef Error**: 
+  - Python 3.13 changed the signature of ForwardRef._evaluate(), requiring a 'recursive_guard' parameter
+  - This broke compatibility with the version of Pydantic used by LangChain
+  
+- **Session Handling Problems**:
+  - Session IDs were hardcoded in test scripts
+  - Session data was being deleted during cleanup operations
+  
+- **Text Parsing Issues**:
+  - Complex regex patterns for extracting information from text were brittle
+  - Attempted workarounds by disabling LangChain made the problem worse
+
+#### Implemented Fixes
+1. **Patched Pydantic ForwardRef for Python 3.13**:
+   - Created a script to patch the ForwardRef._evaluate method at runtime
+   - This allowed LangChain to function correctly with Python 3.13
+
+2. **Session Handling Improvements**:
+   - Created dynamically-generated test sessions rather than relying on hardcoded IDs
+   - Ensured character information was properly passed and preserved
+
+3. **Simplified Approach to Data Handling**:
+   - Created a comprehensive startup script that tests and fixes all components
+   - Added more robust error handling for session lookups
+
+#### Implementation Details
+- **Key Files Created/Modified**:
+  - `fix_pydantic_forward_refs.py`: Script that patches Pydantic for Python 3.13 compatibility
+  - `start_daria_fixed.sh`: Comprehensive script that tests and starts all components
+  - Test data files to ensure session testing functionality
+
+#### Key Insights
+1. **IMPORTANT: Do NOT disable LangChain**
+   - LangChain is the backbone of the interview functionality
+   - Attempting to create shell scripts or workarounds that disable LangChain will break core functionality
+   - Always maintain LangChain integration and fix compatibility issues directly
+
+2. **Prefer AI-Generated JSON over Complex Text Parsing**
+   - When structured data is needed, ask the AI/OpenAI to generate JSON directly
+   - This approach is more reliable than complex regex or text parsing
+   - Example: Instead of parsing AI responses for structured data, request the data in JSON format directly
+
+#### Lessons Learned
+- Python version compatibility issues can be subtle but have major impacts
+- Runtime patching can be an effective temporary solution for dependency issues
+- Test scripts should create dynamic test data rather than rely on hardcoded values
+- Direct JSON generation from AI is preferable to post-processing text responses
+
 ### Character Identity and Context Leakage (May 15, 2025)
 
 #### Problem Summary
@@ -90,6 +147,29 @@ The DARIA interview tool experienced two critical issues:
 - Robust sanitization requires multiple layers of pattern detection
 - Test guides with specific characters are valuable for verification
 - Custom character handling requires explicit mapping in multiple places
+
+### 2025-05-23 Transcript Upload Format Fix
+
+We encountered an issue with the transcript upload feature where the JSON format needed to match a specific structure for proper functioning. The existing upload transcript feature in the UI was creating JSON with a different schema than what was required. 
+
+To address this, we created a helper script `fix_uploaded_transcript_format.py` that can parse various transcript formats and save them in the exact JSON structure needed by the system. This script:
+
+- Processes transcript files with different formats (colon-separated, brackets, etc.)
+- Identifies moderator vs participant speakers automatically
+- Creates session data with the correct structure including UUIDs for session and messages
+- Saves directly to the data/interviews/sessions/ directory
+- Links the session to a guide if needed
+
+The script can be used as:
+```
+./fix_uploaded_transcript_format.py -f transcript.txt -g guide-id -t "Interview Title" -p "Project Name"
+```
+
+This approach allows for reliable transcript uploads while avoiding modifications to the core codebase.
+
+**Important reminder:** Do not attempt to disable LangChain as it is the backbone of the interview functionality. Always maintain LangChain integration for proper operation of the system.
+
+Additionally, when working with complex text parsing tasks, consider first trying to have the AI generate the desired JSON structure directly rather than writing complex parsing code. This approach is often more maintainable and robust.
 
 ## Setup and Installation
 

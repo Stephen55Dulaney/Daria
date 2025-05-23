@@ -1,0 +1,48 @@
+{
+  "id": "3beece49-01fa-4920-a7ab-b1b69ea30abf",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "9aa3334b-60e9-4842-ac5c-30e28f106a93",
+      "content": "testing",
+      "role": "user",
+      "timestamp": "2025-05-21T21:26:41.485820"
+    },
+    {
+      "id": "174edbf7-9a70-45de-bbe6-bbd949f5eadf",
+      "content": "what is the AI think",
+      "role": "user",
+      "timestamp": "2025-05-21T21:28:21.661264"
+    },
+    {
+      "id": "73cabd5f-f2bb-4093-86a0-eca6c015111d",
+      "content": "Are you there?",
+      "role": "user",
+      "timestamp": "2025-05-21T21:32:19.633534"
+    },
+    {
+      "id": "52c2b216-26a5-4dd7-9d5e-3a526e14a964",
+      "content": "hi are you there",
+      "role": "user",
+      "timestamp": "2025-05-21T22:12:10.553689"
+    },
+    {
+      "id": "8d7f89a4-baa7-439c-97fe-9dcf3684bc2a",
+      "content": "test langchain",
+      "role": "user",
+      "timestamp": "2025-05-21T22:40:41.214194"
+    }
+  ],
+  "transcript": "\n\nParticipant: testing\n\nParticipant: what is the AI think\n\nParticipant: Are you there?\n\nParticipant: hi are you there\n\nParticipant: test langchain",
+  "analysis": null,
+  "created_at": "2025-05-21T21:26:28.656044",
+  "updated_at": "2025-05-21T22:40:41.214717",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

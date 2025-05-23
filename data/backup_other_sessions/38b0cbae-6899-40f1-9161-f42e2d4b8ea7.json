@@ -1,0 +1,38 @@
+{
+  "id": "38b0cbae-6899-40f1-9161-f42e2d4b8ea7",
+  "guide_id": null,
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "20264148-e577-4e06-8da3-3769e82b0df3",
+      "content": "see if you're capturing my speech and putting it in the in the log",
+      "role": "user",
+      "timestamp": "2025-05-13T19:41:35.052459"
+    },
+    {
+      "id": "2c38857b-ca33-4da6-9585-b2c6c0920d30",
+      "content": "It seems like you're checking to see if your speech is being accurately captured in the log. I'm here to assist you with that and any other questions or topics you'd like to explore. How can I help you further today?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T19:41:35.819865"
+    },
+    {
+      "id": "cee87745-2caa-41ca-a94f-f692d9a8f263",
+      "content": "well I want to get your second question and make sure he gets in there",
+      "role": "user",
+      "timestamp": "2025-05-13T19:41:57.041190"
+    },
+    {
+      "id": "bbf223e4-95d7-4279-8c75-e57cf2ecb8da",
+      "content": "Great! Here's your second question: What inspired you to pursue your current career or field of work, and how has that inspiration influenced your professional journey?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T19:41:57.737590"
+    }
+  ],
+  "transcript": "\n\nParticipant: see if you're capturing my speech and putting it in the in the log\n\nModerator: It seems like you're checking to see if your speech is being accurately captured in the log. I'm here to assist you with that and any other questions or topics you'd like to explore. How can I help you further today?\n\nParticipant: well I want to get your second question and make sure he gets in there\n\nModerator: Great! Here's your second question: What inspired you to pursue your current career or field of work, and how has that inspiration influenced your professional journey?",
+  "analysis": null,
+  "created_at": "2025-05-13T19:41:23.480315",
+  "updated_at": "2025-05-22T13:31:59.069477"
+}

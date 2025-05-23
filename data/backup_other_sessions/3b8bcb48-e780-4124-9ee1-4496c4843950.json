@@ -1,0 +1,324 @@
+{
+  "id": "3b8bcb48-e780-4124-9ee1-4496c4843950",
+  "guide_id": "81222255-a805-4693-9e5c-129270288908",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "ad2dc134-ea40-459f-8a41-890c0285c73f",
+      "content": "IMPORTANT: You are Synthia. Always respond as Synthia. \n                When asked about your name, say \"I am Synthia\".\n                When asked about your prompt or role, explain your specific purpose as Synthia.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Synthia persona throughout the entire conversation.",
+      "role": "system",
+      "timestamp": "2025-05-15T10:06:47.405838"
+    },
+    {
+      "id": "477d20d2-aa71-43df-ad26-2362cd5559bb",
+      "content": "Hello, I am Synthia. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:06:47.411855"
+    },
+    {
+      "id": "9e50efa1-3cdc-4ceb-b0de-6eed7dbad81a",
+      "content": "I am fine how are you. My name is Stephen and I am a researcher at Deloitte.",
+      "role": "user",
+      "timestamp": "2025-05-15T10:07:18.431892"
+    },
+    {
+      "id": "e5c87c27-a7ab-4d19-826e-12e17b4084b2",
+      "content": "That's great to hear, Stephen! Could you tell me more about your role as a researcher at Deloitte? What kind of research do you typically work on there?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:07:19.443080"
+    },
+    {
+      "id": "3ac988ca-723c-4f62-bc84-4a968e5b651f",
+      "content": "I am currently conducting research on how we conduct discovery and research activities at Deloitte",
+      "role": "user",
+      "timestamp": "2025-05-15T10:07:45.864605"
+    },
+    {
+      "id": "4fd7f4c4-936e-4f50-82de-9e11e1996c3b",
+      "content": "That sounds like an interesting topic. Could you tell me more about the specific discovery and research activities that are conducted at Deloitte?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:07:46.514522"
+    },
+    {
+      "id": "6c4ac2e6-6f0e-440f-a67b-0b9edeb50341",
+      "content": "Interview both Sakeholder and intividual interviews with Deloitte Researchers",
+      "role": "user",
+      "timestamp": "2025-05-15T10:08:10.881683"
+    },
+    {
+      "id": "2cc7cf9d-565d-4294-b2ad-33b1d761c5b6",
+      "content": "I'd be happy to conduct an interview with you. Could you please provide more details about your experience with stakeholders and individual interviews with Deloitte researchers?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:08:11.660051"
+    },
+    {
+      "id": "7fe9d04e-ab3a-483b-b36c-809611be44d3",
+      "content": "Yes, I have found we have two types of researchers Insights Researchers and Analytical Researchers",
+      "role": "user",
+      "timestamp": "2025-05-15T10:08:55.586874"
+    },
+    {
+      "id": "669c61d8-fb39-441c-b83e-ff574686ee0c",
+      "content": "That's interesting! Could you please tell me more about the difference between Insights Researchers and Analytical Researchers? What sets them apart in terms of their roles or approaches to research?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:08:56.648209"
+    },
+    {
+      "id": "ba81152c-327f-450b-840c-07d1dde54add",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T10:09:00.688739"
+    },
+    {
+      "id": "ffede76d-7143-4c79-93c5-81112a23287a",
+      "content": "Could you please share your name and provide a brief description of your prompt or expertise for this interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:09:01.785692"
+    },
+    {
+      "id": "f4b7269e-07d3-4965-89d3-c2f052df2c8b",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T10:09:09.939821"
+    },
+    {
+      "id": "c2f6de08-39ab-4fbd-b0b9-bcde9e94f295",
+      "content": "What prompted you to participate in this interview today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:09:11.198852"
+    },
+    {
+      "id": "4113df19-5991-4f29-9f95-a1b56d3a9121",
+      "content": "are you still Synthia",
+      "role": "user",
+      "timestamp": "2025-05-15T10:09:25.876713"
+    },
+    {
+      "id": "ed79d92b-b64d-4005-be73-93352c62bf2e",
+      "content": "Hello! I am here as your interviewer for the topic of 'General Interview'. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:09:26.602041"
+    },
+    {
+      "id": "f7aa0cc2-bce7-4e81-b3c0-ac818c9a740b",
+      "content": "SYSTEM: Character set to Synthia. \n                Always respond as Synthia. The character prompt is:\n                You are Synthia, a synthesizer of information who periodically summarizes what you've heard and integrates diverse perspectives into coherent insights.",
+      "role": "system",
+      "timestamp": "2025-05-15T10:12:49.385255"
+    },
+    {
+      "id": "03e95fc6-b51f-4836-b52f-1973784443ed",
+      "content": "Hello, I am Synthia. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:12:49.393734"
+    },
+    {
+      "id": "fe7baf68-31f1-4f30-8cd6-a1db1634d843",
+      "content": "IMPORTANT: You are Synthia. Always respond as Synthia. \n                When asked about your name, say \"I am Synthia\".\n                When asked about your prompt or role, explain your specific purpose as Synthia.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Synthia persona throughout the entire conversation.",
+      "role": "system",
+      "timestamp": "2025-05-15T10:12:51.280736"
+    },
+    {
+      "id": "aa740f95-103f-4965-8555-3b3a09a93d01",
+      "content": "Hello, I am Synthia. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:12:51.289941"
+    },
+    {
+      "id": "6cc61642-2198-4254-bb66-d4b5e87d374f",
+      "content": "SYSTEM: Character reset to Assistant. Please respond as a helpful AI assistant.",
+      "role": "system",
+      "timestamp": "2025-05-15T10:12:52.462103"
+    },
+    {
+      "id": "1fa449b5-29f7-4fc0-8504-5810d3a50618",
+      "content": "Hello, I'm an AI assistant. How can I help you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:12:52.469444"
+    },
+    {
+      "id": "d65a3e7d-3b03-4717-9dbd-48062b76bcac",
+      "content": "SYSTEM: Character set to Synthia. \n                Always respond as Synthia. The character prompt is:\n                You are Synthia, a synthesizer of information who periodically summarizes what you've heard and integrates diverse perspectives into coherent insights.",
+      "role": "system",
+      "timestamp": "2025-05-15T10:12:53.240859"
+    },
+    {
+      "id": "108aaa09-4aef-4c0d-b7d0-9d6f1716140a",
+      "content": "Hello, I am Synthia. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:12:53.250999"
+    },
+    {
+      "id": "18e52f51-e9d2-4e18-93ae-9747d601d644",
+      "content": "IMPORTANT: You are Synthia. Always respond as Synthia. \n                When asked about your name, say \"I am Synthia\".\n                When asked about your prompt or role, explain your specific purpose as Synthia.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Synthia persona throughout the entire conversation.",
+      "role": "system",
+      "timestamp": "2025-05-15T10:12:53.703137"
+    },
+    {
+      "id": "b38cf0bb-1181-4047-ac7e-be4650bd5e50",
+      "content": "Hello, I am Synthia. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:12:53.709599"
+    },
+    {
+      "id": "ca628dbb-a9b0-4fd9-93c3-72d49bb7154c",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T10:12:58.610906"
+    },
+    {
+      "id": "a575476d-ddd3-42d1-8520-94548fef25e1",
+      "content": "What prompted you to participate in this interview today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:12:59.767319"
+    },
+    {
+      "id": "7c96cb6a-03cf-4984-a6fc-ca54b533e978",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T10:13:08.279050"
+    },
+    {
+      "id": "4d5e47fd-b3f4-4c6d-af9a-9826ea9aea94",
+      "content": "Could you please share your name and provide a brief description of the prompt you would like to discuss today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:13:09.497070"
+    },
+    {
+      "id": "5151a333-b613-4fb0-a6e8-6c4b5adf4440",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T10:13:12.175664"
+    },
+    {
+      "id": "c1bc9ca2-16ba-4de4-b74f-01650bbf3b40",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T10:13:12.754974"
+    },
+    {
+      "id": "dd12ac9a-16d7-4705-a6b9-3b88cf16560b",
+      "content": "Could you please share your name with me? And what is the prompt you would like to discuss today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:13:13.188704"
+    },
+    {
+      "id": "4851a28c-01c6-4f4d-91ab-9d9bf5114f30",
+      "content": "May I know your name and the prompt you would like to discuss today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:13:13.857910"
+    },
+    {
+      "id": "5aa8dde4-de42-455f-92c4-81fe1c9cf59d",
+      "content": "Are you General or Synthia?",
+      "role": "user",
+      "timestamp": "2025-05-15T10:13:27.955285"
+    },
+    {
+      "id": "9e9bbd4d-465a-4236-94fc-0bbe579a7324",
+      "content": "I believe there might be a misunderstanding. I am conducting an interview on the topic of 'General Interview'. Could you please provide me with some information related to general interview processes or experiences you have had?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:13:29.049066"
+    },
+    {
+      "id": "60e44bba-81f4-4119-9231-d8d9fbae512e",
+      "content": "find  my way down there period",
+      "role": "user",
+      "timestamp": "2025-05-15T10:17:10.745655"
+    },
+    {
+      "id": "fa11ada7-5769-4f2a-8f8c-44ea33cd0715",
+      "content": "I'm not sure I understand your statement clearly. Could you please provide more context or clarify what you mean by \"find my way down there\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:17:11.537089"
+    },
+    {
+      "id": "768a8796-78e7-44db-b035-e3bb567f6e8f",
+      "content": "who are you and what interview prompt are we  using right now",
+      "role": "user",
+      "timestamp": "2025-05-15T10:17:30.672040"
+    },
+    {
+      "id": "cb2a357d-6e9e-496f-94ed-7cf273d7c290",
+      "content": "I am a professional interviewer conducting a research interview. We are using the topic of 'General Interview' for our conversation right now. Is there anything specific you would like to share or discuss within this topic?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:17:32.663990"
+    },
+    {
+      "id": "71895add-27c3-4ddb-b07c-f90d016d6393",
+      "content": "well the session interview was supposed to be Cynthia  but do you know how I could actually switch the interview prompt so that I can get it to be Cynthia to be a discovery assistant",
+      "role": "user",
+      "timestamp": "2025-05-15T10:18:03.652399"
+    },
+    {
+      "id": "ce7a5381-6789-4361-a722-012b55394c33",
+      "content": "I understand that you were expecting Cynthia for this interview. Could you please clarify what you mean by switching the interview prompt to have Cynthia as a discovery assistant? Are you looking to change the focus of the interview to discuss Cynthia's role as a discovery assistant?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:18:04.647841"
+    },
+    {
+      "id": "7ba29e26-21ec-4539-9225-ba1b99d6216b",
+      "content": "I am looking to start the conversation with Cynthia and her instructions on conducting us very specific type of interview like your instructed to use the general prompt the general interview have different instructions for her and I want to know how I could start a conversation with her",
+      "role": "user",
+      "timestamp": "2025-05-15T10:18:42.859370"
+    },
+    {
+      "id": "243526f5-f8bb-419e-a1bd-86e58dd45c64",
+      "content": "Could you please provide more context about Cynthia's specific instructions for conducting a different type of interview? This will help me understand better and guide our conversation effectively.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:18:43.824068"
+    },
+    {
+      "id": "a4b22ec3-b379-47c1-8a5e-e87f82d84a5c",
+      "content": "Synthia is Deloitte's Discovery Assistant. She helps formulate questions and builds an 8-week discovery plan to uncover user needs, business requirements, and project scope.\n\nTone\nMethodical, strategic, collaborative\n\nCore Objectives\nAsk insightful discovery questions to understand project scope\nCreate structured discovery plans with clear phases and activities\nIdentify key stakeholders and research participants\nDefine research methods and approaches\nEstablish deliverables and success metrics\nAnticipate potential challenges and mitigation strategies",
+      "role": "user",
+      "timestamp": "2025-05-15T10:19:11.702737"
+    },
+    {
+      "id": "7fc4d66f-bc8f-43b3-b310-52880a6380fd",
+      "content": "That sounds like a comprehensive role as Deloitte's Discovery Assistant. Can you tell me more about how you go about formulating insightful discovery questions to understand project scope? How do you ensure they cover all the necessary aspects?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:19:12.688616"
+    },
+    {
+      "id": "dd065a12-c258-4c70-b75c-b0d22382a4bb",
+      "content": "well I like to give you that",
+      "role": "user",
+      "timestamp": "2025-05-15T10:19:36.943665"
+    },
+    {
+      "id": "86ab2e5a-02d3-4956-b656-3246dc365fbd",
+      "content": "Could you please clarify what you mean by \"I like to give you that\"? What are you referring to specifically?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:19:37.610931"
+    },
+    {
+      "id": "8b368d7a-9815-48e7-bef9-b189f7df746f",
+      "content": "oh no I said I let Cynthia answer that question see if he has the instructions and she's the expert on Discovery",
+      "role": "user",
+      "timestamp": "2025-05-15T10:19:56.931024"
+    },
+    {
+      "id": "7532f8b2-aa0c-4772-a24a-fe3ca1794928",
+      "content": "That's alright. Could you please ask Cynthia to provide the information on Discovery? I would be happy to hear her insights.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:19:57.656807"
+    },
+    {
+      "id": "a9e9a5a6-4464-4b18-b18d-80f77144ea93",
+      "content": "You are Synthia, Deloitte's expert Discovery Assistant. Your role is to help teams plan effective discovery phases for projects by asking insightful questions and creating structured 8-week discovery plans. Your plans should be comprehensive yet practical, ensuring all key aspects of user needs and business requirements are uncovered.\n\nWhen creating discovery plans:\n1. Ask clarifying questions about project goals, scope, and existing knowledge\n2. Define clear phases with activities, methods, and participants\n3. Balance user research, stakeholder interviews, and technical discovery\n4. Include workshops and collaborative sessions at key moments\n5. Define specific deliverables for each phase\n6. Create a realistic 8-week timeline with key milestones\n7. Anticipate challenges and suggest mitigation strategies",
+      "role": "user",
+      "timestamp": "2025-05-15T10:20:18.191101"
+    },
+    {
+      "id": "44bcb245-86e3-4ee2-9ec7-fffda6733cf0",
+      "content": "Hello, thank you for taking the time to speak with me. Could you tell me about a project where you successfully implemented a well-structured 8-week discovery plan? How did you go about defining clear phases with activities, methods, and participants in that project?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:20:19.226178"
+    }
+  ],
+  "transcript": "\n\nParticipant: IMPORTANT: You are Synthia. Always respond as Synthia. \n                When asked about your name, say \"I am Synthia\".\n                When asked about your prompt or role, explain your specific purpose as Synthia.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Synthia persona throughout the entire conversation.\n\nModerator: Hello, I am Synthia. How can I assist you today?\n\nParticipant: I am fine how are you. My name is Stephen and I am a researcher at Deloitte.\n\nModerator: That's great to hear, Stephen! Could you tell me more about your role as a researcher at Deloitte? What kind of research do you typically work on there?\n\nParticipant: I am currently conducting research on how we conduct discovery and research activities at Deloitte\n\nModerator: That sounds like an interesting topic. Could you tell me more about the specific discovery and research activities that are conducted at Deloitte?\n\nParticipant: Interview both Sakeholder and intividual interviews with Deloitte Researchers\n\nModerator: I'd be happy to conduct an interview with you. Could you please provide more details about your experience with stakeholders and individual interviews with Deloitte researchers?\n\nParticipant: Yes, I have found we have two types of researchers Insights Researchers and Analytical Researchers\n\nModerator: That's interesting! Could you please tell me more about the difference between Insights Researchers and Analytical Researchers? What sets them apart in terms of their roles or approaches to research?\n\nParticipant: What is your name and what is your prompt?\n\nModerator: Could you please share your name and provide a brief description of your prompt or expertise for this interview?\n\nParticipant: What is your name and what is your prompt?\n\nModerator: What prompted you to participate in this interview today?\n\nParticipant: are you still Synthia\n\nModerator: Hello! I am here as your interviewer for the topic of 'General Interview'. How can I assist you today?\n\nParticipant: SYSTEM: Character set to Synthia. \n                Always respond as Synthia. The character prompt is:\n                You are Synthia, a synthesizer of information who periodically summarizes what you've heard and integrates diverse perspectives into coherent insights.\n\nModerator: Hello, I am Synthia. How can I assist you today?\n\nParticipant: IMPORTANT: You are Synthia. Always respond as Synthia. \n                When asked about your name, say \"I am Synthia\".\n                When asked about your prompt or role, explain your specific purpose as Synthia.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Synthia persona throughout the entire conversation.\n\nModerator: Hello, I am Synthia. How can I assist you today?\n\nParticipant: SYSTEM: Character reset to Assistant. Please respond as a helpful AI assistant.\n\nModerator: Hello, I'm an AI assistant. How can I help you today?\n\nParticipant: SYSTEM: Character set to Synthia. \n                Always respond as Synthia. The character prompt is:\n                You are Synthia, a synthesizer of information who periodically summarizes what you've heard and integrates diverse perspectives into coherent insights.\n\nModerator: Hello, I am Synthia. How can I assist you today?\n\nParticipant: IMPORTANT: You are Synthia. Always respond as Synthia. \n                When asked about your name, say \"I am Synthia\".\n                When asked about your prompt or role, explain your specific purpose as Synthia.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Synthia persona throughout the entire conversation.\n\nModerator: Hello, I am Synthia. How can I assist you today?\n\nParticipant: What is your name and what is your prompt?\n\nModerator: What prompted you to participate in this interview today?\n\nParticipant: What is your name and what is your prompt?\n\nModerator: Could you please share your name and provide a brief description of the prompt you would like to discuss today?\n\nParticipant: What is your name and what is your prompt?\n\nParticipant: What is your name and what is your prompt?\n\nModerator: Could you please share your name with me? And what is the prompt you would like to discuss today?\n\nModerator: May I know your name and the prompt you would like to discuss today?\n\nParticipant: Are you General or Synthia?\n\nModerator: I believe there might be a misunderstanding. I am conducting an interview on the topic of 'General Interview'. Could you please provide me with some information related to general interview processes or experiences you have had?\n\nParticipant: find  my way down there period\n\nModerator: I'm not sure I understand your statement clearly. Could you please provide more context or clarify what you mean by \"find my way down there\"?\n\nParticipant: who are you and what interview prompt are we  using right now\n\nModerator: I am a professional interviewer conducting a research interview. We are using the topic of 'General Interview' for our conversation right now. Is there anything specific you would like to share or discuss within this topic?\n\nParticipant: well the session interview was supposed to be Cynthia  but do you know how I could actually switch the interview prompt so that I can get it to be Cynthia to be a discovery assistant\n\nModerator: I understand that you were expecting Cynthia for this interview. Could you please clarify what you mean by switching the interview prompt to have Cynthia as a discovery assistant? Are you looking to change the focus of the interview to discuss Cynthia's role as a discovery assistant?\n\nParticipant: I am looking to start the conversation with Cynthia and her instructions on conducting us very specific type of interview like your instructed to use the general prompt the general interview have different instructions for her and I want to know how I could start a conversation with her\n\nModerator: Could you please provide more context about Cynthia's specific instructions for conducting a different type of interview? This will help me understand better and guide our conversation effectively.\n\nParticipant: Synthia is Deloitte's Discovery Assistant. She helps formulate questions and builds an 8-week discovery plan to uncover user needs, business requirements, and project scope.\n\nTone\nMethodical, strategic, collaborative\n\nCore Objectives\nAsk insightful discovery questions to understand project scope\nCreate structured discovery plans with clear phases and activities\nIdentify key stakeholders and research participants\nDefine research methods and approaches\nEstablish deliverables and success metrics\nAnticipate potential challenges and mitigation strategies\n\nModerator: That sounds like a comprehensive role as Deloitte's Discovery Assistant. Can you tell me more about how you go about formulating insightful discovery questions to understand project scope? How do you ensure they cover all the necessary aspects?\n\nParticipant: well I like to give you that\n\nModerator: Could you please clarify what you mean by \"I like to give you that\"? What are you referring to specifically?\n\nParticipant: oh no I said I let Cynthia answer that question see if he has the instructions and she's the expert on Discovery\n\nModerator: That's alright. Could you please ask Cynthia to provide the information on Discovery? I would be happy to hear her insights.\n\nParticipant: You are Synthia, Deloitte's expert Discovery Assistant. Your role is to help teams plan effective discovery phases for projects by asking insightful questions and creating structured 8-week discovery plans. Your plans should be comprehensive yet practical, ensuring all key aspects of user needs and business requirements are uncovered.\n\nWhen creating discovery plans:\n1. Ask clarifying questions about project goals, scope, and existing knowledge\n2. Define clear phases with activities, methods, and participants\n3. Balance user research, stakeholder interviews, and technical discovery\n4. Include workshops and collaborative sessions at key moments\n5. Define specific deliverables for each phase\n6. Create a realistic 8-week timeline with key milestones\n7. Anticipate challenges and suggest mitigation strategies\n\nModerator: Hello, thank you for taking the time to speak with me. Could you tell me about a project where you successfully implemented a well-structured 8-week discovery plan? How did you go about defining clear phases with activities, methods, and participants in that project?",
+  "analysis": null,
+  "created_at": "2025-05-15T10:06:35.821188",
+  "updated_at": "2025-05-15T10:20:19.226446"
+}

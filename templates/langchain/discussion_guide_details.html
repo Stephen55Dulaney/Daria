@@ -319,8 +319,8 @@
             <div class="card guide-card mb-4">
                 <div class="card-header d-flex justify-content-between align-items-center">
                     <h5 class="card-title mb-0">Sessions</h5>
-                    <button type="button" class="btn btn-sm btn-primary" id="newSessionBtn">
-                        <i class="bi bi-plus"></i> New Session
+                    <button type="button" class="btn btn-sm btn-primary" id="uploadTranscriptBtn">
+                        <i class="bi bi-upload"></i> Upload Transcript
                     </button>
                 </div>
                 <div class="card-body">
@@ -552,11 +552,78 @@
         </div>
     </div>
 </div>
+
+<!-- Upload Transcript Modal -->
+<div class="modal fade" id="uploadTranscriptModal" tabindex="-1" aria-labelledby="uploadTranscriptModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="uploadTranscriptModalLabel">Upload Interview Transcript</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form id="uploadTranscriptForm">
+                    <input type="hidden" name="guide_id" value="{{ guide_id }}">
+                    <input type="hidden" name="title" value="{{ guide.title }}">
+                    <input type="hidden" name="project" value="{{ guide.project }}">
+                    <input type="hidden" name="interview_type" value="{{ guide.interview_type }}">
+                    
+                    <!-- Participant Information -->
+                    <div class="mb-3">
+                        <label for="participant_name" class="form-label">Participant Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="participant_name" name="participant_name" required>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="participant_email" class="form-label">Participant Email</label>
+                            <input type="email" class="form-control" id="participant_email" name="participant_email">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="participant_role" class="form-label">Participant Role</label>
+                            <input type="text" class="form-control" id="participant_role" name="participant_role">
+                        </div>
+                    </div>
+                    
+                    <!-- Transcript Upload -->
+                    <div class="mb-3">
+                        <label for="transcript_file" class="form-label">Transcript File <span class="text-danger">*</span></label>
+                        <input type="file" class="form-control" id="transcript_file" name="transcript_file" accept=".txt" required>
+                        <div class="form-text">Upload a text file containing the interview transcript. The system will automatically detect speakers in the transcript.</div>
+                    </div>
+                    
+                    <div id="fileNameDisplay" class="alert alert-info mt-2 d-none">
+                        Selected file: <span id="fileNameText"></span>
+                    </div>
+                    
+                    <div id="uploadError" class="alert alert-danger mt-2 d-none"></div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="submitUploadBtn">Upload Transcript</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Add global error handling
+        window.addEventListener('error', function(event) {
+            console.error('Global error caught:', event.error);
+            console.error('Error message:', event.message);
+            console.error('Error source:', event.filename, 'Line:', event.lineno, 'Column:', event.colno);
+        });
+        
+        // Add unhandled promise rejection handling
+        window.addEventListener('unhandledrejection', function(event) {
+            console.error('Unhandled promise rejection:', event.reason);
+            console.error('Promise:', event.promise);
+        });
+        
         // Copy functionality for prompts
         document.querySelectorAll('.copy-btn').forEach(button => {
             button.addEventListener('click', function() {
@@ -680,7 +747,6 @@
         
         // Add event listeners to all buttons that should open the session creation modal
         document.getElementById('startNewSessionBtn').addEventListener('click', showSessionModal);
-        document.getElementById('newSessionBtn').addEventListener('click', showSessionModal);
         const noSessionsBtn = document.getElementById('noSessionsBtn');
         if (noSessionsBtn) {
             noSessionsBtn.addEventListener('click', showSessionModal);
@@ -742,6 +808,126 @@
                 alert('Error creating session: ' + error);
             });
         });
+        
+        // Upload transcript functionality
+        const uploadTranscriptBtn = document.getElementById('uploadTranscriptBtn');
+        const uploadTranscriptModal = document.getElementById('uploadTranscriptModal') ? 
+            new bootstrap.Modal(document.getElementById('uploadTranscriptModal')) : null;
+        const uploadTranscriptForm = document.getElementById('uploadTranscriptForm');
+        const fileInput = document.getElementById('transcript_file');
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
+        const fileNameText = document.getElementById('fileNameText');
+        const uploadError = document.getElementById('uploadError');
+        const submitUploadBtn = document.getElementById('submitUploadBtn');
+        
+        // Debug info for element existence
+        console.log('Element check:', {
+            'uploadTranscriptBtn': !!uploadTranscriptBtn,
+            'uploadTranscriptModal': !!document.getElementById('uploadTranscriptModal'),
+            'uploadTranscriptForm': !!uploadTranscriptForm,
+            'fileInput': !!fileInput,
+            'fileNameDisplay': !!fileNameDisplay,
+            'fileNameText': !!fileNameText,
+            'uploadError': !!uploadError,
+            'submitUploadBtn': !!submitUploadBtn
+        });
+        
+        // Only bind events if elements exist
+        if (uploadTranscriptBtn) {
+            uploadTranscriptBtn.addEventListener('click', function() {
+                console.log('Upload transcript button clicked');
+                if (uploadTranscriptModal) {
+                    uploadTranscriptModal.show();
+                } else {
+                    console.error('uploadTranscriptModal is not initialized');
+                }
+            });
+        } else {
+            console.error('uploadTranscriptBtn not found in the DOM');
+        }
+        
+        if (fileInput) {
+            fileInput.addEventListener('change', function() {
+                console.log('File input changed');
+                if (this.files.length) {
+                    const file = this.files[0];
+                    console.log('Selected file:', file.name, 'Size:', file.size, 'Type:', file.type);
+                    fileNameText.textContent = file.name;
+                    fileNameDisplay.classList.remove('d-none');
+                } else {
+                    fileNameDisplay.classList.add('d-none');
+                }
+            });
+        } else {
+            console.error('fileInput not found in the DOM');
+        }
+        
+        if (submitUploadBtn) {
+            submitUploadBtn.addEventListener('click', function() {
+                console.log('Submit upload button clicked');
+                if (!uploadTranscriptForm.checkValidity()) {
+                    console.log('Form validation failed');
+                    uploadTranscriptForm.reportValidity();
+                    return;
+                }
+                
+                console.log('Form is valid, proceeding with upload');
+                uploadError.classList.add('d-none');
+                
+                const formData = new FormData(uploadTranscriptForm);
+                
+                // Log form data for debugging
+                for (let [key, value] of formData.entries()) {
+                    console.log(`FormData: ${key} = ${value instanceof File ? `File: ${value.name}` : value}`);
+                }
+                
+                // Disable submit button during upload
+                submitUploadBtn.disabled = true;
+                submitUploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...';
+                
+                console.log('Sending fetch request to /api/upload_transcript');
+                fetch('/api/upload_transcript', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(response => {
+                    console.log('Received response:', response.status, response.statusText);
+                    return response.json();
+                })
+                .then(data => {
+                    console.log('Received data:', data);
+                    submitUploadBtn.disabled = false;
+                    submitUploadBtn.innerHTML = 'Upload Transcript';
+                    
+                    if (data.success) {
+                        console.log('Upload successful, closing modal and reloading page');
+                        // Close modal
+                        if (uploadTranscriptModal) {
+                            uploadTranscriptModal.hide();
+                        }
+                        
+                        // Reload the page to show the new session
+                        setTimeout(() => {
+                            console.log('Reloading page...');
+                            window.location.reload();
+                        }, 500);
+                    } else {
+                        console.error('Upload failed:', data.error);
+                        uploadError.textContent = data.error || 'An error occurred during upload';
+                        uploadError.classList.remove('d-none');
+                    }
+                })
+                .catch(error => {
+                    console.error('Fetch error:', error);
+                    submitUploadBtn.disabled = false;
+                    submitUploadBtn.innerHTML = 'Upload Transcript';
+                    uploadError.textContent = 'Network error: ' + error.message;
+                    uploadError.classList.remove('d-none');
+                });
+            });
+        } else {
+            console.error('submitUploadBtn not found in the DOM');
+        }
     });
 </script>
 {% endblock %} 

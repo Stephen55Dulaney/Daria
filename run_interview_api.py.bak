@@ -12,7 +12,7 @@ import datetime
 import uuid
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
-from flask import Flask, request, jsonify, render_template, redirect, Response, flash, send_file, url_for, session
+from flask import Flask, request, jsonify, render_template, redirect, Response, flash, send_file, url_for, session, send_from_directory
 from flask_cors import CORS
 import yaml
 import requests
@@ -29,9 +29,20 @@ from models.user import User, UserRepository
 import re
 import traceback
 
+
+# Custom JSON encoder for datetime objects
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        import datetime
+        if isinstance(obj, (datetime.date, datetime.datetime)):
+            return obj.isoformat()
+        return super().default(obj)
+
 # Import user routes
 from user_routes import user_bp
 from auth_routes import auth_bp
+from routes.issue_routes import bp as issues_bp
+from langchain_features import langchain_blueprint
 
 # Set up logging
 logging.basicConfig(
@@ -57,6 +68,22 @@ app = Flask(__name__,
 # Configure secret key for sessions
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'daria-interview-tool-secret-key')
 
+
+# Initialize base directories
+BASE_DIR = Path(__file__).parent.absolute()
+DATA_DIR = BASE_DIR / "data" / "interviews"
+SESSIONS_DIR = DATA_DIR / 'sessions'
+
+# Ensure directories exist
+DATA_DIR.mkdir(parents=True, exist_ok=True)
+SESSIONS_DIR.mkdir(parents=True, exist_ok=True)
+
+# Configure app paths
+app.config['INTERVIEW_DATA_DIR'] = str(DATA_DIR)
+app.config['INTERVIEW_SESSIONS_DIR'] = str(SESSIONS_DIR)
+
+
+
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -77,12 +104,11 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 logger.info("SocketIO initialized for real-time communication")
 
 # Define paths
-BASE_DIR = Path(__file__).parent.absolute()
-DATA_DIR = BASE_DIR / "data" / "interviews"
 PROMPT_DIR = BASE_DIR / "tools" / "prompt_manager" / "prompts"
 
 # Ensure directories exist
-DATA_DIR.mkdir(parents=True, exist_ok=True)
+
+# Configure directory paths
 PROMPT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Initialize PromptManager
@@ -92,6 +118,12 @@ logger.info(f"Initialized PromptManager with prompt_dir={PROMPT_DIR}")
 
 # Initialize LangChain service if enabled
 use_langchain = args.use_langchain
+
+# Check if --no-langchain was explicitly provided (it overrides --use-langchain)
+if args.no_langchain:
+    use_langchain = False
+    logger.info("LangChain explicitly disabled via --no-langchain flag")
+
 interview_service = None
 discussion_service = None
 observer_service = None
@@ -104,15 +136,19 @@ except Exception as e:
     logger.error(f"Error initializing discussion service: {str(e)}")
     discussion_service = None
 
+# Initialize observer service regardless of LangChain setting
+# This ensures monitoring capability works even with basic mode
+try:
+    observer_service = ObserverService(openai_api_key=os.environ.get('OPENAI_API_KEY'))
+    logger.info("Observer service initialized successfully")
+except Exception as e:
+    logger.error(f"Error initializing observer service: {str(e)}")
+    observer_service = None
+
 if use_langchain:
     try:
         interview_service = InterviewService(data_dir=str(DATA_DIR))
         logger.info("LangChain interview service initialized successfully")
-        
-        # discussion_service is already initialized above
-        
-        observer_service = ObserverService(openai_api_key=os.environ.get('OPENAI_API_KEY'))
-        logger.info("Observer service initialized successfully")
     except Exception as e:
         logger.error(f"Error initializing LangChain services: {str(e)}")
         logger.warning("Falling back to simple response generation")
@@ -168,7 +204,7 @@ def save_interview(session_id: str, interview_data: Dict[str, Any]) -> bool:
         # Save to file
         file_path = DATA_DIR / f"{session_id}.json"
         with open(file_path, 'w') as f:
-            json.dump(serializable_data, f, indent=2)
+            json.dump(serializable_data, f, cls=DateTimeEncoder, indent=2)
         
         return True
     except Exception as e:
@@ -202,7 +238,8 @@ def load_all_interviews() -> Dict[str, Dict[str, Any]]:
     """Load all interviews from the data directory."""
     interviews = {}
     try:
-        DATA_DIR.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
+
+# Configure directory paths
         for file_path in DATA_DIR.glob("*.json"):
             try:
                 session_id = file_path.stem
@@ -441,12 +478,15 @@ def create_fresh_interview_link():
             
         # Generate the sharing URL
         host_url = request.host_url.rstrip('/')
-        sharing_url = f"{host_url}/interview/{new_session_id}?remote=true"
+        standard_url = f"{host_url}/interview/{new_session_id}?remote=true"
+        remote_url = f"{host_url}/remote_interview?session_id={new_session_id}"
             
         return jsonify({
             'success': True,
             'session_id': new_session_id,
-            'sharing_url': sharing_url
+            'sharing_url': remote_url,  # Use the new remote URL by default
+            'standard_url': standard_url,
+            'remote_url': remote_url
         })
             
     except Exception as e:
@@ -1009,6 +1049,10 @@ def text_to_speech_elevenlabs():
         text = data.get('text', '')
         voice_id = data.get('voice_id', 'EXAVITQu4vr4xnSDxMaL')
         
+        if not text:
+            logger.error("No text provided for text-to-speech")
+            return jsonify({'error': 'No text provided'}), 400
+        
         # Try to forward to audio service
         try:
             audio_service_url = 'http://localhost:5015/text_to_speech'
@@ -1031,73 +1075,120 @@ def text_to_speech_elevenlabs():
                     
                 elif 'audio/' in content_type:
                     # For audio responses (MP3 data)
-                    return Response(response.content, 
-                                   mimetype=content_type)
+                    audio_response = Response(response.content, mimetype=content_type)
+                    # Add CORS headers
+                    audio_response.headers.add('Access-Control-Allow-Origin', '*')
+                    audio_response.headers.add('Access-Control-Allow-Headers', 'Content-Type')
+                    return audio_response
                     
                 else:
                     # Default to returning raw content
-                    return response.content, 200, {'Content-Type': content_type}
+                    return response.content, 200, {
+                        'Content-Type': content_type,
+                        'Access-Control-Allow-Origin': '*',
+                        'Access-Control-Allow-Headers': 'Content-Type'
+                    }
             else:
                 logger.error(f"Error from TTS service: {response.status_code}")
                 # Return a success response with a message instead of an error
                 # This prevents client errors but informs that TTS failed
                 return jsonify({
-                    'success': True,
-                    'fallback': True,
-                    'message': 'TTS service unavailable, using silent mode'
-                })
+                    'success': False,
+                    'error': f'TTS service returned status code {response.status_code}'
+                }), 500
                 
         except Exception as e:
             logger.error(f"Error forwarding to TTS service: {str(e)}")
             # Provide a fallback response instead of raising an exception
             return jsonify({
-                'success': True,
-                'fallback': True,
-                'message': 'TTS service unavailable, using silent mode'
-            })
+                'success': False,
+                'error': f'TTS service connection error: {str(e)}'
+            }), 500
         
     except Exception as e:
         logger.error(f"Error in text_to_speech_elevenlabs: {str(e)}")
         return jsonify({
-            'success': True,
-            'fallback': True,
-            'message': 'TTS service error, using silent mode'
-        })
+            'success': False,
+            'error': f'TTS processing error: {str(e)}'
+        }), 500
 
 @app.route('/api/speech_to_text', methods=['POST'])
 def speech_to_text():
     """Process audio file and convert speech to text.
     
-    Note: For simplicity, this endpoint returns a success response
-    with hardcoded text. The actual speech-to-text functionality
-    is implemented client-side using the Web Speech API in the browser.
+    This endpoint can:
+    1. Use the external audio service (if available)
+    2. Return a placeholder response if audio service isn't available
     """
     try:
-        # For compatibility with the API, still accept the audio file
+        # Check if audio file is provided
         if 'audio' not in request.files:
             return jsonify({"success": False, "error": "No audio file provided"}), 400
         
-        # Get the audio file and save it (to simulate processing)
+        # Get session ID if provided
+        session_id = request.form.get('session_id', '')
+        
+        # Get the audio file
         audio_file = request.files['audio']
-        filename = os.path.join('uploads', f"temp_audio_{uuid.uuid4()}.webm")
         
         # Ensure uploads directory exists
         os.makedirs('uploads', exist_ok=True)
+        
+        # Save the temporary file
+        filename = os.path.join('uploads', f"temp_audio_{uuid.uuid4()}.webm")
         audio_file.save(filename)
         
-        # Clean up the file (no need to keep it)
+        # Try to forward to audio service
         try:
-            os.remove(filename)
-        except:
-            pass
+            audio_service_url = 'http://localhost:5015/speech_to_text'
+            
+            logger.info(f"Forwarding STT request to {audio_service_url}")
+            
+            # Create a new multipart form with the saved file
+            files = {'audio': open(filename, 'rb')}
+            data = {'session_id': session_id} if session_id else {}
+            
+            response = requests.post(
+                audio_service_url,
+                files=files,
+                data=data,
+                timeout=10
+            )
+            
+            # Clean up the temporary file
+            try:
+                os.remove(filename)
+            except Exception as e:
+                logger.error(f"Error removing temp file: {str(e)}")
+            
+            # Return the response from the STT service
+            if response.status_code == 200:
+                return response.json()
+            else:
+                logger.error(f"Error from STT service: {response.status_code}")
+                # Return a fallback response if the service fails
+                return jsonify({
+                    'success': True,
+                    'text': "I'm saying something important in this interview.",
+                    'fallback': True
+                })
+                
+        except Exception as e:
+            logger.error(f"Error forwarding to STT service: {str(e)}")
+            
+            # Clean up the temporary file
+            try:
+                os.remove(filename)
+            except Exception as file_e:
+                logger.error(f"Error removing temp file: {str(file_e)}")
+            
+            # Return a fallback response
+            return jsonify({
+                'success': True,
+                'text': "I didn't quite catch that. Could you please repeat?",
+                'fallback': True
+            })
         
-        # Return a success response with placeholder text
-        # In reality, we're relying on the browser's Web Speech API
-        # This is just to maintain API compatibility
-        return jsonify({
-            'success': True,
-            'text': "I'm saying something important in this interview."
-        })
     except Exception as e:
         logger.error(f"Error in speech_to_text: {str(e)}")
         return jsonify({
@@ -1125,6 +1216,9 @@ def create_interview():
             'title': data.get('title', 'Untitled Interview'),
             'project': data.get('project', ''),
             'interview_type': data.get('interview_type', 'custom_interview'),
+            'topic': data.get('topic', 'General Interview'),
+            'context': data.get('context', 'This is an interview conversation.'),
+            'goals': data.get('goals', 'Gather information from the participant'),
             'prompt': data.get('prompt', ''),
             'interview_prompt': data.get('interview_prompt', ''),
             'analysis_prompt': data.get('analysis_prompt', ''),
@@ -1140,18 +1234,50 @@ def create_interview():
             'last_updated': now,
             'expiration_date': now + datetime.timedelta(days=30),
             'status': 'active',
-            'conversation_history': []
+            'conversation_history': [],
+            'custom_questions': data.get('custom_questions', []),
+            'options': data.get('options', {
+                'record_transcript': True,
+                'analysis': True,
+                'use_tts': True
+            })
         }
+        
+        
+        # Update the guide with the new session ID
+        if guide_id:
+            guide_file = os.path.join(DATA_DIR, f"{guide_id}.json")
+            if os.path.exists(guide_file):
+                try:
+                    with open(guide_file, 'r') as f:
+                        guide_data = json.load(f)
+                    
+                    # Add the session ID to the guide's sessions list if not already there
+                    if "sessions" not in guide_data:
+                        guide_data["sessions"] = []
+                    if session_id not in guide_data["sessions"]:
+                        guide_data["sessions"].append(session_id)
+                        guide_data["updated_at"] = now
+                    
+                    # Save the updated guide data
+                    with open(guide_file, 'w') as f:
+                        json.dump(guide_data, f, indent=2)
+                except Exception as e:
+                    logger.error(f"Error updating guide {guide_id} with session {session_id}: {str(e)}")
         
         # Save the interview data
         save_interview(session_id, interview_data)
         logger.info(f"Created new interview with ID: {session_id}")
         
+        # All interview types should be treated as discussion guides for consistency
+        # This provides a unified experience regardless of interview type
+        redirect_url = f"/discussion_guide/{session_id}"
+        
         # Return success response with session ID and redirect URL
         return jsonify({
             'status': 'success',
             'session_id': session_id,
-            'redirect_url': f"/interview_details/{session_id}"
+            'redirect_url': redirect_url
         })
     except Exception as e:
         logger.error(f"Error creating interview: {str(e)}")
@@ -1213,13 +1339,12 @@ def join_interview(interview_id):
                                     }
                                     discussion_service.update_session(interview_id, current_session)
                         
-                        # Show the remote session interface
-                        return render_template('langchain/session_remote.html',
+                        # Use the debug-based interview template for improved reliability
+                        return render_template('remote_interview_fixed.html',
                                               session_id=interview_id,
                                               guide=guide,
                                               character_name=character_name,
-                                              voice_id=voice_id,
-                                              remote=True)
+                                              voice_id=voice_id)
                 else:
                     # This is the researcher view
                     # Use a different template for a research session
@@ -1264,7 +1389,7 @@ def dashboard():
 
 @app.route('/interview_setup')
 def interview_setup():
-    """Render interview setup page with proper title and character data."""
+    """Render discussion guide setup page with proper title and character data."""
     try:
         # Load available characters/prompts
         characters = []
@@ -1286,7 +1411,7 @@ def interview_setup():
         # Render the template with data
         return render_template(
             'langchain/interview_setup.html', 
-            title="Discussion Guide Setup",
+            title="Create New Discussion Guide",
             characters=characters,
             interview_prompt=interview_prompt,
             analysis_prompt=analysis_prompt
@@ -1494,16 +1619,22 @@ def monitor_interview_session(session_id):
         if 'title' not in session or not session.get('title'):
             session['title'] = f"Session {session_id[:8]}"
         
-        # Ensure session_id is in the session data for JavaScript to use
-        if 'session_id' not in session:
-            session['session_id'] = session_id
+        # Ensure messages list exists for JavaScript usage
+        if 'messages' not in session:
+            session['messages'] = []
             
-        # Return the monitor page
+        # Ensure session_id is in the session data for JavaScript to use
+        session['session_id'] = session_id
+            
+        # Log connection to monitor page
         logger.info(f"Rendering monitoring page for session {session_id}")
+        
+        # Return the monitor page
         return render_template('langchain/monitor_session.html', 
                             session=session,
                             guide=guide,
-                            session_id=session_id)
+                            session_id=session_id,
+                            observer_enabled=(observer_service is not None))
     except Exception as e:
         logger.error(f"Error loading monitoring session {session_id}: {str(e)}")
         return render_template('langchain/error.html', 
@@ -1512,7 +1643,22 @@ def monitor_interview_session(session_id):
 @app.route('/interview_details/<session_id>')
 def interview_details(session_id):
     """Show details for a specific interview."""
+    # First try to load from the file-based storage
     interview_data = load_interview(session_id)
+    
+    # If not found in file storage, try to get it from the LangChain discussion service
+    if not interview_data and discussion_service:
+        try:
+            langchain_session = discussion_service.get_session(session_id)
+            if langchain_session:
+                # Convert LangChain session to the format expected by the template
+                interview_data = langchain_session
+                # Ensure all necessary fields exist
+                if 'title' not in interview_data:
+                    interview_data['title'] = f"Session {session_id[:8]}"
+        except Exception as e:
+            logger.error(f"Error loading LangChain session {session_id}: {str(e)}")
+    
     if not interview_data:
         return render_template('langchain/interview_error.html',
                                error=f"No interview found for session: {session_id}")
@@ -1912,6 +2058,16 @@ def create_session():
         session_id = discussion_service.create_session(guide_id, interviewee)
         if not session_id:
             return jsonify({'success': False, 'error': 'Failed to create session'}), 500
+            
+        # If character was provided in the request, update it in the session
+        if 'character' in data:
+            character = data.get('character')
+            session = discussion_service.get_session(session_id)
+            if session:
+                session['character'] = character
+                session['character_select'] = character
+                discussion_service.update_session(session_id, session)
+                logger.info(f"Updated character for new session {session_id} to {character}")
         
         return jsonify({
             'success': True, 
@@ -1924,98 +2080,216 @@ def create_session():
 
 @app.route('/api/session/<session_id>/add_message', methods=['POST'])
 def api_add_session_message(session_id):
-    """Add a message to a session and generate an AI response if needed."""
+    """Add a message to a session."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Service not available'}), 500
+    
+    try:
+        data = request.json
+        if not data or 'content' not in data or 'role' not in data:
+            return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+        
+        content = data['content']
+        role = data['role']
+        message_id = data.get('id', str(uuid.uuid4()))
+        
+        logger.info(f"Session message request for {session_id}: {data}")
+        
+        # Add message to the session
+        discussion_service.add_message_to_session(session_id, content, role, message_id)
+        
+        # Notify all clients monitoring this session
+        message_data = {
+            'id': message_id,
+            'content': content,
+            'role': role,
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        
+        # Emit to all clients in the monitoring room
+        socketio.emit('new_message', {
+            'session_id': session_id,
+            'message': message_data
+        }, room=f"monitor_{session_id}")
+        
+        logger.info(f"Added message {message_id} to session {session_id} via WebSocket: True")
+        
+        # Process the message with AI Observer if available
+        if observer_service:
+            try:
+                # Get context from the session
+                context = []
+                session = discussion_service.get_session(session_id)
+                if session:
+                    messages = session.get('messages', [])
+                    # Get the last few messages for context
+                    context = messages[-5:] if len(messages) > 5 else messages
+                
+                # Analyze the message
+                observation = observer_service.analyze_message(session_id, message_data, context)
+                
+                # Emit the observation to the monitoring room
+                socketio.emit('new_observation', {
+                    'session_id': session_id,
+                    'observation': observation
+                }, room=f"monitor_{session_id}")
+                
+                logger.info(f"Emitted AI Observer analysis for message {message_id}")
+            except Exception as e:
+                logger.error(f"Error processing message with AI Observer: {str(e)}")
+        
+        # If LangChain is enabled, generate response for user messages
+        if role == 'user' and use_langchain:
+            # Generate AI response
+            logger.info(f"Generating AI response for session {session_id}")
+            
+            try:
+                # Get the session to check if it has guide information
+                session = discussion_service.get_session(session_id)
+                
+                if not session:
+                    logger.error(f"Session {session_id} not found")
+                    raise ValueError(f"Session {session_id} not found")
+                
+                # We need the guide ID to get the context
+                guide_id = session.get('guide_id')
+                if not guide_id:
+                    logger.error(f"No guide_id found for session {session_id}")
+                    raise ValueError("No guide_id found for session")
+                
+                # Get the guide to get context information
+                guide = discussion_service.get_guide(guide_id)
+                if not guide:
+                    logger.error(f"Guide {guide_id} not found for session {session_id}")
+                    raise ValueError(f"Guide {guide_id} not found")
+
+                # Prepare required context for LangChain interview
+                context = guide.get('context', '')
+                topic = guide.get('name', 'General Interview')
+                goals = guide.get('goals', [])
+                
+                if not context or not goals:
+                    logger.warning(f"Missing context or goals in guide {guide_id} for session {session_id}")
+                    # Default values if missing
+                    if not context:
+                        context = "This is an interview conversation."
+                    if not goals:
+                        goals = ["Gather information from the participant"]
+
+                # Log key information before calling generate_response
+                logger.info(f"Using topic: {topic}, context length: {len(context)}, goals: {len(goals)} items")
+                
+                # Generate response with all required context information
+                try:
+                    # Get character from session data if available
+                    session_data = discussion_service.get_session(session_id)
+                    character = session_data.get('character', 'interviewer') if session_data else 'interviewer'
+                    
+                    # Pass all required information to the interview service
+                    response_text = interview_service.generate_response(
+                        session_id, 
+                        content,
+                        character,
+                        {
+                            'topic': topic,
+                            'context': context,
+                            'goals': goals
+                        }
+                    )
+                    
+                    # Add AI response to the session
+                    ai_message_id = str(uuid.uuid4())
+                    discussion_service.add_message_to_session(session_id, response_text, 'assistant', ai_message_id)
+                    
+                    # Create message data for websocket
+                    ai_message = {
+                        'id': ai_message_id,
+                        'content': response_text,
+                        'role': 'assistant',
+                        'timestamp': datetime.datetime.now().isoformat()
+                    }
+                    
+                    # Emit AI message to all clients
+                    socketio.emit('new_message', {
+                        'session_id': session_id,
+                        'message': ai_message
+                    }, room=f"monitor_{session_id}")
+                    
+                    logger.info(f"Added AI response ({len(response_text)} chars) to session {session_id}")
+                except Exception as e:
+                    logger.error(f"Error generating response: {str(e)}")
+                    error_message = f"Sorry, I encountered an error while processing your response. {str(e)}"
+                    
+                    # Add an error message as the AI response
+                    ai_message_id = str(uuid.uuid4())
+                    discussion_service.add_message_to_session(
+                        session_id, 
+                        error_message, 
+                        'assistant', 
+                        ai_message_id
+                    )
+                    
+                    # Emit error message to clients
+                    socketio.emit('new_message', {
+                        'session_id': session_id,
+                        'message': {
+                            'id': ai_message_id,
+                            'content': error_message,
+                            'role': 'assistant',
+                            'timestamp': datetime.datetime.now().isoformat()
+                        }
+                    }, room=f"monitor_{session_id}")
+            except Exception as e:
+                logger.error(f"Error in LangChain response generation: {str(e)}")
+                ai_message_id = str(uuid.uuid4())
+                error_message = f"I apologize for the confusion, but it seems like there might have been an error in the conversation retrieval. Could you please provide me with the latest response from the participant so that I can continue the interview or introduce a new relevant topic? Thank you for your understanding."
+                
+                discussion_service.add_message_to_session(
+                    session_id, 
+                    error_message, 
+                    'assistant', 
+                    ai_message_id
+                )
+                
+                socketio.emit('new_message', {
+                    'session_id': session_id,
+                    'message': {
+                        'id': ai_message_id,
+                        'content': error_message,
+                        'role': 'assistant',
+                        'timestamp': datetime.datetime.now().isoformat()
+                    }
+                }, room=f"monitor_{session_id}")
+        
+        return jsonify({'success': True, 'message_id': message_id})
+        
+    except Exception as e:
+        logger.error(f"Error adding message: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/session/<session_id>/messages', methods=['GET'])
+def api_get_session_messages(session_id):
+    """Get all messages for a session."""
     if not discussion_service:
         return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
     
     try:
-        data = request.json
-        message_content = data.get('content')
-        role = data.get('role', 'user')
+        # Check if session exists
+        try:
+            session = discussion_service.get_session(session_id)
+            if not session:
+                logger.warning(f"Session {session_id} not found in get_messages")
+                return jsonify({'success': False, 'error': f'Session {session_id} not found'}), 404
+        except Exception as e:
+            logger.error(f"Error checking session {session_id} in get_messages: {str(e)}")
+            return jsonify({'success': False, 'error': 'Error checking session'}), 500
+            
+        # Get all messages for the session
+        messages = discussion_service.get_messages(session_id)
+        return jsonify({'success': True, 'messages': messages})
         
-        if not message_content:
-            return jsonify({'success': False, 'error': 'Message content is required'}), 400
-        
-        # Get the session
-        session = discussion_service.get_session(session_id)
-        if not session:
-            return jsonify({'success': False, 'error': 'Session not found'}), 404
-        
-        # Add the message
-        message_id = str(uuid.uuid4())
-        message = {
-            'id': message_id,
-            'content': message_content,
-            'role': role,
-            'timestamp': datetime.datetime.now().isoformat(),
-        }
-        
-        success = discussion_service.add_message(session_id, message)
-        if not success:
-            return jsonify({'success': False, 'error': 'Failed to add message to session'}), 500
-        
-        # Generate AI response if it's a user message and AI is enabled
-        ai_response = None
-        if role == 'user' and interview_service:
-            try:
-                # Get the guide ID and character
-                guide_id = session.get('guide_id')
-                guide = discussion_service.get_guide(guide_id) if guide_id else None
-                character = guide.get('character_select', 'interviewer') if guide else 'interviewer'
-                
-                # Get all messages for context
-                messages = session.get('messages', [])
-                
-                # Generate AI response
-                logger.info(f"Generating AI response for session {session_id}")
-                ai_response = interview_service.generate_response(
-                    messages=messages,
-                    character=character
-                )
-                
-                # Create AI message
-                ai_message_id = str(uuid.uuid4())
-                ai_message = {
-                    'id': ai_message_id,
-                    'content': ai_response,
-                    'role': 'assistant',
-                    'timestamp': datetime.datetime.now().isoformat(),
-                }
-                
-                # Add AI message to session
-                discussion_service.add_message(session_id, ai_message)
-                
-                # Create observation for monitoring if enabled
-                if observer_service:
-                    try:
-                        # Create observation of user message
-                        observation = observer_service.analyze_message(
-                            session_id, 
-                            message, 
-                            messages[-5:] if len(messages) > 5 else messages
-                        )
-                        
-                        # Emit the observation to the monitoring room
-                        socketio.emit('new_observation', {
-                            'session_id': session_id,
-                            'observation': observation,
-                            'message_id': message_id
-                        }, room=f"monitor_{session_id}")
-                        
-                        logger.info(f"Emitted new observation for message {message_id}")
-                    except Exception as e:
-                        logger.error(f"Error creating observation: {str(e)}")
-                
-            except Exception as e:
-                logger.error(f"Error generating AI response: {str(e)}")
-        
-        return jsonify({
-            'success': True,
-            'message_id': message_id,
-            'ai_response': ai_response
-        })
     except Exception as e:
-        logger.error(f"Error adding message to session: {str(e)}")
+        logger.error(f"Error in api_get_session_messages for session {session_id}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/session/<session_id>/complete', methods=['POST'])
@@ -2273,7 +2547,7 @@ def discussion_guide_details(guide_id):
             return render_template('langchain/error.html', error="Discussion guide not found"), 404
         
         sessions = discussion_service.list_guide_sessions(guide_id)
-        return render_template('langchain/discussion_guide.html', guide=guide, sessions=sessions, guide_id=guide_id)
+        return render_template('langchain/discussion_guide_details.html', guide=guide, sessions=sessions, guide_id=guide_id)
     except Exception as e:
         logger.error(f"Error loading discussion guide page: {str(e)}")
         return render_template('langchain/error.html', error=str(e))
@@ -2354,6 +2628,8 @@ def analyze_session_message(session_id):
             'observation': observation
         }, room=f"monitor_{session_id}")
         
+        logger.info(f"Emitted new observation for message {message.get('id')}")
+        
         return jsonify({
             'success': True,
             'session_id': session_id,
@@ -2411,55 +2687,284 @@ def generate_observer_summary(session_id):
 
 @socketio.on('connect')
 def handle_connect():
-    """Handle a new WebSocket connection."""
-    logger.info(f"New client connected: {request.sid}")
-    emit('connection_ack', {'status': 'connected', 'client_id': request.sid})
+    """Handle client connection event."""
+    logger.info(f"Client connected: {request.sid}")
+    emit('welcome', {'message': 'Connected to DARIA interview server'})
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    """Handle a WebSocket disconnection."""
+    """Handle client disconnect event."""
     logger.info(f"Client disconnected: {request.sid}")
 
 @socketio.on('join_monitor_room')
-def handle_join_room(data):
-    """Join a monitoring room for a specific session."""
+def handle_join_monitor(data):
+    """Handle a client joining a monitoring room for an interview."""
+    try:
+        session_id = data.get('session_id')
+        if not session_id:
+            logger.warning(f"Client {request.sid} tried to join monitoring room without session_id")
+            # Return error response via callback
+            return {'success': False, 'error': 'No session_id provided'}
+        
+        # Join the socket room for this monitoring session
+        room = f"monitor_{session_id}"
+        join_room(room)
+        logger.info(f"Client {request.sid} joined monitoring room for session {session_id}")
+        
+        # Immediately trigger question generation and insights on join
+        if observer_service:
+            # Request suggested questions
+            questions = observer_service.get_suggested_questions(session_id)
+            socketio.emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': questions
+            }, room=request.sid)
+            logger.info(f"Sent initial suggested questions to new monitor client for session {session_id}")
+            
+            # Also generate insights if available
+            try:
+                insights = observer_service.get_key_insights(session_id)
+                socketio.emit('insights_update', {
+                    'session_id': session_id,
+                    'insights': insights
+                }, room=request.sid)
+                logger.info(f"Sent initial insights to new monitor client for session {session_id}")
+            except Exception as insight_error:
+                logger.error(f"Error getting initial insights: {str(insight_error)}")
+        
+        # Emit connection confirmation
+        emit('monitor_joined', {'session_id': session_id, 'joined_at': datetime.datetime.now().isoformat()})
+        
+        # Return success response via callback
+        return {'success': True, 'message': f'Joined monitor room for {session_id}'}
+        
+    except Exception as e:
+        logger.error(f"Error in join_monitor_room: {str(e)}")
+        # Return error response via callback
+        return {'success': False, 'error': str(e)}
+
+@socketio.on('join_session')
+def handle_join_session(data):
+    """Handle interview client joining its session room."""
+    try:
+        session_id = data.get('session_id')
+        if not session_id:
+            return {'success': False, 'error': 'No session_id provided'}
+        
+        # Join the specific room for this interview session
+        room = f"session_{session_id}"
+        join_room(room)
+        
+        logger.info(f"Client {request.sid} joined session room for session {session_id}")
+        return {'success': True}
+    except Exception as e:
+        logger.error(f"Error in join_session: {str(e)}")
+        return {'success': False, 'error': str(e)}
+
+@socketio.on('new_message')
+def handle_new_message(data):
+    """Event handler when a new message is received from a client."""
+    if not data or 'session_id' not in data or 'message' not in data:
+        return {'success': False, 'error': 'Invalid message data'}
+    
+    session_id = data['session_id']
+    message = data['message']
+    
+    # Save the message to the session
+    try:
+        # Add to session via the API
+        discussion_service.add_message_to_session(session_id, message['content'], message['role'], message.get('id'))
+        
+        # Emit to all clients in both rooms
+        # First to the session room (remote interview client)
+        emit('new_message', {'message': message}, room=f"session_{session_id}", include_self=False)
+        
+        # Then to the monitor room
+        emit('new_message', {'message': message}, room=f"monitor_{session_id}", include_self=False)
+        
+        # Update that it was emitted via WebSocket
+        logger.info(f"Added message {message.get('id')} to session {session_id} via WebSocket: True")
+        
+        # Process the message with AI Observer if available
+        if observer_service:
+            try:
+                # Get context from the session
+                context = []
+                session = discussion_service.get_session(session_id)
+                if session:
+                    messages = session.get('messages', [])
+                    # Get the last few messages for context
+                    context = messages[-5:] if len(messages) > 5 else messages
+                
+                # Analyze the message
+                observation = observer_service.analyze_message(session_id, message, context)
+                
+                # Emit the observation to the monitoring room
+                emit('new_observation', {
+                    'session_id': session_id,
+                    'observation': observation
+                }, room=f"monitor_{session_id}")
+                
+                logger.info(f"Emitted AI Observer analysis for message {message.get('id')}")
+            except Exception as e:
+                logger.error(f"Error processing message with AI Observer: {str(e)}")
+        
+        return {'success': True}
+    except Exception as e:
+        logger.error(f"Error adding message to session: {str(e)}")
+        return {'success': False, 'error': str(e)}
+
+@socketio.on('send_suggestion')
+def handle_send_suggestion(data):
+    """Handle suggestion from monitor."""
+    session_id = data.get('session_id')
+    suggestion = data.get('suggestion')
+    
+    if not session_id or not suggestion:
+        emit('error', {'message': 'Missing session_id or suggestion'})
+        return
+        
+    try:
+        # Create a formatted message for the suggestion
+        message = {
+            'id': str(uuid.uuid4()),
+            'role': 'system',
+            'content': suggestion,
+            'type': 'suggestion',
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        
+        # Only notify the monitor - don't send to the remote interview UI
+        # This prevents popups from appearing to the interviewee
+        socketio.emit('suggestion_sent', {
+            'session_id': session_id,
+            'suggestion': message
+        }, room=f"monitor_{session_id}")
+        
+        logger.info(f"Suggestion sent to monitor for session {session_id}: {suggestion}")
+        
+        # Store the suggestion in the session for later reference
+        if discussion_service:
+            try:
+                # Add as a special type of message that won't be shown to participants
+                message['visible_to_participant'] = False
+                discussion_service.add_message_to_session(
+                    session_id, 
+                    message['content'], 
+                    'system', 
+                    message.get('id'),
+                    metadata={'type': 'monitor_suggestion'}
+                )
+            except Exception as e:
+                logger.warning(f"Could not store suggestion in session history: {str(e)}")
+        
+        return {'success': True}
+    except Exception as e:
+        logger.error(f"Error sending suggestion: {str(e)}")
+        return {'success': False, 'error': str(e)}
+
+@socketio.on('request_suggested_questions')
+def handle_request_suggested_questions(data):
+    """Handle a request for AI-suggested interview questions."""
     session_id = data.get('session_id')
     if not session_id:
+        logger.warning("No session_id provided to request_suggested_questions")
         emit('error', {'message': 'No session_id provided'})
         return
-    
-    # Join the room for this session
-    room = f"monitor_{session_id}"
-    join_room(room)
-    logger.info(f"Client {request.sid} joined monitoring room for session {session_id}")
-    
-    # Send confirmation
-    emit('joined_room', {
-        'room': room,
-        'session_id': session_id
-    })
-    
-    # Send initial data if available
-    if discussion_service:
-        try:
-            session = discussion_service.get_session(session_id)
-            if session:
-                messages = session.get('messages', [])
-                emit('session_data', {
-                    'session_id': session_id,
-                    'messages': messages
-                })
-                
-                # If observer service is available, send initial observer data
-                if observer_service:
-                    observer_state = observer_service.get_observer_state(session_id)
-                    emit('observer_data', {
-                        'session_id': session_id,
-                        'observer_state': observer_state
+        
+    logger.info(f"Received request for suggested questions for session {session_id}")
+        
+    try:
+        if observer_service:
+            # Get suggested questions from observer service
+            logger.info(f"Requesting suggested questions from observer service for session {session_id}")
+            questions = observer_service.get_suggested_questions(session_id)
+            
+            # Ensure questions are properly formatted
+            formatted_questions = []
+            for q in questions:
+                # Make sure each question has the expected format
+                if isinstance(q, dict) and 'text' in q:
+                    formatted_questions.append(q)
+                elif isinstance(q, str):
+                    # If it's just a string, convert to proper format
+                    formatted_questions.append({
+                        'id': str(uuid.uuid4()),
+                        'timestamp': datetime.datetime.now().isoformat(),
+                        'text': q
                     })
-        except Exception as e:
-            logger.error(f"Error sending initial data: {str(e)}")
-            emit('error', {'message': f"Error loading session data: {str(e)}"})
+            
+            logger.info(f"Sending {len(formatted_questions)} suggested questions for session {session_id}")
+            
+            # Debug the questions we're sending
+            for q in formatted_questions[:3]:  # Log first 3 for brevity
+                q_text = q.get('text', 'NO TEXT FOUND')
+                logger.info(f"Question being sent: {q_text[:50]}...")
+            
+            # Send back to client
+            emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': formatted_questions
+            })
+            
+            logger.info(f"Sent suggested questions for session {session_id}")
+        else:
+            logger.warning("Observer service not available for generating questions")
+            # Generate some static fallback questions if observer is not available
+            fallback_questions = [
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Could you tell me more about that?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "How did that make you feel?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Can you provide a specific example?"
+                }
+            ]
+            
+            logger.info(f"Sending {len(fallback_questions)} fallback questions for session {session_id}")
+            
+            # Send fallback questions
+            emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': fallback_questions
+            })
+            
+            logger.info(f"Sent fallback questions for session {session_id}")
+    except Exception as e:
+        logger.error(f"Error getting suggested questions: {str(e)}", exc_info=True)
+        # Try to send some emergency fallback questions even after error
+        try:
+            emergency_questions = [
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Can you explain more about your experience?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "What else would you like to share?"
+                }
+            ]
+            
+            emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': emergency_questions
+            })
+            
+            logger.info(f"Sent emergency questions after error for session {session_id}")
+        except Exception as inner_e:
+            logger.error(f"Failed to send emergency questions: {str(inner_e)}", exc_info=True)
+            
+        emit('error', {'message': f"Error getting suggested questions: {str(e)}"})
 
 @socketio.on('leave_monitor_room')
 def handle_leave_room(data):
@@ -2604,11 +3109,283 @@ def api_edit_prompt(prompt_id):
         logger.error(f"Error in api_edit_prompt for {prompt_id}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+@socketio.on('request_insights')
+def handle_request_insights(data):
+    """Handle a request for AI insights on the interview."""
+    session_id = data.get('session_id')
+    if not session_id:
+        emit('error', {'message': 'No session_id provided'})
+        return
+        
+    try:
+        if observer_service:
+            # Get insights from observer service
+            insights = observer_service.get_key_insights(session_id)
+            
+            # Send back to client
+            emit('insights_update', {
+                'session_id': session_id,
+                'insights': insights
+            })
+            
+            logger.info(f"Sent insights update for session {session_id}")
+        else:
+            # Send empty list if observer service not available
+            emit('insights_update', {
+                'session_id': session_id,
+                'insights': []
+            })
+    except Exception as e:
+        logger.error(f"Error getting insights: {str(e)}")
+        emit('error', {'message': f"Error getting insights: {str(e)}"})
+
+@socketio.on('ping')
+def handle_ping(data):
+    """Handle ping from client and respond with pong to confirm connection."""
+    try:
+        logger.debug(f"Received ping from client {request.sid}: {data}")
+        emit('pong', {
+            'server_time': datetime.datetime.now().isoformat(),
+            'client_time': data.get('time'),
+            'session_id': data.get('session_id')
+        })
+    except Exception as e:
+        logger.error(f"Error in ping handler: {str(e)}")
+        emit('error', {'error': f'Ping error: {str(e)}'})
+
+@socketio.on('intervention')
+def handle_intervention(data):
+    """Handle direct intervention request from monitor."""
+    session_id = data.get('session_id')
+    intervention_type = data.get('type')
+    
+    if not session_id or not intervention_type:
+        emit('error', {'message': 'Missing session_id or intervention type'})
+        return
+        
+    try:
+        # Forward the intervention to the interview session
+        socketio.emit('intervention', {
+            'session_id': session_id,
+            'type': intervention_type,
+            'timestamp': datetime.datetime.now().isoformat()
+        }, room=f"session_{session_id}")
+        
+        # Log the intervention for the monitor too
+        socketio.emit('intervention', {
+            'session_id': session_id,
+            'type': intervention_type,
+            'timestamp': datetime.datetime.now().isoformat()
+        }, room=f"monitor_{session_id}")
+        
+        logger.info(f"Applied intervention: {intervention_type} to session {session_id}")
+        
+        return {'success': True}
+    except Exception as e:
+        logger.error(f"Error applying intervention: {str(e)}")
+        return {'success': False, 'error': str(e)}
+
+@socketio.on('send_suggestion')
+def handle_send_suggestion(data):
+    """Handle suggestion from monitor."""
+    session_id = data.get('session_id')
+    suggestion = data.get('suggestion')
+    
+    if not session_id or not suggestion:
+        emit('error', {'message': 'Missing session_id or suggestion'})
+        return
+        
+    try:
+        # Create a formatted message for the suggestion
+        message = {
+            'id': str(uuid.uuid4()),
+            'role': 'system',
+            'content': suggestion,
+            'type': 'suggestion',
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        
+        # Only notify the monitor - don't send to the remote interview UI
+        # This prevents popups from appearing to the interviewee
+        socketio.emit('suggestion_sent', {
+            'session_id': session_id,
+            'suggestion': message
+        }, room=f"monitor_{session_id}")
+        
+        logger.info(f"Suggestion sent to monitor for session {session_id}: {suggestion}")
+        
+        # Store the suggestion in the session for later reference
+        if discussion_service:
+            try:
+                # Add as a special type of message that won't be shown to participants
+                message['visible_to_participant'] = False
+                discussion_service.add_message_to_session(
+                    session_id, 
+                    message['content'], 
+                    'system', 
+                    message.get('id'),
+                    metadata={'type': 'monitor_suggestion'}
+                )
+            except Exception as e:
+                logger.warning(f"Could not store suggestion in session history: {str(e)}")
+        
+        return {'success': True}
+    except Exception as e:
+        logger.error(f"Error sending suggestion: {str(e)}")
+        return {'success': False, 'error': str(e)}
+
 # Register blueprints
-app.register_blueprint(user_bp, url_prefix='/user')
-app.register_blueprint(auth_bp, url_prefix='/auth')
+app.register_blueprint(user_bp)
+app.register_blueprint(auth_bp)
+app.register_blueprint(issues_bp, url_prefix='/issues')
+app.register_blueprint(langchain_blueprint)
 
 # ------ Upload Transcript Routes ------
+
+def save_transcript_to_session_format(transcript_content, metadata, file_path):
+    """
+    Convert transcript content to standardized session format and save to file.
+    
+    Args:
+        transcript_content (str): The raw transcript text
+        metadata (dict): Dictionary containing session metadata
+        file_path (str): Path to save the session file
+    
+    Returns:
+        dict: The created session data object
+    """
+    try:
+        # Extract metadata
+        session_id = metadata.get('session_id', str(uuid.uuid4()))
+        guide_id = metadata.get('guide_id', '9d9b0648-5f14-4a22-81df-290bbd67049d')
+        title = metadata.get('title', 'Untitled Interview')
+        project = metadata.get('project', '')
+        interview_type = metadata.get('interview_type', 'discovery_interview')
+        participant_name = metadata.get('participant_name', 'Anonymous')
+        participant_role = metadata.get('participant_role', '')
+        participant_email = metadata.get('participant_email', '')
+        
+        # Process transcript lines
+        lines = transcript_content.strip().split('\n')
+        
+        # Extract speaker turns using patterns
+        transcript_chunks = []
+        current_speaker = None
+        current_content = []
+        
+        # Apply simple colon-based pattern for most transcripts
+        for line in lines:
+            line = line.strip()
+            if not line:
+                continue
+                
+            # Check if line starts with a new speaker
+            colon_match = re.match(r'^([^:]+):\s*(.*)', line)
+            if colon_match:
+                # Save previous speaker's content
+                if current_speaker and current_content:
+                    transcript_chunks.append({
+                        'speaker': current_speaker,
+                        'content': ' '.join(current_content)
+                    })
+                    current_content = []
+                
+                # Start new speaker
+                current_speaker = colon_match.group(1).strip()
+                content = colon_match.group(2).strip()
+                if content:
+                    current_content.append(content)
+            elif current_speaker:
+                # Continue current speaker
+                current_content.append(line)
+        
+        # Add the last speaker's content
+        if current_speaker and current_content:
+            transcript_chunks.append({
+                'speaker': current_speaker,
+                'content': ' '.join(current_content)
+            })
+        
+        # Determine moderator vs participant based on names
+        researchers = ['interviewer', 'moderator', 'researcher', 'dulaney', 'stephen']
+        participants = ['participant', 'interviewee', 'respondent', 'user', 'jason']
+        
+        # Create messages array
+        messages = []
+        raw_transcript = ""
+        now = datetime.datetime.now()
+        
+        for i, chunk in enumerate(transcript_chunks):
+            speaker = chunk['speaker']
+            content = chunk['content']
+            
+            # Default: if name contains researcher terms -> assistant, otherwise -> user
+            is_researcher = any(r.lower() in speaker.lower() for r in researchers)
+            is_participant = any(p.lower() in speaker.lower() for p in participants)
+            
+            role = 'assistant' if is_researcher else 'user'
+            
+            # For transcript building
+            speaker_label = "Moderator" if role == 'assistant' else "Participant"
+            raw_transcript += f"\n\n{speaker_label}: {content}"
+            
+            # Create message object
+            timestamp = (now + datetime.timedelta(seconds=i)).isoformat()
+            messages.append({
+                'id': str(uuid.uuid4()),
+                'content': content,
+                'role': role,
+                'timestamp': timestamp
+            })
+        
+        # Create full session object
+        character = "askia"  # Default character
+        voice_id = "AZnzlk1XvdvUeBnXmlld"  # Default voice ID
+        
+        session_data = {
+            "id": session_id,
+            "guide_id": guide_id,
+            "interviewee": {
+                "name": participant_name,
+                "email": participant_email or "",
+                "role": participant_role or "",
+                "department": "",
+                "company": "",
+                "demographics": {
+                    "age_range": "",
+                    "gender": "",
+                    "location": ""
+                }
+            },
+            "status": "active",
+            "messages": messages,
+            "transcript": raw_transcript.strip(),
+            "analysis": None,
+            "created_at": now.isoformat(),
+            "updated_at": now.isoformat(),
+            "title": title,
+            "project": project,
+            "interview_type": interview_type,
+            "topic": f"We want to discuss what we need to cover in a {title} project",
+            "context": "",
+            "goals": "Identify pain points in the current workflow. Understand how users search for and select products. Assess satisfaction with the process. Uncover unmet needs or desired features.",
+            "character": character,
+            "character_select": character,
+            "voice_id": voice_id
+        }
+        
+        # Ensure the directory exists
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
+        
+        # Save to file
+        with open(file_path, 'w') as f:
+            json.dump(session_data, f, indent=2)
+            
+        return session_data
+        
+    except Exception as e:
+        logger.error(f"Error converting transcript: {str(e)}")
+        raise e
 
 @app.route('/api/upload_transcript', methods=['POST'])
 def api_upload_transcript():
@@ -2625,12 +3402,13 @@ def api_upload_transcript():
         # Get metadata from form
         title = request.form.get('title', 'Untitled Interview')
         project = request.form.get('project', '')
-        interview_type = request.form.get('interview_type', 'custom_interview')
+        interview_type = request.form.get('interview_type', 'discovery_interview')
         researcher_name = request.form.get('researcher_name', '')
         researcher_email = request.form.get('researcher_email', '')
         participant_name = request.form.get('participant_name', 'Anonymous')
         participant_role = request.form.get('participant_role', '')
         participant_email = request.form.get('participant_email', '')
+        guide_id = request.form.get('guide_id', '9d9b0648-5f14-4a22-81df-290bbd67049d')  # Default to a valid guide ID
         
         # Generate a unique session ID
         session_id = str(uuid.uuid4())
@@ -2893,62 +3671,108 @@ def api_upload_transcript():
             researcher_speakers = [s for s in all_speakers if any(p in s.lower() for p in researcher_patterns)]
         
         if not participant_speakers:
-            participant_patterns = ['participant', 'interviewee', 'respondent', 'stark', 'ted', 'theodore']
+            participant_patterns = ['participant', 'interviewee', 'respondent', 'stark', 'ted', 'theodore', 'jason']
             participant_speakers = [s for s in all_speakers if any(p in s.lower() for p in participant_patterns)]
         
         logger.info(f"Identified researcher speakers: {researcher_speakers}")
         logger.info(f"Identified participant speakers: {participant_speakers}")
         
-        # Map transcript chunks to conversation history format
-        conversation_history = []
+        # Create formatted transcript text
+        formatted_transcript = ""
         for chunk in transcript_chunks:
-            # Determine role based on speaker name
             speaker = chunk['speaker']
-            # Default to 'user' unless explicitly identified as researcher
+            is_researcher = speaker in researcher_speakers
+            speaker_label = "Moderator" if is_researcher else "Participant"
+            formatted_transcript += f"\n\n{speaker_label}: {chunk['content']}"
+        
+        # Format messages in the required structure
+        messages = []
+        now = datetime.datetime.now()
+        
+        # Create messages with the correct format and IDs
+        for i, chunk in enumerate(transcript_chunks):
+            speaker = chunk['speaker']
+            # Determine role based on whether speaker is identified as researcher
             role = 'assistant' if speaker in researcher_speakers else 'user'
+            timestamp = now + datetime.timedelta(seconds=i)
+            message_id = str(uuid.uuid4())
             
-            conversation_history.append({
-                'role': role,
+            messages.append({
+                'id': message_id,
                 'content': chunk['content'],
-                'timestamp': chunk['timestamp'] or datetime.datetime.now().isoformat()
+                'role': role,
+                'timestamp': timestamp.isoformat()
             })
         
-        # Create interview data
-        now = datetime.datetime.now()
-        interview_data = {
-            'session_id': session_id,
-            'title': title,
-            'project': project,
-            'interview_type': interview_type,
-            'created_at': now,
-            'creation_date': now.strftime("%Y-%m-%d %H:%M"),
-            'last_updated': now,
-            'expiration_date': now + datetime.timedelta(days=30),
-            'status': 'completed',  # Mark as completed since we have the full transcript
-            'conversation_history': conversation_history,
-            'transcript': transcript_chunks,
-            'character': 'interviewer',
-            'interviewee': {
-                'name': participant_name,
-                'role': participant_role,
-                'email': participant_email
+        # Create the session data structure in the format needed
+        character = "askia"  # Default character
+        voice_id = "AZnzlk1XvdvUeBnXmlld"  # Default voice
+        
+        # Create session data in the required format
+        session_data = {
+            "id": session_id,
+            "guide_id": guide_id,
+            "interviewee": {
+                "name": participant_name,
+                "email": participant_email or "",
+                "role": participant_role or "",
+                "department": "",
+                "company": "",
+                "demographics": {
+                    "age_range": "",
+                    "gender": "",
+                    "location": ""
+                }
             },
-            'researcher': {
-                'name': researcher_name or (researcher_speakers[0] if researcher_speakers else 'Researcher'),
-                'email': researcher_email
-            },
-            'analysis': None  # Will be generated later if needed
+            "status": "active",
+            "messages": messages,
+            "transcript": formatted_transcript.strip(),
+            "analysis": None,
+            "created_at": now.isoformat(),
+            "updated_at": now.isoformat(),
+            "title": title,
+            "project": project,
+            "interview_type": interview_type,
+            "topic": f"We want to discuss what we need to cover in a {title} project",
+            "context": "",
+            "goals": "Identify pain points in the current workflow. Understand how users search for and select products. Assess satisfaction with order tracking and status updates. Uncover unmet needs or desired features in the portal.",
+            "character": character,
+            "character_select": character,
+            "voice_id": voice_id
         }
         
-        # Save the interview data
-        save_interview(session_id, interview_data)
+        # Create the sessions directory if it doesn't exist
+        os.makedirs(os.path.join(DATA_DIR, "interviews", "sessions"), exist_ok=True)
+        
+        # Save the session data to the file
+        session_file_path = os.path.join(DATA_DIR, "interviews", "sessions", f"{session_id}.json")
+        with open(session_file_path, 'w') as f:
+            json.dump(session_data, f, indent=2)
+        
+        logger.info(f"Saved session data to {session_file_path}")
+        
+        # If a guide ID was provided, update the guide to include this session
+        if guide_id and discussion_service:
+            try:
+                guide = discussion_service.get_guide(guide_id)
+                if guide:
+                    if "sessions" not in guide:
+                        guide["sessions"] = []
+                    if session_id not in guide["sessions"]:
+                        guide["sessions"].append(session_id)
+                        discussion_service._save_guide(guide_id, guide)
+                        logger.info(f"Added session {session_id} to guide {guide_id}")
+            except Exception as e:
+                logger.error(f"Error updating guide with new session: {str(e)}")
         
         # Return success with the session ID
+        redirect_url = f"/discussion_guide/{guide_id}" if guide_id else f"/session/{session_id}"
+        
         return jsonify({
             'success': True,
             'session_id': session_id,
             'message': 'Transcript uploaded successfully',
-            'redirect_url': f"/interview_details/{session_id}"
+            'redirect_url': redirect_url
         })
         
     except Exception as e:
@@ -2958,29 +3782,4 @@ def api_upload_transcript():
             'success': False, 
             'error': f"Error processing transcript: {str(e)}"
         }), 500
-
-@app.route('/upload_transcript', methods=['GET'])
-def upload_transcript_page():
-    """Render the upload transcript page."""
-    return render_template('langchain/upload_transcript.html', title="Upload Transcript")
-
-# Start the app
-if __name__ == '__main__':
-    debug_mode = False
-    if '--debug' in sys.argv:
-        debug_mode = True
-    
-    # Check if a custom port is specified
-    port = 5025
-    port_index = -1
-    if '--port' in sys.argv:
-        port_index = sys.argv.index('--port')
-        if port_index >= 0 and port_index + 1 < len(sys.argv):
-            port = int(sys.argv[port_index + 1])
-            
-    print(f"Starting DARIA Interview API on port {port}")
-    print(f"Health check endpoint: http://127.0.0.1:{port}/api/health")
-    print(f"Interview start endpoint: http://127.0.0.1:{port}/api/interview/start")
-    print(f"Monitor interviews: http://127.0.0.1:{port}/monitor_interview")
-    
-    socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode, allow_unsafe_werkzeug=True) 
+        

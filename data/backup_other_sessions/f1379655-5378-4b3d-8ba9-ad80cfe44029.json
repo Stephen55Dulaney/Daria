@@ -1,0 +1,26 @@
+{
+  "id": "f1379655-5378-4b3d-8ba9-ad80cfe44029",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "fb742101-c85c-4963-90d0-d655bfd1d17b",
+      "content": "I would like to know how you're doing and what is your name",
+      "role": "user",
+      "timestamp": "2025-05-15T11:09:09.934776"
+    },
+    {
+      "id": "098f9295-b1c8-48d1-80fc-1f09f1e3292e",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:09:11.085197"
+    }
+  ],
+  "transcript": "\n\nParticipant: I would like to know how you're doing and what is your name\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+  "analysis": null,
+  "created_at": "2025-05-15T11:08:58.841048",
+  "updated_at": "2025-05-15T11:09:11.085370"
+}

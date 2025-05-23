@@ -1,0 +1,42 @@
+{
+  "id": "d485a6e8-3996-45f9-a891-8cb0f4a53ecc",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "2b7a9ba0-af83-4856-952d-90b088329133",
+      "content": "I'm just testing to make sure you're still working",
+      "role": "user",
+      "timestamp": "2025-05-16T19:36:14.218015"
+    },
+    {
+      "id": "d5798f3e-78df-4d03-992a-6a2faf5014e0",
+      "content": "Of course, I'm here and ready to assist you. How can I help you today with the interview topic?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T19:36:17.000676"
+    },
+    {
+      "id": "8ecb1112-f3e9-426a-97f9-8e3ba45da2de",
+      "content": "I'm I'm just trying what is your interview topic",
+      "role": "user",
+      "timestamp": "2025-05-16T19:36:31.699646"
+    },
+    {
+      "id": "9c7e929e-9ae8-4157-afcf-06aa5c87f505",
+      "content": "Hello and thank you for your question. The interview topic is 'General Interview'. This means we will be discussing different aspects of interviews in general. Are you ready to proceed with the interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T19:36:33.473356"
+    }
+  ],
+  "transcript": "\n\nParticipant: I'm just testing to make sure you're still working\n\nModerator: Of course, I'm here and ready to assist you. How can I help you today with the interview topic?\n\nParticipant: I'm I'm just trying what is your interview topic\n\nModerator: Hello and thank you for your question. The interview topic is 'General Interview'. This means we will be discussing different aspects of interviews in general. Are you ready to proceed with the interview?",
+  "analysis": null,
+  "created_at": "2025-05-16T19:36:03.578199",
+  "updated_at": "2025-05-16T19:36:33.473645",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

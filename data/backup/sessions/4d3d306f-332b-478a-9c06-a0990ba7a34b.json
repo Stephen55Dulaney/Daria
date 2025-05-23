@@ -1,0 +1,42 @@
+{
+  "id": "4d3d306f-332b-478a-9c06-a0990ba7a34b",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "734e83dc-e7a9-44eb-8a89-87d755e45eb8",
+      "content": "connecting another interview to test to make sure you're happy and healthy and everything is working",
+      "role": "user",
+      "timestamp": "2025-05-22T09:43:29.947671"
+    },
+    {
+      "id": "6e900623-0a09-41f6-b6c5-d02badee7f74",
+      "content": "Could you please elaborate on what you mean by \"connecting another interview to test\"? Are you referring to conducting a follow-up interview to ensure the participant's well-being and satisfaction with the previous interview experience?",
+      "role": "assistant",
+      "timestamp": "2025-05-22T09:43:31.395024"
+    },
+    {
+      "id": "9d631993-f564-48da-a31d-d9d364987370",
+      "content": "ending the interview",
+      "role": "user",
+      "timestamp": "2025-05-22T09:43:45.856887"
+    },
+    {
+      "id": "ea6b1c32-b4f8-4ecd-86e0-34cb2cd4969b",
+      "content": "Before we end the interview, I'd like to ask: What advice would you give to someone preparing for an interview to help them make a great impression?",
+      "role": "assistant",
+      "timestamp": "2025-05-22T09:43:46.858969"
+    }
+  ],
+  "transcript": "\n\nParticipant: connecting another interview to test to make sure you're happy and healthy and everything is working\n\nModerator: Could you please elaborate on what you mean by \"connecting another interview to test\"? Are you referring to conducting a follow-up interview to ensure the participant's well-being and satisfaction with the previous interview experience?\n\nParticipant: ending the interview\n\nModerator: Before we end the interview, I'd like to ask: What advice would you give to someone preparing for an interview to help them make a great impression?",
+  "analysis": null,
+  "created_at": "2025-05-22T09:43:17.513723",
+  "updated_at": "2025-05-22T09:43:46.860037",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

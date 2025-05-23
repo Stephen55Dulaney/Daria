@@ -1,0 +1,38 @@
+{
+  "id": "7f9c2abf-dc26-4c7c-9bd1-28df379404bd",
+  "guide_id": "8522dd18-cd96-4acb-84ca-fbbb68133b63",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "78beaa58-4723-481b-a8f3-2adf44b9c8a9",
+      "content": "I am trying to figure out what's going on with this new test it looks okay I was panicked for a while",
+      "role": "user",
+      "timestamp": "2025-05-14T15:04:18.760247"
+    },
+    {
+      "id": "c33f9a7a-cf5a-4eff-bf30-517193cad669",
+      "content": "It sounds like you're dealing with a new test. Could you tell me more about what specifically was causing you to panic about it?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T15:04:20.156940"
+    },
+    {
+      "id": "1c75c441-5a30-4412-8d75-2ff1ce80fa54",
+      "content": "everything was closed and there's accordance and the whole thing looked different and now that I see what's going on I'm believing this just might work",
+      "role": "user",
+      "timestamp": "2025-05-14T15:04:43.908008"
+    },
+    {
+      "id": "344098f2-0556-49b5-81bb-3062376d1a59",
+      "content": "It sounds like you've been through some changes recently. Could you tell me more about what happened that made everything look different to you? What specifically made you believe that things might work out now?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T15:04:44.719802"
+    }
+  ],
+  "transcript": "\n\nParticipant: I am trying to figure out what's going on with this new test it looks okay I was panicked for a while\n\nModerator: It sounds like you're dealing with a new test. Could you tell me more about what specifically was causing you to panic about it?\n\nParticipant: everything was closed and there's accordance and the whole thing looked different and now that I see what's going on I'm believing this just might work\n\nModerator: It sounds like you've been through some changes recently. Could you tell me more about what happened that made everything look different to you? What specifically made you believe that things might work out now?",
+  "analysis": null,
+  "created_at": "2025-05-14T15:04:06.168483",
+  "updated_at": "2025-05-14T15:04:44.720417"
+}

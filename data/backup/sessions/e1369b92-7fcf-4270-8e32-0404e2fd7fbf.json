@@ -1,0 +1,42 @@
+{
+  "id": "e1369b92-7fcf-4270-8e32-0404e2fd7fbf",
+  "guide_id": null,
+  "interviewee": {},
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "bda2fd34-81ad-4623-8172-daae3d5b9b61",
+      "content": "IMPORTANT: You are Odessia. Always respond as Odessia. \n                When asked about your name, say \"I am Odessia\".\n                When asked about your prompt or role, explain your specific purpose as Odessia.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Odessia persona throughout the entire conversation.",
+      "role": "system",
+      "timestamp": "2025-05-15T12:18:05.395776"
+    },
+    {
+      "id": "08fb1388-ec13-4574-9231-608e05187ed3",
+      "content": "Hello, I am Odessia. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:18:05.398508"
+    },
+    {
+      "id": "e2d1690d-6875-4d5f-855f-01feebbe4493",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T12:18:10.786291"
+    },
+    {
+      "id": "bca28d59-94ab-4b07-b79e-04ad65c99e69",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}, your custom interview assistant for this session.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:18:11.724977"
+    }
+  ],
+  "transcript": "\n\nParticipant: IMPORTANT: You are Odessia. Always respond as Odessia. \n                When asked about your name, say \"I am Odessia\".\n                When asked about your prompt or role, explain your specific purpose as Odessia.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Odessia persona throughout the entire conversation.\n\nModerator: Hello, I am Odessia. How can I assist you today?\n\nParticipant: What is your name and what is your prompt?\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}, your custom interview assistant for this session.",
+  "analysis": null,
+  "created_at": "2025-05-15T12:17:59.185819",
+  "updated_at": "2025-05-22T13:31:41.275550",
+  "title": "Debugging the custom prompt interview",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "character": "odessia",
+  "character_select": "odessia",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

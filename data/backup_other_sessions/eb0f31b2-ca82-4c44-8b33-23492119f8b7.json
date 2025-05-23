@@ -1,0 +1,38 @@
+{
+  "id": "eb0f31b2-ca82-4c44-8b33-23492119f8b7",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "32681ec1-672d-4d78-9297-751938fe2d17",
+      "content": "I was hoping we could do a quick interview",
+      "role": "user",
+      "timestamp": "2025-05-14T08:42:51.887522"
+    },
+    {
+      "id": "aa964467-e3c5-48ce-9689-207ea2b53a35",
+      "content": "Of course, I'd be happy to help. What is the purpose of this interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T08:42:52.521604"
+    },
+    {
+      "id": "6b293697-5b0e-4717-8e7f-7f55be8e777e",
+      "content": "the purpose is to test the interview system to make sure everything is working so we can possibly turn you into the remote interview",
+      "role": "user",
+      "timestamp": "2025-05-14T08:43:10.956815"
+    },
+    {
+      "id": "3182799b-cb8e-44de-b3f6-3df45dc2a9ec",
+      "content": "Thank you for participating in this test interview. Could you please confirm if you are able to hear me clearly and if the video feed is working well on your end?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T08:43:12.052352"
+    }
+  ],
+  "transcript": "\n\nParticipant: I was hoping we could do a quick interview\n\nModerator: Of course, I'd be happy to help. What is the purpose of this interview?\n\nParticipant: the purpose is to test the interview system to make sure everything is working so we can possibly turn you into the remote interview\n\nModerator: Thank you for participating in this test interview. Could you please confirm if you are able to hear me clearly and if the video feed is working well on your end?",
+  "analysis": null,
+  "created_at": "2025-05-14T08:42:42.117400",
+  "updated_at": "2025-05-14T08:43:12.052495"
+}

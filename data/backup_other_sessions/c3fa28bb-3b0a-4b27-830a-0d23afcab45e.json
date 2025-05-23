@@ -1,0 +1,38 @@
+{
+  "id": "c3fa28bb-3b0a-4b27-830a-0d23afcab45e",
+  "guide_id": "5b14b322-f6fd-4898-9ce6-3a9d03a9e535",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "0f7fcac1-fd3c-47d0-bbe1-d80058e8305d",
+      "content": "the interview from top to bottom",
+      "role": "user",
+      "timestamp": "2025-05-15T07:18:55.379215"
+    },
+    {
+      "id": "18729425-7eba-47bb-8527-fe1cb860ca6c",
+      "content": "Great! Let's get started with the interview. Could you please share with me a little bit about your background and experience related to the topic we will be discussing today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T07:18:56.820600"
+    },
+    {
+      "id": "0c49d69e-7eef-4f20-a3b8-fd12c23bb75d",
+      "content": "the interview",
+      "role": "user",
+      "timestamp": "2025-05-15T07:19:14.433599"
+    },
+    {
+      "id": "72b69565-3897-41a7-92d9-85bfeaaedcda",
+      "content": "Hello! Thank you for participating in this interview. To start off, could you please tell me a little bit about your experience with interviews in general? Have you had many interviews before, or is this a new experience for you?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T07:19:15.551259"
+    }
+  ],
+  "transcript": "\n\nParticipant: the interview from top to bottom\n\nModerator: Great! Let's get started with the interview. Could you please share with me a little bit about your background and experience related to the topic we will be discussing today?\n\nParticipant: the interview\n\nModerator: Hello! Thank you for participating in this interview. To start off, could you please tell me a little bit about your experience with interviews in general? Have you had many interviews before, or is this a new experience for you?",
+  "analysis": null,
+  "created_at": "2025-05-15T07:18:45.634386",
+  "updated_at": "2025-05-15T07:19:15.551619"
+}

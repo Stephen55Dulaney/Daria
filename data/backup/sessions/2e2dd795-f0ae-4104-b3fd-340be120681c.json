@@ -1,0 +1,140 @@
+{
+  "id": "2e2dd795-f0ae-4104-b3fd-340be120681c",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {
+    "name": "Stephen Dulaney",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "8542f1cd-b437-428b-9518-8949406c0300",
+      "content": "what is your name and what is your prompt",
+      "role": "user",
+      "timestamp": "2025-05-15T12:25:14.385312"
+    },
+    {
+      "id": "ba9c907b-83a4-4651-807e-fee23e686b88",
+      "content": "My name is Thomas. I'm a test character for the DARIA interview system.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:25:15.052389"
+    },
+    {
+      "id": "b3abe3a8-6d49-41a7-98ec-35f8cacad599",
+      "content": "how can I help you today Thomas",
+      "role": "user",
+      "timestamp": "2025-05-15T12:25:25.356817"
+    },
+    {
+      "id": "3b4d8181-2164-41bd-9b27-8ae4c9a532f4",
+      "content": "I'm here to conduct an interview with you. Are you ready to get started?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:25:25.953145"
+    },
+    {
+      "id": "c69f9ff8-2f4e-4230-a906-8d8b4e6062cd",
+      "content": "yes I'm ready please proceed",
+      "role": "user",
+      "timestamp": "2025-05-15T12:25:43.953417"
+    },
+    {
+      "id": "d72c97f0-f0bf-4434-9f1a-91d086426c41",
+      "content": "Great to hear that you're ready to proceed! To start off, can you please tell me a little bit about your background and experience with interviews?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:25:44.711039"
+    },
+    {
+      "id": "5f246023-9830-42d3-8a00-802eb4051425",
+      "content": "I am a researcher at Deloitte I've been doing this for a long time I've been doing research probably for longer than that",
+      "role": "user",
+      "timestamp": "2025-05-15T12:26:03.457596"
+    },
+    {
+      "id": "9bfe9531-df0f-4df1-834c-75485e4b899e",
+      "content": "That's impressive! It sounds like you have extensive experience in research. Can you tell me more about the specific areas you focus on in your research at Deloitte?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:26:04.304416"
+    },
+    {
+      "id": "8384926e-0e96-4dd1-bf29-59810910e5b3",
+      "content": " that I have had to actually research our own researchers",
+      "role": "user",
+      "timestamp": "2025-05-15T12:26:28.759427"
+    },
+    {
+      "id": "6d7899b9-a43e-4804-983f-145ad5407729",
+      "content": "That sounds intriguing! Could you tell me more about why you needed to research your own researchers? What kind of information were you looking for?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:26:30.150966"
+    },
+    {
+      "id": "eede20e9-a49d-4917-affe-21b3ccd5f65c",
+      "content": "well the information I was looking for is to help build a tool which is called the advanced research and interview assistant so if I was going to build a tool I needed to understand how researchers conducted their research",
+      "role": "user",
+      "timestamp": "2025-05-15T12:26:55.330454"
+    },
+    {
+      "id": "d4e805db-ab12-43d1-bc42-dfdf4d70643e",
+      "content": "That's great to hear that you're working on building the Advanced Research and Interview Assistant tool! To better understand how researchers conduct their research, could you tell me more about the specific areas or industries you are focusing on for this tool?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:26:56.166290"
+    },
+    {
+      "id": "74a8c2ce-d945-4ca5-8374-a6bdf85f3fbb",
+      "content": "well it's an internal tool for 8-week projects we want to try to understand how we can create a discovery plan and then by interviewing the people and then coming up with a plan together so we're going to have Daria who actually interviews the researchers and the Consultants to help them and then when they get into their their enacting they the plan that research study we will have Daria help them select",
+      "role": "user",
+      "timestamp": "2025-05-15T12:27:37.863904"
+    },
+    {
+      "id": "bcea403a-bd44-4393-8e35-95814fa2e596",
+      "content": "That sounds like a very interesting project! Could you explain a bit more about how the process of creating a discovery plan works? How do you typically go about interviewing the researchers and consultants to come up with this plan together?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:27:39.022467"
+    },
+    {
+      "id": "a9fc5341-f6e3-4bd3-bd3e-587e70934bc7",
+      "content": "well for that we have Cynthia who synthesizes discovery plans and she's an expert in her prompt is specialized in gathering the correct information and Grading report at the end which is a discovery plan",
+      "role": "user",
+      "timestamp": "2025-05-15T12:28:11.138409"
+    },
+    {
+      "id": "b93f6936-9a83-4da3-b6c8-e2f8ef4142aa",
+      "content": "That sounds like an interesting role. Can you tell me more about how Cynthia synthesizes discovery plans and what the process involves?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:28:11.802255"
+    },
+    {
+      "id": "762f463e-5c3f-481f-ae36-b0be7a65482b",
+      "content": "right now I'd like to end it the interview",
+      "role": "user",
+      "timestamp": "2025-05-15T12:28:25.864412"
+    },
+    {
+      "id": "f9fb1f6c-67b0-4730-990f-f37ab0318670",
+      "content": "Of course, I understand. Before we conclude, is there anything specific you would like to share or ask regarding our conversation today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:28:26.443033"
+    }
+  ],
+  "transcript": "\n\nParticipant: what is your name and what is your prompt\n\nModerator: My name is Thomas. I'm a test character for the DARIA interview system.\n\nParticipant: how can I help you today Thomas\n\nModerator: I'm here to conduct an interview with you. Are you ready to get started?\n\nParticipant: yes I'm ready please proceed\n\nModerator: Great to hear that you're ready to proceed! To start off, can you please tell me a little bit about your background and experience with interviews?\n\nParticipant: I am a researcher at Deloitte I've been doing this for a long time I've been doing research probably for longer than that\n\nModerator: That's impressive! It sounds like you have extensive experience in research. Can you tell me more about the specific areas you focus on in your research at Deloitte?\n\nParticipant:  that I have had to actually research our own researchers\n\nModerator: That sounds intriguing! Could you tell me more about why you needed to research your own researchers? What kind of information were you looking for?\n\nParticipant: well the information I was looking for is to help build a tool which is called the advanced research and interview assistant so if I was going to build a tool I needed to understand how researchers conducted their research\n\nModerator: That's great to hear that you're working on building the Advanced Research and Interview Assistant tool! To better understand how researchers conduct their research, could you tell me more about the specific areas or industries you are focusing on for this tool?\n\nParticipant: well it's an internal tool for 8-week projects we want to try to understand how we can create a discovery plan and then by interviewing the people and then coming up with a plan together so we're going to have Daria who actually interviews the researchers and the Consultants to help them and then when they get into their their enacting they the plan that research study we will have Daria help them select\n\nModerator: That sounds like a very interesting project! Could you explain a bit more about how the process of creating a discovery plan works? How do you typically go about interviewing the researchers and consultants to come up with this plan together?\n\nParticipant: well for that we have Cynthia who synthesizes discovery plans and she's an expert in her prompt is specialized in gathering the correct information and Grading report at the end which is a discovery plan\n\nModerator: That sounds like an interesting role. Can you tell me more about how Cynthia synthesizes discovery plans and what the process involves?\n\nParticipant: right now I'd like to end it the interview\n\nModerator: Of course, I understand. Before we conclude, is there anything specific you would like to share or ask regarding our conversation today?",
+  "analysis": {
+    "content": "Overall, Thomas maintained a consistent identity throughout the interview as a test character for the DARIA interview system. He properly identified himself at the beginning of the interview and consistently referred to his role in conducting the interview.\n\nHowever, there was a moment where Thomas failed to properly identify himself or broke character when he mentioned having Cynthia as part of the team synthesizing discovery plans. This could be seen as a deviation from his initial role as the interviewer.\n\nWhen directly asked about his purpose and identity, Thomas responded properly and provided information about his role in conducting interviews and building the Advanced Research and Interview Assistant tool. He also engaged with the participant's responses and asked follow-up questions to further understand their research process.\n\nIn conclusion, while there was a slight deviation in identity during the interview, Thomas overall maintained a consistent identity as a test character for the DARIA interview system and responded properly to direct questions about his purpose and identity.",
+    "generated_at": "2025-05-15T12:29:45.188076"
+  },
+  "created_at": "2025-05-15T12:25:07.457540",
+  "updated_at": "2025-05-15T12:29:45.188820",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

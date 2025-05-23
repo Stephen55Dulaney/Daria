@@ -1,0 +1,102 @@
+{
+  "id": "91647d53-fdb9-4771-8e09-7b48a8c60c35",
+  "guide_id": null,
+  "interviewee": {},
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "80cb9ed6-5703-4a4a-91cb-acee0d0f7539",
+      "content": "Why is this so hard for me to figure out. It worked so well and now nothing. I get frustrated",
+      "role": "user",
+      "timestamp": "2025-05-15T17:47:33.483584"
+    },
+    {
+      "id": "fac0c46e-01c4-4112-9ee3-0dbb6f98cf47",
+      "content": "It sounds like you're feeling frustrated about something that was working well before but now isn't. Could you tell me more about what you're trying to figure out and what has changed?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:47:34.372587"
+    },
+    {
+      "id": "8d712ba7-62a3-4a10-bd1e-cbddeab6f613",
+      "content": "Yes I am I had this great AI observer that took our conversation mostly mine and analysed it along the way.",
+      "role": "user",
+      "timestamp": "2025-05-15T17:48:13.367462"
+    },
+    {
+      "id": "38d8d518-8527-4089-a1e1-4677f0cbb3a4",
+      "content": "That sounds fascinating! Could you tell me more about this AI observer and how it analyzed your conversation? How did you come across this technology?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:48:14.076252"
+    },
+    {
+      "id": "5188ec8a-77e4-49e5-abb6-61880a8e511d",
+      "content": "Yes, Some of the insights it captured were very useful and clever.",
+      "role": "user",
+      "timestamp": "2025-05-15T17:48:37.059162"
+    },
+    {
+      "id": "d3593a78-8e47-427d-bca1-31b9d725f211",
+      "content": "That's great to hear! Could you share an example of an insight that you found particularly useful or clever from your experiences?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:48:37.771344"
+    },
+    {
+      "id": "08009364-6e2f-41bb-8a59-be1d8153b1bb",
+      "content": "I only see one at a time in this debug tool The other one just pushed the old ones down and kept the newest at the top,",
+      "role": "user",
+      "timestamp": "2025-05-15T17:49:13.440528"
+    },
+    {
+      "id": "7599488e-7ecd-4fd7-b235-8467a6c66d92",
+      "content": "It sounds like you're referring to a debug tool that only displays one entry at a time and pushes the older ones down. Could you tell me more about how this setup impacts your debugging process?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:49:14.278329"
+    },
+    {
+      "id": "f04909a0-af91-4fc2-a950-21088e0241a2",
+      "content": "Ther are days when things go right and then there are days when you pound your head against the same thing over an over.",
+      "role": "user",
+      "timestamp": "2025-05-15T17:49:43.855867"
+    },
+    {
+      "id": "4bb3b556-3051-4d6d-adb4-59805e9150ec",
+      "content": "It sounds like you've experienced both highs and lows. Can you tell me about a specific experience where everything seemed to go right for you? What made that day or moment so special?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:49:44.789002"
+    },
+    {
+      "id": "66008333-d6f5-4b42-a475-d0a62f71cfd6",
+      "content": "I see emotion dots which is ecsiting but the latest analuysis is replacing the old ones",
+      "role": "user",
+      "timestamp": "2025-05-15T17:50:16.561424"
+    },
+    {
+      "id": "657d70be-2425-4cfd-9ca2-b5cbf9d8335a",
+      "content": "That sounds fascinating! Could you please tell me more about what emotion dots are and how they are being replaced by the latest analysis?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:50:17.133406"
+    },
+    {
+      "id": "17f294ef-e7ce-4d2e-b465-a028a6dd5858",
+      "content": "What happens when I select Assistant?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:54:20.713525"
+    },
+    {
+      "id": "b4954898-3e0e-4485-902f-dcbd95dd4f54",
+      "content": "What happens when I type as System?",
+      "role": "system",
+      "timestamp": "2025-05-15T17:54:37.276008"
+    }
+  ],
+  "transcript": "\n\nParticipant: Why is this so hard for me to figure out. It worked so well and now nothing. I get frustrated\n\nModerator: It sounds like you're feeling frustrated about something that was working well before but now isn't. Could you tell me more about what you're trying to figure out and what has changed?\n\nParticipant: Yes I am I had this great AI observer that took our conversation mostly mine and analysed it along the way.\n\nModerator: That sounds fascinating! Could you tell me more about this AI observer and how it analyzed your conversation? How did you come across this technology?\n\nParticipant: Yes, Some of the insights it captured were very useful and clever.\n\nModerator: That's great to hear! Could you share an example of an insight that you found particularly useful or clever from your experiences?\n\nParticipant: I only see one at a time in this debug tool The other one just pushed the old ones down and kept the newest at the top,\n\nModerator: It sounds like you're referring to a debug tool that only displays one entry at a time and pushes the older ones down. Could you tell me more about how this setup impacts your debugging process?\n\nParticipant: Ther are days when things go right and then there are days when you pound your head against the same thing over an over.\n\nModerator: It sounds like you've experienced both highs and lows. Can you tell me about a specific experience where everything seemed to go right for you? What made that day or moment so special?\n\nParticipant: I see emotion dots which is ecsiting but the latest analuysis is replacing the old ones\n\nModerator: That sounds fascinating! Could you please tell me more about what emotion dots are and how they are being replaced by the latest analysis?\n\nModerator: What happens when I select Assistant?\n\nParticipant: What happens when I type as System?",
+  "analysis": null,
+  "created_at": "2025-05-15T17:46:58.100306",
+  "updated_at": "2025-05-22T13:31:41.287565",
+  "title": "Debugging the custom prompt interview",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "character": "odessia",
+  "character_select": "odessia",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

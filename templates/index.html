@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DARIA Interview Tool</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { color: #333; }
+        .guide { border: 1px solid #ddd; margin: 10px 0; padding: 10px; border-radius: 5px; }
+        .guide h3 { margin-top: 0; }
+        a { color: #0066cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <h1>DARIA Interview Tool</h1>
+    <p>Welcome to the DARIA Interview Tool. This is a simplified version that supports basic functionality.</p>
+    
+    <h2>Discussion Guides</h2>
+    <div id="guides-list">Loading...</div>
+    
+    <script>
+        // Fetch and display discussion guides
+        fetch('/api/discussion_guides')
+            .then(response => response.json())
+            .then(guides => {
+                const guidesList = document.getElementById('guides-list');
+                if (guides.length === 0) {
+                    guidesList.innerHTML = '<p>No discussion guides found.</p>';
+                    return;
+                }
+                
+                let html = '';
+                guides.forEach(guide => {
+                    html += `<div class="guide">
+                        <h3>${guide.title || 'Untitled Guide'}</h3>
+                        <p>Project: ${guide.project || 'N/A'}</p>
+                        <p>Sessions: ${(guide.sessions || []).length}</p>
+                        <a href="/discussion_guide/${guide.id}">View Guide</a>
+                    </div>`;
+                });
+                guidesList.innerHTML = html;
+            })
+            .catch(error => {
+                document.getElementById('guides-list').innerHTML = 
+                    `<p>Error loading guides: ${error.message}</p>`;
+            });
+    </script>
+</body>
+</html>

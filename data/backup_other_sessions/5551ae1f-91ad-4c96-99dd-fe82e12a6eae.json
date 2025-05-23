@@ -1,0 +1,38 @@
+{
+  "id": "5551ae1f-91ad-4c96-99dd-fe82e12a6eae",
+  "guide_id": "61180742-01e7-4cc7-b4a6-39b1b8dea349",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "c8f97574-c69f-4fda-a650-203fca9577fa",
+      "content": "make sure you're still with me",
+      "role": "user",
+      "timestamp": "2025-05-13T16:25:27.304339"
+    },
+    {
+      "id": "9b83059c-944d-4d30-a9dc-d7eec573d6b5",
+      "content": "Of course, I'm still here with you! Is there a specific topic or question you'd like to explore further, or shall we delve into another aspect of the conversation?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T16:25:28.615654"
+    },
+    {
+      "id": "40125fbc-e7d2-4f8a-ad02-51cd46bf096a",
+      "content": "nope you're playing pretty well I just want to make sure you're no errors and everything's working",
+      "role": "user",
+      "timestamp": "2025-05-13T16:25:47.584828"
+    },
+    {
+      "id": "2eebe9ce-f138-4a29-ab58-4d8d6d3dfdb2",
+      "content": "What inspired you to pursue a career in your current field, and how has your journey been so far?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T16:25:48.166950"
+    }
+  ],
+  "transcript": "\n\nParticipant: make sure you're still with me\n\nModerator: Of course, I'm still here with you! Is there a specific topic or question you'd like to explore further, or shall we delve into another aspect of the conversation?\n\nParticipant: nope you're playing pretty well I just want to make sure you're no errors and everything's working\n\nModerator: What inspired you to pursue a career in your current field, and how has your journey been so far?",
+  "analysis": null,
+  "created_at": "2025-05-13T16:25:18.754103",
+  "updated_at": "2025-05-13T16:25:48.167501"
+}

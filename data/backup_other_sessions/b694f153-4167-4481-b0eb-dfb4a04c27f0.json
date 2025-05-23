@@ -1,0 +1,38 @@
+{
+  "id": "b694f153-4167-4481-b0eb-dfb4a04c27f0",
+  "guide_id": "8522dd18-cd96-4acb-84ca-fbbb68133b63",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "36e14e9a-b422-4e0c-ab37-78581603f55c",
+      "content": "thing to make sure we didn't break anything",
+      "role": "user",
+      "timestamp": "2025-05-14T16:45:30.083332"
+    },
+    {
+      "id": "08e41f02-9ac9-4aa8-bc43-eb85c4b12ea0",
+      "content": "Could you please clarify what you mean by \"thing to make sure we didn't break anything\"? Are you referring to a specific process or tool used to prevent errors or damages during a task or activity?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T16:45:31.538087"
+    },
+    {
+      "id": "3c6d0283-2021-4240-ac9c-e3b795884bbb",
+      "content": "I am referring to this interview tool that captures my speech and makes text and enters it into the conversation send it to land chain you lynching creates another question and come to the bacteria text to speech is it to me",
+      "role": "user",
+      "timestamp": "2025-05-14T16:46:05.495043"
+    },
+    {
+      "id": "ab7c6b51-ef1d-4d68-8671-98d3d4fbc3b6",
+      "content": "It seems like you're talking about a tool that transcribes your speech into text during an interview, is that correct? Can you tell me more about this tool and how you use it during interviews?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T16:46:06.687232"
+    }
+  ],
+  "transcript": "\n\nParticipant: thing to make sure we didn't break anything\n\nModerator: Could you please clarify what you mean by \"thing to make sure we didn't break anything\"? Are you referring to a specific process or tool used to prevent errors or damages during a task or activity?\n\nParticipant: I am referring to this interview tool that captures my speech and makes text and enters it into the conversation send it to land chain you lynching creates another question and come to the bacteria text to speech is it to me\n\nModerator: It seems like you're talking about a tool that transcribes your speech into text during an interview, is that correct? Can you tell me more about this tool and how you use it during interviews?",
+  "analysis": null,
+  "created_at": "2025-05-14T16:45:20.279604",
+  "updated_at": "2025-05-14T16:46:06.687674"
+}

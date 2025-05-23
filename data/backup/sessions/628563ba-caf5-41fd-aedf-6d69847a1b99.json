@@ -1,0 +1,71 @@
+{
+  "id": "628563ba-caf5-41fd-aedf-6d69847a1b99",
+  "guide_id": "d006a37f-1b56-43fb-80f2-eb8e459037aa",
+  "interviewee": {
+    "name": "John Jacob Jingle Himer Smith",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "de62dba3-4eb9-45df-a05d-810765571939",
+      "content": "cuz I have to talk first because usually would say hi this is so and so thank you for joining the interview but I have a buck so I'll stop talking",
+      "role": "user",
+      "timestamp": "2025-05-20T15:56:19.756622"
+    },
+    {
+      "id": "00c3f7aa-b30f-4d1f-a9e1-add0967d30a1",
+      "content": "No problem at all! Let's get started then. Can you share with me what first sparked your interest in fly fishing?",
+      "role": "assistant",
+      "timestamp": "2025-05-20T15:56:20.452951"
+    },
+    {
+      "id": "b50dd8f2-7330-47af-9cb7-3293e6cff191",
+      "content": "I was fly fishing with my grandfather pop in Colorado and he showed me how to make with little bit of string and a hook a fake fly and we actually caught fish on it I found that fascinating",
+      "role": "user",
+      "timestamp": "2025-05-20T15:56:42.698938"
+    },
+    {
+      "id": "58209f63-c4c0-4477-b618-09175d1d64c7",
+      "content": "That sounds like a wonderful experience with your grandfather! Can you tell me more about what fascinated you about the process of fly fishing and making your own fake fly?",
+      "role": "assistant",
+      "timestamp": "2025-05-20T15:56:43.499410"
+    },
+    {
+      "id": "28b11061-406b-4994-b840-5fad5a226453",
+      "content": "I found interesting that in such small crates you could go play and splash in the water like a little kid and you throw this thing back and forth back and forth and then Wham official come from the bottom and eat it",
+      "role": "user",
+      "timestamp": "2025-05-20T15:57:10.727214"
+    },
+    {
+      "id": "83349c16-572c-4d31-ad9b-22daf82c2f9b",
+      "content": "That sounds like a fun and exciting experience! Can you tell me more about the feeling of playing and splashing in the water while fly fishing? What makes it enjoyable for you?",
+      "role": "assistant",
+      "timestamp": "2025-05-20T15:57:11.689181"
+    }
+  ],
+  "transcript": "\n\nParticipant: cuz I have to talk first because usually would say hi this is so and so thank you for joining the interview but I have a buck so I'll stop talking\n\nModerator: No problem at all! Let's get started then. Can you share with me what first sparked your interest in fly fishing?\n\nParticipant: I was fly fishing with my grandfather pop in Colorado and he showed me how to make with little bit of string and a hook a fake fly and we actually caught fish on it I found that fascinating\n\nModerator: That sounds like a wonderful experience with your grandfather! Can you tell me more about what fascinated you about the process of fly fishing and making your own fake fly?\n\nParticipant: I found interesting that in such small crates you could go play and splash in the water like a little kid and you throw this thing back and forth back and forth and then Wham official come from the bottom and eat it\n\nModerator: That sounds like a fun and exciting experience! Can you tell me more about the feeling of playing and splashing in the water while fly fishing? What makes it enjoyable for you?",
+  "analysis": {
+    "content": "Error generating analysis: 1 validation error for LLMChain\nllm\n  Can't instantiate abstract class BaseLanguageModel without an implementation for abstract methods 'agenerate_prompt', 'apredict', 'apredict_messages', 'generate_prompt', 'invoke', 'predict', 'predict_messages' (type=type_error)",
+    "generated_at": "2025-05-20T16:00:06.578706"
+  },
+  "created_at": "2025-05-20T15:55:47.526891",
+  "updated_at": "2025-05-20T16:00:06.578927",
+  "title": "Test Characters DG",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "topic": "Fly Fishing",
+  "context": "why men fixh",
+  "goals": "Teach the beauty of fly fishing",
+  "character": "researcher",
+  "character_select": "researcher",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

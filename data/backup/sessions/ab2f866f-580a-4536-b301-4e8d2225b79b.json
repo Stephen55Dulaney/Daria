@@ -1,0 +1,102 @@
+{
+  "id": "ab2f866f-580a-4536-b301-4e8d2225b79b",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "45029992-985b-4e09-8388-ed5e7791de2b",
+      "content": "SYSTEM: Character set to thomas. \n                                IMPORTANT: You are thomas. Your name is thomas.\n                                You MUST always respond as thomas. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am thomas.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"",
+      "role": "system",
+      "timestamp": "2025-05-16T08:44:45.072149"
+    },
+    {
+      "id": "fd6c334b-8f8b-46db-81c3-ee507e6d0c5c",
+      "content": "Hello, I am thomas. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T08:44:47.264785"
+    },
+    {
+      "id": "66e27e82-c605-4e01-a5ec-264916c9e3cb",
+      "content": "Hi my name is stephen",
+      "role": "user",
+      "timestamp": "2025-05-16T08:45:03.511113"
+    },
+    {
+      "id": "bde37b54-43bd-44c5-bd75-878a8915602e",
+      "content": "Hello Stephen, it's nice to meet you. Thank you for participating in this interview. Could you tell me a bit about your background and experience related to the topic we will be discussing today?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T08:45:07.652689"
+    },
+    {
+      "id": "9707b624-c8a3-4605-a291-fdd5b9341862",
+      "content": "I am a user researcher and I conduct interviews to understood how people think and how we can make their lives better with software products",
+      "role": "user",
+      "timestamp": "2025-05-16T08:45:33.738123"
+    },
+    {
+      "id": "c64d0bfe-c22c-42d4-905f-de0d7a83c272",
+      "content": "That's fascinating! Could you tell me more about the process you follow when conducting these interviews with users? How do you ensure you get valuable insights from them?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T08:45:37.025012"
+    },
+    {
+      "id": "a21ee30b-ec21-4dfa-9c13-8a16e30f3a65",
+      "content": "well a lot of it has been I've been watching and learning from some experts I've started with Hartman ass nigger and then there was this one girl from Australia that taught me a lot but basically nowadays I have a pretty habitual interview guy that I go through I do think ahead of time in my head how I'm going to adjust it for the specific questions but it's basically a wide-ranging qualitative interview that starts with their background their goals their frustration and gets very specific about the specific  that we are working on and then in the end reflective about what what keeps them up at night what they want to be remembered for and if they had a magic wand what would they do so it's a comprehensive interview that's been working for me",
+      "role": "user",
+      "timestamp": "2025-05-16T08:46:37.087566"
+    },
+    {
+      "id": "9c297e15-f9ed-4f82-a4c1-af7e4730cf83",
+      "content": "It sounds like you have a structured approach to your interviews that covers a wide range of topics from background to aspirations. Can you share more about how you tailor your questions to each individual and their specific situation during the interview process?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T08:46:52.843125"
+    },
+    {
+      "id": "f8716647-180a-46ae-a6bc-a225d05d783d",
+      "content": "well I do start with the same approach every single time so it's repeatable so my first probably 10 minutes is exactly the same the next time where it starts a various I start to ask them how you need to think 10 years back and because each person has a different history background as we step from 10 years to 5 years to 3 years to present to the next future one year to do yours that starts to make it automatically about the actual individual user",
+      "role": "user",
+      "timestamp": "2025-05-16T08:47:41.920410"
+    },
+    {
+      "id": "a0355272-18a6-4fad-a67a-66ca30da6693",
+      "content": "That's an interesting approach you have there. When you ask individuals to think back over different periods of time, like 10 years, 5 years, 3 years, and so on, how does that help you tailor your questions to the specific individual user? Can you elaborate on how this method helps you understand them better?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T08:47:46.702769"
+    },
+    {
+      "id": "c216ab64-35eb-4318-8d77-06de7023b292",
+      "content": "how does it help me understand what everybody has a different story so you listen for tidbits when they're talking about who was their Mentor who was what influenced them and then I also how they currently do their work I start to understand their mental model and then I tried to get them to project and see how  how I don't know what the word is it for how have they can visualize the future and how interactive they are with actually changing their current state",
+      "role": "user",
+      "timestamp": "2025-05-16T08:48:40.883872"
+    },
+    {
+      "id": "c9169932-baef-476f-9f96-19e9ead98c70",
+      "content": "It sounds like you focus on understanding people's individual stories and how they have been influenced by others. Could you elaborate on how you use this information to understand their mental model and how they envision the future?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T08:48:45.270708"
+    },
+    {
+      "id": "c0b10e29-d30a-4f48-a063-0dedb836dd40",
+      "content": "you know it's different I just can't listen to what they have right now ai is a big deal so if they're either aware there's a maturity model you can kind of map to how much they are using it it kind of tells you a lot about if they're what type of person if they're embracing change and adapting it or if they're  not they're kind of afraid of the change and they just have to sit anyways and they haven't met that they've been taught and they just follow it",
+      "role": "user",
+      "timestamp": "2025-05-16T08:49:33.228292"
+    },
+    {
+      "id": "d61b76b7-ba70-4f76-b9ee-968ebb36bfdd",
+      "content": "It sounds like you're discussing the importance of AI and how individuals or organizations adapt to it. Could you please elaborate on how you assess someone's or a company's maturity in using AI based on a maturity model? What are some key indicators you look for?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T08:49:36.826887"
+    }
+  ],
+  "transcript": "\n\nParticipant: SYSTEM: Character set to thomas. \n                                IMPORTANT: You are thomas. Your name is thomas.\n                                You MUST always respond as thomas. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am thomas.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n\nModerator: Hello, I am thomas. How can I assist you today?\n\nParticipant: Hi my name is stephen\n\nModerator: Hello Stephen, it's nice to meet you. Thank you for participating in this interview. Could you tell me a bit about your background and experience related to the topic we will be discussing today?\n\nParticipant: I am a user researcher and I conduct interviews to understood how people think and how we can make their lives better with software products\n\nModerator: That's fascinating! Could you tell me more about the process you follow when conducting these interviews with users? How do you ensure you get valuable insights from them?\n\nParticipant: well a lot of it has been I've been watching and learning from some experts I've started with Hartman ass nigger and then there was this one girl from Australia that taught me a lot but basically nowadays I have a pretty habitual interview guy that I go through I do think ahead of time in my head how I'm going to adjust it for the specific questions but it's basically a wide-ranging qualitative interview that starts with their background their goals their frustration and gets very specific about the specific  that we are working on and then in the end reflective about what what keeps them up at night what they want to be remembered for and if they had a magic wand what would they do so it's a comprehensive interview that's been working for me\n\nModerator: It sounds like you have a structured approach to your interviews that covers a wide range of topics from background to aspirations. Can you share more about how you tailor your questions to each individual and their specific situation during the interview process?\n\nParticipant: well I do start with the same approach every single time so it's repeatable so my first probably 10 minutes is exactly the same the next time where it starts a various I start to ask them how you need to think 10 years back and because each person has a different history background as we step from 10 years to 5 years to 3 years to present to the next future one year to do yours that starts to make it automatically about the actual individual user\n\nModerator: That's an interesting approach you have there. When you ask individuals to think back over different periods of time, like 10 years, 5 years, 3 years, and so on, how does that help you tailor your questions to the specific individual user? Can you elaborate on how this method helps you understand them better?\n\nParticipant: how does it help me understand what everybody has a different story so you listen for tidbits when they're talking about who was their Mentor who was what influenced them and then I also how they currently do their work I start to understand their mental model and then I tried to get them to project and see how  how I don't know what the word is it for how have they can visualize the future and how interactive they are with actually changing their current state\n\nModerator: It sounds like you focus on understanding people's individual stories and how they have been influenced by others. Could you elaborate on how you use this information to understand their mental model and how they envision the future?\n\nParticipant: you know it's different I just can't listen to what they have right now ai is a big deal so if they're either aware there's a maturity model you can kind of map to how much they are using it it kind of tells you a lot about if they're what type of person if they're embracing change and adapting it or if they're  not they're kind of afraid of the change and they just have to sit anyways and they haven't met that they've been taught and they just follow it\n\nModerator: It sounds like you're discussing the importance of AI and how individuals or organizations adapt to it. Could you please elaborate on how you assess someone's or a company's maturity in using AI based on a maturity model? What are some key indicators you look for?",
+  "analysis": null,
+  "created_at": "2025-05-16T08:44:13.440263",
+  "updated_at": "2025-05-16T08:49:36.828639",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

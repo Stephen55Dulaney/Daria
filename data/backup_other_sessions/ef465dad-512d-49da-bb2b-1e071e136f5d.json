@@ -1,0 +1,38 @@
+{
+  "id": "ef465dad-512d-49da-bb2b-1e071e136f5d",
+  "guide_id": "81222255-a805-4693-9e5c-129270288908",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "1e4487bc-e994-474f-b516-0269c560c1a1",
+      "content": "doing a test to show you off to a friend of mine",
+      "role": "user",
+      "timestamp": "2025-05-15T09:52:59.212542"
+    },
+    {
+      "id": "b7dc0646-158a-4523-8fab-916445daf70a",
+      "content": "I'm here to help! What specific information or details are you looking to showcase to your friend during this test?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T09:53:00.366956"
+    },
+    {
+      "id": "18c76a1b-ccf8-4af5-8bb2-916591351d3d",
+      "content": "so I want to get this I have been given access to a a WS instance but I'm actually a ux researcher I'm developing this by just talking to an AI in the AI starting the code I'm using cursor  so I don't know any of this part and I've done this week and I need to get a connection so I can connect my GitHub to this instance  for your local IP okay  I think you do that by going down here and and doing something",
+      "role": "user",
+      "timestamp": "2025-05-15T09:54:11.228040"
+    },
+    {
+      "id": "5578531d-1116-4acf-bae4-c987e99c4c0b",
+      "content": "Could you please provide more details about the WS instance you've been given access to? Are you trying to connect your GitHub to this instance using your local IP address?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T09:54:12.228370"
+    }
+  ],
+  "transcript": "\n\nParticipant: doing a test to show you off to a friend of mine\n\nModerator: I'm here to help! What specific information or details are you looking to showcase to your friend during this test?\n\nParticipant: so I want to get this I have been given access to a a WS instance but I'm actually a ux researcher I'm developing this by just talking to an AI in the AI starting the code I'm using cursor  so I don't know any of this part and I've done this week and I need to get a connection so I can connect my GitHub to this instance  for your local IP okay  I think you do that by going down here and and doing something\n\nModerator: Could you please provide more details about the WS instance you've been given access to? Are you trying to connect your GitHub to this instance using your local IP address?",
+  "analysis": null,
+  "created_at": "2025-05-15T09:52:48.789355",
+  "updated_at": "2025-05-15T09:54:12.228501"
+}

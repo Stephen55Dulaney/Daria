@@ -1,0 +1,37 @@
+{
+  "session_id": "e4e38f56-0960-4185-ae85-e2cb6e90f8c6",
+  "title": "End to End Debug Questions",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "prompt": "You are a research analyst examining interview data about {topic}.\nRead the following transcript(s) carefully and identify key themes, patterns, and insights.\nFocus on what the data actually says rather than assumptions or preconceptions.\n\nResearch questions:\n{questions}\n\nTranscript data:\n{data}",
+  "interview_prompt": "You are a research analyst examining interview data about {topic}.\nRead the following transcript(s) carefully and identify key themes, patterns, and insights.\nFocus on what the data actually says rather than assumptions or preconceptions.\n\nResearch questions:\n{questions}\n\nTranscript data:\n{data}",
+  "analysis_prompt": "Analyze the provided data systematically. Identify recurring themes, interesting outliers,\nand potential insights. Consider both explicit statements and implicit meanings.\nOrganize your findings into clear categories and note any limitations of the data.\n",
+  "character_select": "researcher",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb",
+  "interviewee": {
+    "name": "Stephen Dulaney",
+    "role": "",
+    "email": ""
+  },
+  "created_at": "2025-05-14T09:37:23.718035",
+  "creation_date": "2025-05-14 09:37",
+  "last_updated": "2025-05-14T09:37:23.718035",
+  "expiration_date": "2025-06-13T09:37:23.718035",
+  "status": "active",
+  "conversation_history": [],
+  "id": "e4e38f56-0960-4185-ae85-e2cb6e90f8c6",
+  "updated_at": "2025-05-14T09:56:28.778238",
+  "sessions": [
+    "8af2e5b9-7f12-4b6e-aec3-22ec2fcfe49c",
+    "32f03402-6a7a-4b6d-97e6-5066b6b4ec20",
+    "36fc69e8-f584-4068-9096-91b82313c08f",
+    "3bb6acf1-e0e1-4391-a47b-fc493073feb5",
+    "e790ae43-04de-4881-a53c-f1e0e020cf87"
+  ],
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "custom_questions": []
+}

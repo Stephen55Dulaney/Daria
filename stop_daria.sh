@@ -49,4 +49,29 @@ stop_service 8889  # Web server
 echo "All services have been stopped successfully"
 echo "=================================================="
 echo "DARIA Interview System has been shut down"
-echo "==================================================" 
+echo "=================================================="
+
+echo "====== Stopping DARIA Service ======"
+
+# Find and kill any processes on port 5025
+echo "Finding processes on port 5025..."
+PIDS=$(lsof -ti:5025 2>/dev/null)
+
+if [ -z "$PIDS" ]; then
+  echo "No DARIA processes found running on port 5025."
+else
+  echo "Stopping DARIA processes with PIDs: $PIDS"
+  kill -15 $PIDS 2>/dev/null || true
+  
+  # Wait a moment for graceful shutdown
+  sleep 2
+  
+  # Check if processes are still running and force kill if needed
+  REMAINING=$(lsof -ti:5025 2>/dev/null)
+  if [ ! -z "$REMAINING" ]; then
+    echo "Force killing remaining processes: $REMAINING"
+    kill -9 $REMAINING 2>/dev/null || true
+  fi
+  
+  echo "✅ DARIA service stopped."
+fi 

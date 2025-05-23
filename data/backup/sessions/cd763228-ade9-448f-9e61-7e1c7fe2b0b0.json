@@ -1,0 +1,89 @@
+{
+  "id": "cd763228-ade9-448f-9e61-7e1c7fe2b0b0",
+  "guide_id": null,
+  "interviewee": {
+    "name": "Stephen Dulaney",
+    "email": "sdulaney@deloitte.com",
+    "role": "UX Researcher",
+    "department": "User Research",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "4a8cde98-e95a-4aae-a16d-adc3e037ddb8",
+      "content": "hi this is Steven are you there",
+      "role": "user",
+      "timestamp": "2025-05-15T14:27:10.442539"
+    },
+    {
+      "id": "c4a218e5-603e-4d75-841e-c6e65ada2dfa",
+      "content": "Hello Steven, I'm here. How can I assist you today with your interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T14:27:10.987101"
+    },
+    {
+      "id": "e18e97ee-3036-465e-bf86-08b81243412c",
+      "content": "I'm just trying to make sure everything is going okay who are you and what is your prompt",
+      "role": "user",
+      "timestamp": "2025-05-15T15:15:33.262628"
+    },
+    {
+      "id": "3cdce816-09f1-49ba-a0fd-a38692fab3bb",
+      "content": "I am Odessia. As Odessia, I'm Deloitte's Journey Mapping specialist.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:15:34.546916"
+    },
+    {
+      "id": "707f95fa-3f2a-4f08-ac4b-d4efad257f83",
+      "content": "good thank you odyssia you passed the test but we need to talk about to get you a good journey man",
+      "role": "user",
+      "timestamp": "2025-05-15T15:15:48.786216"
+    },
+    {
+      "id": "badf8d22-3641-4ebb-9d20-2767c2c96dd7",
+      "content": "Thank you for the feedback! Could you please elaborate on what you mean by getting me a good journey man?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:15:49.411946"
+    },
+    {
+      "id": "c47a87b1-bd01-40aa-ba96-cadb5f7cbc74",
+      "content": "Journey map",
+      "role": "user",
+      "timestamp": "2025-05-15T15:16:11.564607"
+    },
+    {
+      "id": "4cd781c5-d838-4e9c-b0f2-64a72afa61cf",
+      "content": "Hello! I'm Odessia, a journey-mapping specialist. When you hear the term \"journey map,\" what comes to mind for you?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:16:12.246732"
+    },
+    {
+      "id": "e4c9a72a-f204-46f1-8bdb-ca168a45e09d",
+      "content": "where is the thing running that is not",
+      "role": "user",
+      "timestamp": "2025-05-15T15:16:33.717975"
+    },
+    {
+      "id": "a3e34768-6cd9-4993-928c-05e9c12a79d0",
+      "content": "I'm a bit confused by your question. Could you please clarify what you mean by \"the thing running that is not\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:16:34.778320"
+    }
+  ],
+  "transcript": "\n\nParticipant: hi this is Steven are you there\n\nModerator: Hello Steven, I'm here. How can I assist you today with your interview?\n\nParticipant: I'm just trying to make sure everything is going okay who are you and what is your prompt\n\nModerator: I am Odessia. As Odessia, I'm Deloitte's Journey Mapping specialist.\n\nParticipant: good thank you odyssia you passed the test but we need to talk about to get you a good journey man\n\nModerator: Thank you for the feedback! Could you please elaborate on what you mean by getting me a good journey man?\n\nParticipant: Journey map\n\nModerator: Hello! I'm Odessia, a journey-mapping specialist. When you hear the term \"journey map,\" what comes to mind for you?\n\nParticipant: where is the thing running that is not\n\nModerator: I'm a bit confused by your question. Could you please clarify what you mean by \"the thing running that is not\"?",
+  "analysis": null,
+  "created_at": "2025-05-15T14:26:22.333038",
+  "updated_at": "2025-05-22T13:31:41.278380",
+  "title": "Debugging the custom prompt interview",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "character": "odessia",
+  "character_select": "odessia",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

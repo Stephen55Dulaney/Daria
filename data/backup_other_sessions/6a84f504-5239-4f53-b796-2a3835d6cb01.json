@@ -1,0 +1,95 @@
+{
+  "id": "6a84f504-5239-4f53-b796-2a3835d6cb01",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Stephen Dulaney",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "b115930e-1b50-4921-a57b-49566920408a",
+      "content": "hello",
+      "role": "user",
+      "timestamp": "2025-05-14T07:59:46.728277"
+    },
+    {
+      "id": "30dad592-d961-4946-b307-02a2398b3e61",
+      "content": "Hello! How are you feeling today?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T07:59:47.792126"
+    },
+    {
+      "id": "85a0b3ec-9c68-47be-9755-e01be894b805",
+      "content": "I'm good today",
+      "role": "user",
+      "timestamp": "2025-05-14T07:59:53.119177"
+    },
+    {
+      "id": "832fc24f-cada-41ec-a86c-4fd8ddbe391b",
+      "content": "That's great to hear! Is there anything specific that has contributed to you feeling good today, or is it just an overall positive day for you?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T07:59:53.703519"
+    },
+    {
+      "id": "9c2f53f8-559f-4194-bd96-f0841a7206d8",
+      "content": "is an overall positive day for me cuz we're going to fix these bugs",
+      "role": "user",
+      "timestamp": "2025-05-14T08:00:08.889545"
+    },
+    {
+      "id": "8955c6eb-553e-416e-82a3-d202a83140bd",
+      "content": "That's great to hear that you're having a positive day! I'm glad you're excited about fixing those bugs. Can you tell me more about the process of bug fixing and how you approach solving technical issues in your work?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T08:00:09.924792"
+    },
+    {
+      "id": "4f25c25d-bafe-4b83-8977-908c8196f23a",
+      "content": "in your work",
+      "role": "user",
+      "timestamp": "2025-05-14T08:00:25.078791"
+    },
+    {
+      "id": "0cfb51a0-7c45-4a60-a681-65440385e7d1",
+      "content": "What specific challenges or obstacles have you encountered in your work, and how have you overcome them?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T08:00:25.877884"
+    },
+    {
+      "id": "cac504ef-e54f-4562-8ad4-263c41852d6a",
+      "content": "hello",
+      "role": "user",
+      "timestamp": "2025-05-14T08:09:22.767029"
+    },
+    {
+      "id": "a12bbdd8-9fc0-4034-827b-429a897744de",
+      "content": "Hello! How are you doing today? Is there anything specific you would like to talk about or ask me?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T08:09:23.711714"
+    },
+    {
+      "id": "2515a5e2-498f-41c4-91d0-10a32858eb42",
+      "content": "why do you keep taking my answers from the transcript and deleting them",
+      "role": "user",
+      "timestamp": "2025-05-14T08:09:37.090861"
+    },
+    {
+      "id": "7da907f0-8d40-43c6-a9f7-d13bbce6d1ab",
+      "content": "I apologize for any confusion. It seems there may have been a misunderstanding. Let's continue with the interview. Can you share more about your experience in the field and how it has shaped your perspective on the industry?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T08:09:37.887088"
+    }
+  ],
+  "transcript": "\n\nParticipant: hello\n\nModerator: Hello! How are you feeling today?\n\nParticipant: I'm good today\n\nModerator: That's great to hear! Is there anything specific that has contributed to you feeling good today, or is it just an overall positive day for you?\n\nParticipant: is an overall positive day for me cuz we're going to fix these bugs\n\nModerator: That's great to hear that you're having a positive day! I'm glad you're excited about fixing those bugs. Can you tell me more about the process of bug fixing and how you approach solving technical issues in your work?\n\nParticipant: in your work\n\nModerator: What specific challenges or obstacles have you encountered in your work, and how have you overcome them?\n\nParticipant: hello\n\nModerator: Hello! How are you doing today? Is there anything specific you would like to talk about or ask me?\n\nParticipant: why do you keep taking my answers from the transcript and deleting them\n\nModerator: I apologize for any confusion. It seems there may have been a misunderstanding. Let's continue with the interview. Can you share more about your experience in the field and how it has shaped your perspective on the industry?",
+  "analysis": null,
+  "created_at": "2025-05-14T07:30:23.299154",
+  "updated_at": "2025-05-14T08:09:37.888653"
+}

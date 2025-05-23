@@ -139,28 +139,39 @@
                         </div>
                     </div>
                     
-                    {% if session.interviewee %}
-                    <div class="mb-3">
-                        <h3 class="h6 text-muted">Participant Information</h3>
-                        {% if session.interviewee.name %}
-                        <p class="mb-1"><strong>Name:</strong> {{ session.interviewee.name }}</p>
-                        {% endif %}
-                        {% if session.interviewee.email %}
+                    {% if session.interviewee is defined and session.interviewee and session.interviewee.name %}
+                        <div class="mb-3">
+                            <h3 class="h6 text-muted">Participant Information</h3>
+                            <p class="mb-1"><strong>Name:</strong> {{ session.interviewee.name }}</p>
+                        </div>
+                    {% elif session.participant_name %}
+                        <div class="mb-3">
+                            <h3 class="h6 text-muted">Participant Information</h3>
+                            <p class="mb-1"><strong>Name:</strong> {{ session.participant_name }}</p>
+                        </div>
+                    {% endif %}
+                    {% if session.interviewee is defined and session.interviewee and session.interviewee.email %}
                         <p class="mb-1"><strong>Email:</strong> {{ session.interviewee.email }}</p>
-                        {% endif %}
-                        {% if session.interviewee.role %}
+                    {% endif %}
+                    {% if session.interviewee is defined and session.interviewee and session.interviewee.role %}
                         <p class="mb-1"><strong>Role:</strong> {{ session.interviewee.role }}</p>
-                        {% endif %}
-                        {% if session.interviewee.department %}
+                    {% endif %}
+                    {% if session.interviewee is defined and session.interviewee and session.interviewee.department %}
                         <p class="mb-1"><strong>Department:</strong> {{ session.interviewee.department }}</p>
-                        {% endif %}
-                    </div>
                     {% endif %}
                     
                     <div class="mb-3">
                         <h3 class="h6 text-muted">Session Stats</h3>
                         <p class="mb-1"><strong>Duration:</strong> {{ session.duration|default('N/A') }}</p>
-                        <p class="mb-1"><strong>Messages:</strong> {{ session.messages|length if session.messages else 0 }}</p>
+                        <p class="mb-1"><strong>Messages:</strong>
+                            {% if session.messages is defined and session.messages %}
+                                {{ session.messages|length }}
+                            {% elif session.conversation_history is defined and session.conversation_history %}
+                                {{ session.conversation_history|length }}
+                            {% else %}
+                                0
+                            {% endif %}
+                        </p>
                         <p class="mb-1"><strong>Transcript Length:</strong> {{ (session.transcript|string|length / 1000)|round(1) }}k characters</p>
                     </div>
                     
@@ -258,19 +269,33 @@
                         <!-- Transcript Tab -->
                         <div class="tab-pane fade show active" id="transcript" role="tabpanel" aria-labelledby="transcript-tab">
                             <div class="transcript-container">
-                                {% if session.messages and session.messages|length > 0 %}
+                                {% if session.messages is defined and session.messages %}
                                     {% for message in session.messages %}
-                                    <div class="message {{ 'message-moderator' if message.role == 'assistant' else 'message-participant' }}">
-                                        <div class="message-header">
-                                            <strong>{{ 'Moderator' if message.role == 'assistant' else 'Participant' }}</strong>
-                                            {% if message.timestamp %}
-                                            <span class="ms-2 small">
-                                                {{ message.timestamp.split('T')[1].split('.')[0] if message.timestamp is string else message.timestamp.strftime('%H:%M:%S') }}
-                                            </span>
-                                            {% endif %}
+                                        <div class="message {{ 'message-moderator' if message.role == 'assistant' else 'message-participant' }}">
+                                            <div class="message-header">
+                                                <strong>{{ 'Moderator' if message.role == 'assistant' else 'Participant' }}</strong>
+                                                {% if message.timestamp %}
+                                                <span class="ms-2 small">
+                                                    {{ message.timestamp.split('T')[1].split('.')[0] if message.timestamp is string else message.timestamp.strftime('%H:%M:%S') }}
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="message-content">{{ message.content }}</div>
                                         </div>
-                                        <div class="message-content">{{ message.content }}</div>
-                                    </div>
+                                    {% endfor %}
+                                {% elif session.conversation_history is defined and session.conversation_history %}
+                                    {% for message in session.conversation_history %}
+                                        <div class="message {{ 'message-moderator' if message.role == 'assistant' else 'message-participant' }}">
+                                            <div class="message-header">
+                                                <strong>{{ 'Moderator' if message.role == 'assistant' else 'Participant' }}</strong>
+                                                {% if message.timestamp %}
+                                                <span class="ms-2 small">
+                                                    {{ message.timestamp.split('T')[1].split('.')[0] if message.timestamp is string else message.timestamp.strftime('%H:%M:%S') }}
+                                                </span>
+                                                {% endif %}
+                                            </div>
+                                            <div class="message-content">{{ message.content }}</div>
+                                        </div>
                                     {% endfor %}
                                 {% elif session.transcript %}
                                     <div class="message message-participant">
@@ -672,9 +697,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (exportTranscriptBtn) {
         exportTranscriptBtn.addEventListener('click', function() {
             // Get transcript content
-            const transcriptContent = `{% if session.transcript %}{{ session.transcript|replace("'", "\\'")|replace('\n', '\\n') }}{% else %}{% if session.messages %}{% for message in session.messages %}{{ ('Moderator' if message.role == 'assistant' else 'Participant') + ': ' + message.content|replace("'", "\\'")|replace('\n', '\\n') }}
-{% endfor %}{% endif %}{% endif %}`;
-            
+            const transcriptContent = `{{ transcript_content }}`;
             // Create a blob and download link
             const blob = new Blob([transcriptContent], { type: 'text/plain' });
             const url = URL.createObjectURL(blob);

@@ -1,0 +1,41 @@
+{
+  "id": "58a7f663-f1e8-41fa-be98-de629f834ee3",
+  "guide_id": "bd1e9389-d18a-481e-8ccf-266c8360a45a",
+  "interviewee": {
+    "name": "John Jacob Jingle Himer Smith",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "f8a5af6d-8121-4cbc-9c21-6831b7164d58",
+      "content": "hello I'm waiting for the interview to start and you're not talking to me",
+      "role": "user",
+      "timestamp": "2025-05-16T15:40:14.965434"
+    },
+    {
+      "id": "08dca85b-7e08-4c2c-98a4-e7db75be264e",
+      "content": "Hello! Thank you for your patience. I'm Thesea, and I'll be conducting the interview with you today. Let's get started! Can you please introduce yourself and tell me a bit about your background or experience related to the topic we'll be discussing?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T15:40:18.963277"
+    }
+  ],
+  "transcript": "\n\nParticipant: hello I'm waiting for the interview to start and you're not talking to me\n\nModerator: Hello! Thank you for your patience. I'm Thesea, and I'll be conducting the interview with you today. Let's get started! Can you please introduce yourself and tell me a bit about your background or experience related to the topic we'll be discussing?",
+  "analysis": null,
+  "created_at": "2025-05-16T15:39:42.515393",
+  "updated_at": "2025-05-16T15:40:18.963562",
+  "title": "Testing the additional questions take 5",
+  "project": "Test 4444",
+  "interview_type": "persona_interview",
+  "character": "thesea",
+  "character_select": "thesea",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL"
+}

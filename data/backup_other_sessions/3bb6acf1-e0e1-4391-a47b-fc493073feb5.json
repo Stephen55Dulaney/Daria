@@ -1,0 +1,26 @@
+{
+  "id": "3bb6acf1-e0e1-4391-a47b-fc493073feb5",
+  "guide_id": "e4e38f56-0960-4185-ae85-e2cb6e90f8c6",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "29340d0d-face-47af-b298-cac2cddadf67",
+      "content": "want to see if we're going to be able to capture the session information which I don't see right here",
+      "role": "user",
+      "timestamp": "2025-05-14T09:55:44.788557"
+    },
+    {
+      "id": "c1998263-5bc4-4dd6-a490-c92551f55096",
+      "content": "It sounds like you're looking to ensure that we can capture the session information effectively. Could you provide more details about the specific information you're referring to and the context in which it needs to be captured?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:55:45.656604"
+    }
+  ],
+  "transcript": "\n\nParticipant: want to see if we're going to be able to capture the session information which I don't see right here\n\nModerator: It sounds like you're looking to ensure that we can capture the session information effectively. Could you provide more details about the specific information you're referring to and the context in which it needs to be captured?",
+  "analysis": null,
+  "created_at": "2025-05-14T09:55:33.024814",
+  "updated_at": "2025-05-14T09:55:45.657107"
+}

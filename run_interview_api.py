@@ -81,6 +81,7 @@ logger.info("SocketIO initialized for real-time communication")
 # Define paths
 BASE_DIR = Path(__file__).parent.absolute()
 DATA_DIR = BASE_DIR / "data" / "interviews"
+SESSIONS_DIR = DATA_DIR / 'sessions'
 PROMPT_DIR = BASE_DIR / "tools" / "prompt_manager" / "prompts"
 
 # Ensure directories exist
@@ -232,13 +233,62 @@ def load_all_interviews() -> Dict[str, Dict[str, Any]]:
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    """Health check endpoint."""
-    prompts = list(load_all_prompts().keys())
+    """Robust health check endpoint for DARIA."""
+    import requests
+    import socket
+    import time
+    
+    # Check available prompts/characters
+    try:
+        prompts = list(load_all_prompts().keys())
+    except Exception as e:
+        prompts = []
+    
+    # Check LangChain status
+    langchain_status = bool(globals().get('use_langchain', False))
+    
+    # Check TTS service
+    tts_ok = False
+    try:
+        tts_resp = requests.get('http://localhost:5015/health', timeout=2)
+        tts_ok = tts_resp.status_code == 200 and tts_resp.json().get('status') == 'ok'
+    except Exception:
+        tts_ok = False
+    
+    # Check STT service
+    stt_ok = False
+    try:
+        stt_resp = requests.get('http://localhost:5016/health', timeout=2)
+        stt_ok = stt_resp.status_code == 200 and stt_resp.json().get('status') == 'ok'
+    except Exception:
+        stt_ok = False
+    
+    # Check Memory Companion service
+    memory_ok = False
+    try:
+        mem_resp = requests.get('http://localhost:5030/health', timeout=2)
+        memory_ok = mem_resp.status_code == 200 and mem_resp.json().get('status') == 'ok'
+    except Exception:
+        memory_ok = False
+    
+    # Compose result
     return jsonify({
-        'status': 'ok',
+        'status': 'ok' if (tts_ok and stt_ok and memory_ok and langchain_status and len(prompts) > 0) else 'error',
         'version': '1.0.0',
+        'langchain_enabled': langchain_status,
         'available_prompts': prompts,
-        'langchain_enabled': use_langchain
+        'characters_loaded': len(prompts),
+        'tts_service': tts_ok,
+        'stt_service': stt_ok,
+        'memory_companion': memory_ok,
+        'timestamp': time.strftime('%Y-%m-%dT%H:%M:%S'),
+        'details': {
+            'tts': tts_ok,
+            'stt': stt_ok,
+            'memory': memory_ok,
+            'langchain': langchain_status,
+            'characters': prompts
+        }
     })
 
 @app.route('/api/interview/start', methods=['POST'])
@@ -3199,343 +3249,95 @@ app.register_blueprint(langchain_blueprint)
 def api_upload_transcript():
     """Handle transcript upload and conversion to interview format."""
     try:
-        # Ensure files were uploaded
+        # 1. Validate form and file
         if 'transcript_file' not in request.files:
+            logger.error("No transcript_file in request.files")
             return jsonify({'success': False, 'error': 'No transcript file provided'}), 400
-        
+
         transcript_file = request.files['transcript_file']
-        if transcript_file.filename == '':
-            return jsonify({'success': False, 'error': 'No file selected'}), 400
-        
-        # Get metadata from form
+        guide_id = request.form.get('guide_id')
+        participant_name = request.form.get('participant_name', 'Anonymous')
+        participant_email = request.form.get('participant_email', '')
+        participant_role = request.form.get('participant_role', '')
         title = request.form.get('title', 'Untitled Interview')
         project = request.form.get('project', '')
-        interview_type = request.form.get('interview_type', 'custom_interview')
-        researcher_name = request.form.get('researcher_name', '')
-        researcher_email = request.form.get('researcher_email', '')
-        participant_name = request.form.get('participant_name', 'Anonymous')
-        participant_role = request.form.get('participant_role', '')
-        participant_email = request.form.get('participant_email', '')
-        
-        # Generate a unique session ID
-        session_id = str(uuid.uuid4())
-        
-        # Read and process the transcript content
-        try:
-            transcript_content = transcript_file.read().decode('utf-8')
-        except UnicodeDecodeError:
-            # Try another common encoding if utf-8 fails
-            transcript_file.seek(0)
-            transcript_content = transcript_file.read().decode('latin-1')
-            
-        # Debug: Log the first 10 lines to understand format
-        preview_lines = transcript_content.strip().split('\n')[:10]
-        logger.info(f"Transcript preview (first 10 lines):\n{''.join([line + '\n' for line in preview_lines])}")
-        
-        # Process transcript into conversation chunks
-        lines = transcript_content.strip().split('\n')
-        transcript_chunks = []
-        current_speaker = None
-        current_timestamp = None
-        current_content = []
-        
-        # Detect format patterns
-        zoom_bracket_pattern = r'^\s*\[(.*?)\]\s*(\d{1,2}:\d{1,2}:\d{1,2})'  # [Name] 00:00:00
-        simple_bracket_pattern = r'^\s*\[(.*?)\]'  # [Name]
-        colon_pattern = r'^([^:]+):\s*(.*)'  # Name: text
-        time_pattern = r'^(\d{1,2}:\d{1,2}:\d{1,2})\s+(.+)'  # 00:00:00 text
-        
-        format_type = None
-        
-        # Check first few lines to determine format
-        for line in [l for l in lines[:15] if l.strip()][:5]:
-            if re.match(zoom_bracket_pattern, line):
-                format_type = "zoom_bracket"
-                break
-            elif re.match(simple_bracket_pattern, line):
-                format_type = "simple_bracket"
-                break
-            elif re.match(colon_pattern, line):
-                format_type = "colon"
-                break
-            elif re.match(time_pattern, line):
-                format_type = "time_prefixed"
-                break
-        
-        logger.info(f"Detected transcript format: {format_type or 'unknown'}")
-        
-        # Process transcript based on detected format
-        for line in lines:
+        interview_type = request.form.get('interview_type', 'imported_transcript')
+
+        # 2. Get the guide and copy over metadata
+        guide = discussion_service.get_guide(guide_id) if guide_id else None
+        if not guide:
+            logger.error(f"Guide not found for ID: {guide_id}")
+            return jsonify({'success': False, 'error': 'Guide not found'}), 400
+
+        # 3. Create a new session using the same method as the modal
+        interviewee = {
+            'name': participant_name,
+            'email': participant_email,
+            'role': participant_role,
+            'department': '',
+            'company': '',
+            'demographics': {
+                'age_range': '',
+                'gender': '',
+                'location': ''
+            }
+        }
+        session_id = discussion_service.create_session(guide_id, interviewee)
+        if not session_id:
+            logger.error("Failed to create session")
+            return jsonify({'success': False, 'error': 'Failed to create session'}), 500
+
+        # 4. Parse the transcript file into messages
+        transcript_text = transcript_file.read().decode('utf-8')
+        # Simple line-based parsing: alternate user/assistant, or use a smarter parser if you have one
+        messages = []
+        for line in transcript_text.splitlines():
             line = line.strip()
             if not line:
                 continue
-            
-            if format_type == "zoom_bracket":
-                # Try to match [Speaker] 00:00:00 pattern (Zoom format)
-                match = re.match(zoom_bracket_pattern, line)
-                if match:
-                    # Save previous speaker's content if we're switching speakers
-                    if current_speaker and current_content:
-                        transcript_chunks.append({
-                            'speaker': current_speaker,
-                            'speaker_name': current_speaker,
-                            'content': ' '.join(current_content),
-                            'timestamp': current_timestamp or ''
-                        })
-                        current_content = []
-                    
-                    # Extract new speaker and timestamp
-                    current_speaker = match.group(1).strip()
-                    current_timestamp = match.group(2)
-                    
-                    # Get content after timestamp
-                    timestamp_start = line.find(current_timestamp)
-                    if timestamp_start > 0:
-                        content_start = timestamp_start + len(current_timestamp)
-                        content = line[content_start:].strip()
-                        if content:
-                            current_content.append(content)
-                else:
-                    # If no match, treat as continuation of current speaker
-                    if current_speaker:
-                        current_content.append(line)
-            
-            elif format_type == "simple_bracket":
-                # Try to match [Speaker] pattern (without timestamp)
-                match = re.match(simple_bracket_pattern, line)
-                if match:
-                    # Save previous speaker's content if we're switching speakers
-                    if current_speaker and current_content:
-                        transcript_chunks.append({
-                            'speaker': current_speaker,
-                            'speaker_name': current_speaker,
-                            'content': ' '.join(current_content),
-                            'timestamp': current_timestamp or ''
-                        })
-                        current_content = []
-                    
-                    # Extract new speaker
-                    current_speaker = match.group(1).strip()
-                    
-                    # Get content after bracket
-                    bracket_end = line.find(']')
-                    if bracket_end > 0:
-                        content = line[bracket_end+1:].strip()
-                        if content:
-                            current_content.append(content)
-                else:
-                    # If no match, treat as continuation of current speaker
-                    if current_speaker:
-                        current_content.append(line)
-            
-            elif format_type == "colon":
-                # Try to match Name: Content pattern
-                match = re.match(colon_pattern, line)
-                if match:
-                    # Save previous speaker's content if we're switching speakers
-                    if current_speaker and current_content:
-                        transcript_chunks.append({
-                            'speaker': current_speaker,
-                            'speaker_name': current_speaker,
-                            'content': ' '.join(current_content),
-                            'timestamp': current_timestamp or ''
-                        })
-                        current_content = []
-                    
-                    # Extract new speaker and content
-                    current_speaker = match.group(1).strip()
-                    content = match.group(2).strip()
-                    if content:
-                        current_content.append(content)
-                else:
-                    # If no match, treat as continuation of current speaker
-                    if current_speaker:
-                        current_content.append(line)
-            
-            elif format_type == "time_prefixed":
-                # Try to match 00:00:00 Content pattern
-                match = re.match(time_pattern, line)
-                if match:
-                    timestamp = match.group(1)
-                    remaining_text = match.group(2).strip()
-                    
-                    # Check if remaining text has speaker designation
-                    speaker_match = re.match(colon_pattern, remaining_text)
-                    if speaker_match:
-                        # This is a new speaker entry
-                        if current_speaker and current_content:
-                            transcript_chunks.append({
-                                'speaker': current_speaker,
-                                'speaker_name': current_speaker,
-                                'content': ' '.join(current_content),
-                                'timestamp': current_timestamp or ''
-                            })
-                            current_content = []
-                        
-                        current_speaker = speaker_match.group(1).strip()
-                        current_timestamp = timestamp
-                        content = speaker_match.group(2).strip()
-                        if content:
-                            current_content.append(content)
-                    else:
-                        # No speaker designation, continue with current speaker
-                        current_timestamp = timestamp
-                        if current_speaker:
-                            current_content.append(remaining_text)
-                        else:
-                            # No current speaker, create a generic one
-                            current_speaker = "Speaker"
-                            current_content.append(remaining_text)
-                else:
-                    # If no match, treat as continuation of current speaker
-                    if current_speaker:
-                        current_content.append(line)
-            
+            # Heuristic: if line starts with "Moderator:" or "Assistant:", role=assistant, else user
+            if line.lower().startswith(('moderator:', 'assistant:')):
+                content = line.split(':', 1)[-1].strip()
+                role = 'assistant'
+            elif line.lower().startswith(('participant:', 'user:')):
+                content = line.split(':', 1)[-1].strip()
+                role = 'user'
             else:
-                # Fallback processing for unknown formats
-                # Try bracket format first (most common in Zoom transcripts)
-                bracket_match = re.match(simple_bracket_pattern, line)
-                if bracket_match:
-                    # Save previous speaker's content if we're switching speakers
-                    if current_speaker and current_content:
-                        transcript_chunks.append({
-                            'speaker': current_speaker,
-                            'speaker_name': current_speaker,
-                            'content': ' '.join(current_content),
-                            'timestamp': current_timestamp or ''
-                        })
-                        current_content = []
-                    
-                    # Extract new speaker
-                    current_speaker = bracket_match.group(1).strip()
-                    
-                    # Get content after bracket
-                    bracket_end = line.find(']')
-                    if bracket_end > 0:
-                        content = line[bracket_end+1:].strip()
-                        if content:
-                            current_content.append(content)
-                else:
-                    # Try colon pattern
-                    colon_match = re.match(colon_pattern, line)
-                    if colon_match:
-                        # Save previous speaker's content if we're switching speakers
-                        if current_speaker and current_content:
-                            transcript_chunks.append({
-                                'speaker': current_speaker,
-                                'speaker_name': current_speaker,
-                                'content': ' '.join(current_content),
-                                'timestamp': current_timestamp or ''
-                            })
-                            current_content = []
-                        
-                        # Extract new speaker and content
-                        current_speaker = colon_match.group(1).strip()
-                        content = colon_match.group(2).strip()
-                        if content:
-                            current_content.append(content)
-                    elif current_speaker:
-                        # If no pattern match, treat as continuation
-                        current_content.append(line)
-                    else:
-                        # No current speaker, create a generic one
-                        current_speaker = "Speaker"
-                        current_content.append(line)
-        
-        # Add the last speaker's content
-        if current_speaker and current_content:
-            transcript_chunks.append({
-                'speaker': current_speaker,
-                'speaker_name': current_speaker,
-                'content': ' '.join(current_content),
-                'timestamp': current_timestamp or ''
-            })
-        
-        # Log the extracted chunks for debugging
-        logger.info(f"Extracted {len(transcript_chunks)} chunks from transcript")
-        if transcript_chunks:
-            logger.info(f"First chunk: {transcript_chunks[0]}")
-        
-        # Auto-identify researcher and participant based on names in transcript
-        researcher_speakers = []
-        participant_speakers = []
-        
-        # Extract unique speaker names from transcript
-        all_speakers = list(set(chunk['speaker'] for chunk in transcript_chunks))
-        logger.info(f"Detected speakers: {all_speakers}")
-        
-        # If researcher_name is provided, try to identify their messages
-        if researcher_name:
-            researcher_speakers = [s for s in all_speakers if researcher_name.lower() in s.lower()]
-        
-        # If participant_name is provided, try to identify their messages
-        if participant_name and participant_name != 'Anonymous':
-            participant_speakers = [s for s in all_speakers if participant_name.lower() in s.lower()]
-        
-        # If not found by name, look for typical interviewer/interviewee patterns
-        if not researcher_speakers:
-            researcher_patterns = ['interviewer', 'researcher', 'moderator', 'dulaney', 'stephen']
-            researcher_speakers = [s for s in all_speakers if any(p in s.lower() for p in researcher_patterns)]
-        
-        if not participant_speakers:
-            participant_patterns = ['participant', 'interviewee', 'respondent', 'stark', 'ted', 'theodore']
-            participant_speakers = [s for s in all_speakers if any(p in s.lower() for p in participant_patterns)]
-        
-        logger.info(f"Identified researcher speakers: {researcher_speakers}")
-        logger.info(f"Identified participant speakers: {participant_speakers}")
-        
-        # Map transcript chunks to conversation history format
-        conversation_history = []
-        for chunk in transcript_chunks:
-            # Determine role based on speaker name
-            speaker = chunk['speaker']
-            # Default to 'user' unless explicitly identified as researcher
-            role = 'assistant' if speaker in researcher_speakers else 'user'
-            
-            conversation_history.append({
+                # Default to user
+                content = line
+                role = 'user'
+            messages.append({
+                'id': str(uuid.uuid4()),
+                'content': content,
                 'role': role,
-                'content': chunk['content'],
-                'timestamp': chunk['timestamp'] or datetime.datetime.now().isoformat()
+                'timestamp': datetime.datetime.now().isoformat()
             })
-        
-        # Create interview data
-        now = datetime.datetime.now()
-        interview_data = {
-            'session_id': session_id,
-            'title': title,
-            'project': project,
-            'interview_type': interview_type,
-            'created_at': now,
-            'creation_date': now.strftime("%Y-%m-%d %H:%M"),
-            'last_updated': now,
-            'expiration_date': now + datetime.timedelta(days=30),
-            'status': 'completed',  # Mark as completed since we have the full transcript
-            'conversation_history': conversation_history,
-            'transcript': transcript_chunks,
-            'character': 'interviewer',
-            'interviewee': {
-                'name': participant_name,
-                'role': participant_role,
-                'email': participant_email
-            },
-            'researcher': {
-                'name': researcher_name or (researcher_speakers[0] if researcher_speakers else 'Researcher'),
-                'email': researcher_email
-            },
-            'analysis': None  # Will be generated later if needed
-        }
-        
-        # Save the interview data
-        save_interview(session_id, interview_data)
-        
-        # Return success with the session ID
+
+        # 5. Update the session JSON with messages, transcript, and guide metadata
+        session = discussion_service.get_session(session_id)
+        if not session:
+            logger.error("Session not found after creation")
+            return jsonify({'success': False, 'error': 'Session not found after creation'}), 500
+
+        session['messages'] = messages
+        session['transcript'] = transcript_text
+        session['title'] = title
+        session['project'] = project
+        session['interview_type'] = interview_type
+        session['updated_at'] = datetime.datetime.now().isoformat()
+        # Copy over guide metadata fields if present
+        for field in ['topic', 'context', 'goals', 'character', 'character_select', 'voice_id', 'custom_questions']:
+            if field in guide:
+                session[field] = guide[field]
+
+        discussion_service.update_session(session_id, session)
+
+        # 6. Return a redirect to the session detail page
         return jsonify({
             'success': True,
             'session_id': session_id,
-            'message': 'Transcript uploaded successfully',
-            'redirect_url': f"/interview_details/{session_id}"
+            'redirect_url': f"/session/{session_id}"
         })
-        
     except Exception as e:
         logger.error(f"Error uploading transcript: {str(e)}")
         logger.error(traceback.format_exc())
@@ -4056,8 +3858,7 @@ def send_confirmed_suggestion(session_id):
         
         suggestion = request.json['suggestion']
         logger.info(f"Sending confirmed suggestion to session {session_id}: {suggestion}")
-        
-        # Create a formatted message for the suggestion
+                # Create a formatted message for the suggestion
         message = {
             'id': str(uuid.uuid4()),
             'role': 'system',
@@ -4200,6 +4001,48 @@ def get_suggested_questions_api(session_id):
             'session_id': session_id,
             'questions': emergency_questions
         })
+
+@app.route('/api/issues/new', methods=['POST'])
+def api_create_issue():
+    """API endpoint to create a new issue."""
+    try:
+        from models.issue_tracker import IssueManager, IssueType, IssuePriority
+        issue_manager = IssueManager(data_dir=os.path.join(BASE_DIR, 'data', 'issues'))
+        
+        data = request.json
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        # Required fields
+        title = data.get('title')
+        description = data.get('description')
+        
+        if not title or not description:
+            return jsonify({"error": "Title and description are required"}), 400
+        
+        # Optional fields with defaults
+        issue_type = data.get('issue_type', IssueType.BUG)
+        priority = data.get('priority', IssuePriority.MEDIUM)
+        creator_id = data.get('creator_id', 'api_user')
+        
+        # Create the issue
+        issue = issue_manager.create_issue(
+            title=title,
+            description=description,
+            creator_id=creator_id,
+            issue_type=issue_type,
+            priority=priority
+        )
+        
+        # Return the created issue
+        return jsonify({
+            "success": True,
+            "message": "Issue created successfully",
+            "issue": issue.to_dict()
+        })
+    except Exception as e:
+        logger.error(f"Error creating issue: {str(e)}")
+        return jsonify({"error": str(e)}), 500
 
 # Start the app
 if __name__ == '__main__':

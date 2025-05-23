@@ -1,0 +1,78 @@
+{
+  "id": "a56e0ab4-b7e5-4215-9e2b-be92f8205ba2",
+  "guide_id": null,
+  "interviewee": {},
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "de930ae6-ea25-4b0c-9963-a6545f97bc7d",
+      "content": "SYSTEM: Character set to odessia. \n                                IMPORTANT: You are odessia. Your name is odessia.\n                                You MUST always respond as odessia. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am odessia.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"",
+      "role": "system",
+      "timestamp": "2025-05-15T17:38:32.686187"
+    },
+    {
+      "id": "a2ee68e2-79bf-4558-b522-6a9cd1709770",
+      "content": "Hello, I am odessia. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:38:32.689367"
+    },
+    {
+      "id": "b83022e8-29fd-46fc-92da-7a094b698703",
+      "content": "check",
+      "role": "user",
+      "timestamp": "2025-05-15T17:38:41.134762"
+    },
+    {
+      "id": "16a3f1a9-8b54-442f-be57-58fb826e80ca",
+      "content": "Hello! Could you please clarify what you mean by \"check\" in this context?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:38:41.775429"
+    },
+    {
+      "id": "71463bba-6efb-42ba-a6ec-03927dce95fd",
+      "content": "well I want to see if the new deserver is pay attention and I want to see if the interview updates",
+      "role": "user",
+      "timestamp": "2025-05-15T17:39:00.386616"
+    },
+    {
+      "id": "87b07248-0e87-4cb8-b95f-331176d603ee",
+      "content": "It sounds like you are looking to see if the interviewer is attentive and whether they keep you updated during the interview process. Can you tell me more about what you mean by the new deserver and how you think it relates to the interview process?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:39:01.264929"
+    },
+    {
+      "id": "e12e124d-5d47-4450-a8f1-fa9d74d649da",
+      "content": "session stats  aren't",
+      "role": "user",
+      "timestamp": "2025-05-15T17:39:25.984484"
+    },
+    {
+      "id": "db3ab769-b0ff-4868-80e7-b53131e5d3c2",
+      "content": "Could you please clarify what you mean by \"session stats aren't\"? Are you referring to statistics related to a particular session or something else?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:39:26.678198"
+    },
+    {
+      "id": "b7ee5441-751e-4efd-8e44-6cf76e023c0a",
+      "content": "okay I'm going to say that as far as the testing goes that we've passed the testing  on Phase 2 so you did great",
+      "role": "user",
+      "timestamp": "2025-05-15T17:39:49.554056"
+    },
+    {
+      "id": "27faf7bd-4ad7-4e65-b1e8-ba4f913855c8",
+      "content": "That's fantastic to hear that Phase 2 testing went well! Can you tell me more about the process you went through during Phase 2 testing and what made it successful?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T17:39:50.361295"
+    }
+  ],
+  "transcript": "\n\nParticipant: SYSTEM: Character set to odessia. \n                                IMPORTANT: You are odessia. Your name is odessia.\n                                You MUST always respond as odessia. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am odessia.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n\nModerator: Hello, I am odessia. How can I assist you today?\n\nParticipant: check\n\nModerator: Hello! Could you please clarify what you mean by \"check\" in this context?\n\nParticipant: well I want to see if the new deserver is pay attention and I want to see if the interview updates\n\nModerator: It sounds like you are looking to see if the interviewer is attentive and whether they keep you updated during the interview process. Can you tell me more about what you mean by the new deserver and how you think it relates to the interview process?\n\nParticipant: session stats  aren't\n\nModerator: Could you please clarify what you mean by \"session stats aren't\"? Are you referring to statistics related to a particular session or something else?\n\nParticipant: okay I'm going to say that as far as the testing goes that we've passed the testing  on Phase 2 so you did great\n\nModerator: That's fantastic to hear that Phase 2 testing went well! Can you tell me more about the process you went through during Phase 2 testing and what made it successful?",
+  "analysis": null,
+  "created_at": "2025-05-15T17:38:27.249756",
+  "updated_at": "2025-05-22T13:31:41.286109",
+  "title": "Debugging the custom prompt interview",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "character": "odessia",
+  "character_select": "odessia",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

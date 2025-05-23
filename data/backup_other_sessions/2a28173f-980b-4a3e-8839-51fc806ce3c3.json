@@ -1,0 +1,50 @@
+{
+  "id": "2a28173f-980b-4a3e-8839-51fc806ce3c3",
+  "guide_id": "81222255-a805-4693-9e5c-129270288908",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "4a74006e-62d3-446b-afbe-4d89fb57b893",
+      "content": "my name is Steven I just wanted to make sure the speech to text is working in this version",
+      "role": "user",
+      "timestamp": "2025-05-15T10:45:23.076251"
+    },
+    {
+      "id": "eddd1c35-343f-4b1e-ad8a-7d96b75580e8",
+      "content": "That's great, Steven. Could you please share more details about the speech-to-text feature you are referring to? What specific version or software are you testing it on?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:45:24.102313"
+    },
+    {
+      "id": "d7c7adf5-bff8-4b99-a9b1-443d7474e2e8",
+      "content": "I believe I'm using 11 labs to do this conversion and it's working pretty well I'm using it to capture my voice and enter it to the transcript and so that you can have what I'm saying in text and S the next question",
+      "role": "user",
+      "timestamp": "2025-05-15T10:45:53.970472"
+    },
+    {
+      "id": "486b7479-9fd2-441e-b451-995123f098d7",
+      "content": "That sounds interesting! Could you tell me more about the process of using these 11 labs for voice conversion and transcription? How did you come across this method, and what has your experience been like using it?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:45:54.846936"
+    },
+    {
+      "id": "ff984334-7fc2-4730-b997-fa38a7c18162",
+      "content": "what is your name",
+      "role": "user",
+      "timestamp": "2025-05-15T10:46:15.983073"
+    },
+    {
+      "id": "5263c729-4310-4dff-96f1-c76c9469eef8",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:46:17.155212"
+    }
+  ],
+  "transcript": "\n\nParticipant: my name is Steven I just wanted to make sure the speech to text is working in this version\n\nModerator: That's great, Steven. Could you please share more details about the speech-to-text feature you are referring to? What specific version or software are you testing it on?\n\nParticipant: I believe I'm using 11 labs to do this conversion and it's working pretty well I'm using it to capture my voice and enter it to the transcript and so that you can have what I'm saying in text and S the next question\n\nModerator: That sounds interesting! Could you tell me more about the process of using these 11 labs for voice conversion and transcription? How did you come across this method, and what has your experience been like using it?\n\nParticipant: what is your name\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+  "analysis": null,
+  "created_at": "2025-05-15T10:45:11.253045",
+  "updated_at": "2025-05-15T10:46:17.155332"
+}

@@ -1,0 +1,53 @@
+{
+  "id": "c441449f-83d7-483d-88c3-352ba62471d9",
+  "guide_id": "264ac2ea-7f97-45fe-8637-b0dbfe384c6c",
+  "interviewee": {
+    "name": "testing Thom",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "0c558465-08d4-4820-abc2-31ba05c31e82",
+      "content": "Hello this is Stephen I wanted you to say the introduction first and the AI assistant is still assistant",
+      "role": "user",
+      "timestamp": "2025-05-15T15:48:20.641237"
+    },
+    {
+      "id": "d32dd288-be72-4d31-b2db-f38790ec35cf",
+      "content": "Hello Stephen, thank you for joining me today. Could you please introduce yourself for our interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:48:21.326277"
+    },
+    {
+      "id": "31e8c9d1-deba-48f0-b35f-b213e93f8efc",
+      "content": "Your name and what you're prompt",
+      "role": "user",
+      "timestamp": "2025-05-15T15:51:44.208100"
+    },
+    {
+      "id": "abc6234f-1902-4646-a342-047fc5041666",
+      "content": "I am Interviewer. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:51:45.195835"
+    }
+  ],
+  "transcript": "\n\nParticipant: Hello this is Stephen I wanted you to say the introduction first and the AI assistant is still assistant\n\nModerator: Hello Stephen, thank you for joining me today. Could you please introduce yourself for our interview?\n\nParticipant: Your name and what you're prompt\n\nModerator: I am Interviewer. I'm your interview assistant helping to gather information through our conversation.",
+  "analysis": null,
+  "created_at": "2025-05-15T15:48:05.702799",
+  "updated_at": "2025-05-15T15:51:45.196313",
+  "title": "Untitled Guide",
+  "project": "",
+  "interview_type": "custom_interview",
+  "character": "",
+  "character_select": "",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL"
+}

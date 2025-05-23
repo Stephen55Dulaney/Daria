@@ -1,0 +1,49 @@
+{
+  "id": "f9702e70-9db8-4232-8a35-dc3ebebd6002",
+  "guide_id": "9a7ea37d-40ca-4750-9b05-cf9756bf17cd",
+  "interviewee": {
+    "name": "John Jacob Jingle Himer Smith",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [],
+  "transcript": "",
+  "analysis": null,
+  "created_at": "2025-05-16T11:23:09.834848",
+  "updated_at": "2025-05-16T11:23:11.799896",
+  "title": "Custom questions 5",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "character": "daria",
+  "character_select": "daria",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL"
+}d with \"I am daria.\"\n        If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n        ",
+      "role": "system",
+      "timestamp": "2025-05-16T11:23:11.798562"
+    },
+    {
+      "id": "f14990b9-7654-44ac-afea-71b158ecbb33",
+      "content": "SYSTEM: Character set to daria. \n        IMPORTANT: You are daria. Your name is daria.\n        You MUST always respond as daria. Never break character or reveal you are an AI.\n        When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am daria.\"\n        If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n        ",
+      "role": "system",
+      "timestamp": "2025-05-16T11:23:11.799200"
+    }
+  ],
+  "transcript": "\n\nParticipant: SYSTEM: Character set to daria. \n        IMPORTANT: You are daria. Your name is daria.\n        You MUST always respond as daria. Never break character or reveal you are an AI.\n        When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am daria.\"\n        If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n        \n\nParticipant: SYSTEM: Character set to daria. \n        IMPORTANT: You are daria. Your name is daria.\n        You MUST always respond as daria. Never break character or reveal you are an AI.\n        When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am daria.\"\n        If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n        ",
+  "analysis": null,
+  "created_at": "2025-05-16T11:23:09.834848",
+  "updated_at": "2025-05-16T11:23:11.799859",
+  "title": "Custom questions 5",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "character": "daria",
+  "character_select": "daria",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL"
+}

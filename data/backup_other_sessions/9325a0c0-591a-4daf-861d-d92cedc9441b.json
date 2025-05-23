@@ -1,0 +1,74 @@
+{
+  "id": "9325a0c0-591a-4daf-861d-d92cedc9441b",
+  "guide_id": "8522dd18-cd96-4acb-84ca-fbbb68133b63",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "5b7f2d98-20e3-474c-8ce0-ba9e32d3f167",
+      "content": "checking to see if you're working with me",
+      "role": "user",
+      "timestamp": "2025-05-14T13:54:05.053864"
+    },
+    {
+      "id": "d4be6da3-d827-43b0-a741-2213255c87dc",
+      "content": "Yes, I'm here with you. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T13:54:05.692416"
+    },
+    {
+      "id": "d70eb56c-1c97-4729-94e3-d651666407ec",
+      "content": "having some problem with the remote interview page which is your child page you are still working which is critical  so I use you to make sure that we have basic functionality and then we can go to the next page that's based on your structure and see if it's working",
+      "role": "user",
+      "timestamp": "2025-05-14T13:54:29.766660"
+    },
+    {
+      "id": "e09606a8-d07c-4764-99be-ba0022e1016c",
+      "content": "It sounds like you're facing some issues with the remote interview page and you're still working on it. Could you please clarify what specific problems you're encountering with the page's functionality? Are there any particular features or buttons that are not working as expected?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T13:54:30.841995"
+    },
+    {
+      "id": "1b5a6c62-9210-4283-8aef-53832de9980e",
+      "content": "yes the copy conversation button doesn't work the connecting is connecting dot dot 00 and never connects the send message in the end message are gray in an active and there's three accordions at the bottom session information",
+      "role": "user",
+      "timestamp": "2025-05-14T13:55:14.898145"
+    },
+    {
+      "id": "b744b6c5-de6e-4830-a2b5-7fcf14437b72",
+      "content": "Thank you for sharing that information. It sounds like you're facing some technical issues with the copy conversation button and the connecting process. Could you tell me more about when this issue started happening and if you have tried any troubleshooting steps so far to resolve it? Additionally, could you explain more about the three accordions at the bottom with session information?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T13:55:16.027295"
+    },
+    {
+      "id": "f6adf355-0867-4070-bf55-06b4e9e2b38c",
+      "content": "yeah the three accordions help us kind of on the page display and copy the debug log the session information and one of the thing it happened we added a new big feature to the whole site which was the debug tool and when we added the debug tool which is great  we probably mess with the routes and it no longer worked",
+      "role": "user",
+      "timestamp": "2025-05-14T13:56:09.445052"
+    },
+    {
+      "id": "94fef3fd-2e1f-4a7b-b1ad-9f590edff2f2",
+      "content": "It sounds like the debug tool you added had some impact on the routes of your site. Could you tell me more about how adding this debug tool affected the functionality of the site and what steps you took to address the issue with the routes not working properly?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T13:56:10.686103"
+    },
+    {
+      "id": "02a1032c-62a1-466a-baa3-90b442df98fc",
+      "content": "well so far every single page is working except for the the debug tool so I can't quite figure out why  you are working I can't even access the debug tool on that page I've closed the browser I've restarted I've tried it on Chrome  which is a different browser  same result nothing nothing but I don't have any debugging tools to grab onto  it's unless there's something in the log  oh there's an uncut reference today that might be the first thing  that's helpful",
+      "role": "user",
+      "timestamp": "2025-05-14T13:57:08.367571"
+    },
+    {
+      "id": "112217a5-c64f-4ec7-aac7-5392e0567f62",
+      "content": "It sounds like you're having trouble accessing the debug tool for a specific page. Can you tell me more about what happens when you try to access it? Is there an error message or does the page not load properly?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T13:57:09.753053"
+    }
+  ],
+  "transcript": "\n\nParticipant: checking to see if you're working with me\n\nModerator: Yes, I'm here with you. How can I assist you today?\n\nParticipant: having some problem with the remote interview page which is your child page you are still working which is critical  so I use you to make sure that we have basic functionality and then we can go to the next page that's based on your structure and see if it's working\n\nModerator: It sounds like you're facing some issues with the remote interview page and you're still working on it. Could you please clarify what specific problems you're encountering with the page's functionality? Are there any particular features or buttons that are not working as expected?\n\nParticipant: yes the copy conversation button doesn't work the connecting is connecting dot dot 00 and never connects the send message in the end message are gray in an active and there's three accordions at the bottom session information\n\nModerator: Thank you for sharing that information. It sounds like you're facing some technical issues with the copy conversation button and the connecting process. Could you tell me more about when this issue started happening and if you have tried any troubleshooting steps so far to resolve it? Additionally, could you explain more about the three accordions at the bottom with session information?\n\nParticipant: yeah the three accordions help us kind of on the page display and copy the debug log the session information and one of the thing it happened we added a new big feature to the whole site which was the debug tool and when we added the debug tool which is great  we probably mess with the routes and it no longer worked\n\nModerator: It sounds like the debug tool you added had some impact on the routes of your site. Could you tell me more about how adding this debug tool affected the functionality of the site and what steps you took to address the issue with the routes not working properly?\n\nParticipant: well so far every single page is working except for the the debug tool so I can't quite figure out why  you are working I can't even access the debug tool on that page I've closed the browser I've restarted I've tried it on Chrome  which is a different browser  same result nothing nothing but I don't have any debugging tools to grab onto  it's unless there's something in the log  oh there's an uncut reference today that might be the first thing  that's helpful\n\nModerator: It sounds like you're having trouble accessing the debug tool for a specific page. Can you tell me more about what happens when you try to access it? Is there an error message or does the page not load properly?",
+  "analysis": null,
+  "created_at": "2025-05-14T13:53:55.060633",
+  "updated_at": "2025-05-14T13:57:09.753831"
+}

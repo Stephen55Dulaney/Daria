@@ -1,0 +1,83 @@
+{
+  "id": "23fe6cf7-6783-4ed7-8023-e11e2a2ebbf2",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Hope Inworks",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "c6415053-499d-4ca3-b80a-bd11b84f711e",
+      "content": "to know what type of interview you're going to conduct with me today",
+      "role": "user",
+      "timestamp": "2025-05-14T09:10:01.907553"
+    },
+    {
+      "id": "56e19189-0cce-47bf-878c-20b4b9e6f4dd",
+      "content": "Thank you for asking. Today, I'll be conducting a general interview to learn more about your experiences, skills, and background. We'll discuss your qualifications, interests, and any relevant information you'd like to share. Is there anything specific you'd like to highlight or discuss during our interview today?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:10:02.883660"
+    },
+    {
+      "id": "22687545-60f1-453a-9240-f732a0b24a4b",
+      "content": "I actually thought you were odyssier but it sounds to me like your thesia which is fine my background is in a math and physics and then also an art so that led me to the internet as a career and after being 25 years in the internet as a career I've come to Ai and and been reinvigorated",
+      "role": "user",
+      "timestamp": "2025-05-14T09:10:48.964850"
+    },
+    {
+      "id": "98044b3f-6382-4581-89e7-28294cb9a00e",
+      "content": "That's impressive to hear about your diverse background in math, physics, art, and now AI. Could you tell me more about how your previous experiences in math, physics, and art have influenced your transition into a career in AI?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:10:50.076750"
+    },
+    {
+      "id": "45a70262-fb7c-4ef0-a46d-1ceb1740d59e",
+      "content": "okay that is a good question well math and physics are about problem solving physics teaches you a nice framework to attack and break down problems into idealized situations so that you can solve problems math is the fundamental of how nature works so putting those together I realized that there was actually a theory behind our and if you developed a framework instead of principles in art you can actually have a point of view and a perspective so that led me to a life from the internet and now ai is like this entire new imagination or the entire past internet where they've read everything  and created these crazy models there's vectors there's tensors there's Vector stores there's dot products there's cross products so having an understanding of the mathematics and the physics behind curvature and geometry and how we can take a vector Store and put in a little vectorized statement and look for the things that are similar and it thinks that are opposite has been very interesting to me",
+      "role": "user",
+      "timestamp": "2025-05-14T09:12:10.573855"
+    },
+    {
+      "id": "135172d0-180b-400c-b463-64688c002716",
+      "content": "It sounds like you have a strong background in math and physics, and how they can be applied to different fields like art and artificial intelligence. Can you elaborate on how you specifically apply your knowledge of mathematics and physics to your work in AI?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:12:11.711833"
+    },
+    {
+      "id": "2f9d4c49-0dec-4b29-b7a4-ec22a18ee177",
+      "content": "well just having the vocabulary in particular so when I was working on this product knowing that you could vectorize the whole set of of  transcripts and then if you had a vectorized store of the transcripts you could take a small part and you could look for similarities and do semantic searches semantic matches so just having to understanding that it existed allowed me to ask the AI and the AI could actually build what I was talking about",
+      "role": "user",
+      "timestamp": "2025-05-14T09:13:01.551666"
+    },
+    {
+      "id": "0ad8f5d4-b3de-4839-aac4-74dc5a0f93e7",
+      "content": "It sounds like you were able to leverage the concept of vectorization in working with transcripts to enable semantic searches and matches. How did this capability impact the efficiency or effectiveness of your work with AI technology? Can you share more about the specific benefits you experienced by utilizing vectorization in your project?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:13:02.570647"
+    },
+    {
+      "id": "e66bf75c-83c0-4337-a961-62b19c63b4db",
+      "content": "vectorization is just kind of a quick way to take a bunch of language kind of confusing comedy good and then create a set of numbers in a basis once you have the kind of the basis set of the vector space then you can take a small part or statement and you can actually factorize it question or statement you can look through the store to see what is the closest in alignment with that so the vector store and there's a lot more you don't have to understand all of it but just understanding that it's possible and something you can experiment with and then using the experimental methodology  that gives me a systematic approach to kind of explore and create  and the art is also kind of creative so the whole combination has worked to  take find new ideas explore new ideas and make them into working software",
+      "role": "user",
+      "timestamp": "2025-05-14T09:14:22.634484"
+    },
+    {
+      "id": "77540426-4949-43f7-8c71-634d9cc91f5f",
+      "content": "It sounds like you are referring to using vectorization as a method to represent language in a numerical form for analysis. Can you elaborate on how you apply this process in your work or projects? How has this approach helped you in generating new ideas and developing software?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:14:23.591603"
+    }
+  ],
+  "transcript": "\n\nParticipant: to know what type of interview you're going to conduct with me today\n\nModerator: Thank you for asking. Today, I'll be conducting a general interview to learn more about your experiences, skills, and background. We'll discuss your qualifications, interests, and any relevant information you'd like to share. Is there anything specific you'd like to highlight or discuss during our interview today?\n\nParticipant: I actually thought you were odyssier but it sounds to me like your thesia which is fine my background is in a math and physics and then also an art so that led me to the internet as a career and after being 25 years in the internet as a career I've come to Ai and and been reinvigorated\n\nModerator: That's impressive to hear about your diverse background in math, physics, art, and now AI. Could you tell me more about how your previous experiences in math, physics, and art have influenced your transition into a career in AI?\n\nParticipant: okay that is a good question well math and physics are about problem solving physics teaches you a nice framework to attack and break down problems into idealized situations so that you can solve problems math is the fundamental of how nature works so putting those together I realized that there was actually a theory behind our and if you developed a framework instead of principles in art you can actually have a point of view and a perspective so that led me to a life from the internet and now ai is like this entire new imagination or the entire past internet where they've read everything  and created these crazy models there's vectors there's tensors there's Vector stores there's dot products there's cross products so having an understanding of the mathematics and the physics behind curvature and geometry and how we can take a vector Store and put in a little vectorized statement and look for the things that are similar and it thinks that are opposite has been very interesting to me\n\nModerator: It sounds like you have a strong background in math and physics, and how they can be applied to different fields like art and artificial intelligence. Can you elaborate on how you specifically apply your knowledge of mathematics and physics to your work in AI?\n\nParticipant: well just having the vocabulary in particular so when I was working on this product knowing that you could vectorize the whole set of of  transcripts and then if you had a vectorized store of the transcripts you could take a small part and you could look for similarities and do semantic searches semantic matches so just having to understanding that it existed allowed me to ask the AI and the AI could actually build what I was talking about\n\nModerator: It sounds like you were able to leverage the concept of vectorization in working with transcripts to enable semantic searches and matches. How did this capability impact the efficiency or effectiveness of your work with AI technology? Can you share more about the specific benefits you experienced by utilizing vectorization in your project?\n\nParticipant: vectorization is just kind of a quick way to take a bunch of language kind of confusing comedy good and then create a set of numbers in a basis once you have the kind of the basis set of the vector space then you can take a small part or statement and you can actually factorize it question or statement you can look through the store to see what is the closest in alignment with that so the vector store and there's a lot more you don't have to understand all of it but just understanding that it's possible and something you can experiment with and then using the experimental methodology  that gives me a systematic approach to kind of explore and create  and the art is also kind of creative so the whole combination has worked to  take find new ideas explore new ideas and make them into working software\n\nModerator: It sounds like you are referring to using vectorization as a method to represent language in a numerical form for analysis. Can you elaborate on how you apply this process in your work or projects? How has this approach helped you in generating new ideas and developing software?",
+  "analysis": null,
+  "created_at": "2025-05-14T09:04:06.105396",
+  "updated_at": "2025-05-14T09:14:23.592789"
+}

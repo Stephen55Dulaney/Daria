@@ -1,0 +1,38 @@
+{
+  "id": "df0ffa7d-61d6-4b59-a68a-7827746f027c",
+  "guide_id": "8522dd18-cd96-4acb-84ca-fbbb68133b63",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "ab77b1b0-72e7-4fd1-a997-36dd140bea8b",
+      "content": "I just want to make sure that you are working correctly",
+      "role": "user",
+      "timestamp": "2025-05-14T13:34:00.852851"
+    },
+    {
+      "id": "834f5375-2193-4cf3-ae18-5065cf31ac92",
+      "content": "I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+      "role": "assistant",
+      "timestamp": "2025-05-14T13:34:00.854813"
+    },
+    {
+      "id": "5e2eeeeb-a0bb-4c07-ab0b-655a12d71147",
+      "content": "and what was the issue",
+      "role": "user",
+      "timestamp": "2025-05-14T13:34:14.314204"
+    },
+    {
+      "id": "f3ea3a8e-5ebe-499a-8851-93a85fc6aeaf",
+      "content": "I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+      "role": "assistant",
+      "timestamp": "2025-05-14T13:34:14.318447"
+    }
+  ],
+  "transcript": "\n\nParticipant: I just want to make sure that you are working correctly\n\nModerator: I apologize, but there was an unexpected issue with the interview system. Please try again shortly.\n\nParticipant: and what was the issue\n\nModerator: I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+  "analysis": null,
+  "created_at": "2025-05-14T13:33:48.853141",
+  "updated_at": "2025-05-14T13:34:14.318724"
+}

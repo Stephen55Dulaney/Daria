@@ -1,0 +1,371 @@
+{
+  "id": "613ae59b-a70d-484b-8581-6e36d045782e",
+  "guide_id": null,
+  "interviewee": {
+    "name": "Hope Inworks",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "8a47f4b3-c370-4613-a067-7f4a44082e5c",
+      "content": "hello this is Steven are you going to listen to me",
+      "role": "user",
+      "timestamp": "2025-05-15T18:49:40.210359"
+    },
+    {
+      "id": "fe008a34-6e50-4119-affd-90e80526e9ed",
+      "content": "Hello Steven. Yes, I am here to listen to you. Could you please share with me what you would like to discuss today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:49:42.817128"
+    },
+    {
+      "id": "8733bddd-0171-4bca-a05a-f2b153762652",
+      "content": "well today I would like to talk about whatever questions you have to help me cuz I need to figure out what kind of questions I should be asking to make the research experience better or delete researchers when they're using Advanced Internet assistant",
+      "role": "user",
+      "timestamp": "2025-05-15T18:50:12.919363"
+    },
+    {
+      "id": "6f2a36d3-d3cc-49c5-a92e-53425ad434a3",
+      "content": "That sounds like an interesting topic. To start off, could you tell me more about the challenges you're facing with researchers using Advanced Internet assistant? What specific issues are you trying to address or improve upon?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:50:15.861012"
+    },
+    {
+      "id": "7bf80599-a9bd-4513-8e69-8e9a661619d8",
+      "content": "well we're trying to basically make an AI assistant and we want the AI that actually start with the researcher and actually assist the researcher and developing a discussion guide and a research plan",
+      "role": "user",
+      "timestamp": "2025-05-15T18:50:45.345883"
+    },
+    {
+      "id": "ae0662c0-9b5c-42a1-8500-02bee1e45fa9",
+      "content": "That sounds like a fascinating project! When you mention starting with the researcher to assist in developing a discussion guide and research plan, could you tell me more about how you envision the AI assisting specifically in these tasks?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:50:48.019131"
+    },
+    {
+      "id": "21c786af-8d01-4843-87d2-35cfeb038724",
+      "content": "are you listening to me",
+      "role": "user",
+      "timestamp": "2025-05-15T18:51:40.405722"
+    },
+    {
+      "id": "42ae0773-8df2-40a3-993d-2bcf4778e5c9",
+      "content": "Yes, I'm here and ready to listen. Could you please share more about what you would like to discuss today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:51:43.199253"
+    },
+    {
+      "id": "a9a5839b-b7b0-4e40-a604-a46a1c12a647",
+      "content": "I would like to understand how an AI can help me decide how many questions I need to ask in research interview",
+      "role": "user",
+      "timestamp": "2025-05-15T18:51:59.256188"
+    },
+    {
+      "id": "94f54305-18b2-49ca-a446-e0fb95e33fd5",
+      "content": "How familiar are you with using AI in research interviews to determine the number of questions needed?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:52:08.180342"
+    },
+    {
+      "id": "06f90be5-3232-4284-ad94-907d24ac97dd",
+      "content": " envision AI cuz I don't know if that's really what I want to do with the suggestion",
+      "role": "user",
+      "timestamp": "2025-05-15T18:52:46.664340"
+    },
+    {
+      "id": "2c212f2f-3a4f-4df5-b4b3-de0c9795310f",
+      "content": "When you mention \"envision AI,\" are you referring to a specific project or idea related to artificial intelligence that you are considering? Could you provide more details about what you mean by \"envision AI\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:52:49.728896"
+    },
+    {
+      "id": "458b382b-58ba-40a8-aace-248721d6bdb7",
+      "content": "IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"How do you envision an AI could assist in determining the optimal number of questions for a research interview?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: How do you envision an AI could assist in determining the optimal number of questions for a research interview?\" or similar natural phrasing.",
+      "role": "system",
+      "timestamp": "2025-05-15T18:52:50.743181"
+    },
+    {
+      "id": "0d0e5e58-2afa-45a7-9765-dcade4241db1",
+      "content": " I'm missing the speech to text by the text to speech",
+      "role": "user",
+      "timestamp": "2025-05-15T18:53:00.209170"
+    },
+    {
+      "id": "4d629df9-0410-41d0-9ae3-a23f2f466fbf",
+      "content": "I see that you're experiencing issues with speech-to-text and text-to-speech technology. Could you please provide more details about the specific problem you are facing?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:53:02.989319"
+    },
+    {
+      "id": "13bf2d3c-1be4-4668-bac2-a5d909072bce",
+      "content": "the problem I'm facing is I'm trying to test the monitoring tool so there's certain buttons on there like pause briefly change topic Sunrise so far and I want to see if you get them",
+      "role": "user",
+      "timestamp": "2025-05-15T18:53:28.925805"
+    },
+    {
+      "id": "74cbf71e-2003-40d0-b99d-1827336b62a2",
+      "content": "Could you please provide more details about the monitoring tool you are testing? What specific functionalities are you trying to test, and what are the key objectives of your testing process?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:53:31.650083"
+    },
+    {
+      "id": "a4698062-42e9-4898-b6a8-21cef4257ac6",
+      "content": "I'm trying to see if I can get it to suggested question and that you would ask me the question without seeing it and see that's not right",
+      "role": "user",
+      "timestamp": "2025-05-15T18:53:58.765133"
+    },
+    {
+      "id": "549cbaff-c03d-428a-8149-d76174ce977c",
+      "content": " that's not the way we want this to work",
+      "role": "user",
+      "timestamp": "2025-05-15T18:54:07.018357"
+    },
+    {
+      "id": "31e61e2f-8db6-44ae-a0ac-76f76459e8f0",
+      "content": "I understand you have certain expectations for this interview. Could you please elaborate on how you envision it working?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:54:09.504670"
+    },
+    {
+      "id": "722bcadd-8415-41f2-8a23-bcbdf7765d6b",
+      "content": "IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"how old is your cat?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: how old is your cat?\" or similar natural phrasing.",
+      "role": "system",
+      "timestamp": "2025-05-15T18:54:10.525538"
+    },
+    {
+      "id": "e288294d-7a1b-4247-8b61-03cc806bba53",
+      "content": "I'm not entirely sure I understand your statement. Could you please clarify what you mean by \"get it to suggested question\" and what you are hoping to achieve in this process?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:54:10.592320"
+    },
+    {
+      "id": "5afa1285-6b00-4a31-89d5-0a4dd9885815",
+      "content": "IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"Can you elaborate on the factors you currently consider when deciding the number of questions for a research interview?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: Can you elaborate on the factors you currently consider when deciding the number of questions for a research interview?\" or similar natural phrasing.",
+      "role": "system",
+      "timestamp": "2025-05-15T18:54:11.618472"
+    },
+    {
+      "id": "fb882061-6129-4c17-ba8a-39b86bc93fd3",
+      "content": " but it shows up over here is that that's Goofy",
+      "role": "user",
+      "timestamp": "2025-05-15T18:54:14.697068"
+    },
+    {
+      "id": "0e64559a-870d-4ffa-8aa1-2f42b2904a82",
+      "content": "I'm sorry, I seem to have missed the context of your statement. Could you please clarify what you mean by \"it shows up over here is that that's Goofy\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:54:17.853106"
+    },
+    {
+      "id": "e1e65c6e-e502-4317-9c0a-9f910b7b6490",
+      "content": "goes up on the on the remote interview page",
+      "role": "user",
+      "timestamp": "2025-05-15T18:54:33.386000"
+    },
+    {
+      "id": "807ae8a4-6fd9-45f3-9fac-8955939cf1be",
+      "content": "Could you please clarify what you mean by \"goes up on the remote interview page\"? Are you referring to something specific on a remote interview platform or website?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:54:44.263651"
+    },
+    {
+      "id": "3e39f5bb-c062-4f61-b1f7-3df97ea581b8",
+      "content": "okay nicely done I think we're going to have to make another we're just trying to do it 6:56",
+      "role": "user",
+      "timestamp": "2025-05-15T18:56:09.212938"
+    },
+    {
+      "id": "f23baaaa-03ea-45c0-9293-dfeb15086a25",
+      "content": "Thank you for your input. Could you please clarify what you meant by \"we're going to have to make another we're just trying to do it 6:56\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:56:12.620692"
+    },
+    {
+      "id": "3ca30785-21af-4676-bfd5-f6e14a0cad42",
+      "content": " you know that's just not right",
+      "role": "user",
+      "timestamp": "2025-05-15T18:56:13.216870"
+    },
+    {
+      "id": "e6be94c5-bef8-4fdc-bdd5-d6d93766263e",
+      "content": "Could you please elaborate on what you mean by \"that's just not right\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:56:15.858091"
+    },
+    {
+      "id": "737a6984-c1aa-48ae-a7af-c2ffa519be29",
+      "content": "and these insides needed I don't see their stuff so what do we got now the value communication medium these are high the key insights",
+      "role": "user",
+      "timestamp": "2025-05-15T18:56:34.914673"
+    },
+    {
+      "id": "cd0955c4-0915-4e3f-8df7-d2e98bf72f0b",
+      "content": "Could you please clarify what you mean by \"insides\" and \"their stuff\"? I want to make sure I understand your question correctly before proceeding.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:56:39.173760"
+    },
+    {
+      "id": "13244b69-e88a-4763-af75-c5e68d2f00e9",
+      "content": "Finish Line with clothes but there's no dots value Communications generate",
+      "role": "user",
+      "timestamp": "2025-05-15T18:57:10.353611"
+    },
+    {
+      "id": "2c6a166f-6cb2-4ac8-8eef-27ff6967b098",
+      "content": "Thank you for sharing. Could you please elaborate on what you mean by \"Finish Line with clothes but there's no dots value Communications generate\"? I want to make sure I understand your statement correctly before we continue.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:57:12.813166"
+    },
+    {
+      "id": "c8986f0b-e969-42cf-9f6c-bab8d2ff7a78",
+      "content": " so that's why you're probably having a little bit of trouble",
+      "role": "user",
+      "timestamp": "2025-05-15T18:57:39.457613"
+    },
+    {
+      "id": "9515a5fb-9979-4e2e-b60e-1db6de8275a3",
+      "content": "Could you please provide more details on the specific challenges you are currently facing?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:57:41.828906"
+    },
+    {
+      "id": "ab51742c-ca79-44f9-93f4-b21048dd470d",
+      "content": "the challenges are we're debugging right now and we have a isolated debugging page which is the debug AI Observer and I think the AI Observer there works pretty good it does good little observation tags in the summary generate summary is pretty nice",
+      "role": "user",
+      "timestamp": "2025-05-15T18:58:08.450771"
+    },
+    {
+      "id": "905f8130-0c46-4933-8593-d9ddc5eb6832",
+      "content": "It sounds like you are currently debugging some issues. Could you elaborate on the specific challenges you are facing during the debugging process?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:58:11.685827"
+    },
+    {
+      "id": "fd150936-c4a2-414a-94b6-21c6b32258f3",
+      "content": " suggestion from the researcher that's not that's not right",
+      "role": "user",
+      "timestamp": "2025-05-15T18:58:35.751946"
+    },
+    {
+      "id": "39879c58-9413-4cce-be01-fbb7412eb51b",
+      "content": "Could you please provide more context or details about the suggestion from the researcher that you feel is incorrect?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:58:38.860410"
+    },
+    {
+      "id": "5d74ec4c-4f39-4f11-a8cd-222756594c88",
+      "content": "IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"Ask why\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: Ask why\" or similar natural phrasing.",
+      "role": "system",
+      "timestamp": "2025-05-15T18:58:39.883152"
+    },
+    {
+      "id": "b42ebd6b-76e4-4d88-bf1e-bbb68b6e734b",
+      "content": " okay but we're getting there I'd have to stay overall it's a successful test and we haven't broken much so that's good",
+      "role": "user",
+      "timestamp": "2025-05-15T18:58:42.162938"
+    },
+    {
+      "id": "05167b13-4310-48dc-876e-a626b508acba",
+      "content": " I thought we still have to get we have a 9 Minute interview that's good too that's probably one of her longer ones",
+      "role": "user",
+      "timestamp": "2025-05-15T18:58:48.815728"
+    },
+    {
+      "id": "e1642813-92af-4f29-b8a6-46944809a368",
+      "content": "It sounds like you have a nine-minute interview scheduled. Can you tell me more about the topics that will be covered during this interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:58:51.447746"
+    },
+    {
+      "id": "38f35b11-0d69-41e0-927c-ce41e37698cf",
+      "content": "That's great to hear that the test has been successful so far. Can you share more about what aspects specifically you found successful in this test?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:58:54.264817"
+    },
+    {
+      "id": "af385432-b183-4650-84b7-df6436925ded",
+      "content": "we've covered the topic I'm talking with you who are you",
+      "role": "user",
+      "timestamp": "2025-05-15T18:59:06.365213"
+    },
+    {
+      "id": "dd9c6864-af1e-4b5b-b48f-3f6e409485d4",
+      "content": "I am Askia. As Askia, I'm Deloitte's expert Discovery Interviewer.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:59:08.888740"
+    },
+    {
+      "id": "7174419f-6c26-47d4-8a59-9e6225648f35",
+      "content": " okay this monitor tool is going to rock",
+      "role": "user",
+      "timestamp": "2025-05-15T18:59:42.931851"
+    },
+    {
+      "id": "62a8a739-6de4-4d3b-a6ab-06b827cb78bc",
+      "content": "That's great to hear! What specific features or capabilities of the monitor tool do you think will make it stand out?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:59:45.083879"
+    },
+    {
+      "id": "839f633b-7ceb-45eb-ad3b-140caa6854fd",
+      "content": "he's a I suggested questions or crazy",
+      "role": "user",
+      "timestamp": "2025-05-15T18:59:58.742077"
+    },
+    {
+      "id": "711a3bd2-f5da-4e0c-bcf8-36cccbd3a62c",
+      "content": "Could you please clarify your statement? Are you asking for suggestions on questions to ask during an interview, or are you referring to something else?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:00:01.967082"
+    },
+    {
+      "id": "890ced61-ad99-41de-9f3e-7af1d8750c16",
+      "content": " go deeper that's not really doing much sunrise",
+      "role": "user",
+      "timestamp": "2025-05-15T19:00:02.084755"
+    },
+    {
+      "id": "49940ebc-23d5-43cb-9dbe-98a13c3b2f6a",
+      "content": "IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"How do you envision an AI could assist in determining the optimal number of questions for a research interview?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: How do you envision an AI could assist in determining the optimal number of questions for a research interview?\" or similar natural phrasing.",
+      "role": "system",
+      "timestamp": "2025-05-15T19:00:02.994021"
+    },
+    {
+      "id": "31b0aefb-ab1f-4300-aa1e-e4ccbeede999",
+      "content": " unless your blackheads are going",
+      "role": "user",
+      "timestamp": "2025-05-15T19:00:04.671568"
+    },
+    {
+      "id": "5c649486-de5f-44d2-94e3-bc709f6ca9c0",
+      "content": "When you mention that something is \"not really doing much,\" could you please elaborate on what you mean by that? Are you referring to a particular situation or topic where you expected a different outcome or impact?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:00:05.351590"
+    },
+    {
+      "id": "7b93eb44-cde3-4f96-a184-ffb8783c2adf",
+      "content": "I believe there might have been a misunderstanding. We are conducting an interview on a general topic. Could you please provide some information or insights related to interviews in general?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:00:08.088336"
+    }
+  ],
+  "transcript": "\n\nParticipant: hello this is Steven are you going to listen to me\n\nModerator: Hello Steven. Yes, I am here to listen to you. Could you please share with me what you would like to discuss today?\n\nParticipant: well today I would like to talk about whatever questions you have to help me cuz I need to figure out what kind of questions I should be asking to make the research experience better or delete researchers when they're using Advanced Internet assistant\n\nModerator: That sounds like an interesting topic. To start off, could you tell me more about the challenges you're facing with researchers using Advanced Internet assistant? What specific issues are you trying to address or improve upon?\n\nParticipant: well we're trying to basically make an AI assistant and we want the AI that actually start with the researcher and actually assist the researcher and developing a discussion guide and a research plan\n\nModerator: That sounds like a fascinating project! When you mention starting with the researcher to assist in developing a discussion guide and research plan, could you tell me more about how you envision the AI assisting specifically in these tasks?\n\nParticipant: are you listening to me\n\nModerator: Yes, I'm here and ready to listen. Could you please share more about what you would like to discuss today?\n\nParticipant: I would like to understand how an AI can help me decide how many questions I need to ask in research interview\n\nModerator: How familiar are you with using AI in research interviews to determine the number of questions needed?\n\nParticipant:  envision AI cuz I don't know if that's really what I want to do with the suggestion\n\nModerator: When you mention \"envision AI,\" are you referring to a specific project or idea related to artificial intelligence that you are considering? Could you provide more details about what you mean by \"envision AI\"?\n\nParticipant: IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"How do you envision an AI could assist in determining the optimal number of questions for a research interview?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: How do you envision an AI could assist in determining the optimal number of questions for a research interview?\" or similar natural phrasing.\n\nParticipant:  I'm missing the speech to text by the text to speech\n\nModerator: I see that you're experiencing issues with speech-to-text and text-to-speech technology. Could you please provide more details about the specific problem you are facing?\n\nParticipant: the problem I'm facing is I'm trying to test the monitoring tool so there's certain buttons on there like pause briefly change topic Sunrise so far and I want to see if you get them\n\nModerator: Could you please provide more details about the monitoring tool you are testing? What specific functionalities are you trying to test, and what are the key objectives of your testing process?\n\nParticipant: I'm trying to see if I can get it to suggested question and that you would ask me the question without seeing it and see that's not right\n\nParticipant:  that's not the way we want this to work\n\nModerator: I understand you have certain expectations for this interview. Could you please elaborate on how you envision it working?\n\nParticipant: IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"how old is your cat?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: how old is your cat?\" or similar natural phrasing.\n\nModerator: I'm not entirely sure I understand your statement. Could you please clarify what you mean by \"get it to suggested question\" and what you are hoping to achieve in this process?\n\nParticipant: IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"Can you elaborate on the factors you currently consider when deciding the number of questions for a research interview?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: Can you elaborate on the factors you currently consider when deciding the number of questions for a research interview?\" or similar natural phrasing.\n\nParticipant:  but it shows up over here is that that's Goofy\n\nModerator: I'm sorry, I seem to have missed the context of your statement. Could you please clarify what you mean by \"it shows up over here is that that's Goofy\"?\n\nParticipant: goes up on the on the remote interview page\n\nModerator: Could you please clarify what you mean by \"goes up on the remote interview page\"? Are you referring to something specific on a remote interview platform or website?\n\nParticipant: okay nicely done I think we're going to have to make another we're just trying to do it 6:56\n\nModerator: Thank you for your input. Could you please clarify what you meant by \"we're going to have to make another we're just trying to do it 6:56\"?\n\nParticipant:  you know that's just not right\n\nModerator: Could you please elaborate on what you mean by \"that's just not right\"?\n\nParticipant: and these insides needed I don't see their stuff so what do we got now the value communication medium these are high the key insights\n\nModerator: Could you please clarify what you mean by \"insides\" and \"their stuff\"? I want to make sure I understand your question correctly before proceeding.\n\nParticipant: Finish Line with clothes but there's no dots value Communications generate\n\nModerator: Thank you for sharing. Could you please elaborate on what you mean by \"Finish Line with clothes but there's no dots value Communications generate\"? I want to make sure I understand your statement correctly before we continue.\n\nParticipant:  so that's why you're probably having a little bit of trouble\n\nModerator: Could you please provide more details on the specific challenges you are currently facing?\n\nParticipant: the challenges are we're debugging right now and we have a isolated debugging page which is the debug AI Observer and I think the AI Observer there works pretty good it does good little observation tags in the summary generate summary is pretty nice\n\nModerator: It sounds like you are currently debugging some issues. Could you elaborate on the specific challenges you are facing during the debugging process?\n\nParticipant:  suggestion from the researcher that's not that's not right\n\nModerator: Could you please provide more context or details about the suggestion from the researcher that you feel is incorrect?\n\nParticipant: IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"Ask why\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: Ask why\" or similar natural phrasing.\n\nParticipant:  okay but we're getting there I'd have to stay overall it's a successful test and we haven't broken much so that's good\n\nParticipant:  I thought we still have to get we have a 9 Minute interview that's good too that's probably one of her longer ones\n\nModerator: It sounds like you have a nine-minute interview scheduled. Can you tell me more about the topics that will be covered during this interview?\n\nModerator: That's great to hear that the test has been successful so far. Can you share more about what aspects specifically you found successful in this test?\n\nParticipant: we've covered the topic I'm talking with you who are you\n\nModerator: I am Askia. As Askia, I'm Deloitte's expert Discovery Interviewer.\n\nParticipant:  okay this monitor tool is going to rock\n\nModerator: That's great to hear! What specific features or capabilities of the monitor tool do you think will make it stand out?\n\nParticipant: he's a I suggested questions or crazy\n\nModerator: Could you please clarify your statement? Are you asking for suggestions on questions to ask during an interview, or are you referring to something else?\n\nParticipant:  go deeper that's not really doing much sunrise\n\nParticipant: IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"How do you envision an AI could assist in determining the optimal number of questions for a research interview?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: How do you envision an AI could assist in determining the optimal number of questions for a research interview?\" or similar natural phrasing.\n\nParticipant:  unless your blackheads are going\n\nModerator: When you mention that something is \"not really doing much,\" could you please elaborate on what you mean by that? Are you referring to a particular situation or topic where you expected a different outcome or impact?\n\nModerator: I believe there might have been a misunderstanding. We are conducting an interview on a general topic. Could you please provide some information or insights related to interviews in general?",
+  "analysis": null,
+  "created_at": "2025-05-15T18:49:30.427811",
+  "updated_at": "2025-05-22T13:31:59.076709",
+  "title": "Testing new interview",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "askia",
+  "character_select": "askia",
+  "voice_id": "ErXwobaYiN019PkySvjV"
+}

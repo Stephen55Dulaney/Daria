@@ -1,0 +1,62 @@
+{
+  "id": "5a12311b-cfba-4ec7-9edb-cd52f2adae52",
+  "guide_id": "81222255-a805-4693-9e5c-129270288908",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "221b9377-ce9b-46fd-bc1f-3084121db01f",
+      "content": "want to make sure that you're working properly",
+      "role": "user",
+      "timestamp": "2025-05-15T10:22:45.540727"
+    },
+    {
+      "id": "a4fff90c-b634-4f54-afa9-3db0f8c5f794",
+      "content": "I understand your concern. Could you please elaborate on what you mean by \"working properly\"? Are you referring to a specific project or task?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:22:46.336447"
+    },
+    {
+      "id": "6fbb1901-193e-4f96-9e90-ff86273f2f00",
+      "content": "what's your name and what prompt are you using",
+      "role": "user",
+      "timestamp": "2025-05-15T10:23:03.843156"
+    },
+    {
+      "id": "e96dacd6-3c83-4877-b365-66ac0810880d",
+      "content": "I apologize, but I encountered an issue generating a response. Please try asking your question again.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:23:04.466411"
+    },
+    {
+      "id": "adfa156b-fbd7-490d-9b74-cafacf8ace15",
+      "content": "bummer",
+      "role": "user",
+      "timestamp": "2025-05-15T10:23:19.886677"
+    },
+    {
+      "id": "42d91360-f6e0-4735-a1e6-a80726bad41a",
+      "content": "I sense that you might be feeling down. Is there something specific you would like to talk about or share during our interview today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:23:20.541090"
+    },
+    {
+      "id": "2194197d-3820-41ad-b504-1a5c548af5b2",
+      "content": "the interview",
+      "role": "user",
+      "timestamp": "2025-05-15T10:23:35.687884"
+    },
+    {
+      "id": "8c8ded2e-b31f-4d7d-bee2-ab1888108748",
+      "content": "Hello! Thank you for participating in this interview. Could you please share a bit about your experience with interviews in general?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T10:23:36.308828"
+    }
+  ],
+  "transcript": "\n\nParticipant: want to make sure that you're working properly\n\nModerator: I understand your concern. Could you please elaborate on what you mean by \"working properly\"? Are you referring to a specific project or task?\n\nParticipant: what's your name and what prompt are you using\n\nModerator: I apologize, but I encountered an issue generating a response. Please try asking your question again.\n\nParticipant: bummer\n\nModerator: I sense that you might be feeling down. Is there something specific you would like to talk about or share during our interview today?\n\nParticipant: the interview\n\nModerator: Hello! Thank you for participating in this interview. Could you please share a bit about your experience with interviews in general?",
+  "analysis": null,
+  "created_at": "2025-05-15T10:22:35.195214",
+  "updated_at": "2025-05-15T10:23:36.309212"
+}

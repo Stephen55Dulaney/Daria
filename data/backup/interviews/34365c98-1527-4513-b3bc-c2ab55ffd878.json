@@ -1,0 +1,4658 @@
+{
+  "session_id": "34365c98-1527-4513-b3bc-c2ab55ffd878",
+  "title": "Washing Machine World",
+  "project": "World of Washing Machines",
+  "interview_type": "discovery_interview",
+  "created_at": "2025-05-22T14:12:22.741615",
+  "creation_date": "2025-05-22 14:12",
+  "last_updated": "2025-05-22T14:12:22.741615",
+  "expiration_date": "2025-06-21T14:12:22.741615",
+  "status": "completed",
+  "conversation_history": [
+    {
+      "role": "assistant",
+      "content": "Hello, just wanting to test the transcript system.",
+      "timestamp": "13:00:25"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you.",
+      "timestamp": "13:00:31"
+    },
+    {
+      "role": "assistant",
+      "content": "Oh.",
+      "timestamp": "13:02:05"
+    },
+    {
+      "role": "assistant",
+      "content": "We can do cameras off or cameras on. I'm fine either way.",
+      "timestamp": "13:02:14"
+    },
+    {
+      "role": "user",
+      "content": "Hey, Steve. I'm good. I'm good. Sorry, I had to use my phone because I have a\u2026 call in the next hour and then my computer is like dying. I'm in the office and I forgot to bring my charger with me.",
+      "timestamp": "13:02:21"
+    },
+    {
+      "role": "assistant",
+      "content": "Hey, how are you?",
+      "timestamp": "13:02:22"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, so we can do\u2026 We can do video on or video off. Either way is fine.",
+      "timestamp": "13:02:36"
+    },
+    {
+      "role": "user",
+      "content": "Sorry to give you my fault. No worries. No worries. I won't see your face. I haven't seen your face for years.",
+      "timestamp": "13:02:37"
+    },
+    {
+      "role": "assistant",
+      "content": "I try to record this just to see. I already learned i have to um I have to turn on the auto admit because I forgot to do that.",
+      "timestamp": "13:02:46"
+    },
+    {
+      "role": "user",
+      "content": "Yeah.",
+      "timestamp": "13:02:48"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, we'll just try to get busy so I get as much as I can. Can you please tell me your name?",
+      "timestamp": "13:02:56"
+    },
+    {
+      "role": "user",
+      "content": "No.",
+      "timestamp": "13:02:57"
+    },
+    {
+      "role": "user",
+      "content": "Sure. My name is T.",
+      "timestamp": "13:03:01"
+    },
+    {
+      "role": "assistant",
+      "content": "In your current role and how long have you been in your current role?",
+      "timestamp": "13:03:03"
+    },
+    {
+      "role": "user",
+      "content": "I'm a senior UX UI designer. Been here a little bit over three years.",
+      "timestamp": "13:03:07"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, can you think of any past jobs or experiences that helped you be successful in your current role?",
+      "timestamp": "13:03:14"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, my previous job was doing a similar type of work in an agency that specifically designed meeting softwares.",
+      "timestamp": "13:03:21"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, it had uh great support in my current work.",
+      "timestamp": "13:03:33"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, so with respect to your current role as an interaction designer UX researcher.",
+      "timestamp": "13:03:36"
+    },
+    {
+      "role": "assistant",
+      "content": "What's your primary goal?",
+      "timestamp": "13:03:42"
+    },
+    {
+      "role": "user",
+      "content": "My primary goal\u2026 was to be able to identify what are the problems I need to solve for the users, for the actual people.",
+      "timestamp": "13:03:47"
+    },
+    {
+      "role": "user",
+      "content": "So\u2026 depends on the business problem, right? Like really identifying the business problem and what I can do to help the users.",
+      "timestamp": "13:03:59"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, so when you're trying to pursue your primary goal, what are some key frustrations you've experienced recently?",
+      "timestamp": "13:04:09"
+    },
+    {
+      "role": "user",
+      "content": "There is\u2026 when projects are planned.",
+      "timestamp": "13:04:21"
+    },
+    {
+      "role": "user",
+      "content": "Research was\u2026 often ignored or eliminated from the project timeline.",
+      "timestamp": "13:04:26"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay. I've seen that one.",
+      "timestamp": "13:04:35"
+    },
+    {
+      "role": "user",
+      "content": "Yeah.",
+      "timestamp": "13:04:35"
+    },
+    {
+      "role": "assistant",
+      "content": "What would be your vision for how we could improve research, user research at Deloitte in the next maybe year and maybe three years?",
+      "timestamp": "13:04:38"
+    },
+    {
+      "role": "user",
+      "content": "Um\u2026 really trying to, first of all, really try and help educate the sales team.",
+      "timestamp": "13:04:52"
+    },
+    {
+      "role": "user",
+      "content": "That educate our clients that we Research is a crucial part of the design to really trying to solve their problems.",
+      "timestamp": "13:05:01"
+    },
+    {
+      "role": "user",
+      "content": "And\u2026 advocate for user research.",
+      "timestamp": "13:05:12"
+    },
+    {
+      "role": "user",
+      "content": "Firm-wise, firm wide, right? Second is to educate or give enough resource and learning opportunities for designers to designers to be more sufficient.",
+      "timestamp": "13:05:16"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay.",
+      "timestamp": "13:05:19"
+    },
+    {
+      "role": "user",
+      "content": "In research.",
+      "timestamp": "13:05:33"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, with that in mind, can you tell me a story of a project that looked like it was a golden opportunity for research when you started?",
+      "timestamp": "13:05:35"
+    },
+    {
+      "role": "assistant",
+      "content": "But no matter how hard you tried, it became frustrating and ended with a sad story.",
+      "timestamp": "13:05:43"
+    },
+    {
+      "role": "user",
+      "content": "There were\u2026 sometimes there were projects that was so kind of over promised to the client and not being\u2026 give me enough time to do it, right? Like it was sold for like a six seven week project, but it's designing the entire",
+      "timestamp": "13:05:54"
+    },
+    {
+      "role": "user",
+      "content": "A new experience, right? Neither research or usability testing was put in the plan for when this project was sold Right. So that was That was the kind of terrible experience. And there were a lot of times the budget was",
+      "timestamp": "13:06:16"
+    },
+    {
+      "role": "assistant",
+      "content": "Yep.",
+      "timestamp": "13:06:29"
+    },
+    {
+      "role": "user",
+      "content": "Very limited. You either have the design or you don't have the design. So usability testing and research was often taken off the book.",
+      "timestamp": "13:06:35"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, can you think of a story where it looked like it was going to be a challenge, but you were surprised at how well you were able to kind of get some research activities completed and they had a positive effect?",
+      "timestamp": "13:06:45"
+    },
+    {
+      "role": "user",
+      "content": "Oh, every time. I have to try so hard to slip.",
+      "timestamp": "13:06:56"
+    },
+    {
+      "role": "user",
+      "content": "Research into the design process even i did for KP, right? I don't know if I told you the story is that I'm doing this whole entire HR site migration, right? They're migrating one site to another And their navigation was all over the place. And I said, I have to do some level of car sorting to understand.",
+      "timestamp": "13:07:02"
+    },
+    {
+      "role": "user",
+      "content": "If our employees understand these terminologies that we're using, if they understand the grouping, even I had to do like fidget around with car sorting you know like car sorting normally we do it with quantum research right like it's it's more like a mass number like",
+      "timestamp": "13:07:24"
+    },
+    {
+      "role": "user",
+      "content": "100 or 200 start kind of thing um but that time I have to do a very specific qualitative car sorting.",
+      "timestamp": "13:07:43"
+    },
+    {
+      "role": "user",
+      "content": "With guided experience and sorry, not guided more moderated research and just teasing out the questions or users, actual employees mental model if they understood what group is supposed to be grouped together or what terminology makes sense to them right so",
+      "timestamp": "13:07:54"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah. Did they have recruiting the right number of participants?",
+      "timestamp": "13:08:16"
+    },
+    {
+      "role": "user",
+      "content": "I only got eight in two weeks. I can't recruit more. I want to do more, but it was very\u2026 challenging and it was towards the end of the year. So no one is, you know, we're actually speaking to KP employees. So a lot of people are actually not in office.",
+      "timestamp": "13:08:21"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah.",
+      "timestamp": "13:08:25"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah, yeah.",
+      "timestamp": "13:08:33"
+    },
+    {
+      "role": "user",
+      "content": "And they're not into you know doing this.",
+      "timestamp": "13:08:38"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, in that case, did you try to see what results you'd get with doing a card sort using AI tools?",
+      "timestamp": "13:08:41"
+    },
+    {
+      "role": "user",
+      "content": "I did not at the time. I wish I\u2026 I would have if I have more knowledge, I would.",
+      "timestamp": "13:08:48"
+    },
+    {
+      "role": "user",
+      "content": "Totally use AI tools, you know, especially in that case",
+      "timestamp": "13:08:53"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, so I want you to kind of think of your best, you know, if you had the budget, it's in the plan.",
+      "timestamp": "13:08:54"
+    },
+    {
+      "role": "assistant",
+      "content": "We're going to plan a discovery cycle. And so I want you to kind of frame out, you know, six weeks discovery cycle, maybe eight weeks How would you start? What are the activities like what would you need if you had a tool",
+      "timestamp": "13:09:00"
+    },
+    {
+      "role": "assistant",
+      "content": "That would help you kind of plan your discovery activities. And then throughout the life cycle, be able to conduct your recovery your your your activities. And then at the very end, analyze, you know, manage your your whatever kind of records that you keep and then generate reports and then share them with the team. So we'll start on the day one. How would you do your first week or your phase zero?",
+      "timestamp": "13:09:14"
+    },
+    {
+      "role": "assistant",
+      "content": "What activities would you try to organize? And what's your process as a user researcher?",
+      "timestamp": "13:09:36"
+    },
+    {
+      "role": "user",
+      "content": "Well, I would try to understand the problem, whether with the whole design team or with the stakeholders to understand what exactly the problem they're trying to solve and based on that, choose the right research methodology to identify what we",
+      "timestamp": "13:09:42"
+    },
+    {
+      "role": "user",
+      "content": "You know, like the problem we're trying to solve, who we're trying to solve it for uh And what type of research could be useful to get the answer we want to.",
+      "timestamp": "13:10:03"
+    },
+    {
+      "role": "user",
+      "content": "Right. That would be the first phase. And second would be, you know, sort of planning for the research methodology, right? Like how do we what questions we're trying to solve, what are we going to do write a plan for that, right? That'll be the second phase. Third would be actual conducting whatever research we need to conduct.",
+      "timestamp": "13:10:13"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay.",
+      "timestamp": "13:10:15"
+    },
+    {
+      "role": "user",
+      "content": "Right. And collect data, right? Collect all the data points And the final phase would be the final phase analyze the data, synthesize the data and come up with a report.",
+      "timestamp": "13:10:38"
+    },
+    {
+      "role": "user",
+      "content": "To see our results if it answers the question we were asking for.",
+      "timestamp": "13:10:54"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, there are any pitfalls in your process where things tend to like fall apart or you need more support?",
+      "timestamp": "13:11:00"
+    },
+    {
+      "role": "user",
+      "content": "I always do. I always do in every stage, right? To an early on stage really early on stage ask the right question.",
+      "timestamp": "13:11:14"
+    },
+    {
+      "role": "user",
+      "content": "You know, plan for the right things. If we understood our problem first, right? And then that stage we need reassurance from the stakeholder to see if we're asking the right question.",
+      "timestamp": "13:11:26"
+    },
+    {
+      "role": "user",
+      "content": "And then when we were planning for the research.",
+      "timestamp": "13:11:44"
+    },
+    {
+      "role": "user",
+      "content": "Usually I tend to have a second opinion on if I'm on the right track if i'm you know, if I'm doing this right, if everything is right putting together. I always do you know",
+      "timestamp": "13:11:49"
+    },
+    {
+      "role": "assistant",
+      "content": "What do you call that step?",
+      "timestamp": "13:12:01"
+    },
+    {
+      "role": "user",
+      "content": "Reassurance. I don't know what to say you know like reassurance like i think that's really important because sometimes you you get into a you get into a zone, you narrow yourself into a thought and then you're like, okay, these are the things",
+      "timestamp": "13:12:10"
+    },
+    {
+      "role": "user",
+      "content": "And you couldn't really jump out of your own kind of mental model and you need some other opinions to kind of help you to help you to do that even with design, I feel like, you know, we're getting so deep into one like",
+      "timestamp": "13:12:24"
+    },
+    {
+      "role": "user",
+      "content": "Direction and then we couldn't really get ourselves outside of that. And then we got zoned into it.",
+      "timestamp": "13:12:40"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah.",
+      "timestamp": "13:12:45"
+    },
+    {
+      "role": "user",
+      "content": "So that\u2026 that I would really love to get a second opinion on.",
+      "timestamp": "13:12:47"
+    },
+    {
+      "role": "user",
+      "content": "And then when we conduct the research, normally we would plan enough manpower to do it.",
+      "timestamp": "13:12:54"
+    },
+    {
+      "role": "user",
+      "content": "I haven't got\u2026 in the place that we realize we don't have enough like researchers for this project if you know during that stage normally if we plan for how to have two researchers two is enough, usually.",
+      "timestamp": "13:13:00"
+    },
+    {
+      "role": "assistant",
+      "content": "And the activities around the resources you have when you start.",
+      "timestamp": "13:13:16"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, usually that's when we get to that stage, everything should be fine. Yeah.",
+      "timestamp": "13:13:19"
+    },
+    {
+      "role": "user",
+      "content": "And then when we get the results, it's also. Easier. I mean, I think in the last stage Some of the figma AI tool is really helpful when it has the initial kind of sorting all your notes for you you know and then that kind of saves some",
+      "timestamp": "13:13:24"
+    },
+    {
+      "role": "assistant",
+      "content": "So\u2026",
+      "timestamp": "13:13:25"
+    },
+    {
+      "role": "user",
+      "content": "Reading time and reorganization time. Which is good.",
+      "timestamp": "13:13:42"
+    },
+    {
+      "role": "assistant",
+      "content": "And those are tools inside of Figma that summarize your notes.",
+      "timestamp": "13:13:46"
+    },
+    {
+      "role": "user",
+      "content": "Oh, sorry, fake jam. Sorry. Yeah, I think it does. I think that's true.",
+      "timestamp": "13:13:48"
+    },
+    {
+      "role": "assistant",
+      "content": "Fig Jam has some tools for summarizing. I haven't played it with them.",
+      "timestamp": "13:13:50"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, you should play with it. Last time I worked with a researcher, she showed me how to do it, which is Pretty cool, you know, like that, all the sticky notes and then like they group it.",
+      "timestamp": "13:13:56"
+    },
+    {
+      "role": "assistant",
+      "content": "Oh, cool. So as a researcher As a user researcher, who do you consider to be your primary customer and then your next customer and then your stakeholder?",
+      "timestamp": "13:14:06"
+    },
+    {
+      "role": "user",
+      "content": "For you, like first step.",
+      "timestamp": "13:14:06"
+    },
+    {
+      "role": "user",
+      "content": "My primary customer. You're talking about Deloitte or you're talking about\u2026",
+      "timestamp": "13:14:21"
+    },
+    {
+      "role": "assistant",
+      "content": "Just as a researcher, we're just talking about you as a researcher when you think about stuff. Everyone has a customer that they try to Life works.",
+      "timestamp": "13:14:25"
+    },
+    {
+      "role": "user",
+      "content": "You know, my number one primary will probably be",
+      "timestamp": "13:14:36"
+    },
+    {
+      "role": "user",
+      "content": "Whoever hires me, right? Like hire me on the project, right?",
+      "timestamp": "13:14:43"
+    },
+    {
+      "role": "user",
+      "content": "Secondary would be decline. The business stakeholders. I think I consider them like also important.",
+      "timestamp": "13:14:51"
+    },
+    {
+      "role": "user",
+      "content": "Actually, I'm sorry. I'm sorry. I would say secondary would be the actual user. The secondary would be the actual user.",
+      "timestamp": "13:14:59"
+    },
+    {
+      "role": "user",
+      "content": "But if I work for a company. Like a product company, that order would probably be reversed, right?",
+      "timestamp": "13:15:08"
+    },
+    {
+      "role": "user",
+      "content": "Or how do I say it? Yeah, probably the same thing. And the last would be the business stakeholder, whether PM or PO, right? Or, you know.",
+      "timestamp": "13:15:16"
+    },
+    {
+      "role": "user",
+      "content": "Business stakeholders. You know what I mean?",
+      "timestamp": "13:15:26"
+    },
+    {
+      "role": "assistant",
+      "content": "Now\u2026 What do you consider like the victory event when you're working with your primary customer?",
+      "timestamp": "13:15:28"
+    },
+    {
+      "role": "user",
+      "content": "They like my work. And they will hire me again.",
+      "timestamp": "13:15:37"
+    },
+    {
+      "role": "assistant",
+      "content": "That is successful outcome that way.",
+      "timestamp": "13:15:44"
+    },
+    {
+      "role": "user",
+      "content": "You know, I don't know, Stephen. I'm sorry. I think it's our work environment, I guess.",
+      "timestamp": "13:15:47"
+    },
+    {
+      "role": "user",
+      "content": "I'm just being really honest.",
+      "timestamp": "13:15:54"
+    },
+    {
+      "role": "assistant",
+      "content": "Yep, yep. And that's it. I mean, I'm doing this interview. It's hard for me not to kind of break in because I'm in the same business. I'm trying to So I have another section here. We don't have a specific tool yet. So I'm going to ask",
+      "timestamp": "13:15:58"
+    },
+    {
+      "role": "user",
+      "content": "Yeah.",
+      "timestamp": "13:16:03"
+    },
+    {
+      "role": "assistant",
+      "content": "Are there any special tools that you're able to use inside of Delete? What kind of tools do you use to set up to do your work?",
+      "timestamp": "13:16:10"
+    },
+    {
+      "role": "assistant",
+      "content": "Let's just start with like a stakeholder interview. How do you decide and how do you organize and how do you activate a stakeholder interview.",
+      "timestamp": "13:16:19"
+    },
+    {
+      "role": "user",
+      "content": "Uh\u2026 I think I had a template of some sort, like I would organize it like just in Words or PowerPoint. Orphic gem right like sometimes doing the presentations in Figma.",
+      "timestamp": "13:16:32"
+    },
+    {
+      "role": "user",
+      "content": "And organize all my thought usually in phase jam. Right.",
+      "timestamp": "13:16:48"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, now after the interviews, that's something you might be able to save kind of just a sample template for with me for that.",
+      "timestamp": "13:16:51"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, something like that.",
+      "timestamp": "13:16:58"
+    },
+    {
+      "role": "assistant",
+      "content": "The next one is let's consider doing a user interview. What types of user interviews do you conduct?",
+      "timestamp": "13:16:59"
+    },
+    {
+      "role": "user",
+      "content": "I've done customer interview. And I've done the car sorting was one type of interview I did.",
+      "timestamp": "13:17:10"
+    },
+    {
+      "role": "user",
+      "content": "But usually it's usually you know qualitative interview with the actual user.",
+      "timestamp": "13:17:18"
+    },
+    {
+      "role": "assistant",
+      "content": "When you're doing a customer interview, do you have different types of interviews or do you have this one interview that you use with all your customers?",
+      "timestamp": "13:17:26"
+    },
+    {
+      "role": "user",
+      "content": "When I plan for it, I have one set of questions for the For the customers, for all the customers.",
+      "timestamp": "13:17:37"
+    },
+    {
+      "role": "user",
+      "content": "But there are types I will slip in one or two questions if you know follow-up questions one day um when they speak something interesting you know what i mean Yeah.",
+      "timestamp": "13:17:44"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, when you're doing customer interviews today, how do you record or how do you kind of record the results or what tools you're using to kind of keep track of the transcripts.",
+      "timestamp": "13:17:56"
+    },
+    {
+      "role": "user",
+      "content": "Oh, that's a good one. That's a good one. A lot of cases I can't record.",
+      "timestamp": "13:18:08"
+    },
+    {
+      "role": "user",
+      "content": "I can only take notes, so I couldn't really record anything.",
+      "timestamp": "13:18:16"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, if you were taking notes, would you take them off the computer or would you take them in a book?",
+      "timestamp": "13:18:20"
+    },
+    {
+      "role": "user",
+      "content": "Computer yeah i'll use FICJAM. I'll use FICJAM right away. And sometimes if it's a Zoom call.",
+      "timestamp": "13:18:24"
+    },
+    {
+      "role": "user",
+      "content": "I would ask for their\u2026 like consents if they can if i can report Can I record, you know, like\u2026 And that really depends on the company, the clients, you know.",
+      "timestamp": "13:18:30"
+    },
+    {
+      "role": "assistant",
+      "content": "I should have asked you consent. Yeah, yeah, yeah.",
+      "timestamp": "13:18:34"
+    },
+    {
+      "role": "user",
+      "content": "Rule about this. You know, some companies now, they don't even allow recording meetings Which is very interesting.",
+      "timestamp": "13:18:46"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay. So if you're doing a customer interview about a new product, would that be different than if you were doing a customer interview about some screens like on Kaiser that are already in production?",
+      "timestamp": "13:18:52"
+    },
+    {
+      "role": "user",
+      "content": "It would be, did you ask, would it be different Yeah, it will.",
+      "timestamp": "13:19:08"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah. Different questions. Now, in your mind, do you just like switch or do you have like a file structure that has two different scripts or do you just kind of That's just like a reflex.",
+      "timestamp": "13:19:11"
+    },
+    {
+      "role": "user",
+      "content": "It would be a different script different yeah Absolutely.",
+      "timestamp": "13:19:14"
+    },
+    {
+      "role": "user",
+      "content": "I try to have like one template or one script for it, but every time it's it's usually different like for some reason.",
+      "timestamp": "13:19:27"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, is it different when you're kind of asking your follow-ups Or is it different?",
+      "timestamp": "13:19:36"
+    },
+    {
+      "role": "assistant",
+      "content": "And the artifacts you share with them or how is it different?",
+      "timestamp": "13:19:42"
+    },
+    {
+      "role": "user",
+      "content": "Uh\u2026",
+      "timestamp": "13:19:47"
+    },
+    {
+      "role": "user",
+      "content": "It's the task I'm asking them to do and also the follow-up questions.",
+      "timestamp": "13:19:51"
+    },
+    {
+      "role": "user",
+      "content": "Based on the product itself.",
+      "timestamp": "13:19:57"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, do you ever use, what do you do with your reports? You got all your transcripts, you've done seven people and you have the transcripts.",
+      "timestamp": "13:19:59"
+    },
+    {
+      "role": "assistant",
+      "content": "And we'll do two different kinds. One of them is just a for a new product design and the other is evaluating an existing set of application or wireframes.",
+      "timestamp": "13:20:07"
+    },
+    {
+      "role": "assistant",
+      "content": "And you have eight, seven to eight interviews each. How do you process those?",
+      "timestamp": "13:20:16"
+    },
+    {
+      "role": "assistant",
+      "content": "Results and what are your what are your artifacts? What are you trying to create when you're done",
+      "timestamp": "13:20:22"
+    },
+    {
+      "role": "user",
+      "content": "Oh, that's a good question. So I would spend\u2026 X amount of time to You know, if there's a video, I would be watched on the videos. If there is no video, I will\u2026 read through all my notes and try to",
+      "timestamp": "13:20:30"
+    },
+    {
+      "role": "user",
+      "content": "Remember every detail that they've talked about, you know, some of the notes are just like quick notes typing out, you know, you know what I mean, right? Like sometimes you have to kind of go through every single notes and kind of",
+      "timestamp": "13:20:47"
+    },
+    {
+      "role": "user",
+      "content": "Tie it up their language a little more just just to kind of Sometimes when you type really quickly when they're speaking you you lose words or you type wrong things you have to go through all of that And\u2026 spend time synthesize all the",
+      "timestamp": "13:21:03"
+    },
+    {
+      "role": "user",
+      "content": "All the talking point, all the notes like using affinity mapping, basically group them into something that sort of makes sense to me.",
+      "timestamp": "13:21:19"
+    },
+    {
+      "role": "user",
+      "content": "And then once those are in groups you kind of having\u2026 sort of a common problem they stated.",
+      "timestamp": "13:21:30"
+    },
+    {
+      "role": "user",
+      "content": "And you you kind of tell, oh, how many people have said they don't understand this.",
+      "timestamp": "13:21:42"
+    },
+    {
+      "role": "user",
+      "content": "Experience or how many people said they don't really get the words Blah, blah, blah, right? You're kind of doing that and then\u2026 making recommendations i mean then you get a few different points of the problems you find from the testing or user research, right?",
+      "timestamp": "13:21:48"
+    },
+    {
+      "role": "user",
+      "content": "And then\u2026 kind of speak about your summarize the total things that should be changed or recommendations that you want to make if it's a new product And if it's a use-based testing or some sort of screen you give them.",
+      "timestamp": "13:22:08"
+    },
+    {
+      "role": "user",
+      "content": "Then you tell them, you show at the end like what should be changed based on a couple of big points that you got from the affinity mapping, right? That's sort of what I'll do.",
+      "timestamp": "13:22:27"
+    },
+    {
+      "role": "assistant",
+      "content": "Are there any certain things that you like peek up and you hear that you kind of know it's in the back of your mind, you got this monitor when it hears it Is there anything special that you're listening for?",
+      "timestamp": "13:22:37"
+    },
+    {
+      "role": "assistant",
+      "content": "During an interview that would change your behavior from just regular note-taking?",
+      "timestamp": "13:22:49"
+    },
+    {
+      "role": "user",
+      "content": "It does. If I see something happen repetitively. Then it just rings the bell you know like every if i hear it one more time you know like if I, if, if I heard it three times already, people saying the same thing, then it rings the bell. Okay.",
+      "timestamp": "13:22:54"
+    },
+    {
+      "role": "assistant",
+      "content": "Take a special note.",
+      "timestamp": "13:23:02"
+    },
+    {
+      "role": "user",
+      "content": "Someone said it one more time, you know, like, okay, that means that's a common problem.",
+      "timestamp": "13:23:09"
+    },
+    {
+      "role": "user",
+      "content": "You know yeah I don't know. Is that how you see it too?",
+      "timestamp": "13:23:15"
+    },
+    {
+      "role": "assistant",
+      "content": "That's interesting. Yeah. Mine's verbatims.",
+      "timestamp": "13:23:15"
+    },
+    {
+      "role": "assistant",
+      "content": "I stop what I'm doing. If I get a good verbatim, it just stops me in my tracks and I write it quotes.",
+      "timestamp": "13:23:23"
+    },
+    {
+      "role": "assistant",
+      "content": "Because those are like golden down the road.",
+      "timestamp": "13:23:28"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, I mean, I mean, some of them, like the quotes are you know.",
+      "timestamp": "13:23:32"
+    },
+    {
+      "role": "assistant",
+      "content": "But I do know what you mean. Yeah. In your first interview, you're pretty open-minded.",
+      "timestamp": "13:23:37"
+    },
+    {
+      "role": "user",
+      "content": "I don't know. When you hear the right quotes, you just know it. You know, like when you hear the right",
+      "timestamp": "13:23:38"
+    },
+    {
+      "role": "assistant",
+      "content": "By the third one. There's a set of things that you're listening for.",
+      "timestamp": "13:23:45"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, exactly. Exactly.",
+      "timestamp": "13:23:51"
+    },
+    {
+      "role": "assistant",
+      "content": "And then by the seventh, you're just confirming that you're just almost tuned down.",
+      "timestamp": "13:23:53"
+    },
+    {
+      "role": "assistant",
+      "content": "Until the one thing surprises you.",
+      "timestamp": "13:23:57"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, yeah, 100%. That's how I feel. Like if I heard like the same thing three times, that means the next time I hear it, it rings the bell right away.",
+      "timestamp": "13:24:00"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay. If you had a special wand, magic wand, is there any thing that you would change about the process that we have that we're forced to work in.",
+      "timestamp": "13:24:10"
+    },
+    {
+      "role": "user",
+      "content": "Uh\u2026",
+      "timestamp": "13:24:23"
+    },
+    {
+      "role": "user",
+      "content": "Um\u2026",
+      "timestamp": "13:24:33"
+    },
+    {
+      "role": "user",
+      "content": "I would say\u2026 during the process of synthesizing data.",
+      "timestamp": "13:24:37"
+    },
+    {
+      "role": "user",
+      "content": "If I have a magic wand i don't need to",
+      "timestamp": "13:24:42"
+    },
+    {
+      "role": "user",
+      "content": "Go through everything again and again",
+      "timestamp": "13:24:47"
+    },
+    {
+      "role": "assistant",
+      "content": "Here's your second question. If I go to your customer, which in your case was like a project manager, someone that might be able to reuse it reliably on projects.",
+      "timestamp": "13:24:52"
+    },
+    {
+      "role": "assistant",
+      "content": "And I said, can you please describe T in one word to me? What one word would you want him to say?",
+      "timestamp": "13:25:01"
+    },
+    {
+      "role": "user",
+      "content": "If\u2026 one word I have to say.",
+      "timestamp": "13:25:10"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm going to go ask this guy, tell me about tea.",
+      "timestamp": "13:25:14"
+    },
+    {
+      "role": "assistant",
+      "content": "What one word do you want him to tell me?",
+      "timestamp": "13:25:17"
+    },
+    {
+      "role": "user",
+      "content": "Like tea is amazing. He can't get everything done and get through.",
+      "timestamp": "13:25:22"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay. Amazing. It's my word.",
+      "timestamp": "13:25:24"
+    },
+    {
+      "role": "assistant",
+      "content": "Isn't anything during a research project that keeps you up at night?",
+      "timestamp": "13:25:29"
+    },
+    {
+      "role": "user",
+      "content": "Amazing.",
+      "timestamp": "13:25:29"
+    },
+    {
+      "role": "user",
+      "content": "Oh. Ever researched keeping me up at night.",
+      "timestamp": "13:25:34"
+    },
+    {
+      "role": "user",
+      "content": "Because there is a lot of uncertainty.",
+      "timestamp": "13:25:39"
+    },
+    {
+      "role": "user",
+      "content": "Even like I did a survey even like crafting every single survey question and choices was was a nightmare. And you just have to like what would people think if I say it this way what would people think if I say it that way",
+      "timestamp": "13:25:44"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah.",
+      "timestamp": "13:25:53"
+    },
+    {
+      "role": "user",
+      "content": "What would this Should I use Likert chart choices or should I use multiple choices? What does it do?",
+      "timestamp": "13:26:05"
+    },
+    {
+      "role": "user",
+      "content": "For the answer I want to get, you know, like, am I going to get the right answer? Is this answer going to be helpful for me in the next step when I design?",
+      "timestamp": "13:26:14"
+    },
+    {
+      "role": "user",
+      "content": "The stuff I'm designing you know like those are all the questions I keep asking myself And\u2026 I don't know about your experience, but I did a survey design and that survey took me you know like i couldn't sleep at night for every question that i'm trying to craft. I'm not a very good writer.",
+      "timestamp": "13:26:23"
+    },
+    {
+      "role": "user",
+      "content": "So, you know, that is a nightmare to me, I guess.",
+      "timestamp": "13:26:47"
+    },
+    {
+      "role": "user",
+      "content": "It keeps me on at night every day during that project.",
+      "timestamp": "13:26:52"
+    },
+    {
+      "role": "assistant",
+      "content": "Yep. I will tell you a story about that afterwards. Okay, so now I'm going to try to share some screens and we'll do a little bit of evaluative discussion.",
+      "timestamp": "13:26:53"
+    },
+    {
+      "role": "user",
+      "content": "Thank you.",
+      "timestamp": "13:27:00"
+    },
+    {
+      "role": "assistant",
+      "content": "And let's see, we won. This one.",
+      "timestamp": "13:27:04"
+    },
+    {
+      "role": "assistant",
+      "content": "And we want",
+      "timestamp": "13:27:10"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, you're able to see this screen?",
+      "timestamp": "13:27:14"
+    },
+    {
+      "role": "user",
+      "content": "Are you sharing? No.",
+      "timestamp": "13:27:19"
+    },
+    {
+      "role": "assistant",
+      "content": "Oh, my share screen, three. Share.",
+      "timestamp": "13:27:20"
+    },
+    {
+      "role": "user",
+      "content": "Okay.",
+      "timestamp": "13:27:26"
+    },
+    {
+      "role": "assistant",
+      "content": "Then over to here. Okay, so\u2026 The first screen is if this is a new interview screen, what fields would you want to include.",
+      "timestamp": "13:27:26"
+    },
+    {
+      "role": "assistant",
+      "content": "So we're going to configure a new interview. And this interview is going to be The AI is going to ask the questions.",
+      "timestamp": "13:27:37"
+    },
+    {
+      "role": "assistant",
+      "content": "To the user and record the answers. You're just going to kind of configure it What kind of information would you want pre-interview type questions?",
+      "timestamp": "13:27:46"
+    },
+    {
+      "role": "user",
+      "content": "Are you asking me what do I want? Where do you want me to react to this?",
+      "timestamp": "13:27:58"
+    },
+    {
+      "role": "assistant",
+      "content": "First of all, let's say Would you ever consider a tool that that helped you, a form that helped you kind of create interview questions And, uh.",
+      "timestamp": "13:27:59"
+    },
+    {
+      "role": "user",
+      "content": "I do. I do. First of all, I do.",
+      "timestamp": "13:28:10"
+    },
+    {
+      "role": "assistant",
+      "content": "And how would you build that from scratch? I should have let you do it that way. I'll just be honest. When I did the same thing, this is how I see interviews.",
+      "timestamp": "13:28:17"
+    },
+    {
+      "role": "assistant",
+      "content": "I see. You know, researcher name stuff I asked the same questions.",
+      "timestamp": "13:28:25"
+    },
+    {
+      "role": "assistant",
+      "content": "But if I'm running Persona, which is kind of what we're doing today slash journey map, there's a slightly different emphasis. I do ask more of the open-ended background.",
+      "timestamp": "13:28:32"
+    },
+    {
+      "role": "assistant",
+      "content": "Goes, if I'm doing a journey map, I might spend more time on the process. And if I'm doing like a evaluating screens of an existing application, you know, I want to talk about screen one, what did you expect? Did you get what you expect? And I don't think everybody",
+      "timestamp": "13:28:40"
+    },
+    {
+      "role": "assistant",
+      "content": "Thinks that way. How do you think about interview types?",
+      "timestamp": "13:28:56"
+    },
+    {
+      "role": "user",
+      "content": "Interview types uh",
+      "timestamp": "13:29:00"
+    },
+    {
+      "role": "assistant",
+      "content": "Zeroed into like user interviews, customer interviews. I'm not doing stakeholders right now.",
+      "timestamp": "13:29:02"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, I get it. I get it.",
+      "timestamp": "13:29:07"
+    },
+    {
+      "role": "user",
+      "content": "Persona application journey. I think these three I never used interview type. I never thought about this.",
+      "timestamp": "13:29:22"
+    },
+    {
+      "role": "user",
+      "content": "I really\u2026 My process was to ask questions.",
+      "timestamp": "13:29:30"
+    },
+    {
+      "role": "user",
+      "content": "That I want to answer for. Like\u2026",
+      "timestamp": "13:29:36"
+    },
+    {
+      "role": "assistant",
+      "content": "So would you have a button that would upload your interview script?",
+      "timestamp": "13:29:43"
+    },
+    {
+      "role": "assistant",
+      "content": "Like, okay.",
+      "timestamp": "13:29:48"
+    },
+    {
+      "role": "user",
+      "content": "I would. I would have a button to upload my interview script.",
+      "timestamp": "13:29:48"
+    },
+    {
+      "role": "user",
+      "content": "But I would ask the questions I would prompt How do I say it? I would describe the problem And I would\u2026 want to ask for the questions I want to answer for.",
+      "timestamp": "13:29:52"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay.",
+      "timestamp": "13:30:03"
+    },
+    {
+      "role": "user",
+      "content": "I never thought about you know persona interview, journey map interview or application interview in this sort of",
+      "timestamp": "13:30:11"
+    },
+    {
+      "role": "assistant",
+      "content": "You know, that surprises me because that's what started this whole research project. So I was sharing this with amaya.",
+      "timestamp": "13:30:18"
+    },
+    {
+      "role": "assistant",
+      "content": "And she goes, Stephen, I don't think of interviews that way. And I was like.",
+      "timestamp": "13:30:24"
+    },
+    {
+      "role": "assistant",
+      "content": "This is the way I always have looked at interviews. I use the exact same script because I use the same script today that we used when I interviewed you for hiring you.",
+      "timestamp": "13:30:28"
+    },
+    {
+      "role": "user",
+      "content": "Oh, really?",
+      "timestamp": "13:30:36"
+    },
+    {
+      "role": "assistant",
+      "content": "I don't know if yes. There's only one script, but I kind of listen for different things and I kind of emphasize or I pause and go deeper into different things depending on those three types.",
+      "timestamp": "13:30:37"
+    },
+    {
+      "role": "user",
+      "content": "Well, maybe you did the right thing. You know, you hired the right person, my friend.",
+      "timestamp": "13:30:49"
+    },
+    {
+      "role": "assistant",
+      "content": "I did. I did. Best thing I've ever done at Deloitte.",
+      "timestamp": "13:30:52"
+    },
+    {
+      "role": "assistant",
+      "content": "You, Amaya, that's my legacy is to the company.",
+      "timestamp": "13:30:56"
+    },
+    {
+      "role": "user",
+      "content": "Thank you. Hopefully I'm doing. Good for the company.",
+      "timestamp": "13:31:02"
+    },
+    {
+      "role": "assistant",
+      "content": "Yes, we are making me proud. So you would start in this configuration by trying to describe the problem.",
+      "timestamp": "13:31:06"
+    },
+    {
+      "role": "user",
+      "content": "Thank you.",
+      "timestamp": "13:31:09"
+    },
+    {
+      "role": "user",
+      "content": "Yeah. Like I, yeah, that's what I would do Because if I don't know persona interview, journey map interview or application interview, like the difference between all three.",
+      "timestamp": "13:31:14"
+    },
+    {
+      "role": "assistant",
+      "content": "In May.",
+      "timestamp": "13:31:15"
+    },
+    {
+      "role": "assistant",
+      "content": "Reason.",
+      "timestamp": "13:31:21"
+    },
+    {
+      "role": "user",
+      "content": "Then I wouldn't know what to do with it. Like I said, let's say I'm doing interview customer interview about e-commerce experience a shopping flow experience or shopping in general.",
+      "timestamp": "13:31:28"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay.",
+      "timestamp": "13:31:32"
+    },
+    {
+      "role": "user",
+      "content": "What would that fit in? Would that be in persona? Would that be journey map? It could be journey map.",
+      "timestamp": "13:31:43"
+    },
+    {
+      "role": "user",
+      "content": "But could also be persona because they're a different type of customers.",
+      "timestamp": "13:31:49"
+    },
+    {
+      "role": "user",
+      "content": "That I'm interviewing. I did a lot of e-commerce project and then Like it's very hard.",
+      "timestamp": "13:31:55"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay.",
+      "timestamp": "13:31:57"
+    },
+    {
+      "role": "user",
+      "content": "For me to imagine like what would that fall into you know what i mean",
+      "timestamp": "13:32:04"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah. Now, what kind of\u2026 like demographic information. Do you actually have a section where you kind of track that or you just block them all together?",
+      "timestamp": "13:32:09"
+    },
+    {
+      "role": "user",
+      "content": "Yeah. No, I would have a section track that. I will want to screen.",
+      "timestamp": "13:32:17"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, what about technology uses?",
+      "timestamp": "13:32:23"
+    },
+    {
+      "role": "user",
+      "content": "Technology uses\u2026 Yeah, I would have a section for that too like how do they\u2026",
+      "timestamp": "13:32:28"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah, these are kind of, are there any special things in your mind? Do you look for somebody when you're in an interview, do you categorize them as in any way with their how well they can manage a screen, especially when you're showing them a screen.",
+      "timestamp": "13:32:33"
+    },
+    {
+      "role": "assistant",
+      "content": "Like, do you watch their behaviors and then categorize them as like super experienced or novice",
+      "timestamp": "13:32:45"
+    },
+    {
+      "role": "user",
+      "content": "Yeah. Yeah. Yeah. I would always capture their experience like i would watch everything they click very carefully.",
+      "timestamp": "13:32:49"
+    },
+    {
+      "role": "user",
+      "content": "And versus what they speak. And sometimes they speak the way they speak and the way they act.",
+      "timestamp": "13:32:56"
+    },
+    {
+      "role": "user",
+      "content": "Are very different. You know what I mean, right?",
+      "timestamp": "13:33:03"
+    },
+    {
+      "role": "assistant",
+      "content": "Now, any other thoughts or recommendations for an interview configuration? Like this is like the pre-interview screen.",
+      "timestamp": "13:33:07"
+    },
+    {
+      "role": "user",
+      "content": "Pretty neat screen.",
+      "timestamp": "13:33:14"
+    },
+    {
+      "role": "user",
+      "content": "I don't know if the operating system, I mean, it could be Android and iOS are vastly different yeah yeah those are I think that would be good.",
+      "timestamp": "13:33:24"
+    },
+    {
+      "role": "assistant",
+      "content": "But if you maybe afterwards you can share So.",
+      "timestamp": "13:33:30"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, you can share this with me and I can think about it a little more.",
+      "timestamp": "13:33:33"
+    },
+    {
+      "role": "assistant",
+      "content": "So what kind of reports do you generate? Do you ever generate personas and journey maps as part of your deliverables?",
+      "timestamp": "13:33:36"
+    },
+    {
+      "role": "user",
+      "content": "Yeah.",
+      "timestamp": "13:33:38"
+    },
+    {
+      "role": "user",
+      "content": "Journey map all the time. Persona, not so much. Usually I already have the persona when I start.",
+      "timestamp": "13:33:46"
+    },
+    {
+      "role": "user",
+      "content": "You know like the the clients would have some sort of preset persona date.",
+      "timestamp": "13:33:53"
+    },
+    {
+      "role": "user",
+      "content": "They know. I don't have to do persona, usually.",
+      "timestamp": "13:33:58"
+    },
+    {
+      "role": "user",
+      "content": "But journey map almost all the time. Unless it's a very specific like tool.",
+      "timestamp": "13:34:06"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, so this tool allows you to\u2026",
+      "timestamp": "13:34:10"
+    },
+    {
+      "role": "assistant",
+      "content": "This tool allows you to conduct the interviews and then it allows you to upload interviews. And then the next thing you have is an archive page.",
+      "timestamp": "13:34:15"
+    },
+    {
+      "role": "assistant",
+      "content": "What would you use? This is all the interviews and they're not organized by project. How would you organize like so um You see the transcripts.",
+      "timestamp": "13:34:20"
+    },
+    {
+      "role": "assistant",
+      "content": "You can see the metadata. And this is basically an archive and then you can search",
+      "timestamp": "13:34:28"
+    },
+    {
+      "role": "assistant",
+      "content": "Would you find a tool like this? How do you bet.",
+      "timestamp": "13:34:40"
+    },
+    {
+      "role": "user",
+      "content": "So each one of those cards are they are they uh is that one particular interview or that's one project?",
+      "timestamp": "13:34:43"
+    },
+    {
+      "role": "assistant",
+      "content": "Yes. One particular interview.",
+      "timestamp": "13:34:50"
+    },
+    {
+      "role": "user",
+      "content": "That's one particular interview. Okay.",
+      "timestamp": "13:34:52"
+    },
+    {
+      "role": "assistant",
+      "content": "And right now they're just all flat.",
+      "timestamp": "13:34:57"
+    },
+    {
+      "role": "user",
+      "content": "I will want to see their demographic, some sort of their interviewees demographic.",
+      "timestamp": "13:35:00"
+    },
+    {
+      "role": "assistant",
+      "content": "Like organized on the front page up front hidden below here.",
+      "timestamp": "13:35:08"
+    },
+    {
+      "role": "user",
+      "content": "Like\u2026 Yeah.",
+      "timestamp": "13:35:09"
+    },
+    {
+      "role": "user",
+      "content": "I see. I see.",
+      "timestamp": "13:35:13"
+    },
+    {
+      "role": "assistant",
+      "content": "I got all this stuff. I can do a lot of things with it.",
+      "timestamp": "13:35:15"
+    },
+    {
+      "role": "assistant",
+      "content": "Ideas is um",
+      "timestamp": "13:35:20"
+    },
+    {
+      "role": "user",
+      "content": "I don't know if you how you think of this, but I usually like to, especially if you do qualitative and quantitative together, you can slice the data by like\u2026 these five people are, you know, between age 18 to 25.",
+      "timestamp": "13:35:21"
+    },
+    {
+      "role": "user",
+      "content": "They think blah, blah, blah, what their problem is. And these are DZ interviewees are from age 45 to like 55, something like that. And then like these are these demographic things what they say in their quotes or something like that. I tend to do that if I can, whatever, if I have a larger",
+      "timestamp": "13:35:41"
+    },
+    {
+      "role": "user",
+      "content": "Larger data collection.",
+      "timestamp": "13:36:05"
+    },
+    {
+      "role": "assistant",
+      "content": "So there's a lot I can do here and I can do search.",
+      "timestamp": "13:36:09"
+    },
+    {
+      "role": "user",
+      "content": "Yeah. I think that filter, you know, Tableau, how Tableau can like kind of slice things",
+      "timestamp": "13:36:13"
+    },
+    {
+      "role": "assistant",
+      "content": "This one I don't have working yet. I haven't done practicing.",
+      "timestamp": "13:36:14"
+    },
+    {
+      "role": "assistant",
+      "content": "This is an emotion search. I need to really work on it, but it'll pull out.",
+      "timestamp": "13:36:21"
+    },
+    {
+      "role": "user",
+      "content": "Yeah. But this is amazing already. You know, I can already see this being very they can search out. Oh, that's really cool.",
+      "timestamp": "13:36:25"
+    },
+    {
+      "role": "assistant",
+      "content": "Happy.",
+      "timestamp": "13:36:25"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, so you don't use first components, but I'll show you how we did. We'll do gone fishing in Montana. We'll do ice fishing.",
+      "timestamp": "13:36:31"
+    },
+    {
+      "role": "assistant",
+      "content": "Hey, Grina. And then, so these are all the transcripts and I could do that same thing where I have more of the metadata surfaced about the people, but I just don't have that much. I mean, part of this research with you",
+      "timestamp": "13:36:39"
+    },
+    {
+      "role": "assistant",
+      "content": "In the next week is to generate real transcripts of researchers and throw them in here and then Organize things better.",
+      "timestamp": "13:36:49"
+    },
+    {
+      "role": "user",
+      "content": "Mm-hmm. Yeah.",
+      "timestamp": "13:36:54"
+    },
+    {
+      "role": "assistant",
+      "content": "You can choose your model and then let's see if it still works.",
+      "timestamp": "13:36:57"
+    },
+    {
+      "role": "assistant",
+      "content": "Oh, no, I got to choose these things first. So I'm just going to do this.",
+      "timestamp": "13:37:00"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm actually choosing different types because the transcripts are there but And then you um so you pick some interviews that you want. And those are the ones that are going to be used to create your persona.",
+      "timestamp": "13:37:05"
+    },
+    {
+      "role": "user",
+      "content": "Oh, look at that. That's amazing.",
+      "timestamp": "13:37:16"
+    },
+    {
+      "role": "assistant",
+      "content": "It's cheating. It's totally cheating. And you can go back to transcripts and talk to them. You can ask questions. You can do all kinds of stuff.",
+      "timestamp": "13:37:20"
+    },
+    {
+      "role": "user",
+      "content": "That's\u2026 Dude, that would do this. This is like the magic wand that wall.",
+      "timestamp": "13:37:27"
+    },
+    {
+      "role": "user",
+      "content": "And I bet it can probably generate user journey too. Like dirty map?",
+      "timestamp": "13:37:34"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah, that's the next page. And then you can switch. I only got one mod. I'm going to try to get Jim and I hooked up.",
+      "timestamp": "13:37:38"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, look at that. Wow, if I have\u2026",
+      "timestamp": "13:37:41"
+    },
+    {
+      "role": "assistant",
+      "content": "So here's the results right now. For the Fisher person.",
+      "timestamp": "13:37:46"
+    },
+    {
+      "role": "assistant",
+      "content": "We're going to throw you in there at the end of the interview and get your persona pretty soon.",
+      "timestamp": "13:37:50"
+    },
+    {
+      "role": "user",
+      "content": "Oh, please.",
+      "timestamp": "13:37:55"
+    },
+    {
+      "role": "user",
+      "content": "Wow.",
+      "timestamp": "13:38:01"
+    },
+    {
+      "role": "assistant",
+      "content": "So\u2026",
+      "timestamp": "13:38:01"
+    },
+    {
+      "role": "assistant",
+      "content": "And I'll show you what you do here. Let's see this one.",
+      "timestamp": "13:38:06"
+    },
+    {
+      "role": "user",
+      "content": "Wow. I want this tour.",
+      "timestamp": "13:38:07"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay. What's this one if I get it, is it in Edge, I think.",
+      "timestamp": "13:38:11"
+    },
+    {
+      "role": "user",
+      "content": "Steven.",
+      "timestamp": "13:38:11"
+    },
+    {
+      "role": "user",
+      "content": "We can generate image. Like a portrait of the person.",
+      "timestamp": "13:38:21"
+    },
+    {
+      "role": "assistant",
+      "content": "Note.",
+      "timestamp": "13:38:22"
+    },
+    {
+      "role": "user",
+      "content": "Jesus Christ.",
+      "timestamp": "13:38:27"
+    },
+    {
+      "role": "assistant",
+      "content": "I think I need to sign. I signed up when I rebooted.",
+      "timestamp": "13:38:42"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, this may be too long. Okay, well, anyway, I'll do that later.",
+      "timestamp": "13:38:47"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm not signed in. This is Adobe Firefly. And then you can take that prompt because if I go back to where I was.",
+      "timestamp": "13:38:54"
+    },
+    {
+      "role": "user",
+      "content": "Oh, okay. I see. What is this Adobe?",
+      "timestamp": "13:38:56"
+    },
+    {
+      "role": "user",
+      "content": "Oh, nice.",
+      "timestamp": "13:39:04"
+    },
+    {
+      "role": "assistant",
+      "content": "The last thing is it's an image prompt. Let's just go into",
+      "timestamp": "13:39:05"
+    },
+    {
+      "role": "assistant",
+      "content": "This is the other two I'm working on. And these are expensive.",
+      "timestamp": "13:39:14"
+    },
+    {
+      "role": "user",
+      "content": "I bet the next time you can do service blueprint. It probably takes you know more more deep research or interviews.",
+      "timestamp": "13:39:17"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm doing personas, I'm doing these, which does personas. Odyssea does journey maps And then I'm doing it.",
+      "timestamp": "13:39:26"
+    },
+    {
+      "role": "assistant",
+      "content": "Come on.",
+      "timestamp": "13:39:36"
+    },
+    {
+      "role": "assistant",
+      "content": "But this is kind of the fun part. Um The Adobe one actually has some pretty good images. I need to get it hooked up. So it's in reserve, ready to go.",
+      "timestamp": "13:39:42"
+    },
+    {
+      "role": "assistant",
+      "content": "But I always forget my password.",
+      "timestamp": "13:39:54"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, while that's cooking too. So the last thing is for, and then you can download, you can save and share And then you can load these into, this is the old screen right before I had multiple models.",
+      "timestamp": "13:40:06"
+    },
+    {
+      "role": "user",
+      "content": "Yeah.",
+      "timestamp": "13:40:08"
+    },
+    {
+      "role": "assistant",
+      "content": "We will do the green eggs and ham journey map. That one is empty.",
+      "timestamp": "13:40:20"
+    },
+    {
+      "role": "assistant",
+      "content": "And then we'll come back here and see this guy. Hope he's coming. He's coming.",
+      "timestamp": "13:40:29"
+    },
+    {
+      "role": "assistant",
+      "content": "The ice fisherman from Greenland.",
+      "timestamp": "13:40:36"
+    },
+    {
+      "role": "assistant",
+      "content": "So anyway, I'm going to try to get all these hooked up together so it creates nice journey maps. And the quality of the journey map might need to be improved.",
+      "timestamp": "13:40:42"
+    },
+    {
+      "role": "user",
+      "content": "Yeah.",
+      "timestamp": "13:40:43"
+    },
+    {
+      "role": "assistant",
+      "content": "As far as like bullets, how much",
+      "timestamp": "13:40:47"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, I'm sure it's at least it's a good start. Place to start you know like think about reading all that and then try and put it together it's It's very time consuming.",
+      "timestamp": "13:40:48"
+    },
+    {
+      "role": "assistant",
+      "content": "As a participant in my research initiative, you will have early access to the tool.",
+      "timestamp": "13:41:02"
+    },
+    {
+      "role": "user",
+      "content": "Oh, look at that. I love it. And\u2026",
+      "timestamp": "13:41:07"
+    },
+    {
+      "role": "assistant",
+      "content": "So there's your ice fisherman. Look at that. He's even got the little stove and he's got pictures of his fish. That's hilarious.",
+      "timestamp": "13:41:12"
+    },
+    {
+      "role": "user",
+      "content": "That's funny. Yeah.",
+      "timestamp": "13:41:21"
+    },
+    {
+      "role": "assistant",
+      "content": "And then here's the journey map for green eggs and ham Initial reaction, resistance avoidance.",
+      "timestamp": "13:41:22"
+    },
+    {
+      "role": "assistant",
+      "content": "It's a children's book. And I just basically read the children's book into the interview because I'm trying to conduct a bunch of interviews and I'm just like, I'm tired of talking about world washing machines. I've done it for seven days in a row.",
+      "timestamp": "13:41:28"
+    },
+    {
+      "role": "assistant",
+      "content": "So I tried to come up with some other things. And then, and it's not quite lined up, but there you go. There's your emotions. So pain points.",
+      "timestamp": "13:41:39"
+    },
+    {
+      "role": "assistant",
+      "content": "That's the basic journey map. And then you save them.",
+      "timestamp": "13:41:48"
+    },
+    {
+      "role": "assistant",
+      "content": "And he goes, and then the last thing is, if you had a homepage, what would you put on your homepage for a research assistant?",
+      "timestamp": "13:41:53"
+    },
+    {
+      "role": "user",
+      "content": "Mm-hmm.",
+      "timestamp": "13:42:02"
+    },
+    {
+      "role": "assistant",
+      "content": "It is pretty lame, but that's all I got right now.",
+      "timestamp": "13:42:04"
+    },
+    {
+      "role": "user",
+      "content": "That's really cool already, man. I would love to love to have access to this tool.",
+      "timestamp": "13:42:07"
+    },
+    {
+      "role": "user",
+      "content": "So I can use it on my projects. Do you think\u2026 the lawyer is going to invest money in this and then",
+      "timestamp": "13:42:11"
+    },
+    {
+      "role": "assistant",
+      "content": "They did. I've been doing this as my bench projects. I didn't have a project And I now have a XYZ number, which is a real utilization to the end of May.",
+      "timestamp": "13:42:20"
+    },
+    {
+      "role": "user",
+      "content": "Oh. That's nice. That's nice. That's nice. You're doing an amazing job, Steven.",
+      "timestamp": "13:42:30"
+    },
+    {
+      "role": "assistant",
+      "content": "To develop my tool.",
+      "timestamp": "13:42:32"
+    },
+    {
+      "role": "assistant",
+      "content": "And then I'm also doing it side by side because I can't tell just yet which way it's going to go.",
+      "timestamp": "13:42:38"
+    },
+    {
+      "role": "assistant",
+      "content": "This is the I don't know if I have a green eggs and ham interview here.",
+      "timestamp": "13:42:46"
+    },
+    {
+      "role": "assistant",
+      "content": "I have fly fishing, but I can put these two transcripts in.",
+      "timestamp": "13:42:53"
+    },
+    {
+      "role": "assistant",
+      "content": "And this is the This is basically open AI's tool called these are custom gpts And this is the other way.",
+      "timestamp": "13:42:59"
+    },
+    {
+      "role": "user",
+      "content": "Mm-hmm.",
+      "timestamp": "13:43:11"
+    },
+    {
+      "role": "assistant",
+      "content": "And this tool, because I was actually going to make my tool so you could edit it. And I'm not, you know, I had this vision where I'd be able to like add bullets with AI to the i started coding it",
+      "timestamp": "13:43:20"
+    },
+    {
+      "role": "assistant",
+      "content": "It was hard because I'm not that great. But this tool already has that ability.",
+      "timestamp": "13:43:32"
+    },
+    {
+      "role": "assistant",
+      "content": "So it just created, these are your JSON files. And those files you looked at are saved as JSON.",
+      "timestamp": "13:43:39"
+    },
+    {
+      "role": "assistant",
+      "content": "And then you can load a JSON and a SVG into, you can drag it to Figma. So that's the reason I'm doing this.",
+      "timestamp": "13:43:46"
+    },
+    {
+      "role": "assistant",
+      "content": "Is because I can get to a point where you use this tool and you create something that's kind of crude and then you can drag it to Figma and then take it to Fig Jam or whatever.",
+      "timestamp": "13:43:52"
+    },
+    {
+      "role": "assistant",
+      "content": "And that's where you're really good. Figma combined with SVG can go straight into Figma.",
+      "timestamp": "13:43:59"
+    },
+    {
+      "role": "user",
+      "content": "Wait, hold on, hold on. You can take JSON file into figma",
+      "timestamp": "13:44:00"
+    },
+    {
+      "role": "user",
+      "content": "Really? Wow, I didn't know that.",
+      "timestamp": "13:44:11"
+    },
+    {
+      "role": "assistant",
+      "content": "Yep. Yep. Yep.",
+      "timestamp": "13:44:12"
+    },
+    {
+      "role": "assistant",
+      "content": "Well, I didn't either.",
+      "timestamp": "13:44:18"
+    },
+    {
+      "role": "user",
+      "content": "And they would generate the design? The look.",
+      "timestamp": "13:44:22"
+    },
+    {
+      "role": "assistant",
+      "content": "And airlines.",
+      "timestamp": "13:44:25"
+    },
+    {
+      "role": "user",
+      "content": "Wow, this is pretty cool. I didn't know that.",
+      "timestamp": "13:44:31"
+    },
+    {
+      "role": "assistant",
+      "content": "Where some of my, oh, here's fly fishing by 10 in Jason. And where's my figma You got to get your Figma up.",
+      "timestamp": "13:44:36"
+    },
+    {
+      "role": "user",
+      "content": "Are you staffed on a different project? I thought Suzette was trying Like, can you step down like",
+      "timestamp": "13:44:45"
+    },
+    {
+      "role": "assistant",
+      "content": "I got kicked off that product. Because it turns out that I'm not a visual designer.",
+      "timestamp": "13:44:51"
+    },
+    {
+      "role": "assistant",
+      "content": "And it was totally, they told it initially it was going to be",
+      "timestamp": "13:44:58"
+    },
+    {
+      "role": "assistant",
+      "content": "It was not going to be just straight up",
+      "timestamp": "13:45:04"
+    },
+    {
+      "role": "user",
+      "content": "Thank you, X. It's like UI and like graphic design, something like that.",
+      "timestamp": "13:45:07"
+    },
+    {
+      "role": "assistant",
+      "content": "Here's the SVT, green eggs and ham. I don't have a good one. I need to get what Thomas filled in. They're crude right now but um These are kind of files I've generated. I don't know where's the good one?",
+      "timestamp": "13:45:11"
+    },
+    {
+      "role": "assistant",
+      "content": "Well, here's the one but these are all, that's a template I know I did one journey math. That's a template.",
+      "timestamp": "13:45:23"
+    },
+    {
+      "role": "assistant",
+      "content": "Persona that's a PowerPoint. Okay, here's one I actually created with the tool And\u2026 And X saved it. I had this other bill that does export. And so this is that green eggs and ham Come on.",
+      "timestamp": "13:45:31"
+    },
+    {
+      "role": "assistant",
+      "content": "And it didn't it cut it off a little bit, but that's using my tool and then hitting export to figma And then you drag it right on and you get the initial reaction resistance in the voice. So it actually dynamically generates that stages and then lines up.",
+      "timestamp": "13:45:50"
+    },
+    {
+      "role": "assistant",
+      "content": "Based on the interview, it'll make some stages up. And then line up all your stuff. This stuff usually stays the same, you know, touch points, frustration, whatever. You got to define that ahead of time. And then I could get more content. Like this only put the first sentence and then",
+      "timestamp": "13:46:05"
+    },
+    {
+      "role": "assistant",
+      "content": "And, you know, it's stripped out the rest for that particular Try.",
+      "timestamp": "13:46:20"
+    },
+    {
+      "role": "user",
+      "content": "You know, that's pretty cool, man. Wow, you're doing some amazing work.",
+      "timestamp": "13:46:23"
+    },
+    {
+      "role": "assistant",
+      "content": "Well, you're helping me with this research. It should have been obvious to me that if I'm making a tool for researchers, I should talk to real researchers.",
+      "timestamp": "13:46:30"
+    },
+    {
+      "role": "user",
+      "content": "Dude, I'm\u2026",
+      "timestamp": "13:46:33"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, yeah, yeah, for sure. This can save a lot of my time and also, you know, those sleepless night can be a little bit easier for me.",
+      "timestamp": "13:46:39"
+    },
+    {
+      "role": "assistant",
+      "content": "And I realized straight away",
+      "timestamp": "13:46:42"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah, the other trick is you can go back in here.",
+      "timestamp": "13:46:51"
+    },
+    {
+      "role": "assistant",
+      "content": "So you can basically talk to them. So you have all these transcripts you took before and you can ask specific questions So you don't have to go through and look at the whole video anymore.",
+      "timestamp": "13:47:12"
+    },
+    {
+      "role": "assistant",
+      "content": "You can just load it up and then you can actually just ask it and find verbatims and it's pretty amazing.",
+      "timestamp": "13:47:21"
+    },
+    {
+      "role": "user",
+      "content": "Wow. Like the AI reads the video For you.",
+      "timestamp": "13:47:29"
+    },
+    {
+      "role": "assistant",
+      "content": "It reads the transcript that I took. I'm using text transcripts. And then it'll parse through there and it'll go back through. I'll put 11 interviews like that's how I started on JP's.",
+      "timestamp": "13:47:32"
+    },
+    {
+      "role": "assistant",
+      "content": "Morgan Chase. I had like 11 financial advisor, just really crude transcripts And then I do like meetings. I do this like right after the interview seconds later, I do summarize this interview with this FA and give me key points and send that out because usually",
+      "timestamp": "13:47:41"
+    },
+    {
+      "role": "assistant",
+      "content": "Right after an interview, it takes a while to get the results.",
+      "timestamp": "13:47:57"
+    },
+    {
+      "role": "assistant",
+      "content": "But I was getting it within two or three minutes and sending it to the team. And there were decent results.",
+      "timestamp": "13:48:00"
+    },
+    {
+      "role": "assistant",
+      "content": "They're top line. They weren't like you weren't digging. You weren't getting the nuance But, um.",
+      "timestamp": "13:48:05"
+    },
+    {
+      "role": "user",
+      "content": "Cheers.",
+      "timestamp": "13:48:06"
+    },
+    {
+      "role": "assistant",
+      "content": "I mean, it's so much faster. And then I could go spend time with 11 interviews and dig for nuance and then find verbatims.",
+      "timestamp": "13:48:12"
+    },
+    {
+      "role": "assistant",
+      "content": "To support the nuance. So much. Well, you're on it now. You're on the team.",
+      "timestamp": "13:48:19"
+    },
+    {
+      "role": "user",
+      "content": "I got to learn how to do this.",
+      "timestamp": "13:48:22"
+    },
+    {
+      "role": "assistant",
+      "content": "Welcome to Dari.",
+      "timestamp": "13:48:27"
+    },
+    {
+      "role": "user",
+      "content": "Yeah. Thank you. Thank you. I'm actually I may have to reach out to you. I have something I'm trying to do a focus group on getting some user reaction on the thing I did. I'm currently on BNY, Bank of New York.",
+      "timestamp": "13:48:28"
+    },
+    {
+      "role": "assistant",
+      "content": "Oh, cool.",
+      "timestamp": "13:48:44"
+    },
+    {
+      "role": "user",
+      "content": "With some loan application stuff. Loan related application but uh You know, kids.",
+      "timestamp": "13:48:45"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah. Well, anything we could use to kind of help kind of make like start with the transcript and try to this tool is not ready to actually conduct the interviews And I don't know if you ever would, but sometimes there's a need like you could reach more stakeholders if you could just send them a link.",
+      "timestamp": "13:48:50"
+    },
+    {
+      "role": "assistant",
+      "content": "And then it would ask them questions. I'll give you a taste of what that is like.",
+      "timestamp": "13:49:07"
+    },
+    {
+      "role": "assistant",
+      "content": "But yeah, you know, so this is what it would sound like.",
+      "timestamp": "13:49:15"
+    },
+    {
+      "role": "assistant",
+      "content": "Say start to begin the interview. Start, please begin the interview.",
+      "timestamp": "13:49:20"
+    },
+    {
+      "role": "assistant",
+      "content": "Welcome to our user study. This research aims to test the design, not the user. We appreciate your participation.",
+      "timestamp": "13:49:30"
+    },
+    {
+      "role": "assistant",
+      "content": "For transparency, this conversation will be recorded for research purposes. Do we have your permission to proceed? Yes, you can proceed.",
+      "timestamp": "13:49:38"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, so you get the idea. So the other two, potentially I could put two screens, like an a and a b And the audio would say, can you please look at these two screens and tell me which one's better A or B? Then I can record the\u2026",
+      "timestamp": "13:49:51"
+    },
+    {
+      "role": "user",
+      "content": "Yeah, yeah.",
+      "timestamp": "13:49:53"
+    },
+    {
+      "role": "assistant",
+      "content": "The users like mouse moments in their audio and then save that as in this vector store, because all these interviews are basically going to a vector store It creates a number that represents what's in there. And that's where the magic of AI happens. And then once you have all these vectors, you can find dot products, which is how much they're alike. And you can find cross products, how much they're different.",
+      "timestamp": "13:50:05"
+    },
+    {
+      "role": "assistant",
+      "content": "And that's how it looks up like the verbatims and does the semantic search.",
+      "timestamp": "13:50:26"
+    },
+    {
+      "role": "assistant",
+      "content": "So you're basically collecting data, you vectorize it, you throw it into a big collection into a dimensional vector space, and then you're running all these math algorithms to try to see what's the same and what's different.",
+      "timestamp": "13:50:31"
+    },
+    {
+      "role": "user",
+      "content": "Okay. Wow, that's pretty cool.",
+      "timestamp": "13:50:43"
+    },
+    {
+      "role": "assistant",
+      "content": "So you can do a lot of stuff. You don't have to just do like, you know, I can do images i can do You know, whatever I can record, it'll vectorize.",
+      "timestamp": "13:50:46"
+    },
+    {
+      "role": "assistant",
+      "content": "And then this is vectorized. You can search it in different ways.",
+      "timestamp": "13:50:54"
+    },
+    {
+      "role": "user",
+      "content": "Mm-hmm.",
+      "timestamp": "13:50:55"
+    },
+    {
+      "role": "user",
+      "content": "Yeah.",
+      "timestamp": "13:51:00"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, well, are there any questions that you expected me to ask that I've forgotten to ask so far?",
+      "timestamp": "13:51:01"
+    },
+    {
+      "role": "user",
+      "content": "No, no, I think you covered a lot of good points. I couldn't think of any.",
+      "timestamp": "13:51:08"
+    },
+    {
+      "role": "assistant",
+      "content": "Okay, I'm going to be doing this with other researchers and some of them have PhDs. Makes me nervous.",
+      "timestamp": "13:51:14"
+    },
+    {
+      "role": "user",
+      "content": "And the mobile.",
+      "timestamp": "13:51:14"
+    },
+    {
+      "role": "user",
+      "content": "You should do it. You should do it. This is a very good starting point, I think. I feel like It's going to be very useful.",
+      "timestamp": "13:51:19"
+    },
+    {
+      "role": "assistant",
+      "content": "Yeah, I'm saying.",
+      "timestamp": "13:51:22"
+    },
+    {
+      "role": "assistant",
+      "content": "You want to see",
+      "timestamp": "13:51:30"
+    }
+  ],
+  "transcript": [
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Hello, just wanting to test the transcript system.",
+      "timestamp": "13:00:25"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Thank you.",
+      "timestamp": "13:00:31"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Oh.",
+      "timestamp": "13:02:05"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "We can do cameras off or cameras on. I'm fine either way.",
+      "timestamp": "13:02:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Hey, Steve. I'm good. I'm good. Sorry, I had to use my phone because I have a\u2026 call in the next hour and then my computer is like dying. I'm in the office and I forgot to bring my charger with me.",
+      "timestamp": "13:02:21"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Hey, how are you?",
+      "timestamp": "13:02:22"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, so we can do\u2026 We can do video on or video off. Either way is fine.",
+      "timestamp": "13:02:36"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Sorry to give you my fault. No worries. No worries. I won't see your face. I haven't seen your face for years.",
+      "timestamp": "13:02:37"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I try to record this just to see. I already learned i have to um I have to turn on the auto admit because I forgot to do that.",
+      "timestamp": "13:02:46"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah.",
+      "timestamp": "13:02:48"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, we'll just try to get busy so I get as much as I can. Can you please tell me your name?",
+      "timestamp": "13:02:56"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "No.",
+      "timestamp": "13:02:57"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Sure. My name is T.",
+      "timestamp": "13:03:01"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "In your current role and how long have you been in your current role?",
+      "timestamp": "13:03:03"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I'm a senior UX UI designer. Been here a little bit over three years.",
+      "timestamp": "13:03:07"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, can you think of any past jobs or experiences that helped you be successful in your current role?",
+      "timestamp": "13:03:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, my previous job was doing a similar type of work in an agency that specifically designed meeting softwares.",
+      "timestamp": "13:03:21"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, it had uh great support in my current work.",
+      "timestamp": "13:03:33"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, so with respect to your current role as an interaction designer UX researcher.",
+      "timestamp": "13:03:36"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "What's your primary goal?",
+      "timestamp": "13:03:42"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "My primary goal\u2026 was to be able to identify what are the problems I need to solve for the users, for the actual people.",
+      "timestamp": "13:03:47"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "So\u2026 depends on the business problem, right? Like really identifying the business problem and what I can do to help the users.",
+      "timestamp": "13:03:59"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, so when you're trying to pursue your primary goal, what are some key frustrations you've experienced recently?",
+      "timestamp": "13:04:09"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "There is\u2026 when projects are planned.",
+      "timestamp": "13:04:21"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Research was\u2026 often ignored or eliminated from the project timeline.",
+      "timestamp": "13:04:26"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay. I've seen that one.",
+      "timestamp": "13:04:35"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah.",
+      "timestamp": "13:04:35"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "What would be your vision for how we could improve research, user research at Deloitte in the next maybe year and maybe three years?",
+      "timestamp": "13:04:38"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Um\u2026 really trying to, first of all, really try and help educate the sales team.",
+      "timestamp": "13:04:52"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "That educate our clients that we Research is a crucial part of the design to really trying to solve their problems.",
+      "timestamp": "13:05:01"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And\u2026 advocate for user research.",
+      "timestamp": "13:05:12"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Firm-wise, firm wide, right? Second is to educate or give enough resource and learning opportunities for designers to designers to be more sufficient.",
+      "timestamp": "13:05:16"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay.",
+      "timestamp": "13:05:19"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "In research.",
+      "timestamp": "13:05:33"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, with that in mind, can you tell me a story of a project that looked like it was a golden opportunity for research when you started?",
+      "timestamp": "13:05:35"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "But no matter how hard you tried, it became frustrating and ended with a sad story.",
+      "timestamp": "13:05:43"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "There were\u2026 sometimes there were projects that was so kind of over promised to the client and not being\u2026 give me enough time to do it, right? Like it was sold for like a six seven week project, but it's designing the entire",
+      "timestamp": "13:05:54"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "A new experience, right? Neither research or usability testing was put in the plan for when this project was sold Right. So that was That was the kind of terrible experience. And there were a lot of times the budget was",
+      "timestamp": "13:06:16"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yep.",
+      "timestamp": "13:06:29"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Very limited. You either have the design or you don't have the design. So usability testing and research was often taken off the book.",
+      "timestamp": "13:06:35"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, can you think of a story where it looked like it was going to be a challenge, but you were surprised at how well you were able to kind of get some research activities completed and they had a positive effect?",
+      "timestamp": "13:06:45"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, every time. I have to try so hard to slip.",
+      "timestamp": "13:06:56"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Research into the design process even i did for KP, right? I don't know if I told you the story is that I'm doing this whole entire HR site migration, right? They're migrating one site to another And their navigation was all over the place. And I said, I have to do some level of car sorting to understand.",
+      "timestamp": "13:07:02"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "If our employees understand these terminologies that we're using, if they understand the grouping, even I had to do like fidget around with car sorting you know like car sorting normally we do it with quantum research right like it's it's more like a mass number like",
+      "timestamp": "13:07:24"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "100 or 200 start kind of thing um but that time I have to do a very specific qualitative car sorting.",
+      "timestamp": "13:07:43"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "With guided experience and sorry, not guided more moderated research and just teasing out the questions or users, actual employees mental model if they understood what group is supposed to be grouped together or what terminology makes sense to them right so",
+      "timestamp": "13:07:54"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah. Did they have recruiting the right number of participants?",
+      "timestamp": "13:08:16"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I only got eight in two weeks. I can't recruit more. I want to do more, but it was very\u2026 challenging and it was towards the end of the year. So no one is, you know, we're actually speaking to KP employees. So a lot of people are actually not in office.",
+      "timestamp": "13:08:21"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah.",
+      "timestamp": "13:08:25"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah, yeah.",
+      "timestamp": "13:08:33"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And they're not into you know doing this.",
+      "timestamp": "13:08:38"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, in that case, did you try to see what results you'd get with doing a card sort using AI tools?",
+      "timestamp": "13:08:41"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I did not at the time. I wish I\u2026 I would have if I have more knowledge, I would.",
+      "timestamp": "13:08:48"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Totally use AI tools, you know, especially in that case",
+      "timestamp": "13:08:53"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, so I want you to kind of think of your best, you know, if you had the budget, it's in the plan.",
+      "timestamp": "13:08:54"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "We're going to plan a discovery cycle. And so I want you to kind of frame out, you know, six weeks discovery cycle, maybe eight weeks How would you start? What are the activities like what would you need if you had a tool",
+      "timestamp": "13:09:00"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "That would help you kind of plan your discovery activities. And then throughout the life cycle, be able to conduct your recovery your your your activities. And then at the very end, analyze, you know, manage your your whatever kind of records that you keep and then generate reports and then share them with the team. So we'll start on the day one. How would you do your first week or your phase zero?",
+      "timestamp": "13:09:14"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "What activities would you try to organize? And what's your process as a user researcher?",
+      "timestamp": "13:09:36"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Well, I would try to understand the problem, whether with the whole design team or with the stakeholders to understand what exactly the problem they're trying to solve and based on that, choose the right research methodology to identify what we",
+      "timestamp": "13:09:42"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "You know, like the problem we're trying to solve, who we're trying to solve it for uh And what type of research could be useful to get the answer we want to.",
+      "timestamp": "13:10:03"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Right. That would be the first phase. And second would be, you know, sort of planning for the research methodology, right? Like how do we what questions we're trying to solve, what are we going to do write a plan for that, right? That'll be the second phase. Third would be actual conducting whatever research we need to conduct.",
+      "timestamp": "13:10:13"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay.",
+      "timestamp": "13:10:15"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Right. And collect data, right? Collect all the data points And the final phase would be the final phase analyze the data, synthesize the data and come up with a report.",
+      "timestamp": "13:10:38"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "To see our results if it answers the question we were asking for.",
+      "timestamp": "13:10:54"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, there are any pitfalls in your process where things tend to like fall apart or you need more support?",
+      "timestamp": "13:11:00"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I always do. I always do in every stage, right? To an early on stage really early on stage ask the right question.",
+      "timestamp": "13:11:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "You know, plan for the right things. If we understood our problem first, right? And then that stage we need reassurance from the stakeholder to see if we're asking the right question.",
+      "timestamp": "13:11:26"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And then when we were planning for the research.",
+      "timestamp": "13:11:44"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Usually I tend to have a second opinion on if I'm on the right track if i'm you know, if I'm doing this right, if everything is right putting together. I always do you know",
+      "timestamp": "13:11:49"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "What do you call that step?",
+      "timestamp": "13:12:01"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Reassurance. I don't know what to say you know like reassurance like i think that's really important because sometimes you you get into a you get into a zone, you narrow yourself into a thought and then you're like, okay, these are the things",
+      "timestamp": "13:12:10"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And you couldn't really jump out of your own kind of mental model and you need some other opinions to kind of help you to help you to do that even with design, I feel like, you know, we're getting so deep into one like",
+      "timestamp": "13:12:24"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Direction and then we couldn't really get ourselves outside of that. And then we got zoned into it.",
+      "timestamp": "13:12:40"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah.",
+      "timestamp": "13:12:45"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "So that\u2026 that I would really love to get a second opinion on.",
+      "timestamp": "13:12:47"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And then when we conduct the research, normally we would plan enough manpower to do it.",
+      "timestamp": "13:12:54"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I haven't got\u2026 in the place that we realize we don't have enough like researchers for this project if you know during that stage normally if we plan for how to have two researchers two is enough, usually.",
+      "timestamp": "13:13:00"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And the activities around the resources you have when you start.",
+      "timestamp": "13:13:16"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, usually that's when we get to that stage, everything should be fine. Yeah.",
+      "timestamp": "13:13:19"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And then when we get the results, it's also. Easier. I mean, I think in the last stage Some of the figma AI tool is really helpful when it has the initial kind of sorting all your notes for you you know and then that kind of saves some",
+      "timestamp": "13:13:24"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So\u2026",
+      "timestamp": "13:13:25"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Reading time and reorganization time. Which is good.",
+      "timestamp": "13:13:42"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And those are tools inside of Figma that summarize your notes.",
+      "timestamp": "13:13:46"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, sorry, fake jam. Sorry. Yeah, I think it does. I think that's true.",
+      "timestamp": "13:13:48"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Fig Jam has some tools for summarizing. I haven't played it with them.",
+      "timestamp": "13:13:50"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, you should play with it. Last time I worked with a researcher, she showed me how to do it, which is Pretty cool, you know, like that, all the sticky notes and then like they group it.",
+      "timestamp": "13:13:56"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Oh, cool. So as a researcher As a user researcher, who do you consider to be your primary customer and then your next customer and then your stakeholder?",
+      "timestamp": "13:14:06"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "For you, like first step.",
+      "timestamp": "13:14:06"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "My primary customer. You're talking about Deloitte or you're talking about\u2026",
+      "timestamp": "13:14:21"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Just as a researcher, we're just talking about you as a researcher when you think about stuff. Everyone has a customer that they try to Life works.",
+      "timestamp": "13:14:25"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "You know, my number one primary will probably be",
+      "timestamp": "13:14:36"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Whoever hires me, right? Like hire me on the project, right?",
+      "timestamp": "13:14:43"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Secondary would be decline. The business stakeholders. I think I consider them like also important.",
+      "timestamp": "13:14:51"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Actually, I'm sorry. I'm sorry. I would say secondary would be the actual user. The secondary would be the actual user.",
+      "timestamp": "13:14:59"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "But if I work for a company. Like a product company, that order would probably be reversed, right?",
+      "timestamp": "13:15:08"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Or how do I say it? Yeah, probably the same thing. And the last would be the business stakeholder, whether PM or PO, right? Or, you know.",
+      "timestamp": "13:15:16"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Business stakeholders. You know what I mean?",
+      "timestamp": "13:15:26"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now\u2026 What do you consider like the victory event when you're working with your primary customer?",
+      "timestamp": "13:15:28"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "They like my work. And they will hire me again.",
+      "timestamp": "13:15:37"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "That is successful outcome that way.",
+      "timestamp": "13:15:44"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "You know, I don't know, Stephen. I'm sorry. I think it's our work environment, I guess.",
+      "timestamp": "13:15:47"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I'm just being really honest.",
+      "timestamp": "13:15:54"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yep, yep. And that's it. I mean, I'm doing this interview. It's hard for me not to kind of break in because I'm in the same business. I'm trying to So I have another section here. We don't have a specific tool yet. So I'm going to ask",
+      "timestamp": "13:15:58"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah.",
+      "timestamp": "13:16:03"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Are there any special tools that you're able to use inside of Delete? What kind of tools do you use to set up to do your work?",
+      "timestamp": "13:16:10"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Let's just start with like a stakeholder interview. How do you decide and how do you organize and how do you activate a stakeholder interview.",
+      "timestamp": "13:16:19"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Uh\u2026 I think I had a template of some sort, like I would organize it like just in Words or PowerPoint. Orphic gem right like sometimes doing the presentations in Figma.",
+      "timestamp": "13:16:32"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And organize all my thought usually in phase jam. Right.",
+      "timestamp": "13:16:48"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, now after the interviews, that's something you might be able to save kind of just a sample template for with me for that.",
+      "timestamp": "13:16:51"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, something like that.",
+      "timestamp": "13:16:58"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "The next one is let's consider doing a user interview. What types of user interviews do you conduct?",
+      "timestamp": "13:16:59"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I've done customer interview. And I've done the car sorting was one type of interview I did.",
+      "timestamp": "13:17:10"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "But usually it's usually you know qualitative interview with the actual user.",
+      "timestamp": "13:17:18"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "When you're doing a customer interview, do you have different types of interviews or do you have this one interview that you use with all your customers?",
+      "timestamp": "13:17:26"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "When I plan for it, I have one set of questions for the For the customers, for all the customers.",
+      "timestamp": "13:17:37"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "But there are types I will slip in one or two questions if you know follow-up questions one day um when they speak something interesting you know what i mean Yeah.",
+      "timestamp": "13:17:44"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, when you're doing customer interviews today, how do you record or how do you kind of record the results or what tools you're using to kind of keep track of the transcripts.",
+      "timestamp": "13:17:56"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, that's a good one. That's a good one. A lot of cases I can't record.",
+      "timestamp": "13:18:08"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I can only take notes, so I couldn't really record anything.",
+      "timestamp": "13:18:16"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, if you were taking notes, would you take them off the computer or would you take them in a book?",
+      "timestamp": "13:18:20"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Computer yeah i'll use FICJAM. I'll use FICJAM right away. And sometimes if it's a Zoom call.",
+      "timestamp": "13:18:24"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I would ask for their\u2026 like consents if they can if i can report Can I record, you know, like\u2026 And that really depends on the company, the clients, you know.",
+      "timestamp": "13:18:30"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I should have asked you consent. Yeah, yeah, yeah.",
+      "timestamp": "13:18:34"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Rule about this. You know, some companies now, they don't even allow recording meetings Which is very interesting.",
+      "timestamp": "13:18:46"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay. So if you're doing a customer interview about a new product, would that be different than if you were doing a customer interview about some screens like on Kaiser that are already in production?",
+      "timestamp": "13:18:52"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "It would be, did you ask, would it be different Yeah, it will.",
+      "timestamp": "13:19:08"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah. Different questions. Now, in your mind, do you just like switch or do you have like a file structure that has two different scripts or do you just kind of That's just like a reflex.",
+      "timestamp": "13:19:11"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "It would be a different script different yeah Absolutely.",
+      "timestamp": "13:19:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I try to have like one template or one script for it, but every time it's it's usually different like for some reason.",
+      "timestamp": "13:19:27"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, is it different when you're kind of asking your follow-ups Or is it different?",
+      "timestamp": "13:19:36"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And the artifacts you share with them or how is it different?",
+      "timestamp": "13:19:42"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Uh\u2026",
+      "timestamp": "13:19:47"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "It's the task I'm asking them to do and also the follow-up questions.",
+      "timestamp": "13:19:51"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Based on the product itself.",
+      "timestamp": "13:19:57"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, do you ever use, what do you do with your reports? You got all your transcripts, you've done seven people and you have the transcripts.",
+      "timestamp": "13:19:59"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And we'll do two different kinds. One of them is just a for a new product design and the other is evaluating an existing set of application or wireframes.",
+      "timestamp": "13:20:07"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And you have eight, seven to eight interviews each. How do you process those?",
+      "timestamp": "13:20:16"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Results and what are your what are your artifacts? What are you trying to create when you're done",
+      "timestamp": "13:20:22"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, that's a good question. So I would spend\u2026 X amount of time to You know, if there's a video, I would be watched on the videos. If there is no video, I will\u2026 read through all my notes and try to",
+      "timestamp": "13:20:30"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Remember every detail that they've talked about, you know, some of the notes are just like quick notes typing out, you know, you know what I mean, right? Like sometimes you have to kind of go through every single notes and kind of",
+      "timestamp": "13:20:47"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Tie it up their language a little more just just to kind of Sometimes when you type really quickly when they're speaking you you lose words or you type wrong things you have to go through all of that And\u2026 spend time synthesize all the",
+      "timestamp": "13:21:03"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "All the talking point, all the notes like using affinity mapping, basically group them into something that sort of makes sense to me.",
+      "timestamp": "13:21:19"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And then once those are in groups you kind of having\u2026 sort of a common problem they stated.",
+      "timestamp": "13:21:30"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And you you kind of tell, oh, how many people have said they don't understand this.",
+      "timestamp": "13:21:42"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Experience or how many people said they don't really get the words Blah, blah, blah, right? You're kind of doing that and then\u2026 making recommendations i mean then you get a few different points of the problems you find from the testing or user research, right?",
+      "timestamp": "13:21:48"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And then\u2026 kind of speak about your summarize the total things that should be changed or recommendations that you want to make if it's a new product And if it's a use-based testing or some sort of screen you give them.",
+      "timestamp": "13:22:08"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Then you tell them, you show at the end like what should be changed based on a couple of big points that you got from the affinity mapping, right? That's sort of what I'll do.",
+      "timestamp": "13:22:27"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Are there any certain things that you like peek up and you hear that you kind of know it's in the back of your mind, you got this monitor when it hears it Is there anything special that you're listening for?",
+      "timestamp": "13:22:37"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "During an interview that would change your behavior from just regular note-taking?",
+      "timestamp": "13:22:49"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "It does. If I see something happen repetitively. Then it just rings the bell you know like every if i hear it one more time you know like if I, if, if I heard it three times already, people saying the same thing, then it rings the bell. Okay.",
+      "timestamp": "13:22:54"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Take a special note.",
+      "timestamp": "13:23:02"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Someone said it one more time, you know, like, okay, that means that's a common problem.",
+      "timestamp": "13:23:09"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "You know yeah I don't know. Is that how you see it too?",
+      "timestamp": "13:23:15"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "That's interesting. Yeah. Mine's verbatims.",
+      "timestamp": "13:23:15"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I stop what I'm doing. If I get a good verbatim, it just stops me in my tracks and I write it quotes.",
+      "timestamp": "13:23:23"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Because those are like golden down the road.",
+      "timestamp": "13:23:28"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, I mean, I mean, some of them, like the quotes are you know.",
+      "timestamp": "13:23:32"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "But I do know what you mean. Yeah. In your first interview, you're pretty open-minded.",
+      "timestamp": "13:23:37"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I don't know. When you hear the right quotes, you just know it. You know, like when you hear the right",
+      "timestamp": "13:23:38"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "By the third one. There's a set of things that you're listening for.",
+      "timestamp": "13:23:45"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, exactly. Exactly.",
+      "timestamp": "13:23:51"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And then by the seventh, you're just confirming that you're just almost tuned down.",
+      "timestamp": "13:23:53"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Until the one thing surprises you.",
+      "timestamp": "13:23:57"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, yeah, 100%. That's how I feel. Like if I heard like the same thing three times, that means the next time I hear it, it rings the bell right away.",
+      "timestamp": "13:24:00"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay. If you had a special wand, magic wand, is there any thing that you would change about the process that we have that we're forced to work in.",
+      "timestamp": "13:24:10"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Uh\u2026",
+      "timestamp": "13:24:23"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Um\u2026",
+      "timestamp": "13:24:33"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I would say\u2026 during the process of synthesizing data.",
+      "timestamp": "13:24:37"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "If I have a magic wand i don't need to",
+      "timestamp": "13:24:42"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Go through everything again and again",
+      "timestamp": "13:24:47"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Here's your second question. If I go to your customer, which in your case was like a project manager, someone that might be able to reuse it reliably on projects.",
+      "timestamp": "13:24:52"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And I said, can you please describe T in one word to me? What one word would you want him to say?",
+      "timestamp": "13:25:01"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "If\u2026 one word I have to say.",
+      "timestamp": "13:25:10"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I'm going to go ask this guy, tell me about tea.",
+      "timestamp": "13:25:14"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "What one word do you want him to tell me?",
+      "timestamp": "13:25:17"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Like tea is amazing. He can't get everything done and get through.",
+      "timestamp": "13:25:22"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay. Amazing. It's my word.",
+      "timestamp": "13:25:24"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Isn't anything during a research project that keeps you up at night?",
+      "timestamp": "13:25:29"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Amazing.",
+      "timestamp": "13:25:29"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh. Ever researched keeping me up at night.",
+      "timestamp": "13:25:34"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Because there is a lot of uncertainty.",
+      "timestamp": "13:25:39"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Even like I did a survey even like crafting every single survey question and choices was was a nightmare. And you just have to like what would people think if I say it this way what would people think if I say it that way",
+      "timestamp": "13:25:44"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah.",
+      "timestamp": "13:25:53"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "What would this Should I use Likert chart choices or should I use multiple choices? What does it do?",
+      "timestamp": "13:26:05"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "For the answer I want to get, you know, like, am I going to get the right answer? Is this answer going to be helpful for me in the next step when I design?",
+      "timestamp": "13:26:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "The stuff I'm designing you know like those are all the questions I keep asking myself And\u2026 I don't know about your experience, but I did a survey design and that survey took me you know like i couldn't sleep at night for every question that i'm trying to craft. I'm not a very good writer.",
+      "timestamp": "13:26:23"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "So, you know, that is a nightmare to me, I guess.",
+      "timestamp": "13:26:47"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "It keeps me on at night every day during that project.",
+      "timestamp": "13:26:52"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yep. I will tell you a story about that afterwards. Okay, so now I'm going to try to share some screens and we'll do a little bit of evaluative discussion.",
+      "timestamp": "13:26:53"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Thank you.",
+      "timestamp": "13:27:00"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And let's see, we won. This one.",
+      "timestamp": "13:27:04"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And we want",
+      "timestamp": "13:27:10"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, you're able to see this screen?",
+      "timestamp": "13:27:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Are you sharing? No.",
+      "timestamp": "13:27:19"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Oh, my share screen, three. Share.",
+      "timestamp": "13:27:20"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Okay.",
+      "timestamp": "13:27:26"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Then over to here. Okay, so\u2026 The first screen is if this is a new interview screen, what fields would you want to include.",
+      "timestamp": "13:27:26"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So we're going to configure a new interview. And this interview is going to be The AI is going to ask the questions.",
+      "timestamp": "13:27:37"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "To the user and record the answers. You're just going to kind of configure it What kind of information would you want pre-interview type questions?",
+      "timestamp": "13:27:46"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Are you asking me what do I want? Where do you want me to react to this?",
+      "timestamp": "13:27:58"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "First of all, let's say Would you ever consider a tool that that helped you, a form that helped you kind of create interview questions And, uh.",
+      "timestamp": "13:27:59"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I do. I do. First of all, I do.",
+      "timestamp": "13:28:10"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And how would you build that from scratch? I should have let you do it that way. I'll just be honest. When I did the same thing, this is how I see interviews.",
+      "timestamp": "13:28:17"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I see. You know, researcher name stuff I asked the same questions.",
+      "timestamp": "13:28:25"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "But if I'm running Persona, which is kind of what we're doing today slash journey map, there's a slightly different emphasis. I do ask more of the open-ended background.",
+      "timestamp": "13:28:32"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Goes, if I'm doing a journey map, I might spend more time on the process. And if I'm doing like a evaluating screens of an existing application, you know, I want to talk about screen one, what did you expect? Did you get what you expect? And I don't think everybody",
+      "timestamp": "13:28:40"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Thinks that way. How do you think about interview types?",
+      "timestamp": "13:28:56"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Interview types uh",
+      "timestamp": "13:29:00"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Zeroed into like user interviews, customer interviews. I'm not doing stakeholders right now.",
+      "timestamp": "13:29:02"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, I get it. I get it.",
+      "timestamp": "13:29:07"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Persona application journey. I think these three I never used interview type. I never thought about this.",
+      "timestamp": "13:29:22"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I really\u2026 My process was to ask questions.",
+      "timestamp": "13:29:30"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "That I want to answer for. Like\u2026",
+      "timestamp": "13:29:36"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So would you have a button that would upload your interview script?",
+      "timestamp": "13:29:43"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Like, okay.",
+      "timestamp": "13:29:48"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I would. I would have a button to upload my interview script.",
+      "timestamp": "13:29:48"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "But I would ask the questions I would prompt How do I say it? I would describe the problem And I would\u2026 want to ask for the questions I want to answer for.",
+      "timestamp": "13:29:52"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay.",
+      "timestamp": "13:30:03"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I never thought about you know persona interview, journey map interview or application interview in this sort of",
+      "timestamp": "13:30:11"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "You know, that surprises me because that's what started this whole research project. So I was sharing this with amaya.",
+      "timestamp": "13:30:18"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And she goes, Stephen, I don't think of interviews that way. And I was like.",
+      "timestamp": "13:30:24"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "This is the way I always have looked at interviews. I use the exact same script because I use the same script today that we used when I interviewed you for hiring you.",
+      "timestamp": "13:30:28"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, really?",
+      "timestamp": "13:30:36"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I don't know if yes. There's only one script, but I kind of listen for different things and I kind of emphasize or I pause and go deeper into different things depending on those three types.",
+      "timestamp": "13:30:37"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Well, maybe you did the right thing. You know, you hired the right person, my friend.",
+      "timestamp": "13:30:49"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I did. I did. Best thing I've ever done at Deloitte.",
+      "timestamp": "13:30:52"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "You, Amaya, that's my legacy is to the company.",
+      "timestamp": "13:30:56"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Thank you. Hopefully I'm doing. Good for the company.",
+      "timestamp": "13:31:02"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yes, we are making me proud. So you would start in this configuration by trying to describe the problem.",
+      "timestamp": "13:31:06"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Thank you.",
+      "timestamp": "13:31:09"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah. Like I, yeah, that's what I would do Because if I don't know persona interview, journey map interview or application interview, like the difference between all three.",
+      "timestamp": "13:31:14"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "In May.",
+      "timestamp": "13:31:15"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Reason.",
+      "timestamp": "13:31:21"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Then I wouldn't know what to do with it. Like I said, let's say I'm doing interview customer interview about e-commerce experience a shopping flow experience or shopping in general.",
+      "timestamp": "13:31:28"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay.",
+      "timestamp": "13:31:32"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "What would that fit in? Would that be in persona? Would that be journey map? It could be journey map.",
+      "timestamp": "13:31:43"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "But could also be persona because they're a different type of customers.",
+      "timestamp": "13:31:49"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "That I'm interviewing. I did a lot of e-commerce project and then Like it's very hard.",
+      "timestamp": "13:31:55"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay.",
+      "timestamp": "13:31:57"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "For me to imagine like what would that fall into you know what i mean",
+      "timestamp": "13:32:04"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah. Now, what kind of\u2026 like demographic information. Do you actually have a section where you kind of track that or you just block them all together?",
+      "timestamp": "13:32:09"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah. No, I would have a section track that. I will want to screen.",
+      "timestamp": "13:32:17"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, what about technology uses?",
+      "timestamp": "13:32:23"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Technology uses\u2026 Yeah, I would have a section for that too like how do they\u2026",
+      "timestamp": "13:32:28"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah, these are kind of, are there any special things in your mind? Do you look for somebody when you're in an interview, do you categorize them as in any way with their how well they can manage a screen, especially when you're showing them a screen.",
+      "timestamp": "13:32:33"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Like, do you watch their behaviors and then categorize them as like super experienced or novice",
+      "timestamp": "13:32:45"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah. Yeah. Yeah. I would always capture their experience like i would watch everything they click very carefully.",
+      "timestamp": "13:32:49"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And versus what they speak. And sometimes they speak the way they speak and the way they act.",
+      "timestamp": "13:32:56"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Are very different. You know what I mean, right?",
+      "timestamp": "13:33:03"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Now, any other thoughts or recommendations for an interview configuration? Like this is like the pre-interview screen.",
+      "timestamp": "13:33:07"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Pretty neat screen.",
+      "timestamp": "13:33:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I don't know if the operating system, I mean, it could be Android and iOS are vastly different yeah yeah those are I think that would be good.",
+      "timestamp": "13:33:24"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "But if you maybe afterwards you can share So.",
+      "timestamp": "13:33:30"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, you can share this with me and I can think about it a little more.",
+      "timestamp": "13:33:33"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So what kind of reports do you generate? Do you ever generate personas and journey maps as part of your deliverables?",
+      "timestamp": "13:33:36"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah.",
+      "timestamp": "13:33:38"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Journey map all the time. Persona, not so much. Usually I already have the persona when I start.",
+      "timestamp": "13:33:46"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "You know like the the clients would have some sort of preset persona date.",
+      "timestamp": "13:33:53"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "They know. I don't have to do persona, usually.",
+      "timestamp": "13:33:58"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "But journey map almost all the time. Unless it's a very specific like tool.",
+      "timestamp": "13:34:06"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, so this tool allows you to\u2026",
+      "timestamp": "13:34:10"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "This tool allows you to conduct the interviews and then it allows you to upload interviews. And then the next thing you have is an archive page.",
+      "timestamp": "13:34:15"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "What would you use? This is all the interviews and they're not organized by project. How would you organize like so um You see the transcripts.",
+      "timestamp": "13:34:20"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "You can see the metadata. And this is basically an archive and then you can search",
+      "timestamp": "13:34:28"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Would you find a tool like this? How do you bet.",
+      "timestamp": "13:34:40"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "So each one of those cards are they are they uh is that one particular interview or that's one project?",
+      "timestamp": "13:34:43"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yes. One particular interview.",
+      "timestamp": "13:34:50"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "That's one particular interview. Okay.",
+      "timestamp": "13:34:52"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And right now they're just all flat.",
+      "timestamp": "13:34:57"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I will want to see their demographic, some sort of their interviewees demographic.",
+      "timestamp": "13:35:00"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Like organized on the front page up front hidden below here.",
+      "timestamp": "13:35:08"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Like\u2026 Yeah.",
+      "timestamp": "13:35:09"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I see. I see.",
+      "timestamp": "13:35:13"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I got all this stuff. I can do a lot of things with it.",
+      "timestamp": "13:35:15"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Ideas is um",
+      "timestamp": "13:35:20"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I don't know if you how you think of this, but I usually like to, especially if you do qualitative and quantitative together, you can slice the data by like\u2026 these five people are, you know, between age 18 to 25.",
+      "timestamp": "13:35:21"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "They think blah, blah, blah, what their problem is. And these are DZ interviewees are from age 45 to like 55, something like that. And then like these are these demographic things what they say in their quotes or something like that. I tend to do that if I can, whatever, if I have a larger",
+      "timestamp": "13:35:41"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Larger data collection.",
+      "timestamp": "13:36:05"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So there's a lot I can do here and I can do search.",
+      "timestamp": "13:36:09"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah. I think that filter, you know, Tableau, how Tableau can like kind of slice things",
+      "timestamp": "13:36:13"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "This one I don't have working yet. I haven't done practicing.",
+      "timestamp": "13:36:14"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "This is an emotion search. I need to really work on it, but it'll pull out.",
+      "timestamp": "13:36:21"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah. But this is amazing already. You know, I can already see this being very they can search out. Oh, that's really cool.",
+      "timestamp": "13:36:25"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Happy.",
+      "timestamp": "13:36:25"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, so you don't use first components, but I'll show you how we did. We'll do gone fishing in Montana. We'll do ice fishing.",
+      "timestamp": "13:36:31"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Hey, Grina. And then, so these are all the transcripts and I could do that same thing where I have more of the metadata surfaced about the people, but I just don't have that much. I mean, part of this research with you",
+      "timestamp": "13:36:39"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "In the next week is to generate real transcripts of researchers and throw them in here and then Organize things better.",
+      "timestamp": "13:36:49"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Mm-hmm. Yeah.",
+      "timestamp": "13:36:54"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "You can choose your model and then let's see if it still works.",
+      "timestamp": "13:36:57"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Oh, no, I got to choose these things first. So I'm just going to do this.",
+      "timestamp": "13:37:00"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I'm actually choosing different types because the transcripts are there but And then you um so you pick some interviews that you want. And those are the ones that are going to be used to create your persona.",
+      "timestamp": "13:37:05"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, look at that. That's amazing.",
+      "timestamp": "13:37:16"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "It's cheating. It's totally cheating. And you can go back to transcripts and talk to them. You can ask questions. You can do all kinds of stuff.",
+      "timestamp": "13:37:20"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "That's\u2026 Dude, that would do this. This is like the magic wand that wall.",
+      "timestamp": "13:37:27"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And I bet it can probably generate user journey too. Like dirty map?",
+      "timestamp": "13:37:34"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah, that's the next page. And then you can switch. I only got one mod. I'm going to try to get Jim and I hooked up.",
+      "timestamp": "13:37:38"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, look at that. Wow, if I have\u2026",
+      "timestamp": "13:37:41"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So here's the results right now. For the Fisher person.",
+      "timestamp": "13:37:46"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "We're going to throw you in there at the end of the interview and get your persona pretty soon.",
+      "timestamp": "13:37:50"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, please.",
+      "timestamp": "13:37:55"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Wow.",
+      "timestamp": "13:38:01"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So\u2026",
+      "timestamp": "13:38:01"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And I'll show you what you do here. Let's see this one.",
+      "timestamp": "13:38:06"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Wow. I want this tour.",
+      "timestamp": "13:38:07"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay. What's this one if I get it, is it in Edge, I think.",
+      "timestamp": "13:38:11"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Steven.",
+      "timestamp": "13:38:11"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "We can generate image. Like a portrait of the person.",
+      "timestamp": "13:38:21"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Note.",
+      "timestamp": "13:38:22"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Jesus Christ.",
+      "timestamp": "13:38:27"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I think I need to sign. I signed up when I rebooted.",
+      "timestamp": "13:38:42"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, this may be too long. Okay, well, anyway, I'll do that later.",
+      "timestamp": "13:38:47"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I'm not signed in. This is Adobe Firefly. And then you can take that prompt because if I go back to where I was.",
+      "timestamp": "13:38:54"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, okay. I see. What is this Adobe?",
+      "timestamp": "13:38:56"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, nice.",
+      "timestamp": "13:39:04"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "The last thing is it's an image prompt. Let's just go into",
+      "timestamp": "13:39:05"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "This is the other two I'm working on. And these are expensive.",
+      "timestamp": "13:39:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I bet the next time you can do service blueprint. It probably takes you know more more deep research or interviews.",
+      "timestamp": "13:39:17"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I'm doing personas, I'm doing these, which does personas. Odyssea does journey maps And then I'm doing it.",
+      "timestamp": "13:39:26"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Come on.",
+      "timestamp": "13:39:36"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "But this is kind of the fun part. Um The Adobe one actually has some pretty good images. I need to get it hooked up. So it's in reserve, ready to go.",
+      "timestamp": "13:39:42"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "But I always forget my password.",
+      "timestamp": "13:39:54"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, while that's cooking too. So the last thing is for, and then you can download, you can save and share And then you can load these into, this is the old screen right before I had multiple models.",
+      "timestamp": "13:40:06"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah.",
+      "timestamp": "13:40:08"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "We will do the green eggs and ham journey map. That one is empty.",
+      "timestamp": "13:40:20"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And then we'll come back here and see this guy. Hope he's coming. He's coming.",
+      "timestamp": "13:40:29"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "The ice fisherman from Greenland.",
+      "timestamp": "13:40:36"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So anyway, I'm going to try to get all these hooked up together so it creates nice journey maps. And the quality of the journey map might need to be improved.",
+      "timestamp": "13:40:42"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah.",
+      "timestamp": "13:40:43"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "As far as like bullets, how much",
+      "timestamp": "13:40:47"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, I'm sure it's at least it's a good start. Place to start you know like think about reading all that and then try and put it together it's It's very time consuming.",
+      "timestamp": "13:40:48"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "As a participant in my research initiative, you will have early access to the tool.",
+      "timestamp": "13:41:02"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh, look at that. I love it. And\u2026",
+      "timestamp": "13:41:07"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So there's your ice fisherman. Look at that. He's even got the little stove and he's got pictures of his fish. That's hilarious.",
+      "timestamp": "13:41:12"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "That's funny. Yeah.",
+      "timestamp": "13:41:21"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And then here's the journey map for green eggs and ham Initial reaction, resistance avoidance.",
+      "timestamp": "13:41:22"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "It's a children's book. And I just basically read the children's book into the interview because I'm trying to conduct a bunch of interviews and I'm just like, I'm tired of talking about world washing machines. I've done it for seven days in a row.",
+      "timestamp": "13:41:28"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So I tried to come up with some other things. And then, and it's not quite lined up, but there you go. There's your emotions. So pain points.",
+      "timestamp": "13:41:39"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "That's the basic journey map. And then you save them.",
+      "timestamp": "13:41:48"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And he goes, and then the last thing is, if you had a homepage, what would you put on your homepage for a research assistant?",
+      "timestamp": "13:41:53"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Mm-hmm.",
+      "timestamp": "13:42:02"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "It is pretty lame, but that's all I got right now.",
+      "timestamp": "13:42:04"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "That's really cool already, man. I would love to love to have access to this tool.",
+      "timestamp": "13:42:07"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "So I can use it on my projects. Do you think\u2026 the lawyer is going to invest money in this and then",
+      "timestamp": "13:42:11"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "They did. I've been doing this as my bench projects. I didn't have a project And I now have a XYZ number, which is a real utilization to the end of May.",
+      "timestamp": "13:42:20"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Oh. That's nice. That's nice. That's nice. You're doing an amazing job, Steven.",
+      "timestamp": "13:42:30"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "To develop my tool.",
+      "timestamp": "13:42:32"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And then I'm also doing it side by side because I can't tell just yet which way it's going to go.",
+      "timestamp": "13:42:38"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "This is the I don't know if I have a green eggs and ham interview here.",
+      "timestamp": "13:42:46"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I have fly fishing, but I can put these two transcripts in.",
+      "timestamp": "13:42:53"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And this is the This is basically open AI's tool called these are custom gpts And this is the other way.",
+      "timestamp": "13:42:59"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Mm-hmm.",
+      "timestamp": "13:43:11"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And this tool, because I was actually going to make my tool so you could edit it. And I'm not, you know, I had this vision where I'd be able to like add bullets with AI to the i started coding it",
+      "timestamp": "13:43:20"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "It was hard because I'm not that great. But this tool already has that ability.",
+      "timestamp": "13:43:32"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So it just created, these are your JSON files. And those files you looked at are saved as JSON.",
+      "timestamp": "13:43:39"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And then you can load a JSON and a SVG into, you can drag it to Figma. So that's the reason I'm doing this.",
+      "timestamp": "13:43:46"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Is because I can get to a point where you use this tool and you create something that's kind of crude and then you can drag it to Figma and then take it to Fig Jam or whatever.",
+      "timestamp": "13:43:52"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And that's where you're really good. Figma combined with SVG can go straight into Figma.",
+      "timestamp": "13:43:59"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Wait, hold on, hold on. You can take JSON file into figma",
+      "timestamp": "13:44:00"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Really? Wow, I didn't know that.",
+      "timestamp": "13:44:11"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yep. Yep. Yep.",
+      "timestamp": "13:44:12"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Well, I didn't either.",
+      "timestamp": "13:44:18"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And they would generate the design? The look.",
+      "timestamp": "13:44:22"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And airlines.",
+      "timestamp": "13:44:25"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Wow, this is pretty cool. I didn't know that.",
+      "timestamp": "13:44:31"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Where some of my, oh, here's fly fishing by 10 in Jason. And where's my figma You got to get your Figma up.",
+      "timestamp": "13:44:36"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Are you staffed on a different project? I thought Suzette was trying Like, can you step down like",
+      "timestamp": "13:44:45"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I got kicked off that product. Because it turns out that I'm not a visual designer.",
+      "timestamp": "13:44:51"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And it was totally, they told it initially it was going to be",
+      "timestamp": "13:44:58"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "It was not going to be just straight up",
+      "timestamp": "13:45:04"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Thank you, X. It's like UI and like graphic design, something like that.",
+      "timestamp": "13:45:07"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Here's the SVT, green eggs and ham. I don't have a good one. I need to get what Thomas filled in. They're crude right now but um These are kind of files I've generated. I don't know where's the good one?",
+      "timestamp": "13:45:11"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Well, here's the one but these are all, that's a template I know I did one journey math. That's a template.",
+      "timestamp": "13:45:23"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Persona that's a PowerPoint. Okay, here's one I actually created with the tool And\u2026 And X saved it. I had this other bill that does export. And so this is that green eggs and ham Come on.",
+      "timestamp": "13:45:31"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And it didn't it cut it off a little bit, but that's using my tool and then hitting export to figma And then you drag it right on and you get the initial reaction resistance in the voice. So it actually dynamically generates that stages and then lines up.",
+      "timestamp": "13:45:50"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Based on the interview, it'll make some stages up. And then line up all your stuff. This stuff usually stays the same, you know, touch points, frustration, whatever. You got to define that ahead of time. And then I could get more content. Like this only put the first sentence and then",
+      "timestamp": "13:46:05"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And, you know, it's stripped out the rest for that particular Try.",
+      "timestamp": "13:46:20"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "You know, that's pretty cool, man. Wow, you're doing some amazing work.",
+      "timestamp": "13:46:23"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Well, you're helping me with this research. It should have been obvious to me that if I'm making a tool for researchers, I should talk to real researchers.",
+      "timestamp": "13:46:30"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Dude, I'm\u2026",
+      "timestamp": "13:46:33"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, yeah, yeah, for sure. This can save a lot of my time and also, you know, those sleepless night can be a little bit easier for me.",
+      "timestamp": "13:46:39"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And I realized straight away",
+      "timestamp": "13:46:42"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah, the other trick is you can go back in here.",
+      "timestamp": "13:46:51"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So you can basically talk to them. So you have all these transcripts you took before and you can ask specific questions So you don't have to go through and look at the whole video anymore.",
+      "timestamp": "13:47:12"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "You can just load it up and then you can actually just ask it and find verbatims and it's pretty amazing.",
+      "timestamp": "13:47:21"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Wow. Like the AI reads the video For you.",
+      "timestamp": "13:47:29"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "It reads the transcript that I took. I'm using text transcripts. And then it'll parse through there and it'll go back through. I'll put 11 interviews like that's how I started on JP's.",
+      "timestamp": "13:47:32"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Morgan Chase. I had like 11 financial advisor, just really crude transcripts And then I do like meetings. I do this like right after the interview seconds later, I do summarize this interview with this FA and give me key points and send that out because usually",
+      "timestamp": "13:47:41"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Right after an interview, it takes a while to get the results.",
+      "timestamp": "13:47:57"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "But I was getting it within two or three minutes and sending it to the team. And there were decent results.",
+      "timestamp": "13:48:00"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "They're top line. They weren't like you weren't digging. You weren't getting the nuance But, um.",
+      "timestamp": "13:48:05"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Cheers.",
+      "timestamp": "13:48:06"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "I mean, it's so much faster. And then I could go spend time with 11 interviews and dig for nuance and then find verbatims.",
+      "timestamp": "13:48:12"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "To support the nuance. So much. Well, you're on it now. You're on the team.",
+      "timestamp": "13:48:19"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "I got to learn how to do this.",
+      "timestamp": "13:48:22"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Welcome to Dari.",
+      "timestamp": "13:48:27"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah. Thank you. Thank you. I'm actually I may have to reach out to you. I have something I'm trying to do a focus group on getting some user reaction on the thing I did. I'm currently on BNY, Bank of New York.",
+      "timestamp": "13:48:28"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Oh, cool.",
+      "timestamp": "13:48:44"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "With some loan application stuff. Loan related application but uh You know, kids.",
+      "timestamp": "13:48:45"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah. Well, anything we could use to kind of help kind of make like start with the transcript and try to this tool is not ready to actually conduct the interviews And I don't know if you ever would, but sometimes there's a need like you could reach more stakeholders if you could just send them a link.",
+      "timestamp": "13:48:50"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And then it would ask them questions. I'll give you a taste of what that is like.",
+      "timestamp": "13:49:07"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "But yeah, you know, so this is what it would sound like.",
+      "timestamp": "13:49:15"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Say start to begin the interview. Start, please begin the interview.",
+      "timestamp": "13:49:20"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Welcome to our user study. This research aims to test the design, not the user. We appreciate your participation.",
+      "timestamp": "13:49:30"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "For transparency, this conversation will be recorded for research purposes. Do we have your permission to proceed? Yes, you can proceed.",
+      "timestamp": "13:49:38"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, so you get the idea. So the other two, potentially I could put two screens, like an a and a b And the audio would say, can you please look at these two screens and tell me which one's better A or B? Then I can record the\u2026",
+      "timestamp": "13:49:51"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah, yeah.",
+      "timestamp": "13:49:53"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "The users like mouse moments in their audio and then save that as in this vector store, because all these interviews are basically going to a vector store It creates a number that represents what's in there. And that's where the magic of AI happens. And then once you have all these vectors, you can find dot products, which is how much they're alike. And you can find cross products, how much they're different.",
+      "timestamp": "13:50:05"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And that's how it looks up like the verbatims and does the semantic search.",
+      "timestamp": "13:50:26"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So you're basically collecting data, you vectorize it, you throw it into a big collection into a dimensional vector space, and then you're running all these math algorithms to try to see what's the same and what's different.",
+      "timestamp": "13:50:31"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Okay. Wow, that's pretty cool.",
+      "timestamp": "13:50:43"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "So you can do a lot of stuff. You don't have to just do like, you know, I can do images i can do You know, whatever I can record, it'll vectorize.",
+      "timestamp": "13:50:46"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "And then this is vectorized. You can search it in different ways.",
+      "timestamp": "13:50:54"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Mm-hmm.",
+      "timestamp": "13:50:55"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "Yeah.",
+      "timestamp": "13:51:00"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, well, are there any questions that you expected me to ask that I've forgotten to ask so far?",
+      "timestamp": "13:51:01"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "No, no, I think you covered a lot of good points. I couldn't think of any.",
+      "timestamp": "13:51:08"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Okay, I'm going to be doing this with other researchers and some of them have PhDs. Makes me nervous.",
+      "timestamp": "13:51:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "And the mobile.",
+      "timestamp": "13:51:14"
+    },
+    {
+      "speaker": "Ti",
+      "speaker_name": "Ti",
+      "content": "You should do it. You should do it. This is a very good starting point, I think. I feel like It's going to be very useful.",
+      "timestamp": "13:51:19"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "Yeah, I'm saying.",
+      "timestamp": "13:51:22"
+    },
+    {
+      "speaker": "Dulaney, Stephen",
+      "speaker_name": "Dulaney, Stephen",
+      "content": "You want to see",
+      "timestamp": "13:51:30"
+    }
+  ],
+  "character": "interviewer",
+  "guide_id": "9d9b0648-5f14-4a22-81df-290bbd67049d",
+  "interviewee": {
+    "name": "Tianyu Qiu",
+    "role": "",
+    "email": ""
+  },
+  "researcher": {
+    "name": "Dulaney, Stephen",
+    "email": ""
+  },
+  "analysis": null
+}

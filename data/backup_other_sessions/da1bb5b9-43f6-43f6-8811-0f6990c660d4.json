@@ -1,0 +1,50 @@
+{
+  "id": "da1bb5b9-43f6-43f6-8811-0f6990c660d4",
+  "guide_id": null,
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "b5fc75ca-af2b-46b2-89b4-676974218f44",
+      "content": "see if you're going to change your prompt",
+      "role": "user",
+      "timestamp": "2025-05-14T12:59:45.382450"
+    },
+    {
+      "id": "f40ff7c5-6674-408c-8e3e-599aaa383df5",
+      "content": "I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+      "role": "assistant",
+      "timestamp": "2025-05-14T12:59:45.385445"
+    },
+    {
+      "id": "343c7268-36f9-4173-aff0-fd205a5c4c6e",
+      "content": "oh you serious I got please try again shortly I've never had that",
+      "role": "user",
+      "timestamp": "2025-05-14T13:00:01.320088"
+    },
+    {
+      "id": "9272251b-3a87-42a2-8b18-45e69d9fb5cb",
+      "content": "I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+      "role": "assistant",
+      "timestamp": "2025-05-14T13:00:01.321344"
+    },
+    {
+      "id": "f9709aa8-67ce-483a-ae07-a9319b6cb450",
+      "content": "you there",
+      "role": "user",
+      "timestamp": "2025-05-14T13:00:15.820518"
+    },
+    {
+      "id": "ccaf73ce-e722-42f3-9c0c-ae85253d5d05",
+      "content": "I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+      "role": "assistant",
+      "timestamp": "2025-05-14T13:00:15.822427"
+    }
+  ],
+  "transcript": "\n\nParticipant: see if you're going to change your prompt\n\nModerator: I apologize, but there was an unexpected issue with the interview system. Please try again shortly.\n\nParticipant: oh you serious I got please try again shortly I've never had that\n\nModerator: I apologize, but there was an unexpected issue with the interview system. Please try again shortly.\n\nParticipant: you there\n\nModerator: I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+  "analysis": null,
+  "created_at": "2025-05-14T12:59:34.912873",
+  "updated_at": "2025-05-22T13:31:41.262339"
+}

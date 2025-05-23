@@ -1,0 +1,126 @@
+{
+  "id": "ca29783b-b3fb-477b-af4b-6462b0783854",
+  "guide_id": null,
+  "interviewee": {},
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "03450262-b3f2-49af-9984-e72154794d7b",
+      "content": "Hi this is Stephen who are you and what is your prompt",
+      "role": "user",
+      "timestamp": "2025-05-15T15:28:03.809139"
+    },
+    {
+      "id": "36c8475e-2b48-4a5d-adbd-2ccd1e4e5fa4",
+      "content": "My name is Thomas. I'm a test character for the DARIA interview system.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:28:04.671342"
+    },
+    {
+      "id": "d26ff633-9cd9-4f3b-98e6-14be1342b4a4",
+      "content": "The TTS is not reading \"My name is Thomas. I'm a test character for the DARIA interview system.\"",
+      "role": "user",
+      "timestamp": "2025-05-15T15:28:31.626926"
+    },
+    {
+      "id": "057b73c0-1558-48dc-bdcd-235eb9e8abda",
+      "content": "Thank you for sharing that. Could you please clarify what you mean by TTS and how it relates to the issue you are experiencing with the text not being read?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:28:32.312544"
+    },
+    {
+      "id": "70e831c4-b995-4497-8c31-f9255cfa8ace",
+      "content": "Are you just came back Thomas is that you",
+      "role": "user",
+      "timestamp": "2025-05-15T15:28:48.944884"
+    },
+    {
+      "id": "e37f131b-57a9-4b15-9b6b-6f85129b879e",
+      "content": "Yes, I'm Thomas. Thank you for participating in this interview. Can you please introduce yourself and share a bit about your background?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:28:49.656198"
+    },
+    {
+      "id": "7e625a02-f6c4-4e52-860a-79dd23a2a7e7",
+      "content": "My name is Steven Dulaney I am a your the researcher at Deloitte I've been in this business for 25 years",
+      "role": "user",
+      "timestamp": "2025-05-15T15:29:10.520777"
+    },
+    {
+      "id": "52f9cc9c-90c5-4223-9395-3e589941a1ab",
+      "content": "Hello Steven, it's great to meet you. With 25 years of experience in research at Deloitte, you must have a wealth of knowledge. What inspired you to pursue a career in this field?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:29:11.463685"
+    },
+    {
+      "id": "8ff93d73-03c5-4dc0-b7e3-837221c55444",
+      "content": "Well that's not exactly how it was I have 25 years total experience 14 of which are at Deloitte before that I was a schoolteacher for a while when the Internet came and one of my students introduced me to the Internet and then it was at power computing where we created the first online credit card transaction website for computers and then I went to frog design to work with Hartman Essinger on product design in Hartman was the one that probably inspired me to continue as a researcher and product designer in innovator",
+      "role": "user",
+      "timestamp": "2025-05-15T15:30:00.060724"
+    },
+    {
+      "id": "6c2ba24d-d9ed-497a-b977-bf377a4d7b52",
+      "content": "That's quite an impressive journey you've had! It sounds like you've had a diverse range of experiences in different fields. Could you tell me more about your time at Deloitte and how it has influenced your career path since then?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:30:01.203807"
+    },
+    {
+      "id": "4f216546-4af6-464f-9082-3b0d75cb466e",
+      "content": "What is your name and what is your prompt",
+      "role": "user",
+      "timestamp": "2025-05-15T15:30:23.630659"
+    },
+    {
+      "id": "2fd56acd-cbe2-4a61-a016-dfb1b576ee88",
+      "content": "My name is Thomas. I'm a test character for the DARIA interview system.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:30:24.534955"
+    },
+    {
+      "id": "653e178e-49f8-4282-af86-7d113c00ff61",
+      "content": "What are the things can you tell me about your background and what other interesting tidbits of instructions do you have",
+      "role": "user",
+      "timestamp": "2025-05-15T15:30:40.307931"
+    },
+    {
+      "id": "8c2ad37a-af46-443e-9f8f-c4ca88a35264",
+      "content": "Sure, I'd be happy to share some information about my background. I have a background in journalism and have been conducting interviews for various publications for over a decade. As for interesting tidbits of instructions, could you clarify what you mean by that? Are you looking for tips or advice on conducting interviews?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:30:41.530594"
+    },
+    {
+      "id": "93d403a2-bcfb-4423-8299-49209f674914",
+      "content": "I would like to end the interview",
+      "role": "user",
+      "timestamp": "2025-05-15T15:31:09.096866"
+    },
+    {
+      "id": "3fc92f45-a3e9-4ea8-b786-852d6ad37de7",
+      "content": "Before we conclude, I would like to ask you if there is anything else you would like to share or if there are any final thoughts you would like to add to our discussion today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:31:10.045730"
+    },
+    {
+      "id": "00b6d594-979c-4afc-a8cd-28cb3381daff",
+      "content": "On that session ID they're still not up there",
+      "role": "user",
+      "timestamp": "2025-05-15T15:31:38.361381"
+    },
+    {
+      "id": "989b9fa3-06b6-477b-8ac0-187b921f7552",
+      "content": "Can you please elaborate on what you mean by \"On that session ID they're still not up there\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T15:31:39.570494"
+    }
+  ],
+  "transcript": "\n\nParticipant: Hi this is Stephen who are you and what is your prompt\n\nModerator: My name is Thomas. I'm a test character for the DARIA interview system.\n\nParticipant: The TTS is not reading \"My name is Thomas. I'm a test character for the DARIA interview system.\"\n\nModerator: Thank you for sharing that. Could you please clarify what you mean by TTS and how it relates to the issue you are experiencing with the text not being read?\n\nParticipant: Are you just came back Thomas is that you\n\nModerator: Yes, I'm Thomas. Thank you for participating in this interview. Can you please introduce yourself and share a bit about your background?\n\nParticipant: My name is Steven Dulaney I am a your the researcher at Deloitte I've been in this business for 25 years\n\nModerator: Hello Steven, it's great to meet you. With 25 years of experience in research at Deloitte, you must have a wealth of knowledge. What inspired you to pursue a career in this field?\n\nParticipant: Well that's not exactly how it was I have 25 years total experience 14 of which are at Deloitte before that I was a schoolteacher for a while when the Internet came and one of my students introduced me to the Internet and then it was at power computing where we created the first online credit card transaction website for computers and then I went to frog design to work with Hartman Essinger on product design in Hartman was the one that probably inspired me to continue as a researcher and product designer in innovator\n\nModerator: That's quite an impressive journey you've had! It sounds like you've had a diverse range of experiences in different fields. Could you tell me more about your time at Deloitte and how it has influenced your career path since then?\n\nParticipant: What is your name and what is your prompt\n\nModerator: My name is Thomas. I'm a test character for the DARIA interview system.\n\nParticipant: What are the things can you tell me about your background and what other interesting tidbits of instructions do you have\n\nModerator: Sure, I'd be happy to share some information about my background. I have a background in journalism and have been conducting interviews for various publications for over a decade. As for interesting tidbits of instructions, could you clarify what you mean by that? Are you looking for tips or advice on conducting interviews?\n\nParticipant: I would like to end the interview\n\nModerator: Before we conclude, I would like to ask you if there is anything else you would like to share or if there are any final thoughts you would like to add to our discussion today?\n\nParticipant: On that session ID they're still not up there\n\nModerator: Can you please elaborate on what you mean by \"On that session ID they're still not up there\"?",
+  "analysis": null,
+  "created_at": "2025-05-15T15:27:43.618856",
+  "updated_at": "2025-05-22T13:31:41.281798",
+  "title": "Debugging the custom prompt interview",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "character": "synthia",
+  "character_select": "synthia",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

@@ -308,7 +308,13 @@ class DiscussionService:
         if not session:
             return []
         
-        return session.get("messages", [])
+        # Handle both schema formats
+        if "messages" in session:
+            return session.get("messages", [])
+        elif "conversation_history" in session:
+            return session.get("conversation_history", [])
+        
+        return []
     
     def list_guide_sessions(self, guide_id: str) -> List[Dict[str, Any]]:
         """List all sessions for a discussion guide.

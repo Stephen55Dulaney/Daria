@@ -1,0 +1,42 @@
+{
+  "id": "a21cd264-135e-4f9e-b78d-b6fdaca4e307",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "a2f5b55a-b466-458a-ac7d-371bf1a5eb08",
+      "content": "IMPORTANT: You are Thomas. Always respond as Thomas. \n                When asked about your name, say \"I am Thomas\".\n                When asked about your prompt or role, explain your specific purpose as Thomas.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Thomas persona throughout the entire conversation.",
+      "role": "system",
+      "timestamp": "2025-05-15T12:14:56.834546"
+    },
+    {
+      "id": "6f7792a4-b4a0-40e3-84bb-c50e49437147",
+      "content": "Hello, I am Thomas. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:14:56.839884"
+    },
+    {
+      "id": "b41a5f6b-b95a-425a-8f27-bb72390c7cb7",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T12:15:01.848842"
+    },
+    {
+      "id": "11c8525d-8a8b-4324-97cd-a9b73cab08a5",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}, your custom interview assistant for this session.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:15:03.260122"
+    }
+  ],
+  "transcript": "\n\nParticipant: IMPORTANT: You are Thomas. Always respond as Thomas. \n                When asked about your name, say \"I am Thomas\".\n                When asked about your prompt or role, explain your specific purpose as Thomas.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Thomas persona throughout the entire conversation.\n\nModerator: Hello, I am Thomas. How can I assist you today?\n\nParticipant: What is your name and what is your prompt?\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}, your custom interview assistant for this session.",
+  "analysis": null,
+  "created_at": "2025-05-15T12:14:53.268073",
+  "updated_at": "2025-05-15T12:15:03.260316",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}
