@@ -245,7 +245,14 @@ class IssueManager:
                    creator_id: str, 
                    issue_type: IssueType = IssueType.BUG,
                    priority: IssuePriority = IssuePriority.MEDIUM,
-                   screenshots: List[str] = None) -> Issue:
+                   screenshots: List[str] = None,
+                   linked_persona=None,
+                   journey_stage=None,
+                   root_cause=None,
+                   insights=None,
+                   ethics=None,
+                   parent_id=None,
+                   cursor_prompt_template=None) -> Issue:
         """Create a new issue"""
         issue = Issue(
             title=title,
@@ -253,7 +260,14 @@ class IssueManager:
             issue_type=issue_type,
             creator_id=creator_id,
             priority=priority,
-            screenshots=screenshots or []
+            screenshots=screenshots or [],
+            linked_persona=linked_persona,
+            journey_stage=journey_stage,
+            root_cause=root_cause,
+            insights=insights,
+            ethics=ethics,
+            parent_id=parent_id,
+            cursor_prompt_template=cursor_prompt_template
         )
         self._save_issue(issue)
         return issue

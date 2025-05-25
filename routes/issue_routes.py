@@ -119,6 +119,19 @@ def create_issue():
         issue_type = request.form.get('issue_type', IssueType.BUG)
         priority = request.form.get('priority', IssuePriority.MEDIUM)
         
+        # Extract research-to-prototype fields
+        linked_persona = request.form.get('linked_persona')
+        journey_stage = request.form.get('journey_stage')
+        root_cause = request.form.get('root_cause')
+        insights = request.form.get('insights')
+        ethics = request.form.get('ethics')
+        parent_id = request.form.get('parent_id')
+        cursor_prompt_template = request.form.get('cursor_prompt_template')
+        
+        # Split insights and ethics by line if present
+        insights_list = [i.strip() for i in insights.split('\n') if i.strip()] if insights else []
+        ethics_list = [e.strip() for e in ethics.split('\n') if e.strip()] if ethics else []
+        
         # Validate form data
         if not title or not description:
             flash('Title and description are required', 'error')
@@ -147,7 +160,14 @@ def create_issue():
             creator_id=current_user.id,
             issue_type=issue_type,
             priority=priority,
-            screenshots=screenshots
+            screenshots=screenshots,
+            linked_persona=linked_persona,
+            journey_stage=journey_stage,
+            root_cause=root_cause,
+            insights=insights_list,
+            ethics=ethics_list,
+            parent_id=parent_id,
+            cursor_prompt_template=cursor_prompt_template
         )
         
         # Update environment info
@@ -184,12 +204,28 @@ def edit_issue(issue_id):
         description = request.form.get('description')
         issue_type = request.form.get('issue_type')
         priority = request.form.get('priority')
-        
+        # Research fields
+        linked_persona = request.form.get('linked_persona')
+        journey_stage = request.form.get('journey_stage')
+        root_cause = request.form.get('root_cause')
+        insights = request.form.get('insights')
+        ethics = request.form.get('ethics')
+        parent_id = request.form.get('parent_id')
+        cursor_prompt_template = request.form.get('cursor_prompt_template')
+        insights_list = [i.strip() for i in insights.split('\n') if i.strip()] if insights else []
+        ethics_list = [e.strip() for e in ethics.split('\n') if e.strip()] if ethics else []
         # Update issue
         issue.title = title
         issue.description = description
         issue.issue_type = issue_type
         issue.priority = priority
+        issue.linked_persona = linked_persona
+        issue.journey_stage = journey_stage
+        issue.root_cause = root_cause
+        issue.insights = insights_list
+        issue.ethics = ethics_list
+        issue.parent_id = parent_id
+        issue.cursor_prompt_template = cursor_prompt_template
         
         # Record history
         issue._record_history("Issue updated", user_id=current_user.id)
