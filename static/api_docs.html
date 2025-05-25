@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA API Documentation</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            padding-top: 60px;
+            background-color: #f8f9fa;
+        }
+        .endpoint {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            border: 1px solid #dee2e6;
+            border-radius: 0.25rem;
+            background-color: white;
+        }
+        .method {
+            font-weight: bold;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            margin-right: 0.5rem;
+        }
+        .get { background-color: #d1ecf1; color: #0c5460; }
+        .post { background-color: #d4edda; color: #155724; }
+        .delete { background-color: #f8d7da; color: #721c24; }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand" href="/">DARIA</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/dashboard">Dashboard</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active" href="/static/api_docs.html">API Docs</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container">
+        <h1 class="mb-4">DARIA API Documentation</h1>
+        
+        <div class="endpoint">
+            <h3><span class="method get">GET</span>/api/health</h3>
+            <p>Check the health status of the API.</p>
+            <h4>Response</h4>
+            <pre><code>{
+    "status": "ok",
+    "timestamp": "2025-05-24T23:57:52.497677"
+}</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method get">GET</span>/api/sessions</h3>
+            <p>Get a list of all interview sessions.</p>
+            <h4>Response</h4>
+            <pre><code>[
+    {
+        "session_id": "uuid",
+        "title": "Interview Title",
+        "status": "active",
+        "created_at": "timestamp",
+        "conversation_history": []
+    }
+]</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method post">POST</span>/api/interview/start</h3>
+            <p>Start a new interview session.</p>
+            <h4>Request Body</h4>
+            <pre><code>{
+    "title": "Interview Title"  // optional
+}</code></pre>
+            <h4>Response</h4>
+            <pre><code>{
+    "success": true,
+    "session_id": "uuid",
+    "message": "Hello! How can I help you today?"
+}</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method post">POST</span>/api/interview/{session_id}/message</h3>
+            <p>Add a message to an interview session.</p>
+            <h4>Request Body</h4>
+            <pre><code>{
+    "message": "User's message"
+}</code></pre>
+            <h4>Response</h4>
+            <pre><code>{
+    "success": true,
+    "message": "Message added successfully"
+}</code></pre>
+        </div>
+
+        <div class="endpoint">
+            <h3><span class="method delete">DELETE</span>/api/interview/{session_id}</h3>
+            <p>Delete an interview session.</p>
+            <h4>Response</h4>
+            <pre><code>{
+    "success": true,
+    "message": "Interview deleted successfully"
+}</code></pre>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html> 

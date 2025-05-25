@@ -1,0 +1,188 @@
+{% extends "base.html" %}
+
+{% block title %}{{ interview.title }} - Interview Details{% endblock %}
+
+{% block extra_head %}
+<style>
+    .details-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+    
+    .details-header {
+        margin-bottom: 2rem;
+    }
+    
+    .details-title {
+        font-size: 2rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+    }
+    
+    .details-meta {
+        display: flex;
+        gap: 2rem;
+        color: var(--text-muted);
+        font-size: 0.875rem;
+        margin-bottom: 1rem;
+    }
+    
+    .details-section {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    }
+    
+    .section-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+    }
+    
+    .transcript {
+        white-space: pre-wrap;
+        font-family: monospace;
+        font-size: 0.875rem;
+        line-height: 1.5;
+        color: var(--text-dark);
+        padding: 1rem;
+        background: var(--background-light);
+        border-radius: 0.25rem;
+        overflow-x: auto;
+    }
+    
+    .metadata-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+        gap: 1rem;
+    }
+    
+    .metadata-item {
+        padding: 1rem;
+        background: var(--background-light);
+        border-radius: 0.25rem;
+    }
+    
+    .metadata-label {
+        font-weight: 500;
+        color: var(--text-muted);
+        margin-bottom: 0.5rem;
+    }
+    
+    .metadata-value {
+        color: var(--text-dark);
+    }
+    
+    .tag-list {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+    
+    .tag {
+        background: var(--background-light);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+    
+    .status-draft {
+        background: #e2e8f0;
+        color: #475569;
+    }
+    
+    .status-completed {
+        background: #86efac;
+        color: #166534;
+    }
+    
+    .status-in-progress {
+        background: #fde68a;
+        color: #92400e;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="details-container">
+    <div class="details-header">
+        <div class="d-flex justify-content-between align-items-start">
+            <h1 class="details-title">{{ interview.title }}</h1>
+            <span class="status-badge status-{{ interview.status.lower() }}">{{ interview.status }}</span>
+        </div>
+        <div class="details-meta">
+            <div><i class="fas fa-user me-2"></i>{{ interview.participant_name }}</div>
+            <div><i class="fas fa-calendar me-2"></i>{{ interview.created_at }}</div>
+        </div>
+        {% if interview.tags %}
+        <div class="tag-list">
+            {% for tag in interview.tags %}
+            <span class="tag">{{ tag }}</span>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+    
+    {% if interview.transcript %}
+    <div class="details-section">
+        <h2 class="section-title">
+            <i class="fas fa-file-alt"></i>
+            Transcript
+        </h2>
+        <div class="transcript">{{ interview.transcript }}</div>
+    </div>
+    {% endif %}
+    
+    {% if interview.metadata %}
+    <div class="details-section">
+        <h2 class="section-title">
+            <i class="fas fa-info-circle"></i>
+            Metadata
+        </h2>
+        <div class="metadata-grid">
+            {% for key, value in interview.metadata.items() %}
+            <div class="metadata-item">
+                <div class="metadata-label">{{ key|title }}</div>
+                <div class="metadata-value">{{ value }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if interview.analysis %}
+    <div class="details-section">
+        <h2 class="section-title">
+            <i class="fas fa-chart-bar"></i>
+            Analysis
+        </h2>
+        <div class="metadata-grid">
+            {% for key, value in interview.analysis.items() %}
+            <div class="metadata-item">
+                <div class="metadata-label">{{ key|title }}</div>
+                <div class="metadata-value">{{ value }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

@@ -1,0 +1,64 @@
+{
+  "id": "34b12821-05a6-4e1e-9346-22c613930e8d",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "the monitoring system because I think we might have broken it",
+      "role": "user",
+      "timestamp": "2025-05-12T19:59:02.050453"
+    },
+    {
+      "content": "Can you tell me more about the specific incident or issue that made you think the monitoring system might be broken?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T19:59:02.973634"
+    },
+    {
+      "content": "AI assistant does not seem to be there  so I need to see if we talk a little more what's going to happen",
+      "role": "user",
+      "timestamp": "2025-05-12T19:59:20.972188"
+    },
+    {
+      "content": "Can you elaborate on how the absence of the AI assistant impacts your work or the overall functionality of the system? How crucial is the AI assistant in your day-to-day tasks or processes?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T19:59:21.839200"
+    },
+    {
+      "content": "I'd say it's highly important to have the AI assistant monitoring the conversations and then just monitoring General cuz we need to have the polling taking place the system test message websocket is not working that's not good okay well I'll send this update to the",
+      "role": "user",
+      "timestamp": "2025-05-12T19:59:56.498719"
+    },
+    {
+      "content": "Can you walk me through the impact of the system test message websocket not working on your day-to-day tasks and processes? How does this issue affect the overall functionality of the system and your ability to monitor conversations effectively?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T19:59:57.799520"
+    },
+    {
+      "content": "oh the monitor is just critical it's kind of complicated but needs to keep track of the conversations to keep the log so that we can ask the questions",
+      "role": "user",
+      "timestamp": "2025-05-12T20:00:27.973164"
+    },
+    {
+      "content": "Can you provide more detail on the specific types of questions that are typically asked based on the log of conversations tracked by the monitoring system? How does the accuracy and completeness of this log impact the quality of the questions that can be asked?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T20:00:28.770020"
+    },
+    {
+      "content": "well  I'm just trying to make sure everything works together",
+      "role": "user",
+      "timestamp": "2025-05-12T20:00:56.563235"
+    },
+    {
+      "content": "Can you share more about the challenges you face in ensuring that everything works together smoothly in the system? What are some specific obstacles or complexities that you encounter in this process of integration and coordination?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T20:00:57.410037"
+    }
+  ],
+  "transcript": "\n\nParticipant: the monitoring system because I think we might have broken it\n\nModerator: Can you tell me more about the specific incident or issue that made you think the monitoring system might be broken?\n\nParticipant: AI assistant does not seem to be there  so I need to see if we talk a little more what's going to happen\n\nModerator: Can you elaborate on how the absence of the AI assistant impacts your work or the overall functionality of the system? How crucial is the AI assistant in your day-to-day tasks or processes?\n\nParticipant: I'd say it's highly important to have the AI assistant monitoring the conversations and then just monitoring General cuz we need to have the polling taking place the system test message websocket is not working that's not good okay well I'll send this update to the\n\nModerator: Can you walk me through the impact of the system test message websocket not working on your day-to-day tasks and processes? How does this issue affect the overall functionality of the system and your ability to monitor conversations effectively?\n\nParticipant: oh the monitor is just critical it's kind of complicated but needs to keep track of the conversations to keep the log so that we can ask the questions\n\nModerator: Can you provide more detail on the specific types of questions that are typically asked based on the log of conversations tracked by the monitoring system? How does the accuracy and completeness of this log impact the quality of the questions that can be asked?\n\nParticipant: well  I'm just trying to make sure everything works together\n\nModerator: Can you share more about the challenges you face in ensuring that everything works together smoothly in the system? What are some specific obstacles or complexities that you encounter in this process of integration and coordination?",
+  "analysis": null,
+  "created_at": "2025-05-12T19:58:51.314130",
+  "updated_at": "2025-05-12T20:00:57.410814"
+}

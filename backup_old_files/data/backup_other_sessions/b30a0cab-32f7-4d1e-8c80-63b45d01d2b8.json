@@ -1,0 +1,62 @@
+{
+  "id": "b30a0cab-32f7-4d1e-8c80-63b45d01d2b8",
+  "guide_id": "9576b33a-daed-45de-9724-adf3524ebd0a",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "123 testing 1 2 3 testing 1 2 3 what's this no message found in session",
+      "role": "user",
+      "id": "8f743a00-b0e2-4272-93f6-cbdc53494d57",
+      "timestamp": "2025-05-12T15:33:41.797751"
+    },
+    {
+      "content": "Great! To continue our discussion, let's delve into planning the discovery phase for your project. To start, could you please provide some key details about the project, such as its goals, scope, and any existing knowledge or research that has been conducted so far? This information will help us tailor the discovery plan effectively.",
+      "role": "assistant",
+      "id": "9c181746-e504-4d0a-ba52-f61fe0000114",
+      "timestamp": "2025-05-12T15:33:42.833920"
+    },
+    {
+      "content": "have 8 weeks to do 10 interviews and we've done five so far",
+      "role": "user",
+      "id": "9a16bf89-a6be-4ce3-b218-737d77a8c180",
+      "timestamp": "2025-05-12T15:34:17.124544"
+    },
+    {
+      "content": "Great! To continue our planning, could you please provide more details about the project goals, scope, and any existing knowledge or research that has been conducted so far? This will help us tailor the discovery plan effectively.",
+      "role": "assistant",
+      "id": "40b0de11-d1b0-4f42-8b5f-f01df25ac77f",
+      "timestamp": "2025-05-12T15:34:17.984278"
+    },
+    {
+      "content": "goal is to create a interview assistant the scope is from the start of discovery  and when we have a client all the way through the  deploying",
+      "role": "user",
+      "id": "b767c57e-d75b-4261-beb5-c8d20d406add",
+      "timestamp": "2025-05-12T15:34:48.444843"
+    },
+    {
+      "content": "Great! To continue our discussion, could you please provide more details about the project goals, scope, and any existing knowledge or research that has been conducted so far? This will help us tailor the discovery plan effectively to achieve the desired outcomes.",
+      "role": "assistant",
+      "id": "dbad1bc1-b8b8-4e52-8d6f-f72d08462854",
+      "timestamp": "2025-05-12T15:34:49.396205"
+    },
+    {
+      "content": "the product goes already mentioned then you don't have much twice a little concerned if you're not really",
+      "role": "user",
+      "id": "16eb3a43-bb0a-4ba6-8bdb-e9f5c567e7e9",
+      "timestamp": "2025-05-12T15:35:22.808264"
+    },
+    {
+      "content": "Great! To continue our discussion, could you please share more details about the project goals, scope, and any existing knowledge or research that has already been conducted? This will help us tailor the discovery plan effectively.",
+      "role": "assistant",
+      "id": "71e0a498-d51f-42d6-b01c-d75c95a3626c",
+      "timestamp": "2025-05-12T15:35:23.600128"
+    }
+  ],
+  "transcript": "\n\nParticipant: 123 testing 1 2 3 testing 1 2 3 what's this no message found in session\n\nModerator: Great! To continue our discussion, let's delve into planning the discovery phase for your project. To start, could you please provide some key details about the project, such as its goals, scope, and any existing knowledge or research that has been conducted so far? This information will help us tailor the discovery plan effectively.\n\nParticipant: have 8 weeks to do 10 interviews and we've done five so far\n\nModerator: Great! To continue our planning, could you please provide more details about the project goals, scope, and any existing knowledge or research that has been conducted so far? This will help us tailor the discovery plan effectively.\n\nParticipant: goal is to create a interview assistant the scope is from the start of discovery  and when we have a client all the way through the  deploying\n\nModerator: Great! To continue our discussion, could you please provide more details about the project goals, scope, and any existing knowledge or research that has been conducted so far? This will help us tailor the discovery plan effectively to achieve the desired outcomes.\n\nParticipant: the product goes already mentioned then you don't have much twice a little concerned if you're not really\n\nModerator: Great! To continue our discussion, could you please share more details about the project goals, scope, and any existing knowledge or research that has already been conducted? This will help us tailor the discovery plan effectively.",
+  "analysis": null,
+  "created_at": "2025-05-12T15:33:28.555495",
+  "updated_at": "2025-05-12T15:35:23.601356"
+}

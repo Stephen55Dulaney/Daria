@@ -1,0 +1,38 @@
+{
+  "id": "1d351f3b-88ed-4466-8bff-12fc765fab17",
+  "guide_id": "bfa27702-6a62-488e-a3f3-68506b66ce06",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "user",
+      "content": "hi this is me I want you to type my message",
+      "id": "0a78335a-6252-4fc4-b0b6-4ba1c0635c64",
+      "timestamp": "2025-05-07T15:36:43.650799"
+    },
+    {
+      "role": "assistant",
+      "content": "Thanks for sharing that message. Can you tell me more about why you want someone else to type your message for you? Are there specific reasons or situations where you find it challenging to type messages yourself?",
+      "id": "174e3bac-7862-4420-a99d-ac49bc456898",
+      "timestamp": "2025-05-07T15:36:46.906032"
+    },
+    {
+      "role": "user",
+      "content": "hi are you there I want you to talk to me",
+      "id": "cb02dada-e134-49e4-9945-4ab09f00116a",
+      "timestamp": "2025-05-07T15:39:02.607291"
+    },
+    {
+      "role": "assistant",
+      "content": "Certainly! I'm here with you. I'm curious to know, why do you prefer someone else to talk to you rather than typing messages? Are there specific reasons or situations where you find it more comfortable or easier to communicate verbally instead of through text?",
+      "id": "acbe6183-c361-464e-858f-1903933da89e",
+      "timestamp": "2025-05-07T15:39:06.075480"
+    }
+  ],
+  "transcript": "\n\nParticipant: hi this is me I want you to type my message\n\nModerator: Thanks for sharing that message. Can you tell me more about why you want someone else to type your message for you? Are there specific reasons or situations where you find it challenging to type messages yourself?\n\nParticipant: hi are you there I want you to talk to me\n\nModerator: Certainly! I'm here with you. I'm curious to know, why do you prefer someone else to talk to you rather than typing messages? Are there specific reasons or situations where you find it more comfortable or easier to communicate verbally instead of through text?",
+  "analysis": null,
+  "created_at": "2025-05-07T15:36:07.124702",
+  "updated_at": "2025-05-07T15:39:06.076765"
+}

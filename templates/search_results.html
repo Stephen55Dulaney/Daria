@@ -1,0 +1,236 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="search-container">
+    <!-- Advanced Search Form -->
+    <div class="advanced-search-form">
+        <h2>Advanced Search</h2>
+        <form id="advancedSearchForm" method="GET" action="{{ url_for('search_interviews') }}">
+            <!-- Text Search -->
+            <div class="form-group">
+                <label for="query">Search Text:</label>
+                <input type="text" id="query" name="query" class="form-control" value="{{ request.args.get('query', '') }}">
+            </div>
+
+            <!-- Emotion Filter -->
+            <div class="form-group">
+                <label for="emotion">Emotion:</label>
+                <select id="emotion" name="emotion" class="form-control">
+                    <option value="">Any</option>
+                    <option value="neutral" {% if request.args.get('emotion') == 'neutral' %}selected{% endif %}>Neutral</option>
+                    <option value="positive" {% if request.args.get('emotion') == 'positive' %}selected{% endif %}>Positive</option>
+                    <option value="negative" {% if request.args.get('emotion') == 'negative' %}selected{% endif %}>Negative</option>
+                </select>
+            </div>
+
+            <!-- Emotion Intensity -->
+            <div class="form-group">
+                <label for="emotion_intensity">Minimum Emotion Intensity:</label>
+                <input type="range" id="emotion_intensity" name="emotion_intensity" min="1" max="5" 
+                       value="{{ request.args.get('emotion_intensity', '1') }}" class="form-control">
+                <span id="intensityValue">{{ request.args.get('emotion_intensity', '1') }}</span>
+            </div>
+
+            <!-- Themes -->
+            <div class="form-group">
+                <label for="themes">Themes:</label>
+                <select id="themes" name="themes" multiple class="form-control">
+                    {% for theme in available_themes %}
+                    <option value="{{ theme }}" {% if theme in selected_themes %}selected{% endif %}>{{ theme }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <!-- Insight Tags -->
+            <div class="form-group">
+                <label for="insight_tags">Insight Tags:</label>
+                <select id="insight_tags" name="insight_tags" multiple class="form-control">
+                    {% for tag in available_tags %}
+                    <option value="{{ tag }}" {% if tag in selected_tags %}selected{% endif %}>{{ tag }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <button type="submit" class="btn btn-primary">Search</button>
+        </form>
+    </div>
+
+    <!-- Search Results -->
+    <div class="search-results">
+        <h2>Search Results</h2>
+        {% if interviews %}
+            <div class="interview-cards">
+                {% for interview in interviews %}
+                <div class="interview-card">
+                    <div class="card-header">
+                        <h3>
+                            <a href="{{ url_for('view_interview', interview_id=interview.id) }}">
+                                {{ interview.project_name }} - {{ interview.date|strftime }}
+                            </a>
+                        </h3>
+                        <span class="emotion-badge {{ interview.emotion }}">
+                            {{ interview.emotion|title }} ({{ interview.emotion_intensity }})
+                        </span>
+                    </div>
+                    <div class="card-body">
+                        <div class="themes">
+                            <strong>Themes:</strong>
+                            {% for theme in interview.themes %}
+                            <span class="theme-tag">{{ theme }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="insights">
+                            <strong>Insights:</strong>
+                            {% for tag in interview.insight_tags %}
+                            <span class="insight-tag">{{ tag }}</span>
+                            {% endfor %}
+                        </div>
+                        <div class="preview">
+                            {{ interview.preview|truncate(200) }}
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if pagination %}
+            <div class="pagination">
+                {% for page in pagination.iter_pages() %}
+                    {% if page %}
+                        <a href="{{ url_for('search_interviews', page=page, **request.args) }}" 
+                           class="{% if page == pagination.page %}active{% endif %}">{{ page }}</a>
+                    {% else %}
+                        <span class="ellipsis">...</span>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% endif %}
+        {% else %}
+            <p>No interviews found matching your search criteria.</p>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Styles -->
+<style>
+.search-container {
+    display: grid;
+    grid-template-columns: 300px 1fr;
+    gap: 20px;
+    padding: 20px;
+}
+
+.advanced-search-form {
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 8px;
+    position: sticky;
+    top: 20px;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-control {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.interview-card {
+    background: white;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.card-header {
+    background: #f8f9fa;
+    padding: 15px;
+    border-bottom: 1px solid #ddd;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-body {
+    padding: 15px;
+}
+
+.emotion-badge {
+    padding: 5px 10px;
+    border-radius: 15px;
+    font-size: 0.9em;
+}
+
+.emotion-badge.neutral { background: #e9ecef; }
+.emotion-badge.positive { background: #d4edda; }
+.emotion-badge.negative { background: #f8d7da; }
+
+.theme-tag, .insight-tag {
+    display: inline-block;
+    padding: 4px 8px;
+    margin: 2px;
+    border-radius: 12px;
+    font-size: 0.85em;
+}
+
+.theme-tag {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+
+.insight-tag {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+
+.preview {
+    margin-top: 15px;
+    color: #666;
+}
+
+.pagination {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.pagination a {
+    display: inline-block;
+    padding: 5px 10px;
+    margin: 0 2px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    text-decoration: none;
+    color: #333;
+}
+
+.pagination a.active {
+    background: #007bff;
+    color: white;
+    border-color: #007bff;
+}
+
+.ellipsis {
+    padding: 5px;
+    color: #666;
+}
+</style>
+
+<!-- Scripts -->
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Update emotion intensity value display
+    const intensitySlider = document.getElementById('emotion_intensity');
+    const intensityValue = document.getElementById('intensityValue');
+    
+    intensitySlider.addEventListener('input', function() {
+        intensityValue.textContent = this.value;
+    });
+});
+</script>
+{% endblock %} 

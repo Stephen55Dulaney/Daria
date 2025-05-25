@@ -1,0 +1,78 @@
+{% extends "base.html" %}
+
+{% block title %}Edit {{ agent }} Prompt - DARIA{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item"><a href="{{ url_for('prompts.prompt_list') }}">Prompt Manager</a></li>
+<li class="breadcrumb-item"><a href="{{ url_for('prompts.view_prompt', agent=agent) }}">{{ agent }}</a></li>
+<li class="breadcrumb-item active" aria-current="page">Edit</li>
+{% endblock %}
+
+{% block inner_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Edit {{ agent }} Prompt</h1>
+    <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-2"></i> Back to Details
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" action="{{ url_for('prompts.edit_prompt', agent=agent) }}">
+            <div class="mb-3">
+                <label for="description" class="form-label">Description</label>
+                <input type="text" class="form-control" id="description" name="description" value="{{ config.description }}">
+                <div class="form-text">Brief description of what this agent does</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="role" class="form-label">Role</label>
+                <input type="text" class="form-control" id="role" name="role" value="{{ config.role }}">
+                <div class="form-text">The role this agent takes (e.g., "UX Research Assistant")</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="tone" class="form-label">Tone</label>
+                <input type="text" class="form-control" id="tone" name="tone" value="{{ config.tone }}">
+                <div class="form-text">The tone this agent should use (e.g., "Professional, friendly, helpful")</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="core_objectives" class="form-label">Core Objectives</label>
+                <textarea class="form-control" id="core_objectives" name="core_objectives" rows="5">{% for objective in config.core_objectives %}{{ objective }}
+{% endfor %}</textarea>
+                <div class="form-text">Each line will be treated as a separate objective</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="contextual_instructions" class="form-label">Contextual Instructions</label>
+                <textarea class="form-control" id="contextual_instructions" name="contextual_instructions" rows="10">{{ config.contextual_instructions }}</textarea>
+                <div class="form-text">Detailed instructions for how the agent should behave</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="dynamic_prompt_prefix" class="form-label">Dynamic Prompt Prefix</label>
+                <textarea class="form-control" id="dynamic_prompt_prefix" name="dynamic_prompt_prefix" rows="3">{{ config.dynamic_prompt_prefix }}</textarea>
+                <div class="form-text">Prefix added to each prompt for this agent</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="analysis_prompt" class="form-label">Analysis Prompt</label>
+                <textarea class="form-control" id="analysis_prompt" name="analysis_prompt" rows="5">{{ config.analysis_prompt }}</textarea>
+                <div class="form-text">Specific prompt used when the agent performs analysis or asks skeptical probing questions</div>
+            </div>
+            
+            <div class="mb-3">
+                <label for="evaluation_note" class="form-label">Evaluation Note</label>
+                <textarea class="form-control" id="evaluation_note" name="evaluation_note" rows="3"></textarea>
+                <div class="form-text">Optional notes about changes made in this version</div>
+            </div>
+            
+            <div class="d-flex justify-content-end gap-2">
+                <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">Cancel</a>
+                <button type="submit" class="btn btn-primary">Save Changes</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %} 

@@ -215,7 +215,6 @@ def load_all_interviews() -> Dict[str, Dict[str, Any]]:
     """Load all interviews from the data directory."""
     interviews = {}
     try:
-        DATA_DIR.mkdir(parents=True, exist_ok=True)  # Ensure directory exists
         for file_path in DATA_DIR.glob("*.json"):
             try:
                 session_id = file_path.stem
@@ -4043,6 +4042,61 @@ def api_create_issue():
     except Exception as e:
         logger.error(f"Error creating issue: {str(e)}")
         return jsonify({"error": str(e)}), 500
+
+@app.route('/api/llm/extract_opportunity', methods=['POST'])
+def extract_opportunity():
+    data = request.get_json()
+    analysis_text = data.get('analysis', '')
+    if not analysis_text:
+        return jsonify({'success': False, 'error': 'No analysis text provided'}), 400
+
+    api_key = os.environ.get('OPENAI_API_KEY')
+    prompt = (
+        "Extract the following fields from the research analysis below and return as JSON:\n"
+        "- title: A concise opportunity title\n"
+        "- description: A summary of the opportunity and its context\n"
+        "- linked_persona: The main user persona(s) involved\n"
+        "- journey_stage: The stage in the user journey\n"
+        "- root_cause: The underlying cause of the problem\n"
+        "- insights: Key research insights (one per line)\n"
+        "- ethics: Ethical considerations (one per line)\n"
+        "- cursor_prompt_template: A template for generating prototype prompts for Cursor AI\n"
+        "\nResearch Analysis:\n" + analysis_text + "\n\nJSON:"
+    )
+    if api_key:
+        try:
+            import openai
+            client = openai.OpenAI(api_key=api_key)
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=512,
+                temperature=0.2
+            )
+            import json as pyjson
+            content = response.choices[0].message.content
+            start = content.find('{')
+            end = content.rfind('}')
+            if start != -1 and end != -1:
+                json_str = content[start:end+1]
+                fields = pyjson.loads(json_str)
+                return jsonify({'success': True, 'fields': fields})
+            else:
+                return jsonify({'success': False, 'error': 'Could not parse LLM response'}), 500
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    else:
+        # Mock response for local testing
+        return jsonify({'success': True, 'fields': {
+            'title': 'Sample Opportunity Title',
+            'description': 'Sample description of the opportunity and its context.',
+            'linked_persona': 'Sample Persona',
+            'journey_stage': 'Discovery',
+            'root_cause': 'Sample root cause',
+            'insights': 'Sample insight 1\nSample insight 2',
+            'ethics': 'Sample ethical consideration',
+            'cursor_prompt_template': 'Sample cursor prompt template'
+        }})
 
 # Start the app
 if __name__ == '__main__':

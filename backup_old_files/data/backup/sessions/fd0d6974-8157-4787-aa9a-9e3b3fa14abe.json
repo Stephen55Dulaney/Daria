@@ -1,0 +1,161 @@
+{
+  "id": "fd0d6974-8157-4787-aa9a-9e3b3fa14abe",
+  "guide_id": null,
+  "interviewee": {
+    "name": "John Jacob Jengle Himer Smith",
+    "email": "sdulaney@deloitte.com",
+    "role": "UX Researcher",
+    "department": "User Research",
+    "company": "Deloitte",
+    "demographics": {
+      "age_range": "25-34",
+      "gender": "Female",
+      "location": "TX"
+    }
+  },
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "962ed9e7-b7a1-4595-911e-7093e68b3b33",
+      "content": "hello this is a test of skeptica",
+      "role": "user",
+      "timestamp": "2025-05-15T19:54:14.234735"
+    },
+    {
+      "id": "4c3d00c1-aeed-4aa6-b08d-c5dbb70bbd3d",
+      "content": "Hello! I'm Skeptica, here to help you with your interview. What would you like to discuss or share with me today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:54:17.488348"
+    },
+    {
+      "id": "0e5279b0-af63-48b1-ac03-fc186dc580ca",
+      "content": "I've been having problems all day long trying to get these things working on my digital interview assistant is so hard to keep bug tracking and trying to get something to work and then every time if you don't do your full regression testing you get burned",
+      "role": "user",
+      "timestamp": "2025-05-15T19:54:44.159523"
+    },
+    {
+      "id": "22aadc97-c47b-4ffb-bb90-b1d73d7e4bef",
+      "content": "It sounds like you're facing some challenges with bug tracking and regression testing on your digital interview assistant. Can you tell me more about the specific issues you're encountering with bug tracking?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:54:47.270562"
+    },
+    {
+      "id": "78ec7f7c-79cd-49a9-bded-9cea2f66c8b1",
+      "content": "well I did make it like little bug tracker and so that's fine and I can capture him but every time we kind of do a new fix something usually something else break so you have to do regression testing from the ground up because if you skip it two or three changes and then you find out that you don't have text to speech or some fundamental function is too late",
+      "role": "user",
+      "timestamp": "2025-05-15T19:55:24.199509"
+    },
+    {
+      "id": "51cc05cd-1648-42a2-8d85-6bf47ba5fa1d",
+      "content": "It sounds like you're experiencing challenges with regression testing in your bug tracker. Can you elaborate on why you're finding that when you make a fix, something else breaks? Are there specific patterns or issues you've noticed during this process that might be causing these problems?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:55:27.788046"
+    },
+    {
+      "id": "4caab10d-2100-43b6-a4d1-b8197166db7b",
+      "content": "no I mean I know it's complicated the websockets kind of crazy like right now it's not really refreshing until I get the refresh but it's I don't know it should be live if not we used to have this really cool feature that said suggest a question it's not working",
+      "role": "user",
+      "timestamp": "2025-05-15T19:56:08.676814"
+    },
+    {
+      "id": "edcd58e2-8310-45dc-9b24-14bc7d0c5245",
+      "content": "It sounds like you're having some issues with websockets and live refreshing on your platform. Can you provide more details on what specifically is not working as expected with the live refreshing feature?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:56:12.188107"
+    },
+    {
+      "id": "78013180-71bd-4108-806d-d21008a460bd",
+      "content": " I don't know what to tell you it's just been frustrating Beyond in",
+      "role": "user",
+      "timestamp": "2025-05-15T19:56:13.192678"
+    },
+    {
+      "id": "4d2201dc-97a1-443d-9e3d-15a6f1bde017",
+      "content": "It sounds like you've been feeling frustrated. Could you share a bit more about what's been causing this frustration for you?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:56:25.482871"
+    },
+    {
+      "id": "ff507b9e-586e-4d1e-8e04-871006929811",
+      "content": " so that's part of it and then sometimes like what I'm saying right now",
+      "role": "user",
+      "timestamp": "2025-05-15T19:56:50.209419"
+    },
+    {
+      "id": "4fa96eff-cff1-4d7d-851f-e092adcc9245",
+      "content": "Could you please clarify what you mean by \"that's part of it\" and \"what I'm saying right now\"? I want to make sure I understand your point clearly.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:56:53.081515"
+    },
+    {
+      "id": "388cbdd8-198a-4821-a8b7-ae841c9ede53",
+      "content": "for the speech to text it gets tired or something and it just just deletes what I said and then it catches again but the first part of my paragraph is just gone and then you give me Snippets that's not the full conversation",
+      "role": "user",
+      "timestamp": "2025-05-15T19:57:20.112787"
+    },
+    {
+      "id": "faf9ddf7-bb49-4734-ab1b-df8a46482090",
+      "content": "It sounds like you're experiencing some issues with the speech-to-text function. Can you provide more details on how often this happens and in what context? Are there specific conditions or patterns when this deletion occurs?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:57:23.419717"
+    },
+    {
+      "id": "a2c5746c-a858-4ab9-bc80-3a08b4cb6331",
+      "content": " so here we go so that looks pretty good it captured everything that I'm saying",
+      "role": "user",
+      "timestamp": "2025-05-15T19:58:00.611032"
+    },
+    {
+      "id": "21561e14-f21f-4b11-b5d4-6df457a9ebff",
+      "content": "That's great to hear! Could you please elaborate on what specifically you are referring to as \"it\" that captured everything you are saying?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:58:04.096364"
+    },
+    {
+      "id": "3f162817-6648-41fd-a839-9a6ee8683e2a",
+      "content": " thing live and it's also detecting new topics and making observations",
+      "role": "user",
+      "timestamp": "2025-05-15T19:58:32.870313"
+    },
+    {
+      "id": "d2dac92c-d480-44a7-b23f-142e896ef44a",
+      "content": "That's fascinating! Could you please elaborate on how this thing works in real-time to detect new topics and make observations? What kind of technology or process enables it to do so?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:58:44.820678"
+    },
+    {
+      "id": "cac24e8b-3188-41b6-8b80-322d005bcb42",
+      "content": "no you didn't even catch all that but can we take the suggested question and put it on the bottom of the deep bug AI observation email",
+      "role": "user",
+      "timestamp": "2025-05-15T19:59:10.937854"
+    },
+    {
+      "id": "61fdaa75-7bf8-49e4-81e5-f2b693a14a26",
+      "content": "I'm sorry, I think there might have been a misunderstanding. Could you please clarify what you mean by putting the suggested question on the bottom of the deep bug AI observation email? Are you referring to adding a question at the end of the email for further clarification or discussion on the bug observation?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:59:14.272209"
+    },
+    {
+      "id": "0f8ba1e2-cf2d-4a69-81a3-341b59b0bd8b",
+      "content": " okay I'm going to end the interview",
+      "role": "user",
+      "timestamp": "2025-05-15T19:59:53.669621"
+    },
+    {
+      "id": "4327b8ae-e687-455a-8fbc-3336f9b831a1",
+      "content": "Before we end, could you share with me what you found most valuable or interesting about this interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T19:59:56.283020"
+    }
+  ],
+  "transcript": "\n\nParticipant: hello this is a test of skeptica\n\nModerator: Hello! I'm Skeptica, here to help you with your interview. What would you like to discuss or share with me today?\n\nParticipant: I've been having problems all day long trying to get these things working on my digital interview assistant is so hard to keep bug tracking and trying to get something to work and then every time if you don't do your full regression testing you get burned\n\nModerator: It sounds like you're facing some challenges with bug tracking and regression testing on your digital interview assistant. Can you tell me more about the specific issues you're encountering with bug tracking?\n\nParticipant: well I did make it like little bug tracker and so that's fine and I can capture him but every time we kind of do a new fix something usually something else break so you have to do regression testing from the ground up because if you skip it two or three changes and then you find out that you don't have text to speech or some fundamental function is too late\n\nModerator: It sounds like you're experiencing challenges with regression testing in your bug tracker. Can you elaborate on why you're finding that when you make a fix, something else breaks? Are there specific patterns or issues you've noticed during this process that might be causing these problems?\n\nParticipant: no I mean I know it's complicated the websockets kind of crazy like right now it's not really refreshing until I get the refresh but it's I don't know it should be live if not we used to have this really cool feature that said suggest a question it's not working\n\nModerator: It sounds like you're having some issues with websockets and live refreshing on your platform. Can you provide more details on what specifically is not working as expected with the live refreshing feature?\n\nParticipant:  I don't know what to tell you it's just been frustrating Beyond in\n\nModerator: It sounds like you've been feeling frustrated. Could you share a bit more about what's been causing this frustration for you?\n\nParticipant:  so that's part of it and then sometimes like what I'm saying right now\n\nModerator: Could you please clarify what you mean by \"that's part of it\" and \"what I'm saying right now\"? I want to make sure I understand your point clearly.\n\nParticipant: for the speech to text it gets tired or something and it just just deletes what I said and then it catches again but the first part of my paragraph is just gone and then you give me Snippets that's not the full conversation\n\nModerator: It sounds like you're experiencing some issues with the speech-to-text function. Can you provide more details on how often this happens and in what context? Are there specific conditions or patterns when this deletion occurs?\n\nParticipant:  so here we go so that looks pretty good it captured everything that I'm saying\n\nModerator: That's great to hear! Could you please elaborate on what specifically you are referring to as \"it\" that captured everything you are saying?\n\nParticipant:  thing live and it's also detecting new topics and making observations\n\nModerator: That's fascinating! Could you please elaborate on how this thing works in real-time to detect new topics and make observations? What kind of technology or process enables it to do so?\n\nParticipant: no you didn't even catch all that but can we take the suggested question and put it on the bottom of the deep bug AI observation email\n\nModerator: I'm sorry, I think there might have been a misunderstanding. Could you please clarify what you mean by putting the suggested question on the bottom of the deep bug AI observation email? Are you referring to adding a question at the end of the email for further clarification or discussion on the bug observation?\n\nParticipant:  okay I'm going to end the interview\n\nModerator: Before we end, could you share with me what you found most valuable or interesting about this interview?",
+  "analysis": null,
+  "created_at": "2025-05-15T19:54:04.207549",
+  "updated_at": "2025-05-16T07:41:38.434512",
+  "title": "SKeptica",
+  "project": "Test 4444",
+  "interview_type": "discovery_interview",
+  "character": "skeptica",
+  "character_select": "skeptica",
+  "voice_id": "AZnzlk1XvdvUeBnXmlld"
+}

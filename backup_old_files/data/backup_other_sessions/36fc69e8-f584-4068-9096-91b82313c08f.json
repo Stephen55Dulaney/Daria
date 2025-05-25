@@ -1,0 +1,50 @@
+{
+  "id": "36fc69e8-f584-4068-9096-91b82313c08f",
+  "guide_id": "e4e38f56-0960-4185-ae85-e2cb6e90f8c6",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "da090911-72be-4210-896b-48e468ea592f",
+      "content": "I want to see if there is a button to copy the transmission but that's okay",
+      "role": "user",
+      "timestamp": "2025-05-14T09:52:22.355090"
+    },
+    {
+      "id": "027e06a4-bd5d-4e8c-8665-521e6ce8828e",
+      "content": "Certainly! In interviews, it's important to gather relevant information to understand the participant's perspective better. Can you elaborate on what you mean by \"copy the transmission\"? Are you referring to duplicating or saving the conversation for reference later?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:52:23.196886"
+    },
+    {
+      "id": "64642645-11e9-481f-9fd0-32daa8ae8aa7",
+      "content": "yes that is exactly correct in the interview conversation transcript if there is a simple way like a copy button I could use that to help debug and fix the interview for future interview people",
+      "role": "user",
+      "timestamp": "2025-05-14T09:52:58.754828"
+    },
+    {
+      "id": "2de0b84a-454e-4ac4-acea-bd162889d375",
+      "content": "That's a great suggestion! Having a copy button could definitely make it easier to correct and improve interview transcripts for future use. Can you tell me more about any specific challenges you've faced while debugging and fixing interview transcripts in the past?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:52:59.719857"
+    },
+    {
+      "id": "3e964b85-113e-4d24-a2b0-fda7fc8b42cd",
+      "content": "the interview is a good way for me to capture what's working and I can walk through the interface and make comments and then I can copy that conversation transcript and paste it into the cursor AI tool who's helping me debug this interview page",
+      "role": "user",
+      "timestamp": "2025-05-14T09:53:39.859343"
+    },
+    {
+      "id": "f560923e-3c85-4889-b6d8-52329a92c95d",
+      "content": "That sounds like a useful approach to capturing feedback on the interface and using it to improve the interview process. How has using the cursor AI tool helped you in debugging the interview page?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:53:40.505101"
+    }
+  ],
+  "transcript": "\n\nParticipant: I want to see if there is a button to copy the transmission but that's okay\n\nModerator: Certainly! In interviews, it's important to gather relevant information to understand the participant's perspective better. Can you elaborate on what you mean by \"copy the transmission\"? Are you referring to duplicating or saving the conversation for reference later?\n\nParticipant: yes that is exactly correct in the interview conversation transcript if there is a simple way like a copy button I could use that to help debug and fix the interview for future interview people\n\nModerator: That's a great suggestion! Having a copy button could definitely make it easier to correct and improve interview transcripts for future use. Can you tell me more about any specific challenges you've faced while debugging and fixing interview transcripts in the past?\n\nParticipant: the interview is a good way for me to capture what's working and I can walk through the interface and make comments and then I can copy that conversation transcript and paste it into the cursor AI tool who's helping me debug this interview page\n\nModerator: That sounds like a useful approach to capturing feedback on the interface and using it to improve the interview process. How has using the cursor AI tool helped you in debugging the interview page?",
+  "analysis": null,
+  "created_at": "2025-05-14T09:52:10.477269",
+  "updated_at": "2025-05-14T09:53:40.505415"
+}

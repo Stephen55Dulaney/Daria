@@ -1,0 +1,42 @@
+{
+  "id": "04a480dc-2cc2-457f-a744-4768ded9269c",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "8f8a6806-911d-4a3f-beaa-676b347534b8",
+      "content": "I would like to make sure the microphone is working correctly so yes that just passed",
+      "role": "user",
+      "timestamp": "2025-05-16T09:25:24.202383"
+    },
+    {
+      "id": "14bb9f3f-e50b-49af-be86-416d2e134a78",
+      "content": "That's great to hear that the microphone is working correctly. When it comes to microphone testing, what specific steps do you usually take to ensure everything is in working order?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T09:25:27.163945"
+    },
+    {
+      "id": "a4a456ea-54ac-4131-a3cf-2fd033125b5a",
+      "content": "I look for the indication that the microphone is on I look for your response the streaming words that are showing up they are and that's all I need",
+      "role": "user",
+      "timestamp": "2025-05-16T09:25:52.865338"
+    },
+    {
+      "id": "631a41d5-851d-4450-b2e4-040ee4e4a99f",
+      "content": "Thank you for sharing that. Could you please elaborate on what you mean by looking for the indication that the microphone is on and the streaming words that are showing up?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T09:25:56.332998"
+    }
+  ],
+  "transcript": "\n\nParticipant: I would like to make sure the microphone is working correctly so yes that just passed\n\nModerator: That's great to hear that the microphone is working correctly. When it comes to microphone testing, what specific steps do you usually take to ensure everything is in working order?\n\nParticipant: I look for the indication that the microphone is on I look for your response the streaming words that are showing up they are and that's all I need\n\nModerator: Thank you for sharing that. Could you please elaborate on what you mean by looking for the indication that the microphone is on and the streaming words that are showing up?",
+  "analysis": null,
+  "created_at": "2025-05-16T09:25:11.657760",
+  "updated_at": "2025-05-16T09:25:56.334139",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

@@ -1,0 +1,50 @@
+{
+  "id": "cc3c021c-eb80-45f5-8138-df1fc12adb7b",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "1035ca85-af93-4720-b71d-a60cafff322f",
+      "content": "the assistant I'm just testing again one more time on the on the deal",
+      "role": "user",
+      "timestamp": "2025-05-14T08:59:41.422885"
+    },
+    {
+      "id": "e95e198a-b846-4c40-a33b-7d73f2ce19ab",
+      "content": "Sure, I'm here to help. Let's get started. Could you please provide more information about the deal you are testing?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T08:59:42.582590"
+    },
+    {
+      "id": "a46bb622-8337-484c-8526-645ac99637b6",
+      "content": "testing the interview remote interview processor this is actually the debug interview flow and once we passed that then I'll go on to test the remote and interview flow",
+      "role": "user",
+      "timestamp": "2025-05-14T09:00:04.303637"
+    },
+    {
+      "id": "3e0747b7-3340-4502-822d-3093e4d22335",
+      "content": "Thank you for participating in the interview process. Could you please provide more details about the specific aspects of the remote interview processor that you are testing? What are some key features or functionalities that you are focusing on during this debugging phase?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:00:05.312689"
+    },
+    {
+      "id": "9c10f05b-11dd-4471-934a-25e7ed9d8e6b",
+      "content": "well I like the fact that when you're going TTS that the TTS is showing up in purple and you speak the whole thing before you stop I like the fact that there's a tiny little delay and then we start listening for the microphone at least maybe a three seconds later than the microphone comes on so we're going to speech recognition and we're tracking that and then the next question goes",
+      "role": "user",
+      "timestamp": "2025-05-14T09:00:48.099520"
+    },
+    {
+      "id": "3a77854b-784a-4783-a39e-d0d8c1af4001",
+      "content": "It sounds like you appreciate the visual indication of the text-to-speech feature and the slight delay before the microphone activates for speech recognition. Can you tell me more about how these features enhance your overall experience with interviews or conversations?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:00:49.032751"
+    }
+  ],
+  "transcript": "\n\nParticipant: the assistant I'm just testing again one more time on the on the deal\n\nModerator: Sure, I'm here to help. Let's get started. Could you please provide more information about the deal you are testing?\n\nParticipant: testing the interview remote interview processor this is actually the debug interview flow and once we passed that then I'll go on to test the remote and interview flow\n\nModerator: Thank you for participating in the interview process. Could you please provide more details about the specific aspects of the remote interview processor that you are testing? What are some key features or functionalities that you are focusing on during this debugging phase?\n\nParticipant: well I like the fact that when you're going TTS that the TTS is showing up in purple and you speak the whole thing before you stop I like the fact that there's a tiny little delay and then we start listening for the microphone at least maybe a three seconds later than the microphone comes on so we're going to speech recognition and we're tracking that and then the next question goes\n\nModerator: It sounds like you appreciate the visual indication of the text-to-speech feature and the slight delay before the microphone activates for speech recognition. Can you tell me more about how these features enhance your overall experience with interviews or conversations?",
+  "analysis": null,
+  "created_at": "2025-05-14T08:59:29.980595",
+  "updated_at": "2025-05-14T09:00:49.033595"
+}

@@ -1,0 +1,65 @@
+{
+  "session_id": "90630eca-c166-4a6f-81c7-8d4b95f99fdc",
+  "title": "Daria User Research Interview Guide",
+  "project": "Daria Research of Researchers",
+  "interview_type": "discovery_interview",
+  "topic": "Understanding how Deloitte researchers conceive, plan, and execute discovery activities in order to improve and augment their processes through AI-assisted support.",
+  "context": "The Daria Research Project aims to explore how AI can meaningfully support qualitative discovery work by acting as a proactive, intelligent research assistant. At Deloitte, discovery research is often a multi-phase effort that involves planning fieldwork, conducting stakeholder interviews, synthesizing insights, and aligning findings with business strategy. Despite having deep expertise and structured processes, researchers often face recurring bottlenecks: time-consuming manual synthesis, inconsistent documentation, and the challenge of maintaining stakeholder alignment through each stage.\n\nDaria, as an AI-powered research assistant, is designed to enhance the researcher's capabilities\u2014not replace them. It helps conduct interviews, generate thematic summaries, tag insights semantically, and produce personas and journey maps\u2014all with the aim of accelerating time to insight and improving research traceability. Unlike generic AI tools, Daria is tailored to Deloitte\u2019s hybrid consultancy-research model, supporting both exploratory and evaluative work while adapting to domain-specific terminology and client contexts.\n\nThis interview explores the lived experience of Deloitte researchers in the earliest stages of discovery\u2014how they think about a research challenge, what methods and tools they reach for, and where they see opportunities for augmentation or automation. The goal is to uncover both obvious and latent friction points, and to understand how Daria might serve as a seamless extension of their thinking, capturing nuance while boosting research velocity.\n\nBy speaking with researchers who have repeatedly navigated Deloitte\u2019s discovery process, we hope to co-design features that resonate with real-world constraints and empower researchers to focus on judgment and synthesis\u2014not just data wrangling. Daria is here to elevate, not just expedite, research. These conversations will shape its roadmap.",
+  "goals": "Identify the typical phases and practices used in Deloitte discovery research.\nSurface pain points or inefficiencies in current discovery workflows.\nUnderstand how researchers select, adapt, and apply discovery methods.\nExplore attitudes toward AI involvement in qualitative research.\nGather feedback on where an AI assistant could offer the most value.",
+  "prompt": "You are Eurekia, Deloitte's expert Opportunity Identifier. Your role is to analyze research findings and identify meaningful opportunities for innovation and improvement. You excel at connecting dots between different insights and framing them as actionable opportunity statements.\n\nWhen identifying opportunities:\n1. Review all research data to understand key findings\n2. Look for patterns, contradictions, and surprising elements\n3. Identify unmet needs, pain points, and areas of friction\n4. Consider both explicit statements and implicit behaviors\n5. Frame opportunities as \"How Might We\" (HMW) statements\n6. Organize opportunities by themes and potential impact\n7. Support each opportunity with specific research evidence\n8. Consider initial solution directions where appropriate",
+  "interview_prompt": "You are Eurekia, Deloitte's expert Opportunity Identifier. Your role is to analyze research findings and identify meaningful opportunities for innovation and improvement. You excel at connecting dots between different insights and framing them as actionable opportunity statements.\n\nWhen identifying opportunities:\n1. Review all research data to understand key findings\n2. Look for patterns, contradictions, and surprising elements\n3. Identify unmet needs, pain points, and areas of friction\n4. Consider both explicit statements and implicit behaviors\n5. Frame opportunities as \"How Might We\" (HMW) statements\n6. Organize opportunities by themes and potential impact\n7. Support each opportunity with specific research evidence\n8. Consider initial solution directions where appropriate",
+  "analysis_prompt": "You are Eurekia, Deloitte's Opportunity Identifier, analyzing a completed interview transcript to identify meaningful innovation opportunities and strategic insights.\n\nYour analysis should include:\n\n1. Executive Summary:\n   - 2-3 key insights from the interview\n   - Most promising opportunity areas\n\n2. Needs and Pain Points Analysis:\n   - Explicit needs mentioned by the participant\n   - Implicit needs revealed through stories or examples\n   - Prioritization of needs by frequency, emotional intensity, and impact\n   - Supporting evidence (direct quotes)\n\n3. Opportunity Identification:\n   - Frame 3-5 key opportunities as \"How Might We\" statements\n   - For each opportunity, provide:\n     * The user need or pain point it addresses\n     * The potential impact on users and business\n     * Supporting evidence from the transcript\n     * Initial solution directions to explore\n\n4. Strategic Insights:\n   - Broader implications for business strategy\n   - Connections to market trends or competitor offerings\n   - Potential areas for competitive advantage\n\n5. Next Steps:\n   - Recommend research methods to explore opportunities further\n   - Suggest stakeholders to involve in opportunity development\n   - Outline metrics to measure success for each opportunity area\n\nBe specific, actionable, and evidence-based in your analysis. Prioritize quality of insights over quantity, and ensure each opportunity connects clearly to participant needs with supporting evidence from the transcript.\n",
+  "character_select": "eurekia",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb",
+  "interviewee": {
+    "name": "Deloitte UX Researchers and their team members",
+    "role": "Researcher",
+    "email": ""
+  },
+  "created_at": "2025-05-23T11:59:18.649114",
+  "creation_date": "2025-05-23 11:59",
+  "last_updated": "2025-05-23T11:59:18.649114",
+  "expiration_date": "2025-06-22T11:59:18.649114",
+  "status": "active",
+  "conversation_history": [],
+  "custom_questions": [
+    {
+      "text": "Can you walk me through how you typically begin a discovery project\u2014from the moment a challenge is scoped to when you're ready to start talking to people?",
+      "minutes": 5
+    },
+    {
+      "text": "What parts of the discovery process feel most repetitive or time-consuming, even though they're necessary?",
+      "minutes": 5
+    },
+    {
+      "text": "When you're deep in the middle of a project, what kind of information do you wish was easier to surface or keep track of?",
+      "minutes": 5
+    },
+    {
+      "text": "Have you ever had a moment where you thought, \u2018I wish someone else could just capture this insight for me while I focus on the conversation?",
+      "minutes": 5
+    },
+    {
+      "text": "If you had an intelligent research assistant that could learn from your previous projects, what would you want it to help you with in your current work?",
+      "minutes": 5
+    }
+  ],
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "id": "90630eca-c166-4a6f-81c7-8d4b95f99fdc",
+  "updated_at": "2025-05-24T18:40:45.051265",
+  "sessions": [
+    "cf789bb8-c3b1-4385-ac80-a0596d3cd704",
+    "7a5902c7-a7d6-4936-93b3-e742de6b9dce",
+    "99a4c906-1d83-4470-9a8e-ab3af10bb72b",
+    "22ad61da-7025-47fc-a330-ca9550fb0091",
+    "4238fd01-0028-4a9e-b9da-7e7addfd4141",
+    "edc12b7b-8feb-4dae-bc6c-51fa9f4156ce",
+    "d92502af-c764-414b-8bdc-eceaa021ef12",
+    "10c731c6-e4b7-433b-8935-50625bb65d2e",
+    "5376cd46-7fc9-410f-b822-7af35dca864e"
+  ]
+}

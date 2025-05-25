@@ -1,0 +1,26 @@
+{
+  "id": "d85daef6-ac78-42f1-8001-c6da8a4c2abc",
+  "guide_id": "5b14b322-f6fd-4898-9ce6-3a9d03a9e535",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "87d5cf0c-4593-4cd7-a92c-a3bba90662b4",
+      "content": "I want to test to make sure we're working properly",
+      "role": "user",
+      "timestamp": "2025-05-15T08:40:21.986976"
+    },
+    {
+      "id": "5ba9b555-b5df-4feb-8e09-da151725aab9",
+      "content": "I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T08:40:21.989181"
+    }
+  ],
+  "transcript": "\n\nParticipant: I want to test to make sure we're working properly\n\nModerator: I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+  "analysis": null,
+  "created_at": "2025-05-15T08:40:11.514437",
+  "updated_at": "2025-05-15T08:40:21.989314"
+}

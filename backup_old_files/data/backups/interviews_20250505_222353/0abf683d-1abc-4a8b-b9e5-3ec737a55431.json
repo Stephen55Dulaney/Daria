@@ -1,0 +1,76 @@
+{
+  "session_id": "0abf683d-1abc-4a8b-b9e5-3ec737a55431",
+  "character": "interviewer",
+  "voice_id": "",
+  "title": "Untitled Interview",
+  "description": "",
+  "status": "active",
+  "created_at": "2025-05-03T00:58:56.332000",
+  "last_updated": "2025-05-03T01:03:53.949695",
+  "expiration_date": "2025-05-10T00:58:56.332000",
+  "conversation_history": [
+    {
+      "role": "system",
+      "content": "You are a helpful interview assistant."
+    },
+    {
+      "role": "assistant",
+      "content": "Hello! I'm interviewer. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?"
+    },
+    {
+      "role": "user",
+      "content": "I am fine. How are you today?"
+    },
+    {
+      "role": "assistant",
+      "content": "How did that make you feel?"
+    },
+    {
+      "role": "user",
+      "content": "That made me feel great because your voice came across okay."
+    },
+    {
+      "role": "assistant",
+      "content": "What impact did that have on your work or process?"
+    }
+  ],
+  "analysis": null,
+  "transcript": [
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "You are a helpful interview assistant.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Hello! I'm interviewer. I'll be conducting this interview today. Let's get started. Could you please introduce yourself?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "I am fine. How are you today?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "How did that make you feel?",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "That made me feel great because your voice came across okay.",
+      "timestamp": ""
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "What impact did that have on your work or process?",
+      "timestamp": ""
+    }
+  ]
+}

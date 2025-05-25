@@ -1,0 +1,46 @@
+{
+  "id": "5a388284-b285-4db2-a425-58e9bac77f07",
+  "guide_id": "9d9b0648-5f14-4a22-81df-290bbd67049d",
+  "interviewee": {
+    "name": "Test Participant",
+    "email": "",
+    "role": ""
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "18b26762-ffa8-4b5f-98ea-11de4d629e0a",
+      "content": "This is a test transcript.",
+      "role": "assistant",
+      "timestamp": "2025-05-22T14:16:20.772460"
+    },
+    {
+      "id": "fe4b8115-f820-4377-8d2f-01d0d94d99a8",
+      "content": "Hello, I'm responding to the test transcript.",
+      "role": "user",
+      "timestamp": "2025-05-22T14:16:21.772460"
+    },
+    {
+      "id": "becfecf8-f486-4ff4-87f6-16387e0f7ea7",
+      "content": "Thank you for your response.",
+      "role": "assistant",
+      "timestamp": "2025-05-22T14:16:22.772460"
+    }
+  ],
+  "transcript": "\n\nResearcher: This is a test transcript.\n\nParticipant: Hello, I'm responding to the test transcript.\n\nResearcher: Thank you for your response.",
+  "created_at": "2025-05-22T14:16:20.773170",
+  "updated_at": "2025-05-22T22:04:29.753794",
+  "title": "Washing Machine World",
+  "project": "World of Washing Machines",
+  "interview_type": "discovery_interview",
+  "topic": "We want to discuss what we need to cover in a Washing Machine Self Service ordering tool discovery project",
+  "context": "Background Context: World of Washing Machines Corp. Self-Service Ordering Portal (B2B) Overview World of Washing Machines Corp., a leading global manufacturer of home appliances, developed a self-service ordering portal aimed at its B2B customers\u2014primarily retail appliance stores and distributors. This portal streamlines the process for retail partners to browse, order, and manage World of Washing Machines Corp. products directly, without the need for manual sales intervention. Purpose and Business Goals Increase Efficiency: Automate and simplify the ordering process for retail partners, reducing manual order entry and errors. Enhance Partner Experience: Provide a modern, user-friendly interface that empowers retail stores to manage their orders, track shipments, and access product information 24/7. Improve Order Accuracy: Minimize miscommunication and mistakes by allowing partners to input orders directly. Scalability: Enable World of Washing Machines Corp. to serve a growing network of retail partners without proportional increases in sales support staff. Key Features Product Catalog: Comprehensive, searchable catalog with detailed product specs, images, and availability. Order Placement: Intuitive workflows for creating, editing, and submitting orders. Order Tracking: Real-time updates on order status, shipment tracking, and delivery estimates. Account Management: Tools for managing billing, shipping addresses, and user permissions within retail organizations. Promotions & Pricing: Display of partner-specific pricing, volume discounts, and current promotions. Support & Resources: Access to documentation, FAQs, and direct support channels. User Personas Store Managers: Oversee inventory and place bulk orders for multiple locations. Sales Associates: Check product availability and pricing for customers. Procurement Specialists: Manage recurring orders and negotiate bulk deals. World of Washing Machines Corp. Account Managers: Monitor partner activity and provide support as needed. Deloitte\u2019s Role User Research & UX Design: Conducted interviews and usability testing with retail partners to identify pain points and requirements. Portal Development: Designed and implemented the portal architecture, integrating with World of Washing Machines Corp.\u2019s ERP and logistics systems. Change Management: Supported World of Washing Machines Corp. in onboarding retail partners and training them on the new portal. Continuous Improvement: Gathered feedback post-launch to iterate on features and enhance the user experience. Impact Reduced Order Processing Time: Orders placed and processed faster, with fewer errors. Higher Partner Satisfaction: Retailers report improved autonomy and satisfaction with the ordering process. Operational Savings: Decreased reliance on manual sales and support staff for order entry.\n\n",
+  "goals": "Identify pain points in the current ordering workflow. Understand how users search for and select products. Assess satisfaction with order tracking and status updates. Uncover unmet needs or desired features in the portal. Evaluate ease of use for first-time and repeat users.",
+  "character": "askia",
+  "character_select": "askia",
+  "voice_id": "AZnzlk1XvdvUeBnXmlld",
+  "analysis": {
+    "content": "1. Workshop Focus Themes\n\na. Theme: Setting a Clear Ambition\nDescription: Establishing a clear and inspiring ambition statement is crucial for aligning all stakeholders towards a common goal and guiding the project's direction.\nQuote: \"Our ambition should be bold yet achievable, setting the tone for the entire project.\"\n\nb. Theme: Identifying Challenges and Constraints\nDescription: Understanding the current challenges and constraints faced by the organization will help in crafting realistic strategies and solutions.\nQuote: \"We need to address the existing bottlenecks and limitations to ensure our ambition is grounded in reality.\"\n\n2. Recommended Workshop Questions\n\nVision & Ambition Alignment:\n- How do you envision the ideal outcome of this project aligning with the organization's long-term vision?\n- What specific elements of our ambition statement resonate most with your personal goals for the project?\n\nCurrent Challenges & Constraints:\n- What are the key obstacles or constraints you foresee that could hinder our progress towards achieving the ambition?\n- How can we leverage our past learnings from overcoming challenges to inform our approach in this project?\n\nSuccess Metrics & Impact:\n- How do you define success for this project, and what key metrics or outcomes would indicate that we have achieved our ambition?\n- What potential positive impacts do you envision this project having on the organization and its stakeholders?\n\nTeam Norms & Collaboration Expectations:\n- What are your expectations regarding communication, decision-making, and collaboration within the project team?\n- How can we ensure that diverse perspectives and expertise are effectively integrated into our collaborative efforts?\n\nStrategic Risks or Assumptions to Challenge:\n- What assumptions do we need to validate or challenge to ensure the success of our ambition?\n- How can we proactively identify and mitigate potential risks that may impact the realization of our ambition?\n\n3. Quotes & Signals to Reflect Back in the Workshop\n\n- \"Our ambition should be bold yet achievable, setting the tone for the entire project.\" (Use in setting the tone for the ambition-setting exercise)\n- \"We need to address the existing bottlenecks and limitations to ensure our ambition is grounded in reality.\" (Reflect back when discussing challenges and constraints)\n\n4. Workshop Design Implications\n\n- Suggested framing: Emphasize the importance of setting a bold yet realistic ambition and addressing existing bottlenecks to drive meaningful progress.\n- Stakeholder mindsets: Be mindful of varying perspectives and ensure all voices are heard to foster a collaborative and inclusive environment.\n- Team dynamics: Encourage open dialogue and active participation to leverage diverse expertise and insights in co-creating the ambition statement.",
+    "generated_at": "2025-05-22T22:04:29.752899"
+  }
+}

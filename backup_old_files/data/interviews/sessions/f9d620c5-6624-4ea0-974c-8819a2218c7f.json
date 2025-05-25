@@ -1,0 +1,62 @@
+{
+  "id": "f9d620c5-6624-4ea0-974c-8819a2218c7f",
+  "guide_id": "5b14b322-f6fd-4898-9ce6-3a9d03a9e535",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "02f30f60-fcb6-4db1-85f2-a9edc73eb445",
+      "content": "what is your name",
+      "role": "user",
+      "timestamp": "2025-05-15T09:11:48.755874"
+    },
+    {
+      "id": "a1010ed1-ad72-40e4-8372-54a41fbac74e",
+      "content": "{'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}\n\nCould you please share your name with me?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T09:11:50.889663"
+    },
+    {
+      "id": "49acc848-ffc9-4f3b-bd95-0c7532a01204",
+      "content": "my name is Steven Dulaney",
+      "role": "user",
+      "timestamp": "2025-05-15T09:12:11.881044"
+    },
+    {
+      "id": "14a233af-df10-4415-b312-74daafcaff6c",
+      "content": "Hello, Steven! Thank you for sharing your name. Could you please tell me a bit about yourself and what you do?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T09:12:12.546627"
+    },
+    {
+      "id": "918a0350-c271-48c7-b94e-23ff3b7aa97c",
+      "content": "I am a ux researcher at Deloitte I am currently making Daria which is a advanced research and interview assistant for Deloitte researchers",
+      "role": "user",
+      "timestamp": "2025-05-15T09:12:35.732722"
+    },
+    {
+      "id": "c57bebfb-c7da-418c-8c8f-36bc12d445c2",
+      "content": "That sounds like an interesting project! Could you tell me more about Daria and how it assists Deloitte researchers in their work?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T09:12:36.584196"
+    },
+    {
+      "id": "707356ed-79b2-4060-9c55-0874bb777958",
+      "content": "it's an interview tool that we can at craft and design a prompt and then we can send out a link to somebody and conduct a remote interview and then it'll generate a transcript it'll generate analysis and then we can also work with those transcripts later to make personas Journey Maps opportunity maps and later we will turn those into user stories and Sprint catalog and cursor props to generate new software",
+      "role": "user",
+      "timestamp": "2025-05-15T09:13:16.260723"
+    },
+    {
+      "id": "a1b17661-3c45-4f08-93c0-0a32e188028b",
+      "content": "That sounds like a powerful tool for conducting remote interviews and generating valuable insights from them. Could you please share more details about how the tool helps in generating transcripts and analysis? How does it assist in creating personas, journey maps, and user stories from the interview data?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T09:13:17.594949"
+    }
+  ],
+  "transcript": "\n\nParticipant: what is your name\n\nModerator: {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}\n\nCould you please share your name with me?\n\nParticipant: my name is Steven Dulaney\n\nModerator: Hello, Steven! Thank you for sharing your name. Could you please tell me a bit about yourself and what you do?\n\nParticipant: I am a ux researcher at Deloitte I am currently making Daria which is a advanced research and interview assistant for Deloitte researchers\n\nModerator: That sounds like an interesting project! Could you tell me more about Daria and how it assists Deloitte researchers in their work?\n\nParticipant: it's an interview tool that we can at craft and design a prompt and then we can send out a link to somebody and conduct a remote interview and then it'll generate a transcript it'll generate analysis and then we can also work with those transcripts later to make personas Journey Maps opportunity maps and later we will turn those into user stories and Sprint catalog and cursor props to generate new software\n\nModerator: That sounds like a powerful tool for conducting remote interviews and generating valuable insights from them. Could you please share more details about how the tool helps in generating transcripts and analysis? How does it assist in creating personas, journey maps, and user stories from the interview data?",
+  "analysis": null,
+  "created_at": "2025-05-15T09:11:30.193081",
+  "updated_at": "2025-05-15T09:13:17.595598"
+}

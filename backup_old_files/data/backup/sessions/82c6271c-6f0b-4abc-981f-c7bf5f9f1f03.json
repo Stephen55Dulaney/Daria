@@ -1,0 +1,90 @@
+{
+  "id": "82c6271c-6f0b-4abc-981f-c7bf5f9f1f03",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "bf0dcea6-b531-49c8-b2b9-c19d35bf344c",
+      "content": "oh I don't know I'm trying to figure out how this monitor tool is going to work",
+      "role": "user",
+      "timestamp": "2025-05-15T20:40:09.838167"
+    },
+    {
+      "id": "d1b7d3a2-5349-4430-8f6e-53203948c38a",
+      "content": "How familiar are you with monitor tools in general?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T20:40:12.761427"
+    },
+    {
+      "id": "d8300ba3-01da-46ab-89e5-39377255d2a4",
+      "content": "not really that much but the whole concept of being able to watch the interview from a remote location is is part of how we do research by hand so I'm trying to mimic that behavior in the with the computers",
+      "role": "user",
+      "timestamp": "2025-05-15T20:40:32.517319"
+    },
+    {
+      "id": "1c327b67-41aa-4b03-bb76-cebf46f2bdb1",
+      "content": "That sounds interesting! Could you please elaborate on how you are trying to mimic the behavior of watching interviews from a remote location with computers for your research?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T20:40:35.586392"
+    },
+    {
+      "id": "8f65151b-a969-416f-bc91-8e58aabfda09",
+      "content": "okay well we'll need to go into a room first day and stakeholdering you see there's the senior researcher and a consultant  and the subject and so we conduct the interview and I focus in asking the questions and take some notes but you really have to pay attention and be on your toast with the actual questioning so the Observer that takes the notes so if we're going to do these remote interviews with sending somebody at a URL where they can conduct the interview like we're doing in the Observer could be back in the office watching the transcript develop and maybe suggesting additional questions in an AI is also taking notes",
+      "role": "user",
+      "timestamp": "2025-05-15T20:41:28.223298"
+    },
+    {
+      "id": "ac3b1961-6bfb-454e-97e4-624ba658e86c",
+      "content": "It sounds like you are discussing the process of conducting interviews remotely using technology for observation and note-taking. Could you elaborate on how you ensure the same level of engagement and attention remotely as you would in a face-to-face interview setting?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T20:41:32.804571"
+    },
+    {
+      "id": "2fcf8bd0-6afb-43ab-845d-bc5fa6800d6f",
+      "content": "have a good answer for that right now but that's a good point and hopefully the AI can be trained or tweaked so that it asks engaging questions and moves to pay so long the Observer could actually pay a part of that cuz they can see if it's going flat and the guys getting frustrated and pride and poking ask you know intervene and maybe there's a go live",
+      "role": "user",
+      "timestamp": "2025-05-15T20:42:16.942681"
+    },
+    {
+      "id": "d0354c4a-8458-4a2f-80e1-b6eda6be1c7e",
+      "content": "It sounds like you're mentioning the importance of training AI to ask engaging questions and being able to detect when a conversation is going flat or when someone is getting frustrated. Could you elaborate on how you think AI could be improved in this aspect?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T20:42:20.916683"
+    },
+    {
+      "id": "35628d28-5c32-4d8f-977f-62ab75e1c619",
+      "content": "well you can do a lot with just the prompt instructions and so right now we have some basic prompts but we'll learn as we go which prompts are good and which ones aren't and we actually have a prompt library and a system in there to score the prompts for Effectiveness and we will make sure and take a notes after the interview to  make comments so they can be improved over time",
+      "role": "user",
+      "timestamp": "2025-05-15T20:43:04.334787"
+    },
+    {
+      "id": "7a2352fb-3aca-4658-806b-d9d73d249bd7",
+      "content": "That sounds like a really interesting system you have in place for evaluating the prompts used in interviews. Could you tell me more about how you determine the effectiveness of a prompt? What criteria do you consider when scoring the prompts?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T20:43:18.610042"
+    },
+    {
+      "id": "e90faac0-d6b8-4079-957d-220a23ea605f",
+      "content": "well we haven't developed that part yet but we're hoping to get there soon enough  we're in a live interview now we'll see if we get anything waiting for the AI so I don't know what's going to happen there",
+      "role": "user",
+      "timestamp": "2025-05-15T20:43:51.126714"
+    },
+    {
+      "id": "a338c176-8655-4a76-b999-c623de0e623a",
+      "content": "That sounds like an interesting project you're working on. Could you tell me more about the AI you're waiting for in the live interview? What role does it play in your project?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T20:43:55.282644"
+    }
+  ],
+  "transcript": "\n\nParticipant: oh I don't know I'm trying to figure out how this monitor tool is going to work\n\nModerator: How familiar are you with monitor tools in general?\n\nParticipant: not really that much but the whole concept of being able to watch the interview from a remote location is is part of how we do research by hand so I'm trying to mimic that behavior in the with the computers\n\nModerator: That sounds interesting! Could you please elaborate on how you are trying to mimic the behavior of watching interviews from a remote location with computers for your research?\n\nParticipant: okay well we'll need to go into a room first day and stakeholdering you see there's the senior researcher and a consultant  and the subject and so we conduct the interview and I focus in asking the questions and take some notes but you really have to pay attention and be on your toast with the actual questioning so the Observer that takes the notes so if we're going to do these remote interviews with sending somebody at a URL where they can conduct the interview like we're doing in the Observer could be back in the office watching the transcript develop and maybe suggesting additional questions in an AI is also taking notes\n\nModerator: It sounds like you are discussing the process of conducting interviews remotely using technology for observation and note-taking. Could you elaborate on how you ensure the same level of engagement and attention remotely as you would in a face-to-face interview setting?\n\nParticipant: have a good answer for that right now but that's a good point and hopefully the AI can be trained or tweaked so that it asks engaging questions and moves to pay so long the Observer could actually pay a part of that cuz they can see if it's going flat and the guys getting frustrated and pride and poking ask you know intervene and maybe there's a go live\n\nModerator: It sounds like you're mentioning the importance of training AI to ask engaging questions and being able to detect when a conversation is going flat or when someone is getting frustrated. Could you elaborate on how you think AI could be improved in this aspect?\n\nParticipant: well you can do a lot with just the prompt instructions and so right now we have some basic prompts but we'll learn as we go which prompts are good and which ones aren't and we actually have a prompt library and a system in there to score the prompts for Effectiveness and we will make sure and take a notes after the interview to  make comments so they can be improved over time\n\nModerator: That sounds like a really interesting system you have in place for evaluating the prompts used in interviews. Could you tell me more about how you determine the effectiveness of a prompt? What criteria do you consider when scoring the prompts?\n\nParticipant: well we haven't developed that part yet but we're hoping to get there soon enough  we're in a live interview now we'll see if we get anything waiting for the AI so I don't know what's going to happen there\n\nModerator: That sounds like an interesting project you're working on. Could you tell me more about the AI you're waiting for in the live interview? What role does it play in your project?",
+  "analysis": null,
+  "created_at": "2025-05-15T20:39:58.170813",
+  "updated_at": "2025-05-15T20:43:55.283233",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

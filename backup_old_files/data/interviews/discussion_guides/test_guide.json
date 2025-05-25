@@ -1,0 +1,12 @@
+{
+    "id": "test_guide_123",
+    "title": "Test Discussion Guide",
+    "description": "A test guide for DARIA",
+    "questions": [
+        {
+            "id": "q1",
+            "text": "What are your thoughts on AI?",
+            "type": "open_ended"
+        }
+    ]
+}

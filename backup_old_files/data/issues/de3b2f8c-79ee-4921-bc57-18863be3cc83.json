@@ -1,0 +1,35 @@
+{
+  "id": "de3b2f8c-79ee-4921-bc57-18863be3cc83",
+  "title": "Fix Upload Transcript so loads nice in view transcript",
+  "description": "When we use the upload transcript tool and upload a well formed Zoom transcript.txt we loose the names of the people speaking and the final uploaded transcript looks bad. I think we need to check the json upload and get that done correctly then work on the html presentation of the json.",
+  "issue_type": "bug",
+  "status": "open",
+  "priority": "high",
+  "creator_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+  "assigned_to": null,
+  "screenshots": [],
+  "created_at": "2025-05-19T11:51:07.512276",
+  "updated_at": "2025-05-19T11:51:07.512291",
+  "environment": {
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "remote_addr": "127.0.0.1"
+  },
+  "tags": [],
+  "history": [
+    {
+      "timestamp": "2025-05-19T11:51:07.512291",
+      "action": "Issue created",
+      "user_id": null,
+      "details": null
+    }
+  ],
+  "comments": [],
+  "linked_persona": null,
+  "journey_stage": null,
+  "insights": [],
+  "ethics": [],
+  "root_cause": null,
+  "parent_id": null,
+  "linked_prototype_prompt": null,
+  "cursor_prompt_template": null
+}

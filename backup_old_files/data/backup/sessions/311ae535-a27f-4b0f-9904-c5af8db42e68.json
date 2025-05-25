@@ -1,0 +1,69 @@
+{
+  "id": "311ae535-a27f-4b0f-9904-c5af8db42e68",
+  "guide_id": null,
+  "interviewee": {},
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "c5aa9bd6-3532-4148-a852-c6d947579f84",
+      "content": "Who are you?",
+      "role": "user",
+      "timestamp": "2025-05-15T18:15:43.821777"
+    },
+    {
+      "id": "cc9b67aa-52f6-4977-9a11-8800106eac8e",
+      "content": "I am Odessia. As Odessia, I'm Deloitte's Journey Mapping specialist.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:15:44.562063"
+    },
+    {
+      "id": "921d2b40-c756-4af4-bcec-58be059dcb6f",
+      "content": "Hi Odessia, If I wanted to how would I make a journey map?",
+      "role": "user",
+      "timestamp": "2025-05-15T18:16:07.256421"
+    },
+    {
+      "id": "e52d55f9-7a00-40d8-b1dd-6f53b1d19b88",
+      "content": "Hello! Creating a journey map can be a valuable exercise. To start, may I ask what specific experience or process you are looking to map out?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:16:08.390824"
+    },
+    {
+      "id": "1c33ef60-513c-4d79-8668-b29798cbb83e",
+      "content": "I want to make a journey map about user research discovery activities",
+      "role": "user",
+      "timestamp": "2025-05-15T18:16:35.032497"
+    },
+    {
+      "id": "0cca23cc-29b9-4b90-88b8-19bdfb6e056c",
+      "content": "That sounds like a fascinating project! When you think about user research discovery activities, what kind of experiences or stages do you envision mapping out?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:16:35.720742"
+    },
+    {
+      "id": "69b04381-ffd4-4b6d-829e-31217caa5801",
+      "content": "I use Awareness, consideration, deliberation, decision, experience,",
+      "role": "user",
+      "timestamp": "2025-05-15T18:17:17.074599"
+    },
+    {
+      "id": "9d0df9c4-e6ba-4971-8920-6d5e53826dd7",
+      "content": "It sounds like you're describing different stages of a process. Could you tell me more about how these stages apply to your work or experiences?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T18:17:17.765789"
+    }
+  ],
+  "transcript": "\n\nParticipant: Who are you?\n\nModerator: I am Odessia. As Odessia, I'm Deloitte's Journey Mapping specialist.\n\nParticipant: Hi Odessia, If I wanted to how would I make a journey map?\n\nModerator: Hello! Creating a journey map can be a valuable exercise. To start, may I ask what specific experience or process you are looking to map out?\n\nParticipant: I want to make a journey map about user research discovery activities\n\nModerator: That sounds like a fascinating project! When you think about user research discovery activities, what kind of experiences or stages do you envision mapping out?\n\nParticipant: I use Awareness, consideration, deliberation, decision, experience,\n\nModerator: It sounds like you're describing different stages of a process. Could you tell me more about how these stages apply to your work or experiences?",
+  "analysis": {
+    "content": "Error generating analysis: 1 validation error for LLMChain\nllm\n  Can't instantiate abstract class BaseLanguageModel without an implementation for abstract methods 'agenerate_prompt', 'apredict', 'apredict_messages', 'generate_prompt', 'invoke', 'predict', 'predict_messages' (type=type_error)",
+    "generated_at": "2025-05-21T14:12:05.746507"
+  },
+  "created_at": "2025-05-15T18:15:36.068496",
+  "updated_at": "2025-05-22T13:31:41.288316",
+  "title": "Debugging the custom prompt interview",
+  "project": "Test 4444",
+  "interview_type": "journey_map_interview",
+  "character": "odessia",
+  "character_select": "odessia",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

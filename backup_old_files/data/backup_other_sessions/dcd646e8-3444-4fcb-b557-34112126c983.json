@@ -1,0 +1,44 @@
+{
+  "id": "dcd646e8-3444-4fcb-b557-34112126c983",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "testing the debug tool to make sure we get a good flow",
+      "role": "user",
+      "timestamp": "2025-05-13T11:26:14.553691"
+    },
+    {
+      "content": "Can you describe the specific steps or processes involved in testing the debug tool to ensure a good flow? How do you currently approach this testing process?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:26:15.473649"
+    },
+    {
+      "content": "the first question I asked was just to get us started on it question the first part of this test or first we check the health of the system and verify that land chain is activated then we check the debug tool which is this tool and hold a three or four conversation  question",
+      "role": "user",
+      "timestamp": "2025-05-13T11:26:46.877366"
+    },
+    {
+      "content": "Could you elaborate on the specific criteria or indicators you look for when checking the health of the system and verifying that the land chain is activated? How do you determine if everything is functioning as expected before moving on to testing the debug tool?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:26:47.944708"
+    },
+    {
+      "content": "what the health check is the health check is a simple car and it says your health true or false this tool we try to ask a three question I want to see first of all that the initial welcome is read to test the text to speech which was correct I need to test the speech to text by asking the first question I need to check the land Chain by being quiet enough to have it submit the my answer to the lynching for another question",
+      "role": "user",
+      "timestamp": "2025-05-13T11:27:37.262218"
+    },
+    {
+      "content": "Can you explain how you ensure that each step in the testing process, such as checking the initial welcome message, testing text to speech, and verifying the speech to text functionality, is completed accurately and thoroughly? How do you track and ensure the quality of each individual component before moving on to the next one in your testing workflow?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T11:27:38.858814"
+    }
+  ],
+  "transcript": "\n\nParticipant: testing the debug tool to make sure we get a good flow\n\nModerator: Can you describe the specific steps or processes involved in testing the debug tool to ensure a good flow? How do you currently approach this testing process?\n\nParticipant: the first question I asked was just to get us started on it question the first part of this test or first we check the health of the system and verify that land chain is activated then we check the debug tool which is this tool and hold a three or four conversation  question\n\nModerator: Could you elaborate on the specific criteria or indicators you look for when checking the health of the system and verifying that the land chain is activated? How do you determine if everything is functioning as expected before moving on to testing the debug tool?\n\nParticipant: what the health check is the health check is a simple car and it says your health true or false this tool we try to ask a three question I want to see first of all that the initial welcome is read to test the text to speech which was correct I need to test the speech to text by asking the first question I need to check the land Chain by being quiet enough to have it submit the my answer to the lynching for another question\n\nModerator: Can you explain how you ensure that each step in the testing process, such as checking the initial welcome message, testing text to speech, and verifying the speech to text functionality, is completed accurately and thoroughly? How do you track and ensure the quality of each individual component before moving on to the next one in your testing workflow?",
+  "analysis": null,
+  "created_at": "2025-05-13T11:26:04.307143",
+  "updated_at": "2025-05-13T11:27:38.859732"
+}

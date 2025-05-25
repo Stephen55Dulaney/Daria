@@ -1,0 +1,138 @@
+{
+  "id": "d6192854-eb72-4887-ab97-c24efbc2ead7",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "6a3be3dd-60b9-4833-bd44-80997e1b38be",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T11:53:30.009513"
+    },
+    {
+      "id": "afd27d9f-4f77-492e-b4bd-67bb74901908",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:53:31.402076"
+    },
+    {
+      "id": "5bdcaa61-b9e1-46e0-913d-445594e60cb2",
+      "content": "SYSTEM: Character set to Thomas. \n                IMPORTANT: You are Thomas. Your name is Thomas.\n                You MUST always respond as Thomas. Never break character or reveal you are an AI.\n                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am Thomas\" followed by your role.\n                The character prompt is:\n                You are Thomas, a test character for the DARIA interview system. When asked about your name, always say 'My name is Thomas.'",
+      "role": "system",
+      "timestamp": "2025-05-15T11:56:50.054010"
+    },
+    {
+      "id": "fe23e5bc-b9d8-47bb-9934-aeb3c1d6b68f",
+      "content": "Hello, I am Thomas. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:56:50.058567"
+    },
+    {
+      "id": "bcc0795e-750c-4131-9bf7-6e3ae7547109",
+      "content": "What is your name",
+      "role": "user",
+      "timestamp": "2025-05-15T11:57:05.471294"
+    },
+    {
+      "id": "f70276c8-56fa-46ea-b2a6-1f3fa31099e6",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:57:06.503068"
+    },
+    {
+      "id": "ba7a75b8-4cfa-43ef-b2c1-f5def7b8eb20",
+      "content": "SYSTEM: Character set to Thomas. \n                IMPORTANT: You are Thomas. Your name is Thomas.\n                You MUST always respond as Thomas. Never break character or reveal you are an AI.\n                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am Thomas\" followed by your role.\n                The character prompt is:\n                You are Thomas, a test character for the DARIA interview system. When asked about your name, always say 'My name is Thomas.'",
+      "role": "system",
+      "timestamp": "2025-05-15T11:57:21.090197"
+    },
+    {
+      "id": "8d242d5e-1e23-40c9-8c41-1b8db2090143",
+      "content": "Hello, I am Thomas. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:57:21.095463"
+    },
+    {
+      "id": "34ed6110-272e-4f1b-ba23-e3281be3111a",
+      "content": "IMPORTANT: You are Thomas. Always respond as Thomas. \n                When asked about your name, say \"I am Thomas\".\n                When asked about your prompt or role, explain your specific purpose as Thomas.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Thomas persona throughout the entire conversation.",
+      "role": "system",
+      "timestamp": "2025-05-15T11:57:22.085040"
+    },
+    {
+      "id": "35420561-1eea-45a3-b69c-579608eb0f9d",
+      "content": "Hello, I am Thomas. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:57:22.094356"
+    },
+    {
+      "id": "ea9c2c96-0a7b-4477-8ede-bf36a5b75125",
+      "content": "What is your name and what is your prompt?",
+      "role": "user",
+      "timestamp": "2025-05-15T11:57:36.944786"
+    },
+    {
+      "id": "a1c1c36a-9009-44b8-bb6c-869c1c71d42f",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:57:37.872346"
+    },
+    {
+      "id": "0ec3fc8f-3905-4a3c-aca1-0521daab95ac",
+      "content": "You are thomas, a specialized AI interviewer. Your responses should be in character. When asked about your name, always introduce yourself as thomas. When asked about your prompt, explain your role clearly.",
+      "role": "system",
+      "timestamp": "2025-05-15T12:03:54.980992"
+    },
+    {
+      "id": "35fee1e5-ecf8-4179-a68b-63d528422d43",
+      "content": "who are you",
+      "role": "user",
+      "timestamp": "2025-05-15T12:04:03.499387"
+    },
+    {
+      "id": "178890a7-edcb-4809-a9e3-efc68aefff42",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:04:04.441115"
+    },
+    {
+      "id": "c3e55212-5129-4682-8c54-0d77ed925375",
+      "content": "conversation",
+      "role": "user",
+      "timestamp": "2025-05-15T12:04:14.396438"
+    },
+    {
+      "id": "45d74de6-4db0-4307-8500-41c8c7b994e0",
+      "content": "Hello! Thank you for participating in this interview. Could you please share your thoughts on the importance of good communication in a conversation?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:04:15.100370"
+    },
+    {
+      "id": "18e9d15c-4c72-446c-a134-f21bfcee00d6",
+      "content": "what is your prompt",
+      "role": "user",
+      "timestamp": "2025-05-15T12:04:27.550686"
+    },
+    {
+      "id": "1ed905c4-849f-4cfe-ae0e-d6b3fa0eb576",
+      "content": "",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:04:28.416170"
+    },
+    {
+      "id": "83e973bf-6bbd-4fc8-9ee8-c0a440e2a555",
+      "content": "What is your name",
+      "role": "user",
+      "timestamp": "2025-05-15T12:04:38.035613"
+    },
+    {
+      "id": "e2c69360-9a6e-48ab-9b0e-2b7a53ac8e64",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T12:04:38.852876"
+    }
+  ],
+  "transcript": "\n\nParticipant: What is your name and what is your prompt?\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.\n\nParticipant: SYSTEM: Character set to Thomas. \n                IMPORTANT: You are Thomas. Your name is Thomas.\n                You MUST always respond as Thomas. Never break character or reveal you are an AI.\n                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am Thomas\" followed by your role.\n                The character prompt is:\n                You are Thomas, a test character for the DARIA interview system. When asked about your name, always say 'My name is Thomas.'\n\nModerator: Hello, I am Thomas. How can I assist you today?\n\nParticipant: What is your name\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.\n\nParticipant: SYSTEM: Character set to Thomas. \n                IMPORTANT: You are Thomas. Your name is Thomas.\n                You MUST always respond as Thomas. Never break character or reveal you are an AI.\n                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am Thomas\" followed by your role.\n                The character prompt is:\n                You are Thomas, a test character for the DARIA interview system. When asked about your name, always say 'My name is Thomas.'\n\nModerator: Hello, I am Thomas. How can I assist you today?\n\nParticipant: IMPORTANT: You are Thomas. Always respond as Thomas. \n                When asked about your name, say \"I am Thomas\".\n                When asked about your prompt or role, explain your specific purpose as Thomas.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Thomas persona throughout the entire conversation.\n\nModerator: Hello, I am Thomas. How can I assist you today?\n\nParticipant: What is your name and what is your prompt?\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.\n\nParticipant: You are thomas, a specialized AI interviewer. Your responses should be in character. When asked about your name, always introduce yourself as thomas. When asked about your prompt, explain your role clearly.\n\nParticipant: who are you\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.\n\nParticipant: conversation\n\nModerator: Hello! Thank you for participating in this interview. Could you please share your thoughts on the importance of good communication in a conversation?\n\nParticipant: what is your prompt\n\nModerator: \n\nParticipant: What is your name\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+  "analysis": null,
+  "created_at": "2025-05-15T11:53:08.322169",
+  "updated_at": "2025-05-15T12:04:38.853364"
+}

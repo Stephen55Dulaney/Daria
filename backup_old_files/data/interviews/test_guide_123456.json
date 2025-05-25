@@ -1,0 +1,21 @@
+{
+  "id": "test_guide_123456",
+  "title": "Test Discussion Guide",
+  "project": "DARIA Test Project",
+  "status": "active",
+  "created_at": "2025-05-23T00:00:00.000000",
+  "updated_at": "2025-05-23T00:00:00.000000",
+  "options": {
+    "analysis": true,
+    "record_transcript": true,
+    "use_tts": true
+  },
+  "interview_type": "discovery_interview",
+  "character_select": "daria",
+  "custom_questions": [
+    {"priority": "high", "text": "What is your experience with user research?"},
+    {"priority": "medium", "text": "What tools do you currently use?"},
+    {"priority": "low", "text": "How would you like to improve your workflow?"}
+  ],
+  "sessions": ["test_session_123456"]
+}

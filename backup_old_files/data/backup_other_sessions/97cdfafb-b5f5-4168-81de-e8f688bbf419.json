@@ -1,0 +1,38 @@
+{
+  "id": "97cdfafb-b5f5-4168-81de-e8f688bbf419",
+  "guide_id": "24278503-4716-4c34-892d-059f02594d77",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "user",
+      "content": "I just want to test to see if this is going to work for me today",
+      "id": "98bc3b6e-5961-4dec-a208-cea6eae52599",
+      "timestamp": "2025-05-07T10:57:36.616400"
+    },
+    {
+      "role": "assistant",
+      "content": "As a Journey Expert, I'm interested in understanding more about your testing process. Can you walk me through what specifically you are testing today and what outcome you are hoping to achieve? This will help me map out your experience and identify any potential pain points or areas of improvement.",
+      "id": "d4579899-292d-4261-b238-ddffe16ab1a3",
+      "timestamp": "2025-05-07T10:57:40.313827"
+    },
+    {
+      "role": "user",
+      "content": "we need more feedback on this page right now I'm trying to test the Journey of conducting an interview with AI tool",
+      "id": "0a115fe3-d411-4da5-ab8b-77b280b89e61",
+      "timestamp": "2025-05-07T10:58:13.196838"
+    },
+    {
+      "role": "assistant",
+      "content": "Participant: we need more feedback on this page right now I'm trying to test the Journey of conducting an interview with AI tool\n\nInterviewer: That's an interesting endeavor to test the journey of conducting an interview with an AI tool. Can you share with me what specific aspects of the interview process you are focusing on testing? Are you looking to evaluate the efficiency, accuracy, user-friendliness, or any other particular aspects of the AI tool in facilitating the interview process? Understanding your testing objectives will help in analyzing the user experience and potential areas for enhancement.",
+      "id": "e1371ad6-b068-4a3c-82c6-e9c905d55047",
+      "timestamp": "2025-05-07T10:58:18.490513"
+    }
+  ],
+  "transcript": "\n\nParticipant: I just want to test to see if this is going to work for me today\n\nModerator: As a Journey Expert, I'm interested in understanding more about your testing process. Can you walk me through what specifically you are testing today and what outcome you are hoping to achieve? This will help me map out your experience and identify any potential pain points or areas of improvement.\n\nParticipant: we need more feedback on this page right now I'm trying to test the Journey of conducting an interview with AI tool\n\nModerator: Participant: we need more feedback on this page right now I'm trying to test the Journey of conducting an interview with AI tool\n\nInterviewer: That's an interesting endeavor to test the journey of conducting an interview with an AI tool. Can you share with me what specific aspects of the interview process you are focusing on testing? Are you looking to evaluate the efficiency, accuracy, user-friendliness, or any other particular aspects of the AI tool in facilitating the interview process? Understanding your testing objectives will help in analyzing the user experience and potential areas for enhancement.",
+  "analysis": null,
+  "created_at": "2025-05-07T10:57:19.987454",
+  "updated_at": "2025-05-07T10:58:18.491152"
+}

@@ -1,0 +1,131 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Archive{% endblock %}
+
+{% block extra_head %}
+<style>
+    .interview-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+        gap: 1.5rem;
+        padding: 1rem;
+    }
+    
+    .interview-card {
+        background: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .interview-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    
+    .interview-title {
+        font-size: 1.25rem;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+        color: var(--text-dark);
+    }
+    
+    .interview-meta {
+        font-size: 0.875rem;
+        color: var(--text-muted);
+        margin-bottom: 1rem;
+    }
+    
+    .interview-preview {
+        font-size: 0.875rem;
+        color: var(--text-dark);
+        margin-bottom: 1rem;
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    
+    .interview-tags {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin-top: auto;
+    }
+    
+    .tag {
+        background: var(--background-light);
+        padding: 0.25rem 0.75rem;
+        border-radius: 1rem;
+        font-size: 0.75rem;
+        color: var(--text-muted);
+    }
+    
+    .status-badge {
+        display: inline-block;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+        font-size: 0.75rem;
+        font-weight: 500;
+        text-transform: capitalize;
+    }
+    
+    .status-draft {
+        background: #e2e8f0;
+        color: #475569;
+    }
+    
+    .status-completed {
+        background: #86efac;
+        color: #166534;
+    }
+    
+    .status-in-progress {
+        background: #fde68a;
+        color: #92400e;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Interview Archive</h1>
+        <a href="{{ url_for('new_interview') }}" class="btn btn-primary">
+            <i class="fas fa-plus me-2"></i>New Interview
+        </a>
+    </div>
+    
+    {% if interviews %}
+    <div class="interview-grid">
+        {% for interview in interviews %}
+        <a href="{{ url_for('interview_details', session_id=interview.id) }}" class="text-decoration-none">
+            <div class="interview-card">
+                <div class="d-flex justify-content-between align-items-start mb-2">
+                    <h2 class="interview-title">{{ interview.title }}</h2>
+                    <span class="status-badge status-{{ interview.status.lower() }}">{{ interview.status }}</span>
+                </div>
+                <div class="interview-meta">
+                    <div><i class="fas fa-user me-2"></i>{{ interview.participant_name }}</div>
+                    <div><i class="fas fa-calendar me-2"></i>{{ interview.created_at }}</div>
+                </div>
+                <p class="interview-preview">{{ interview.preview }}</p>
+                {% if interview.tags %}
+                <div class="interview-tags">
+                    {% for tag in interview.tags %}
+                    <span class="tag">{{ tag }}</span>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i>No interviews found. Start by creating a new interview.
+    </div>
+    {% endif %}
+</div>
+{% endblock %} 

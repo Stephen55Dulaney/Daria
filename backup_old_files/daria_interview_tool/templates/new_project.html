@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}Start a New UX Discovery Project{% endblock %}
+
+{% block content %}
+<div class="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <h1 class="text-3xl font-bold text-gray-900 mb-2">Start a New UX Discovery Project</h1>
+    <p class="text-gray-600 mb-8">Define the foundation for your research and align your team.</p>
+    
+    <form action="{{ url_for('create_project') }}" method="POST" class="space-y-8" enctype="multipart/form-data">
+        <!-- Project Basics -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Project Basics</h2>
+            <div class="space-y-4">
+                <div>
+                    <input type="text" name="project_name" id="project_name" required
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Project Title">
+                </div>
+                <div>
+                    <textarea name="description" id="description" rows="3" required
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Description"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Problem Space -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Problem Space</h2>
+            <div class="space-y-4">
+                <div>
+                    <textarea name="business_problem" id="business_problem" rows="3" required
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Business Problem / Opportunity"></textarea>
+                </div>
+                <div>
+                    <input type="text" name="stakeholders" id="stakeholders"
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Stakeholders">
+                </div>
+            </div>
+        </div>
+
+        <!-- Methods to Use -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Methods to Use</h2>
+            <div class="grid grid-cols-2 gap-4">
+                <div class="flex items-center">
+                    <input type="checkbox" name="methods[]" value="stakeholder_interviews" id="stakeholder_interviews"
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="stakeholder_interviews" class="ml-2 block text-sm text-gray-900">
+                        Stakeholder Interviews
+                    </label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="methods[]" value="user_interviews" id="user_interviews"
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="user_interviews" class="ml-2 block text-sm text-gray-900">
+                        User Interviews
+                    </label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="methods[]" value="contextual_inquiry" id="contextual_inquiry"
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="contextual_inquiry" class="ml-2 block text-sm text-gray-900">
+                        Contextual Inquiry
+                    </label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="methods[]" value="wireframe_evaluation" id="wireframe_evaluation"
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="wireframe_evaluation" class="ml-2 block text-sm text-gray-900">
+                        Wireframe Evaluation
+                    </label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="methods[]" value="surveys" id="surveys"
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="surveys" class="ml-2 block text-sm text-gray-900">
+                        Surveys
+                    </label>
+                </div>
+                <div class="flex items-center">
+                    <input type="checkbox" name="methods[]" value="ambition_workshop" id="ambition_workshop"
+                        class="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded">
+                    <label for="ambition_workshop" class="ml-2 block text-sm text-gray-900">
+                        Ambition Workshop
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Initial Research Plan -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Initial Research Plan (Optional Pre-fill)</h2>
+            <div class="space-y-4">
+                <div>
+                    <textarea name="research_objectives" id="research_objectives" rows="3"
+                        class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                        placeholder="Research Objectives"></textarea>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <input type="date" name="start_date" id="start_date"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            placeholder="Start Date">
+                    </div>
+                    <div>
+                        <input type="date" name="end_date" id="end_date"
+                            class="block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm"
+                            placeholder="End Date">
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Setup Links & Assets -->
+        <div>
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Setup Links & Assets (Optional)</h2>
+            <div class="border-2 border-dashed border-gray-300 rounded-lg p-6">
+                <div class="text-center">
+                    <svg class="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
+                        <path d="M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <div class="mt-4 flex text-sm text-gray-600 justify-center">
+                        <label for="file-upload" class="relative cursor-pointer bg-white rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                            <span>Upload a file</span>
+                            <input id="file-upload" name="file" type="file" class="sr-only" multiple>
+                        </label>
+                        <p class="pl-1">or drag and drop</p>
+                    </div>
+                    <p class="text-xs text-gray-500">Any relevant files</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex justify-between pt-4">
+            <button type="submit" name="action" value="start"
+                class="inline-flex justify-center py-2 px-4 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-gray-600 hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500">
+                Start Project
+            </button>
+            <button type="submit" name="action" value="draft"
+                class="inline-flex justify-center py-2 px-4 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                Save Draft
+            </button>
+        </div>
+    </form>
+</div>
+{% endblock %} 

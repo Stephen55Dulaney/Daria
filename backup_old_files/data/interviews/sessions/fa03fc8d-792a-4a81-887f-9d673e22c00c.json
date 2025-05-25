@@ -1,0 +1,60 @@
+{
+  "id": "fa03fc8d-792a-4a81-887f-9d673e22c00c",
+  "guide_id": "3e0c3c1d-78ed-4ff5-bd5a-8703b18c5770",
+  "interviewee": {
+    "name": "cynthia sue",
+    "email": "sdulaney@deloitte.com",
+    "role": "UX Researcher",
+    "department": "User Research",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "assistant",
+      "content": "Hello and welcome to this research session. I'll be asking you some questions about your experiences. Feel free to respond naturally. Shall we begin?",
+      "id": "a1b43238-e904-4b42-b62b-86e2cdd0178f",
+      "timestamp": "2025-05-06T15:47:55.274262"
+    },
+    {
+      "role": "user",
+      "content": "Listening is not working.",
+      "id": "3c93721c-bb83-45ba-b25c-2a9edc950ac5",
+      "timestamp": "2025-05-06T15:48:21.898558"
+    },
+    {
+      "role": "assistant",
+      "content": "I'm sorry to hear that you're experiencing issues with the listening function. Could you please provide more details about what specifically is not working? Are you having trouble hearing the audio, or is the device not responding to voice commands? This information will help us better understand and address the issue you're facing.",
+      "id": "a9b9312d-6da9-40d1-9139-e42ea5788dc5",
+      "timestamp": "2025-05-06T15:48:25.390311"
+    },
+    {
+      "role": "user",
+      "content": "The system is not listening to voice commanda",
+      "id": "00dff00c-c6b2-4034-acb0-ebf6304f2d81",
+      "timestamp": "2025-05-06T15:49:05.808138"
+    },
+    {
+      "role": "assistant",
+      "content": "As a Journey Expert, it's important to further investigate the participant's experience with the system not listening to voice commands. To gather more insights, you could ask the participant the following follow-up question:\n\n\"Thank you for sharing that the system is not listening to voice commands. Can you recall a specific instance or scenario when you tried to use voice commands and the system did not respond? Understanding the context of when this issue occurs could help us identify potential patterns or triggers for the problem. Your detailed feedback is valuable in improving the overall user experience. Please feel free to provide any additional information you think might be relevant.\"",
+      "id": "980d071e-ab5f-44f4-9e01-e8c7a1089b68",
+      "timestamp": "2025-05-06T15:49:09.860274"
+    },
+    {
+      "role": "system",
+      "content": "Can you tell me more about that?",
+      "type": "suggestion",
+      "id": "59316f22-07a9-4cac-aed6-04371d3755a8",
+      "timestamp": "2025-05-06T15:49:12.926776"
+    }
+  ],
+  "transcript": "\n\nModerator: Hello and welcome to this research session. I'll be asking you some questions about your experiences. Feel free to respond naturally. Shall we begin?\n\nParticipant: Listening is not working.\n\nModerator: I'm sorry to hear that you're experiencing issues with the listening function. Could you please provide more details about what specifically is not working? Are you having trouble hearing the audio, or is the device not responding to voice commands? This information will help us better understand and address the issue you're facing.\n\nParticipant: The system is not listening to voice commanda\n\nModerator: As a Journey Expert, it's important to further investigate the participant's experience with the system not listening to voice commands. To gather more insights, you could ask the participant the following follow-up question:\n\n\"Thank you for sharing that the system is not listening to voice commands. Can you recall a specific instance or scenario when you tried to use voice commands and the system did not respond? Understanding the context of when this issue occurs could help us identify potential patterns or triggers for the problem. Your detailed feedback is valuable in improving the overall user experience. Please feel free to provide any additional information you think might be relevant.\"\n\nParticipant: Can you tell me more about that?",
+  "analysis": null,
+  "created_at": "2025-05-06T15:47:09.524449",
+  "updated_at": "2025-05-06T15:49:12.927225"
+}

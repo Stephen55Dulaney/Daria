@@ -1,0 +1,97 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Link Generated{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+  <div class="row">
+    <div class="col-md-8 offset-md-2">
+      <div class="card shadow">
+        <div class="card-header bg-success text-white">
+          <h3 class="card-title mb-0">Secure Interview Link Generated</h3>
+        </div>
+        <div class="card-body">
+          <div class="alert alert-success">
+            <i class="fas fa-check-circle"></i> Success! Your secure interview link has been created.
+          </div>
+          
+          <h5 class="mt-4">Interview Details</h5>
+          <table class="table table-bordered">
+            <tr>
+              <th style="width: 30%">Interview ID</th>
+              <td>{{ interview_data.id }}</td>
+            </tr>
+            <tr>
+              <th>Participant</th>
+              <td>{{ interview_data.participant_email }}</td>
+            </tr>
+            <tr>
+              <th>Type</th>
+              <td>{{ interview_data.interview_type|capitalize }}</td>
+            </tr>
+            <tr>
+              <th>Created</th>
+              <td>{{ interview_data.created_at }}</td>
+            </tr>
+            <tr>
+              <th>Expires</th>
+              <td>{{ interview_data.expires_at }}</td>
+            </tr>
+          </table>
+          
+          <div class="mt-4">
+            <h5>Secure Interview Link</h5>
+            <div class="input-group mb-3">
+              <input type="text" class="form-control" id="interview-link" value="{{ interview_link }}" readonly>
+              <button class="btn btn-outline-secondary" type="button" onclick="copyLink()">
+                <i class="fas fa-copy"></i> Copy
+              </button>
+            </div>
+            <div class="form-text text-muted">
+              Share this link with the participant. It contains a secure token that will grant them access to the interview.
+            </div>
+          </div>
+          
+          <div class="alert alert-warning mt-4">
+            <h5><i class="fas fa-exclamation-triangle"></i> Security Notice</h5>
+            <p>This link provides access to your interview. Please keep the following in mind:</p>
+            <ul class="mb-0">
+              <li>Share this link only with your intended participant</li>
+              <li>The link will expire automatically after {{ interview_data.expiration_days|default(7) }} days</li>
+              <li>Anyone with this link can access the interview until it expires</li>
+              <li>You can monitor the interview in real-time once it begins</li>
+            </ul>
+          </div>
+          
+          <div class="d-flex justify-content-between mt-4">
+            <a href="{{ url_for('generate_interview_link') }}" class="btn btn-outline-primary">
+              <i class="fas fa-plus"></i> Create Another Link
+            </a>
+            
+            <a href="{{ url_for('monitor_interview', interview_id=interview_data.id) }}" class="btn btn-primary">
+              <i class="fas fa-video"></i> Go to Interview Monitor
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+function copyLink() {
+  var copyText = document.getElementById("interview-link");
+  copyText.select();
+  copyText.setSelectionRange(0, 99999);
+  document.execCommand("copy");
+  
+  // Show feedback
+  var button = copyText.nextElementSibling;
+  var originalText = button.innerHTML;
+  button.innerHTML = '<i class="fas fa-check"></i> Copied!';
+  setTimeout(function() {
+    button.innerHTML = originalText;
+  }, 2000);
+}
+</script>
+{% endblock %} 

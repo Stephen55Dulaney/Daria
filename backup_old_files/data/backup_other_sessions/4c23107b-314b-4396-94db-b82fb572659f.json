@@ -1,0 +1,71 @@
+{
+  "id": "4c23107b-314b-4396-94db-b82fb572659f",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Synthia Sue",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "137a1876-f3b1-480e-8365-e559a86909a3",
+      "content": "why did you not display the intro question and use TTS to read it?",
+      "role": "user",
+      "timestamp": "2025-05-14T09:16:28.864554"
+    },
+    {
+      "id": "0ba64b9f-18a1-4ed3-98e1-b9f33ab90b13",
+      "content": "I apologize for not displaying the intro question and using text-to-speech (TTS) to read it. Let's focus on the interview topic. Could you please share your experience with interviews and what you believe is important during an interview process?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:16:30.014922"
+    },
+    {
+      "id": "1372f5fb-0ef8-4809-96e2-b9fd0bb49063",
+      "content": "I'm doing Cola",
+      "role": "user",
+      "timestamp": "2025-05-14T09:17:28.843984"
+    },
+    {
+      "id": "33328c2a-922a-4d02-8028-4891ed6e02bd",
+      "content": "Thank you for participating in this interview. When you mentioned you're doing Cola, could you please provide more details or context about what specifically you mean by that? Are you referring to a project, a study, or something else related to Cola?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:17:29.898932"
+    },
+    {
+      "id": "7a729324-846d-45ff-83c8-7fa6cadcb39f",
+      "content": "it's important to have the questions that are coming from the actual character so right now the guide is not available the type of is not available the status I have to participant  the AI character is not available does that means you're not actually asking me the questions I want you to",
+      "role": "user",
+      "timestamp": "2025-05-14T09:25:25.207908"
+    },
+    {
+      "id": "6fafe201-aee6-47b3-874e-f87a4141ecc6",
+      "content": "I understand your concern. I'm here to ask you the questions and gather information for the interview. Let's continue with the interview. Is there anything specific you'd like to share or discuss?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:25:26.076798"
+    },
+    {
+      "id": "db2eac5f-713c-4a4c-9313-a61bb1cbb3cd",
+      "content": "interesting you just read me the first question twice I do like the response and it's building so that's good feedback I do like the microphone active so that's good working there I like I love the debug log because I can see the purple and the green so what's going on I'm going to stop talking now",
+      "role": "user",
+      "timestamp": "2025-05-14T09:26:06.195287"
+    },
+    {
+      "id": "0bbd64e2-3ef5-4ac0-a0b6-95193eaf9728",
+      "content": "Thank you for your feedback. To start off, could you please introduce yourself and tell me about your experience with interviews?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:26:06.866162"
+    }
+  ],
+  "transcript": "\n\nParticipant: why did you not display the intro question and use TTS to read it?\n\nModerator: I apologize for not displaying the intro question and using text-to-speech (TTS) to read it. Let's focus on the interview topic. Could you please share your experience with interviews and what you believe is important during an interview process?\n\nParticipant: I'm doing Cola\n\nModerator: Thank you for participating in this interview. When you mentioned you're doing Cola, could you please provide more details or context about what specifically you mean by that? Are you referring to a project, a study, or something else related to Cola?\n\nParticipant: it's important to have the questions that are coming from the actual character so right now the guide is not available the type of is not available the status I have to participant  the AI character is not available does that means you're not actually asking me the questions I want you to\n\nModerator: I understand your concern. I'm here to ask you the questions and gather information for the interview. Let's continue with the interview. Is there anything specific you'd like to share or discuss?\n\nParticipant: interesting you just read me the first question twice I do like the response and it's building so that's good feedback I do like the microphone active so that's good working there I like I love the debug log because I can see the purple and the green so what's going on I'm going to stop talking now\n\nModerator: Thank you for your feedback. To start off, could you please introduce yourself and tell me about your experience with interviews?",
+  "analysis": null,
+  "created_at": "2025-05-14T09:16:01.758530",
+  "updated_at": "2025-05-14T09:26:06.866844"
+}

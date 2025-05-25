@@ -1,0 +1,64 @@
+{
+  "id": "560a436f-7461-4c28-bdeb-a26f34599847",
+  "guide_id": "61180742-01e7-4cc7-b4a6-39b1b8dea349",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "4d33e06f-6a09-49c2-adf4-6e66a4183c4e",
+      "content": "questions and interview",
+      "role": "user",
+      "timestamp": "2025-05-13T14:39:07.726508"
+    },
+    {
+      "id": "b967b638-433b-451f-90ce-19c8b845e903",
+      "content": "What inspired you to pursue your current career or field of study? Can you share a specific moment or experience that solidified your decision to focus on this path?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T14:39:08.672743"
+    },
+    {
+      "id": "f9e6e040-53cd-4ba9-ae0e-31b88a57af01",
+      "content": "I was inspired by my mother and her passion for computers  so that was very important to me",
+      "role": "user",
+      "timestamp": "2025-05-13T14:39:31.163725"
+    },
+    {
+      "id": "4ff05bee-c73a-4b14-828b-126e0c18f907",
+      "content": "That's wonderful to hear that your mother inspired your passion for computers! How did she first introduce you to the world of technology, and what specific aspects of it do you find most fascinating or enjoyable?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T14:39:31.873678"
+    },
+    {
+      "id": "b60d2a04-564e-4521-8816-47bdc0b1b896",
+      "content": "and we are almost working I'm going to stop in the interview",
+      "role": "user",
+      "timestamp": "2025-05-13T14:39:53.120817"
+    },
+    {
+      "id": "9c10a30e-25c8-44ec-a8eb-efaf7f9e9907",
+      "content": "That sounds like a good plan. Before we wrap up, I'm curious to know - what do you find most rewarding about the work you do in your field?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T14:39:53.840238"
+    },
+    {
+      "role": "system",
+      "content": "The researcher suggests exploring this topic in more depth. Ask follow-up questions to get more details.",
+      "timestamp": "2025-05-13T14:40:00.314665",
+      "id": "00bd58ab-ed3b-4b46-8199-ca46c8b2baed",
+      "intervention": "go-deeper"
+    },
+    {
+      "role": "system",
+      "content": "The researcher has suggested a brief pause. Take a moment before continuing.",
+      "timestamp": "2025-05-13T14:40:01.432148",
+      "id": "5e128828-1aff-468b-934e-0284ecbbec1d",
+      "intervention": "pause"
+    }
+  ],
+  "transcript": "\n\nParticipant: questions and interview\n\nModerator: What inspired you to pursue your current career or field of study? Can you share a specific moment or experience that solidified your decision to focus on this path?\n\nParticipant: I was inspired by my mother and her passion for computers  so that was very important to me\n\nModerator: That's wonderful to hear that your mother inspired your passion for computers! How did she first introduce you to the world of technology, and what specific aspects of it do you find most fascinating or enjoyable?\n\nParticipant: and we are almost working I'm going to stop in the interview\n\nModerator: That sounds like a good plan. Before we wrap up, I'm curious to know - what do you find most rewarding about the work you do in your field?\n\nParticipant: The researcher suggests exploring this topic in more depth. Ask follow-up questions to get more details.\n\nParticipant: The researcher has suggested a brief pause. Take a moment before continuing.",
+  "analysis": null,
+  "created_at": "2025-05-13T14:38:58.699577",
+  "updated_at": "2025-05-13T14:40:01.432455"
+}

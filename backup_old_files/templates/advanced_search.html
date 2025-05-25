@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+
+{% block title %}Advanced Search{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Advanced Search</h1>
+    
+    <div class="card">
+        <div class="card-body">
+            <form id="searchForm" method="POST">
+                <div class="mb-3">
+                    <label for="query" class="form-label">Search Query</label>
+                    <input type="text" class="form-control" id="query" name="query" required>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="type" class="form-label">Search Type</label>
+                    <select class="form-select" id="type" name="type">
+                        <option value="text">Text Search</option>
+                        <option value="semantic">Semantic/Natural Language Search</option>
+                        <option value="emotion">Emotion Search</option>
+                        <option value="theme">Theme Search</option>
+                        <option value="insight">Insight Search</option>
+                    </select>
+                    <small class="form-text text-muted" id="searchDescription"></small>
+                </div>
+                
+                <div class="mb-3">
+                    <label for="limit" class="form-label">Results Limit</label>
+                    <input type="number" class="form-control" id="limit" name="limit" value="10" min="1" max="100">
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Search</button>
+            </form>
+        </div>
+    </div>
+    
+    <div id="debug" class="mt-4 p-3 bg-light" style="display: none;">
+        <h4>Debug Information</h4>
+        <pre id="debugInfo"></pre>
+    </div>
+
+    <div id="results" class="mt-4" style="display: none;">
+        <h2>Search Results</h2>
+        <div class="list-group" id="resultsList"></div>
+    </div>
+</div>
+
+<script>
+// Update search description based on selected type
+document.getElementById('type').addEventListener('change', function() {
+    const descriptions = {
+        'text': 'Simple text matching - finds exact matches in the content',
+        'semantic': 'Natural language understanding - finds relevant content based on meaning',
+        'emotion': 'Search for specific emotional states in interviews',
+        'theme': 'Search for specific themes identified in interviews',
+        'insight': 'Search across insight tags and annotations'
+    };
+    document.getElementById('searchDescription').textContent = descriptions[this.value] || '';
+});
+
+document.getElementById('searchForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    
+    const form = e.target;
+    const formData = new FormData(form);
+    const searchData = {
+        query: formData.get('query'),
+        type: formData.get('type'),
+        limit: parseInt(formData.get('limit'))
+    };
+    
+    // Show debug info
+    const debugDiv = document.getElementById('debug');
+    const debugInfo = document.getElementById('debugInfo');
+    debugDiv.style.display = 'block';
+    debugInfo.textContent = 'Sending request:\n' + JSON.stringify(searchData, null, 2);
+    
+    try {
+        console.log('Sending search request:', searchData);
+        const response = await fetch('/api/search/advanced', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(searchData)
+        });
+        
+        console.log('Raw response:', response);
+        const data = await response.json();
+        console.log('Response data:', data);
+        
+        // Update debug info
+        debugInfo.textContent += '\n\nReceived response:\n' + JSON.stringify(data, null, 2);
+        
+        if (response.ok) {
+            displayResults(data.results);
+        } else {
+            alert(data.error || data.message || 'An error occurred while searching');
+        }
+    } catch (error) {
+        console.error('Search error:', error);
+        debugInfo.textContent += '\n\nError:\n' + error.toString();
+        alert('An error occurred while searching');
+    }
+});
+
+function displayResults(results) {
+    const resultsDiv = document.getElementById('results');
+    const resultsList = document.getElementById('resultsList');
+    resultsList.innerHTML = '';
+    
+    if (!results || results.length === 0) {
+        resultsList.innerHTML = '<div class="list-group-item">No results found</div>';
+    } else {
+        results.forEach(result => {
+            const item = document.createElement('div');
+            item.className = 'list-group-item';
+            
+            // Create title from available fields
+            const title = result.interviewee_name || result.transcript_name || result.project_name || 'Untitled';
+            
+            // Format timestamp if available
+            const timestamp = result.timestamp ? new Date(result.timestamp).toLocaleString() : 'No date';
+            
+            // Format similarity score if available
+            const similarity = result.similarity !== undefined ? 
+                `${(result.similarity * 100).toFixed(2)}%` : 
+                'N/A';
+            
+            item.innerHTML = `
+                <h5 class="mb-1">${title}</h5>
+                <p class="mb-1">${result.content || 'No content available'}</p>
+                <div class="d-flex justify-content-between align-items-center">
+                    <small class="text-muted">Project: ${result.project_name || 'Unknown'}</small>
+                    <small class="text-muted">Similarity: ${similarity}</small>
+                </div>
+                <small class="text-muted">Time: ${timestamp}</small>
+            `;
+            
+            // Add metadata if available
+            if (result.metadata) {
+                const metadata = [];
+                
+                if (result.metadata.emotion) {
+                    metadata.push(`Emotion: ${result.metadata.emotion} (${Math.round(result.metadata.emotion_intensity * 100)}%)`);
+                }
+                
+                if (result.metadata.themes && result.metadata.themes.length) {
+                    metadata.push(`Themes: ${result.metadata.themes.join(', ')}`);
+                }
+                
+                if (result.metadata.insight_tags && result.metadata.insight_tags.length) {
+                    metadata.push(`Insights: ${result.metadata.insight_tags.join(', ')}`);
+                }
+                
+                if (metadata.length) {
+                    item.innerHTML += `
+                        <div class="mt-2">
+                            <small class="text-muted">${metadata.join(' | ')}</small>
+                        </div>
+                    `;
+                }
+            }
+            
+            resultsList.appendChild(item);
+        });
+    }
+    
+    resultsDiv.style.display = 'block';
+}
+
+// Trigger change event to set initial description
+document.getElementById('type').dispatchEvent(new Event('change'));
+</script>
+{% endblock %} 

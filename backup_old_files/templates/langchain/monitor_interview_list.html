@@ -1,0 +1,211 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Available Interviews for Monitoring{% endblock %}
+
+{% block extra_css %}
+<style>
+    .live-indicator {
+        display: inline-block;
+        width: 10px;
+        height: 10px;
+        background-color: #dc3545;
+        border-radius: 50%;
+        margin-right: 8px;
+        animation: pulse 1.5s infinite;
+    }
+    
+    @keyframes pulse {
+        0% {
+            transform: scale(0.8);
+            opacity: 0.7;
+        }
+        50% {
+            transform: scale(1.2);
+            opacity: 1;
+        }
+        100% {
+            transform: scale(0.8);
+            opacity: 0.7;
+        }
+    }
+    
+    .live-session {
+        background-color: rgba(220, 53, 69, 0.05);
+    }
+    
+    .live-label {
+        background-color: #dc3545;
+        color: white;
+        font-size: 0.7rem;
+        padding: 0.15rem 0.5rem;
+        border-radius: 1rem;
+        margin-left: 0.5rem;
+        animation: fade 1.5s infinite;
+    }
+    
+    @keyframes fade {
+        0% { opacity: 0.7; }
+        50% { opacity: 1; }
+        100% { opacity: 0.7; }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="mb-4 d-flex justify-content-between align-items-center">
+        <div>
+            <h1 class="h3">{{ title }}</h1>
+            <p class="text-muted">Select an interview session to monitor</p>
+        </div>
+        <div>
+            <a href="/interview_setup" class="btn btn-primary">
+                <i class="bi bi-plus-circle me-1"></i> Create New Discussion Guide
+            </a>
+        </div>
+    </div>
+    
+    <div class="card">
+        <div class="card-header">
+            <ul class="nav nav-tabs card-header-tabs">
+                <li class="nav-item">
+                    <a class="nav-link active" href="#all-interviews" data-bs-toggle="tab">All Interviews</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#live-interviews" data-bs-toggle="tab">
+                        Live Interviews 
+                        <span class="badge bg-danger ms-1">{{ interviews|selectattr('status', 'equalto', 'active')|list|length }}</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <div class="card-body">
+            {% if interviews %}
+                <div class="tab-content">
+                    <div class="tab-pane active" id="all-interviews">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Created</th>
+                                        <th>Project</th>
+                                        <th>Status</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for session_id, interview in interviews.items() %}
+                                    {% set is_active = interview.get('status', 'active')|lower == 'active' and interview.get('last_message_time', 0)|float > (now|default(0) - 3600) %}
+                                    <tr {% if is_active %}class="live-session"{% endif %}>
+                                        <td>
+                                            {% if is_active %}<span class="live-indicator"></span>{% endif %}
+                                            {{ interview.get('title', 'Untitled Interview') }}
+                                            {% if is_active %}<span class="live-label">LIVE</span>{% endif %}
+                                        </td>
+                                        <td>
+                                            {% if interview.created_at is defined %}
+                                                {% if interview.created_at is string %}
+                                                    {{ interview.created_at }}
+                                                {% else %}
+                                                    {{ interview.created_at.strftime('%b %d, %Y %H:%M') }}
+                                                {% endif %}
+                                            {% else %}
+                                                {{ interview.get('creation_date', 'Unknown') }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ interview.get('project', 'Not specified') }}</td>
+                                        <td>
+                                            <span class="badge {% if is_active %}bg-danger{% else %}bg-success{% endif %}">
+                                                {{ 'Live' if is_active else interview.get('status', 'Active')|capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <a href="/monitor_interview/{{ session_id }}" class="btn btn-sm {% if is_active %}btn-danger{% else %}btn-primary{% endif %}">
+                                                <i class="bi bi-display me-1"></i> Monitor{% if is_active %} Now{% endif %}
+                                            </a>
+                                            <a href="/interview_details/{{ session_id }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-info-circle me-1"></i> Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    
+                    <div class="tab-pane" id="live-interviews">
+                        <div class="table-responsive">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Created</th>
+                                        <th>Project</th>
+                                        <th>Last Activity</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for session_id, interview in interviews.items() %}
+                                    {% set is_active = interview.get('status', 'active')|lower == 'active' and interview.get('last_message_time', 0)|float > (now|default(0) - 3600) %}
+                                    {% if is_active %}
+                                    <tr class="live-session">
+                                        <td>
+                                            <span class="live-indicator"></span>
+                                            {{ interview.get('title', 'Untitled Interview') }}
+                                            <span class="live-label">LIVE</span>
+                                        </td>
+                                        <td>
+                                            {% if interview.created_at is defined %}
+                                                {% if interview.created_at is string %}
+                                                    {{ interview.created_at }}
+                                                {% else %}
+                                                    {{ interview.created_at.strftime('%b %d, %Y %H:%M') }}
+                                                {% endif %}
+                                            {% else %}
+                                                {{ interview.get('creation_date', 'Unknown') }}
+                                            {% endif %}
+                                        </td>
+                                        <td>{{ interview.get('project', 'Not specified') }}</td>
+                                        <td>{{ interview.get('last_updated', 'Just now') }}</td>
+                                        <td>
+                                            <a href="/monitor_interview/{{ session_id }}" class="btn btn-sm btn-danger">
+                                                <i class="bi bi-display me-1"></i> Monitor Now
+                                            </a>
+                                            <a href="/interview_details/{{ session_id }}" class="btn btn-sm btn-outline-secondary">
+                                                <i class="bi bi-info-circle me-1"></i> Details
+                                            </a>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                    {% endfor %}
+                                    
+                                    {% if not interviews|selectattr('status', 'equalto', 'active')|list %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-4">
+                                            <p class="text-muted mb-0">No live interviews currently in progress.</p>
+                                        </td>
+                                    </tr>
+                                    {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <div class="mb-3">
+                        <i class="bi bi-display fs-1 text-muted"></i>
+                    </div>
+                    <p class="text-muted">No active interviews available for monitoring.</p>
+                    <a href="/interview_setup" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-circle me-1"></i> Create New Discussion Guide
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

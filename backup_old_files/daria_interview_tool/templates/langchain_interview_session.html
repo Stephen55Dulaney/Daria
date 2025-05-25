@@ -1,0 +1,862 @@
+{% extends "base.html" %}
+
+{% block title %}Interview Session{% endblock %}
+
+{% block styles %}
+<style>
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f5f7fa;
+    margin: 0;
+    padding: 0;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .interview-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 20px;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  
+  .header h1 {
+    color: #1e3a8a;
+    font-size: 24px;
+    margin: 0;
+  }
+  
+  .chat-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .transcript {
+    flex: 1;
+    overflow-y: auto;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .message {
+    position: relative;
+    padding: 12px 16px;
+    border-radius: 8px;
+    max-width: 80%;
+    animation: fadeIn 0.3s ease-out;
+  }
+  
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  
+  .message.assistant {
+    align-self: flex-start;
+    background-color: #f0f7ff;
+    border-left: 3px solid #1890ff;
+  }
+  
+  .message.user {
+    align-self: flex-end;
+    background-color: #f6f6f6;
+    border-left: 3px solid #999;
+  }
+  
+  .message-header {
+    font-weight: 500;
+    margin-bottom: 4px;
+    color: #333;
+  }
+  
+  .message-content {
+    color: #4b5563;
+    line-height: 1.5;
+  }
+  
+  .input-area {
+    padding: 15px;
+    border-top: 1px solid #e5e7eb;
+    background-color: #f9fafb;
+  }
+  
+  .input-container {
+    display: flex;
+    gap: 10px;
+  }
+  
+  .response-input {
+    flex: 1;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    padding: 12px;
+    font-size: 15px;
+    resize: none;
+    min-height: 80px;
+    max-height: 150px;
+  }
+  
+  .response-input:focus {
+    outline: none;
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.2);
+  }
+  
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 12px 16px;
+    font-size: 15px;
+    font-weight: 500;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  
+  .btn-primary {
+    background-color: #3b82f6;
+    color: white;
+  }
+  
+  .btn-primary:hover {
+    background-color: #2563eb;
+  }
+  
+  .btn-secondary {
+    background-color: #f1f5f9;
+    color: #334155;
+  }
+  
+  .btn-secondary:hover {
+    background-color: #e2e8f0;
+  }
+  
+  .btn-success {
+    background-color: #10b981;
+    color: white;
+  }
+  
+  .btn-success:hover {
+    background-color: #059669;
+  }
+  
+  .btn-danger {
+    background-color: #ef4444;
+    color: white;
+  }
+  
+  .btn-danger:hover {
+    background-color: #dc2626;
+  }
+  
+  .btn i {
+    margin-right: 8px;
+  }
+  
+  .btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+  
+  .controls {
+    display: flex;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  
+  .controls-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  
+  .recording-status {
+    display: flex;
+    align-items: center;
+    font-size: 14px;
+    margin-left: 12px;
+  }
+  
+  .recording-status.active {
+    color: #ef4444;
+  }
+  
+  .recording-status i {
+    margin-right: 5px;
+  }
+  
+  .pulse {
+    animation: pulse 1.5s infinite;
+  }
+  
+  @keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.5; }
+    100% { opacity: 1; }
+  }
+  
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+  
+  .dialog {
+    background: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    padding: 24px;
+    max-width: 450px;
+    width: 100%;
+  }
+  
+  .dialog-header {
+    margin-bottom: 16px;
+    text-align: center;
+  }
+  
+  .dialog-header h2 {
+    margin: 0;
+    font-size: 20px;
+    color: #1f2937;
+  }
+  
+  .dialog-content {
+    margin-bottom: 24px;
+    color: #4b5563;
+    line-height: 1.5;
+  }
+  
+  .dialog-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+  }
+  
+  .footer-actions {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+  }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="interview-container">
+  <div class="header">
+    <h1>Interview Session</h1>
+    <div>
+      <button id="startOverButton" class="btn btn-secondary" style="margin-right: 10px;">
+        <i class="fas fa-redo"></i> Start Over
+      </button>
+      <button id="completeButton" class="btn btn-success">
+        <i class="fas fa-check-circle"></i> Complete Interview
+      </button>
+    </div>
+  </div>
+  
+  <div class="chat-area">
+    <div id="transcript" class="transcript">
+      <!-- Messages will be displayed here -->
+    </div>
+    
+    <div class="input-area">
+      <div class="controls">
+        <div class="controls-left">
+          <button id="playButton" class="btn btn-secondary">
+            <i class="fas fa-play"></i> Play
+          </button>
+          <button id="recordButton" class="btn btn-secondary">
+            <i class="fas fa-microphone"></i> Record
+          </button>
+          <div id="recordingStatus" class="recording-status"></div>
+        </div>
+      </div>
+      
+      <div class="input-container">
+        <textarea id="responseInput" class="response-input" placeholder="Type your response here..."></textarea>
+        <button id="sendButton" class="btn btn-primary" disabled>
+          <i class="fas fa-paper-plane"></i> Send
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Complete Interview Confirmation Dialog -->
+<div id="completeDialog" class="overlay" style="display: none;">
+  <div class="dialog">
+    <div class="dialog-header">
+      <h2>Complete Interview</h2>
+    </div>
+    <div class="dialog-content">
+      Are you sure you want to complete this interview? This will end your session.
+    </div>
+    <div class="dialog-actions">
+      <button id="cancelComplete" class="btn btn-secondary">Cancel</button>
+      <button id="confirmComplete" class="btn btn-success">
+        <i class="fas fa-check"></i> Yes, Complete
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Analysis Results Dialog -->
+<div id="analysisDialog" class="overlay" style="display: none;">
+  <div class="dialog" style="max-width: 700px;">
+    <div class="dialog-header">
+      <h2>Interview Analysis</h2>
+    </div>
+    <div id="analysisContent" class="dialog-content" style="max-height: 60vh; overflow-y: auto;">
+      <!-- Analysis will be displayed here -->
+    </div>
+    <div class="dialog-actions">
+      <button id="closeAnalysis" class="btn btn-primary">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Loading Dialog -->
+<div id="loadingDialog" class="overlay" style="display: none;">
+  <div class="dialog">
+    <div class="dialog-header">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <i class="fas fa-spinner fa-spin" style="font-size: 30px; color: #3b82f6;"></i>
+      </div>
+      <h2 id="loadingMessage">Processing...</h2>
+    </div>
+  </div>
+</div>
+
+<!-- Audio Element (hidden) -->
+<audio id="audioPlayer" style="display: none;"></audio>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+    // Session data from query parameters
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = urlParams.get('session_id');
+    const voiceId = urlParams.get('voice_id');
+    
+    // DOM Elements
+    const transcript = document.getElementById('transcript');
+    const responseInput = document.getElementById('responseInput');
+    const sendButton = document.getElementById('sendButton');
+    const recordButton = document.getElementById('recordButton');
+    const playButton = document.getElementById('playButton');
+    const recordingStatus = document.getElementById('recordingStatus');
+    const completeButton = document.getElementById('completeButton');
+    const completeDialog = document.getElementById('completeDialog');
+    const cancelComplete = document.getElementById('cancelComplete');
+    const confirmComplete = document.getElementById('confirmComplete');
+    const analysisDialog = document.getElementById('analysisDialog');
+    const analysisContent = document.getElementById('analysisContent');
+    const closeAnalysis = document.getElementById('closeAnalysis');
+    const loadingDialog = document.getElementById('loadingDialog');
+    const loadingMessage = document.getElementById('loadingMessage');
+    const audioPlayer = document.getElementById('audioPlayer');
+    const startOverButton = document.getElementById('startOverButton');
+    
+    // State variables
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+    let lastQuestionText = '';
+    
+    // Event Listeners
+    responseInput.addEventListener('input', checkResponseValid);
+    sendButton.addEventListener('click', sendResponse);
+    recordButton.addEventListener('click', toggleRecording);
+    playButton.addEventListener('click', playCurrentQuestion);
+    completeButton.addEventListener('click', () => {
+      completeDialog.style.display = 'flex';
+    });
+    cancelComplete.addEventListener('click', () => {
+      completeDialog.style.display = 'none';
+    });
+    confirmComplete.addEventListener('click', completeInterview);
+    closeAnalysis.addEventListener('click', () => {
+      analysisDialog.style.display = 'none';
+    });
+    startOverButton.addEventListener('click', () => {
+      // Simple confirmation to avoid accidental clicks
+      if (confirm('Are you sure you want to start over? This will take you back to the setup page.')) {
+        window.location.href = '/langchain_interview_test';
+      }
+    });
+    
+    // Initialize interview 
+    initializeInterview();
+    
+    // Function to initialize the interview
+    function initializeInterview() {
+      console.log("Initializing interview with sessionId:", sessionId);
+      
+      if (!sessionId) {
+        console.error("No session ID provided");
+        alert('No session ID provided. Redirecting to setup page.');
+        window.location.href = '/langchain_interview_test';
+        return;
+      }
+      
+      // Display loading dialog
+      showLoading('Loading interview...');
+      console.log("Loading dialog displayed");
+      
+      // Set a timeout to prevent getting stuck on loading
+      const loadingTimeout = setTimeout(() => {
+        console.log("Loading timeout triggered - using default question");
+        hideLoading();
+        // Just start with a default question if loading takes too long
+        const defaultQuestion = "Hello! I'm Daria, your research interviewer today. I'd like to learn about your experiences. Could you start by telling me about yourself and your role?";
+        lastQuestionText = defaultQuestion;
+        addMessage('assistant', defaultQuestion);
+      }, 10000); // 10 second timeout
+      
+      console.log("Requesting first question from API");
+      
+      // Make a request to get the first question
+      fetch('/api/langchain_interview/start_session', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          session_id: sessionId
+        })
+      })
+      .then(response => {
+        console.log("Received response with status:", response.status);
+        
+        if (!response.ok) {
+          throw new Error('Failed to initialize interview session: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log("Received data:", data);
+        
+        clearTimeout(loadingTimeout);
+        hideLoading();
+        
+        // Get the first question
+        const firstQuestion = data?.first_question || "Hello! I'm Daria, your research interviewer today. I'd like to learn about your experiences. Could you start by telling me about yourself and your role?";
+        
+        console.log("First question:", firstQuestion.substring(0, 50) + "...");
+        
+        // Display the first question
+        lastQuestionText = firstQuestion;
+        addMessage('assistant', firstQuestion);
+        
+        // Play the first question
+        console.log("Playing audio for first question");
+        playTextAudio(firstQuestion);
+      })
+      .catch(error => {
+        console.error("Error in initialization:", error);
+        clearTimeout(loadingTimeout);
+        hideLoading();
+        
+        // In case of error, still show a default question
+        const defaultQuestion = "Hello! I'm Daria, your research interviewer today. I'd like to learn about your experiences. Could you start by telling me about yourself and your role?";
+        lastQuestionText = defaultQuestion;
+        addMessage('assistant', defaultQuestion);
+      });
+    }
+    
+    // Function to check if response is valid
+    function checkResponseValid() {
+      sendButton.disabled = responseInput.value.trim() === '';
+    }
+    
+    // Function to add message to transcript
+    function addMessage(role, content) {
+      const messageEl = document.createElement('div');
+      messageEl.className = `message ${role}`;
+      
+      const headerEl = document.createElement('div');
+      headerEl.className = 'message-header';
+      headerEl.textContent = role === 'assistant' ? 'Daria' : 'You';
+      
+      const contentEl = document.createElement('div');
+      contentEl.className = 'message-content';
+      contentEl.textContent = content;
+      
+      messageEl.appendChild(headerEl);
+      messageEl.appendChild(contentEl);
+      
+      transcript.appendChild(messageEl);
+      
+      // Scroll to bottom
+      transcript.scrollTop = transcript.scrollHeight;
+    }
+    
+    // Function to send response
+    function sendResponse() {
+      const response = responseInput.value.trim();
+      if (!response) return;
+      
+      // Disable UI during API call
+      sendButton.disabled = true;
+      responseInput.disabled = true;
+      
+      // Add user message to transcript
+      addMessage('user', response);
+      
+      // Show loading state
+      showLoading('Thinking...');
+      
+      // Set a timeout for the response
+      const responseTimeout = setTimeout(() => {
+        hideLoading();
+        sendButton.disabled = false;
+        responseInput.disabled = false;
+        alert('The response is taking too long. Please try again or refresh the page.');
+      }, 30000); // 30 second timeout
+      
+      // Call API to get next question
+      fetch('/api/langchain_interview/respond', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          user_input: response,
+          session_id: sessionId
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to get response: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        clearTimeout(responseTimeout);
+        hideLoading();
+        
+        if (data.error) {
+          console.error('API error:', data.error);
+          alert('Error: ' + data.error);
+          sendButton.disabled = false;
+          responseInput.disabled = false;
+          return;
+        }
+        
+        // Display next question
+        const nextQuestion = data.next_question;
+        lastQuestionText = nextQuestion;
+        addMessage('assistant', nextQuestion);
+        
+        // Reset response input
+        responseInput.value = '';
+        responseInput.disabled = false;
+        sendButton.disabled = true;
+        
+        // Play the next question
+        playTextAudio(nextQuestion);
+      })
+      .catch(error => {
+        clearTimeout(responseTimeout);
+        hideLoading();
+        console.error('Error sending response:', error);
+        alert('Error sending response. Please try again.');
+        sendButton.disabled = false;
+        responseInput.disabled = false;
+      });
+    }
+    
+    // Function to play the current question
+    function playCurrentQuestion() {
+      if (!lastQuestionText) return;
+      playTextAudio(lastQuestionText);
+    }
+    
+    // Function to play text as audio
+    function playTextAudio(text) {
+      // Disable play button during playback
+      playButton.disabled = true;
+      playButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+      
+      // Set a timeout for the audio loading
+      const audioTimeout = setTimeout(() => {
+        resetPlayButton();
+        console.warn('Audio loading timed out');
+      }, 15000); // 15 second timeout
+      
+      // Call API to convert text to speech
+      fetch('/api/text_to_speech_elevenlabs', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          text: text,
+          voice_id: voiceId
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to convert text to speech: ' + response.status);
+        }
+        return response.blob();
+      })
+      .then(audioBlob => {
+        clearTimeout(audioTimeout);
+        
+        // Create URL for the audio blob
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        // Set up audio player
+        audioPlayer.src = audioUrl;
+        
+        // Reset button when audio ends or on error
+        audioPlayer.onended = resetPlayButton;
+        audioPlayer.onerror = resetPlayButton;
+        
+        // Play the audio
+        audioPlayer.play().catch(err => {
+          console.error('Error playing audio:', err);
+          resetPlayButton();
+          
+          // Don't show alert for network errors to reduce alert fatigue
+          if (!err.message.includes('network')) {
+            alert('Error playing audio. Please try again.');
+          }
+        });
+      })
+      .catch(error => {
+        clearTimeout(audioTimeout);
+        console.error('Error playing audio:', error);
+        resetPlayButton();
+        
+        // Don't show alert for network errors to reduce alert fatigue
+        if (!error.message.includes('network')) {
+          alert('Error playing audio. Please try again.');
+        }
+      });
+    }
+    
+    // Function to reset play button
+    function resetPlayButton() {
+      playButton.disabled = false;
+      playButton.innerHTML = '<i class="fas fa-play"></i> Play';
+    }
+    
+    // Function to toggle recording
+    function toggleRecording() {
+      if (isRecording) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    }
+    
+    // Function to start recording
+    function startRecording() {
+      // Request microphone permission
+      navigator.mediaDevices.getUserMedia({ audio: true })
+        .then(stream => {
+          mediaRecorder = new MediaRecorder(stream);
+          audioChunks = [];
+          
+          mediaRecorder.ondataavailable = event => {
+            audioChunks.push(event.data);
+          };
+          
+          mediaRecorder.onstop = () => {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            
+            // Show transcribing status
+            responseInput.value = "Transcribing...";
+            responseInput.disabled = true;
+            
+            // Create form data to send to server
+            const formData = new FormData();
+            formData.append('audio', audioBlob);
+            formData.append('project_name', 'LangchainTest');
+            
+            // Send to server for transcription
+            fetch('/process_audio?project_name=LangchainTest', {
+              method: 'POST',
+              body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+              responseInput.disabled = false;
+              
+              if (data.error) {
+                console.error('Transcription error:', data.error);
+                responseInput.value = "Error transcribing speech. Please type your response.";
+                responseInput.select();
+                return;
+              }
+              
+              // Success - set the transcription in the input field
+              responseInput.value = data.transcription || data.transcript || "";
+              checkResponseValid();
+            })
+            .catch(error => {
+              responseInput.disabled = false;
+              console.error('Error sending audio for transcription:', error);
+              responseInput.value = "Error transcribing speech. Please type your response.";
+              responseInput.select();
+            });
+          };
+          
+          // Start recording with small time slices for better streaming
+          mediaRecorder.start(100);
+          isRecording = true;
+          
+          // Update UI
+          recordButton.innerHTML = '<i class="fas fa-stop"></i> Stop';
+          recordButton.classList.add('btn-danger');
+          recordButton.classList.remove('btn-secondary');
+          recordingStatus.innerHTML = '<i class="fas fa-circle pulse"></i> Recording...';
+          recordingStatus.classList.add('active');
+        })
+        .catch(error => {
+          console.error('Error accessing microphone:', error);
+          alert('Error accessing microphone. Please check your browser permissions.');
+        });
+    }
+    
+    // Function to stop recording
+    function stopRecording() {
+      if (mediaRecorder && isRecording) {
+        mediaRecorder.stop();
+        isRecording = false;
+        
+        // Stop all tracks in the stream to release the microphone
+        if (mediaRecorder.stream) {
+          mediaRecorder.stream.getTracks().forEach(track => track.stop());
+        }
+        
+        // Update UI
+        recordButton.innerHTML = '<i class="fas fa-microphone"></i> Record';
+        recordButton.classList.remove('btn-danger');
+        recordButton.classList.add('btn-secondary');
+        recordingStatus.innerHTML = '';
+        recordingStatus.classList.remove('active');
+      }
+    }
+    
+    // Function to complete interview
+    function completeInterview() {
+      // Hide complete dialog
+      completeDialog.style.display = 'none';
+      
+      // Show loading dialog
+      showLoading('Analyzing interview responses...');
+      
+      // Set a timeout for the analysis
+      const analysisTimeout = setTimeout(() => {
+        hideLoading();
+        alert('The analysis is taking too long. Please try again or check the console for errors.');
+      }, 60000); // 60 second timeout
+      
+      // Call API to analyze the interview
+      fetch('/api/langchain_interview/analyze', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          session_id: sessionId
+        })
+      })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to analyze interview: ' + response.status);
+        }
+        return response.json();
+      })
+      .then(data => {
+        clearTimeout(analysisTimeout);
+        hideLoading();
+        
+        if (data.error) {
+          console.error('Analysis error:', data.error);
+          alert('Error: ' + data.error);
+          return;
+        }
+        
+        // Format and display analysis
+        const analysis = data.analysis || 'No analysis available';
+        analysisContent.innerHTML = formatAnalysis(analysis);
+        
+        // Show analysis dialog
+        analysisDialog.style.display = 'flex';
+      })
+      .catch(error => {
+        clearTimeout(analysisTimeout);
+        hideLoading();
+        console.error('Error completing interview:', error);
+        alert('Error completing interview. Please try again.');
+      });
+    }
+    
+    // Function to format analysis with basic markdown-like formatting
+    function formatAnalysis(analysis) {
+      // Replace line breaks with paragraphs
+      let formatted = analysis.replace(/\n\n/g, '</p><p>');
+      
+      // Format headings (lines starting with #)
+      formatted = formatted.replace(/^# (.+)$/gm, '<h3>$1</h3>');
+      formatted = formatted.replace(/^## (.+)$/gm, '<h4>$1</h4>');
+      
+      // Format lists
+      formatted = formatted.replace(/^- (.+)$/gm, '<li>$1</li>');
+      formatted = formatted.replace(/(<li>.*<\/li>\n)+/g, '<ul>$&</ul>');
+      
+      // Wrap in paragraph tags if not already
+      if (!formatted.startsWith('<')) {
+        formatted = '<p>' + formatted + '</p>';
+      }
+      
+      return formatted;
+    }
+    
+    // Function to show loading dialog
+    function showLoading(message) {
+      loadingMessage.textContent = message || 'Processing...';
+      loadingDialog.style.display = 'flex';
+    }
+    
+    // Function to hide loading dialog
+    function hideLoading() {
+      loadingDialog.style.display = 'none';
+    }
+  });
+</script>
+{% endblock %} 

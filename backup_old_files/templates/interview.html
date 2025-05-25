@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA - Interview Session</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 1rem;
+            gap: 1rem;
+            max-height: calc(100vh - 180px); /* Account for header and controls */
+            overflow-y: auto;
+        }
+        
+        .chat-container {
+            flex: 1;
+            min-height: 300px;
+            max-height: 50vh;
+            overflow-y: auto;
+            padding: 1rem;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        
+        .report-container {
+            flex: 1;
+            min-height: 300px;
+            max-height: 50vh;
+            overflow-y: auto;
+            background-color: white;
+            border-radius: 0.5rem;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 0.5rem;
+        }
+        .daria-message {
+            color: #2D3748;
+            background-color: #EDF2F7;
+        }
+        .user-message {
+            color: #4A5568;
+            background-color: #E2E8F0;
+            margin-left: 2rem;
+        }
+        .error-message {
+            color: #E53E3E;
+            background-color: #FED7D7;
+        }
+        .controls {
+            padding: 1rem;
+            background-color: white;
+            border-top: 1px solid #E2E8F0;
+            position: sticky;
+            bottom: 0;
+        }
+        .btn {
+            background-color: #8B7355;
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 0.375rem;
+            font-weight: 500;
+        }
+        .btn:hover {
+            background-color: #6B5B45;
+        }
+        .btn:disabled {
+            background-color: #CBD5E0;
+            cursor: not-allowed;
+        }
+        .recording {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        /* Scrollbar styling */
+        .chat-container::-webkit-scrollbar,
+        .report-container::-webkit-scrollbar {
+            width: 8px;
+        }
+        
+        .chat-container::-webkit-scrollbar-track,
+        .report-container::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb,
+        .report-container::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 4px;
+        }
+        
+        .chat-container::-webkit-scrollbar-thumb:hover,
+        .report-container::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+    </style>
+</head>
+<body>
+    <header class="bg-white shadow-sm p-4">
+        <div class="container mx-auto flex items-center gap-4">
+            <img src="{{ url_for('static', filename='images/daria-logo.png') }}" alt="DARIA Logo" class="w-12 h-12 object-contain">
+            <div>
+                <h1 class="text-4xl font-bold">DARIA</h1>
+                <p class="text-gray-600">Deloitte Advanced Research & Interview Assistant</p>
+            </div>
+        </div>
+    </header>
+
+    <!-- Store Flask template variables in data attributes -->
+    <div id="templateData" 
+         data-report-prompt='{{ prompt | tojson | safe }}'
+         data-project-name='{{ project_name | tojson | safe }}'
+         style="display: none;">
+    </div>
+
+    <!-- Initialize variables from data attributes -->
+    <script>
+        const templateData = document.getElementById('templateData');
+        window.REPORT_PROMPT = JSON.parse(templateData.dataset.reportPrompt);
+        window.PROJECT_NAME = JSON.parse(templateData.dataset.projectName);
+        
+        // Debug logging and validation
+        console.log('Interview page loaded');
+        if (!window.PROJECT_NAME) {
+            console.error('Project name is missing');
+        } else {
+            console.log('Project:', window.PROJECT_NAME);
+        }
+        console.log('Report prompt:', window.REPORT_PROMPT);
+    </script>
+
+    <div class="main-content">
+        <div class="chat-container" id="chatContainer">
+            <div class="message daria-message">
+                <strong>Daria:</strong> Hello! I'm Daria, a UX researcher. Click "Start Interview" when you're ready to begin.
+            </div>
+        </div>
+        
+        <div id="reportContainer" class="report-container hidden">
+            <!-- Report will be inserted here -->
+        </div>
+    </div>
+
+    <div class="controls flex items-center gap-4">
+        <button id="startInterview" class="btn">Start Interview</button>
+        <button id="stopInterview" class="btn bg-red-600 hover:bg-red-700 hidden">Stop</button>
+        <div id="recordingStatus" class="text-gray-600">
+            Click 'Start Interview' to begin
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+    <script src="{{ url_for('static', filename='js/audio.js') }}"></script>
+    <script>
+        // Debug logging
+        console.log('Interview page loaded');
+        
+        // Get the report prompt from the global variable
+        const reportPrompt = window.REPORT_PROMPT;
+        console.log('Report prompt:', reportPrompt);
+        
+        const INTRODUCTION = "Welcome to our user study! This research aims to test the design, " +
+            "not the user. We appreciate your participation. " +
+            "For transparency, this conversation will be recorded for research purposes. " +
+            "Do we have your permission to proceed?";
+        
+        const chatContainer = document.getElementById('chatContainer');
+        const startButton = document.getElementById('startInterview');
+        const stopButton = document.getElementById('stopInterview');
+        const status = document.getElementById('recordingStatus');
+        let isInterviewStarted = false;
+        let shouldStopInterview = false;
+
+        // Check if audio.js functions are loaded
+        console.log('speak function available:', typeof speak === 'function');
+        console.log('listen function available:', typeof listen === 'function');
+
+        function addMessage(text, type = 'daria') {
+            console.log('Adding message:', { text, type });
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}-message`;
+            messageDiv.innerHTML = `<strong>${type === 'daria' ? 'Daria' : type === 'user' ? 'You' : 'Error'}:</strong> ${text}`;
+            chatContainer.appendChild(messageDiv);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+
+        // Function to reset the interview state
+        async function resetInterviewState(fullReset = false) {
+            try {
+                console.log('Resetting interview state', fullReset ? '(full reset)' : '(partial reset)');
+                isInterviewStarted = false;
+                shouldStopInterview = false;
+                startButton.disabled = false;
+                stopButton.classList.add('hidden');
+                status.textContent = 'Interview stopped';
+                
+                // Stop any ongoing recording and cleanup
+                await cleanup();
+                
+                // Force stop any ongoing speech
+                if (window.speechSynthesis) {
+                    window.speechSynthesis.cancel();
+                }
+                
+                // Force stop any ongoing audio recording
+                if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {
+                    window.mediaRecorder.stop();
+                }
+                
+                if (fullReset) {
+                    // Reset the chat container to initial state only on full reset
+                    chatContainer.innerHTML = `
+                        <div class="message daria-message">
+                            <strong>Daria:</strong> Hello! I'm Daria, a UX researcher. Click "Start Interview" when you're ready to begin.
+                        </div>
+                    `;
+                    
+                    // Hide the report container if it's visible
+                    const reportContainer = document.getElementById('reportContainer');
+                    if (reportContainer) {
+                        reportContainer.classList.add('hidden');
+                    }
+                    
+                    // Reset button text
+                    startButton.textContent = 'Start Interview';
+                }
+                return true;
+            } catch (error) {
+                console.error('Error in resetInterviewState:', error);
+                return false;
+            }
+        }
+
+        // Stop button click handler
+        stopButton.addEventListener('click', async () => {
+            console.log('Stop button clicked');
+            shouldStopInterview = true;
+            status.textContent = 'Stopping interview...';
+            
+            // Stop any ongoing recording and cleanup
+            await cleanup();
+            
+            // Force stop any ongoing speech
+            if (window.speechSynthesis) {
+                window.speechSynthesis.cancel();
+            }
+            
+            // Force stop any ongoing audio recording
+            if (window.mediaRecorder && window.mediaRecorder.state === 'recording') {
+                window.mediaRecorder.stop();
+            }
+            
+            // Reset the interview state
+            await resetInterviewState(true);
+            addMessage('Interview stopped by user', 'error');
+        });
+
+        async function conductInterview() {
+            // Validate project name before starting
+            if (!window.PROJECT_NAME) {
+                console.error('Project name is missing');
+                addMessage('Error: Project name is missing. Please try again.', 'error');
+                await resetInterviewState(true);
+                return;
+            }
+
+            if (shouldStopInterview) {
+                await resetInterviewState();
+                return;
+            }
+
+            console.log('Starting interview');
+            shouldStopInterview = false;
+            startButton.disabled = true;
+            stopButton.classList.remove('hidden');
+            
+            try {
+                // Request microphone permission early
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                stream.getTracks().forEach(track => track.stop()); // Release the stream
+                
+                // Initial greeting
+                addMessage("Say 'Start' to begin the interview", 'daria');
+                if (shouldStopInterview) {
+                    await resetInterviewState();
+                    return;
+                }
+                await speak("Say 'Start' to begin the interview");
+                
+                // Listen for "Start" command
+                status.textContent = 'Listening for "Start" command...';
+                console.log('Listening for Start command');
+                let startDetected = false;
+                let attempts = 0;
+                const maxAttempts = 3;
+
+                while (!startDetected && attempts < maxAttempts && !shouldStopInterview) {
+                    const initialResponse = await listen();
+                    if (shouldStopInterview) {
+                        await resetInterviewState();
+                        return;
+                    }
+                    console.log('Initial response:', initialResponse);
+                    
+                    if (initialResponse && initialResponse !== 'No speech detected' && initialResponse !== 'Error recording audio') {
+                        addMessage(initialResponse, 'user');
+                        
+                        // Check for any variation of "start", "yes", "begin", or "okay"
+                        const responseText = initialResponse.toLowerCase();
+                        if (responseText.match(/\b(start|yes|begin|okay|ok)\b/)) {
+                            startDetected = true;
+                            console.log('Start command detected');
+                            break;
+                        }
+                    }
+                    
+                    attempts++;
+                    if (!startDetected && attempts < maxAttempts && !shouldStopInterview) {
+                        const retryMessage = "I didn't catch that. Please say 'Start' or 'Yes' to begin the interview.";
+                        addMessage(retryMessage, 'daria');
+                        await speak(retryMessage);
+                    }
+                }
+                
+                if (!startDetected || shouldStopInterview) {
+                    console.log('Start command not detected or interview stopped');
+                    addMessage("I didn't hear 'Start'. Please click 'Start Interview' to try again.", 'error');
+                    await resetInterviewState();
+                    return;
+                }
+                
+                console.log('Starting interview process');
+                // Play introduction
+                addMessage(INTRODUCTION, 'daria');
+                await speak(INTRODUCTION);
+
+                // Begin interview loop with improved flow
+                let consecutiveSilentResponses = 0;
+                let totalQuestions = 0;
+                const maxSilentResponses = 3;
+                const minQuestions = 5;  // Minimum number of questions before considering completion
+                const maxQuestions = 15; // Maximum number of questions before forcing wrap-up
+                
+                while (!shouldStopInterview && 
+                       (totalQuestions < minQuestions || consecutiveSilentResponses < maxSilentResponses) &&
+                       totalQuestions < maxQuestions) {
+                    try {
+                        if (shouldStopInterview) {
+                            await resetInterviewState();
+                            return;
+                        }
+                        
+                        console.log(`Starting question ${totalQuestions + 1} of max ${maxQuestions}`);
+                        status.textContent = 'Listening...';
+                        const userAnswer = await listen();
+                        
+                        if (shouldStopInterview) {
+                            await resetInterviewState();
+                            return;
+                        }
+                        
+                        console.log('User answer:', userAnswer);
+                        
+                        // Handle silence or errors
+                        if (!userAnswer || userAnswer === 'No speech detected' || userAnswer === 'Error recording audio') {
+                            consecutiveSilentResponses++;
+                            if (consecutiveSilentResponses >= maxSilentResponses) {
+                                addMessage("I notice you've been quiet for a while. Would you like to continue the interview?", 'daria');
+                                await speak("I notice you've been quiet for a while. Would you like to continue the interview?");
+                                const continueResponse = await listen();
+                                if (!continueResponse || !continueResponse.toLowerCase().match(/\b(yes|continue|ok|okay|sure)\b/)) {
+                                    break;
+                                }
+                                consecutiveSilentResponses = 0;
+                            }
+                            continue;
+                        }
+                        
+                        // Reset silent response counter on valid response
+                        consecutiveSilentResponses = 0;
+                        addMessage(userAnswer, 'user');
+                        
+                        // Get AI response
+                        console.log('Fetching AI response');
+                        const response = await fetch(`/interview/${encodeURIComponent(window.PROJECT_NAME)}`, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ 
+                                user_input: userAnswer,
+                                question_count: totalQuestions + 1
+                            })
+                        });
+                        
+                        const data = await response.json();
+                        console.log('AI response:', data);
+                        if (data.error) {
+                            addMessage(data.error, 'error');
+                            break;
+                        }
+                        
+                        // Play Daria's response
+                        addMessage(data.response, 'daria');
+                        await speak(data.response);
+                        
+                        totalQuestions++;
+                        
+                        // Check if we've reached the maximum number of questions
+                        if (totalQuestions >= maxQuestions) {
+                            addMessage("We've reached the maximum number of questions for this interview. Let's wrap up.", 'daria');
+                            await speak("We've reached the maximum number of questions for this interview. Let's wrap up.");
+                            break;
+                        }
+                        
+                        // Check if we have enough information after minimum questions
+                        if (totalQuestions >= minQuestions) {
+                            // Wait for user's response to the last question
+                            status.textContent = 'Listening...';
+                            const lastQuestionResponse = await listen();
+                            
+                            if (shouldStopInterview) {
+                                await resetInterviewState();
+                                return;
+                            }
+                            
+                            if (lastQuestionResponse && lastQuestionResponse !== 'No speech detected' && lastQuestionResponse !== 'Error recording audio') {
+                                addMessage(lastQuestionResponse, 'user');
+                            }
+                            
+                            // Now ask about wrapping up
+                            addMessage("Would you like to share anything else, or shall we wrap up the interview?", 'daria');
+                            await speak("Would you like to share anything else, or shall we wrap up the interview?");
+                            const wrapUpResponse = await listen();
+                            
+                            if (shouldStopInterview) {
+                                await resetInterviewState();
+                                return;
+                            }
+                            
+                            // Add the wrap-up response to the transcript if it's valid
+                            if (wrapUpResponse && wrapUpResponse !== 'No speech detected' && wrapUpResponse !== 'Error recording audio') {
+                                addMessage(wrapUpResponse, 'user');
+                            }
+                            
+                            // Check if user wants to continue
+                            if (wrapUpResponse && wrapUpResponse.toLowerCase().match(/\b(more|continue|yes|share)\b/)) {
+                                continue;
+                            }
+                            
+                            // If we get here, it's time to wrap up
+                            try {
+                                // Collect the transcript
+                                const transcript = Array.from(chatContainer.children)
+                                    .map(msg => {
+                                        const speaker = msg.classList.contains('daria-message') ? 'Daria' : 'You';
+                                        return `${speaker}: ${msg.textContent.trim()}`;
+                                    })
+                                    .join('\n');
+                                
+                                // Update status to show we're generating the report
+                                status.textContent = 'Generating report...';
+                                
+                                // Send transcript to final_analysis endpoint
+                                const finalAnalysisResponse = await fetch(`/final_analysis?project_name=${encodeURIComponent(window.PROJECT_NAME)}`, {
+                                    method: 'POST',
+                                    headers: {
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        transcript: transcript,
+                                        report_prompt: window.REPORT_PROMPT
+                                    })
+                                });
+                                
+                                if (!finalAnalysisResponse.ok) {
+                                    const errorData = await finalAnalysisResponse.json();
+                                    throw new Error(errorData.error || 'Failed to generate analysis');
+                                }
+                                
+                                const finalAnalysisData = await finalAnalysisResponse.json();
+                                if (!finalAnalysisData.error) {
+                                    // Show the report container
+                                    const reportContainer = document.getElementById('reportContainer');
+                                    reportContainer.classList.remove('hidden');
+                                    reportContainer.innerHTML = `
+                                        <h2 class="text-2xl font-bold mb-4">Interview Analysis</h2>
+                                        <div class="report-content whitespace-pre-wrap">${finalAnalysisData.analysis}</div>
+                                    `;
+                                    
+                                    // Add a thank you message to the chat
+                                    addMessage('Thank you for your time. The interview analysis has been generated.', 'daria');
+                                    await speak('Thank you for your time. The interview analysis has been generated.');
+                                    
+                                    // Update UI state but don't reset
+                                    status.textContent = 'Interview complete';
+                                    startButton.disabled = false;
+                                    startButton.textContent = 'Start New Interview';
+                                    stopButton.classList.add('hidden');
+                                    isInterviewStarted = false;
+                                    
+                                    // Break out of the interview loop
+                                    break;
+                                } else {
+                                    throw new Error(finalAnalysisData.error);
+                                }
+                                
+                            } catch (error) {
+                                console.error('Error generating analysis:', error);
+                                addMessage("I apologize, but I couldn't generate the final analysis.", 'error');
+                                break;
+                            }
+                        }
+                        
+                    } catch (error) {
+                        console.error('Error in interview process:', error);
+                        addMessage(error.toString(), 'error');
+                    }
+                }
+
+                if (shouldStopInterview) {
+                    await resetInterviewState();
+                    return;
+                }
+
+                // Generate final analysis
+                try {
+                    console.log('Generating final analysis...');
+                    status.textContent = 'Generating analysis...';
+                    
+                    // Ensure project name is properly encoded and not empty
+                    const projectName = window.PROJECT_NAME.trim();
+                    if (!projectName) {
+                        throw new Error('Project name is missing');
+                    }
+                    
+                    // Collect transcript from chat container
+                    const messages = Array.from(chatContainer.children).map(msg => {
+                        const speaker = msg.querySelector('strong')?.textContent.replace(':', '') || '';
+                        const content = msg.textContent.replace(speaker + ':', '').trim();
+                        return `${speaker}: ${content}`;
+                    }).join('\n');
+                    
+                    console.log('Sending final analysis request for project:', projectName);
+                    const finalAnalysisResponse = await fetch(`/final_analysis?project_name=${encodeURIComponent(projectName)}`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            report_prompt: window.REPORT_PROMPT,
+                            transcript: messages
+                        })
+                    });
+                    
+                    if (!finalAnalysisResponse.ok) {
+                        const errorData = await finalAnalysisResponse.json();
+                        throw new Error(errorData.error || 'Failed to generate analysis');
+                    }
+                    
+                    const finalAnalysisData = await finalAnalysisResponse.json();
+                    if (!finalAnalysisData.error) {
+                        // Show the report container
+                        const reportContainer = document.getElementById('reportContainer');
+                        reportContainer.classList.remove('hidden');
+                        reportContainer.innerHTML = `
+                            <h2 class="text-2xl font-bold mb-4">Interview Analysis</h2>
+                            <div class="report-content whitespace-pre-wrap">${finalAnalysisData.analysis}</div>
+                        `

@@ -1,0 +1,42 @@
+{
+  "id": "8b616b8f-9159-4e09-95b6-df48f741bff3",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "3ceb70b3-c3ca-47d5-b5ca-4a2b314ba50e",
+      "content": "testing the flow interview to make sure we got it working",
+      "role": "user",
+      "timestamp": "2025-05-16T11:26:55.743328"
+    },
+    {
+      "id": "af644dda-4fa9-4c63-9bec-53a73f72725f",
+      "content": "Great, thank you for testing it out! Could you tell me about your experience during this test interview? Were there any difficulties or areas where you felt the flow could be improved?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T11:26:58.882852"
+    },
+    {
+      "id": "e6f8a0ae-b646-42c4-afc7-b05ef18cffbf",
+      "content": "end the interivew",
+      "role": "user",
+      "timestamp": "2025-05-16T11:27:14.054306"
+    },
+    {
+      "id": "4882cb7e-042e-4e87-b588-dbf476814cb7",
+      "content": "Before we end the interview, is there anything else you would like to share or discuss?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T11:27:17.205109"
+    }
+  ],
+  "transcript": "\n\nParticipant: testing the flow interview to make sure we got it working\n\nModerator: Great, thank you for testing it out! Could you tell me about your experience during this test interview? Were there any difficulties or areas where you felt the flow could be improved?\n\nParticipant: end the interivew\n\nModerator: Before we end the interview, is there anything else you would like to share or discuss?",
+  "analysis": null,
+  "created_at": "2025-05-16T11:26:42.283950",
+  "updated_at": "2025-05-16T11:27:17.205888",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

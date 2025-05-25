@@ -1,0 +1,74 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Global styles */
+@layer base {
+  html {
+    @apply antialiased;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-800;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-medium tracking-tight leading-tight;
+  }
+
+  /* Fix for overlapping text */
+  p, li, span, label {
+    @apply leading-normal;
+  }
+}
+
+/* Custom component classes */
+@layer components {
+  .btn {
+    @apply px-4 py-2 rounded-md font-medium transition-colors duration-200;
+  }
+
+  .btn-primary {
+    @apply bg-blue-600 text-white hover:bg-blue-700;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-gray-700 border border-gray-300 hover:bg-gray-50;
+  }
+
+  .input {
+    @apply w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500;
+  }
+
+  .card {
+    @apply bg-white rounded-lg shadow-sm p-6;
+  }
+  
+  /* Survey styles */
+  .survey-question {
+    @apply mb-8;
+  }
+  
+  .survey-option {
+    @apply p-4 border rounded-lg mb-4 transition-all hover:shadow-md;
+  }
+  
+  .survey-option-content {
+    @apply ml-2;
+  }
+  
+  .survey-option-title {
+    @apply font-medium text-lg;
+  }
+  
+  .survey-option-description {
+    @apply text-gray-600 mt-1;
+  }
+}
+
+/* Custom utilities */
+@layer utilities {
+  .text-shadow {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  }
+} 

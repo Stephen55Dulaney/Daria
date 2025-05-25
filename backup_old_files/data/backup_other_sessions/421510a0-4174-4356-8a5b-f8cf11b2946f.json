@@ -1,0 +1,28 @@
+{
+  "id": "421510a0-4174-4356-8a5b-f8cf11b2946f",
+  "guide_id": "dcaf2077-9a15-434b-843e-2ff0bd810960",
+  "interviewee": {
+    "name": "Test User",
+    "email": "test@example.com",
+    "role": "Tester"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "bbf3e8a2-5869-4658-954c-ebda800fa9ce",
+      "content": "Hello, I am participating in this interview.",
+      "role": "interviewee",
+      "timestamp": "2025-05-08T10:28:21.306333"
+    },
+    {
+      "id": "af22f265-12e4-4bc2-9e9b-45ae6d579c17",
+      "content": "Tell me more about yourself",
+      "role": "assistant",
+      "timestamp": "2025-05-08T10:34:46.362784"
+    }
+  ],
+  "transcript": "\n\nParticipant: Hello, I am participating in this interview.\n\nModerator: Tell me more about yourself",
+  "analysis": null,
+  "created_at": "2025-05-08T10:23:51.778435",
+  "updated_at": "2025-05-08T10:34:46.362840"
+}

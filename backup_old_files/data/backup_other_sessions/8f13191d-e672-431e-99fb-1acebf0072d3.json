@@ -1,0 +1,54 @@
+{
+  "id": "8f13191d-e672-431e-99fb-1acebf0072d3",
+  "guide_id": "61180742-01e7-4cc7-b4a6-39b1b8dea349",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "who is reading me that is weird  how come",
+      "role": "user",
+      "timestamp": "2025-05-13T12:23:44.545481"
+    },
+    {
+      "content": "Could you please elaborate on what you mean by \"who is reading me\"? Are you referring to someone observing or analyzing your actions during the end-to-end journey map testing process?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:23:46.059094"
+    },
+    {
+      "content": "okay you guys are using both 11 labs and the default at the same time so this test is failed",
+      "role": "user",
+      "timestamp": "2025-05-13T12:24:11.678745"
+    },
+    {
+      "content": "Could you please explain further why using both 11 labs and the default at the same time led to the test being failed? What specific challenges or issues arose from this combination during the end-to-end journey map testing process?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:24:12.717970"
+    },
+    {
+      "content": "and journey map testing process okay you've got two different voices we need to be using the 11 lab voice that's the voice somehow this other  voice is reading at the same time as the 11 laps so that's interesting and unique I'm going to send you the debug logs  the console logs and the transcript and we will end at the interview",
+      "role": "user",
+      "timestamp": "2025-05-13T12:24:53.510431"
+    },
+    {
+      "content": "That sounds like a unique challenge you encountered with the different voices during the end-to-end journey map testing process. When you mention using the \"11 lab voice,\" what specific characteristics or aspects differentiate it from the other voice that was causing interference? Could you provide more details on how these voices impacted the testing process and the overall outcome of the test?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:24:54.655134"
+    },
+    {
+      "content": "for testing the interview the debug interface will remain open for additional testing",
+      "role": "user",
+      "timestamp": "2025-05-13T12:26:00.114239"
+    },
+    {
+      "content": "It seems like having the debug interface open for additional testing is crucial for resolving any issues that may arise during the process. Could you share how the availability of the debug interface has helped you in addressing challenges or making improvements during the end-to-end journey map testing?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:26:01.221721"
+    }
+  ],
+  "transcript": "\n\nParticipant: who is reading me that is weird  how come\n\nModerator: Could you please elaborate on what you mean by \"who is reading me\"? Are you referring to someone observing or analyzing your actions during the end-to-end journey map testing process?\n\nParticipant: okay you guys are using both 11 labs and the default at the same time so this test is failed\n\nModerator: Could you please explain further why using both 11 labs and the default at the same time led to the test being failed? What specific challenges or issues arose from this combination during the end-to-end journey map testing process?\n\nParticipant: and journey map testing process okay you've got two different voices we need to be using the 11 lab voice that's the voice somehow this other  voice is reading at the same time as the 11 laps so that's interesting and unique I'm going to send you the debug logs  the console logs and the transcript and we will end at the interview\n\nModerator: That sounds like a unique challenge you encountered with the different voices during the end-to-end journey map testing process. When you mention using the \"11 lab voice,\" what specific characteristics or aspects differentiate it from the other voice that was causing interference? Could you provide more details on how these voices impacted the testing process and the overall outcome of the test?\n\nParticipant: for testing the interview the debug interface will remain open for additional testing\n\nModerator: It seems like having the debug interface open for additional testing is crucial for resolving any issues that may arise during the process. Could you share how the availability of the debug interface has helped you in addressing challenges or making improvements during the end-to-end journey map testing?",
+  "analysis": null,
+  "created_at": "2025-05-13T12:23:31.616108",
+  "updated_at": "2025-05-13T12:26:01.222003"
+}

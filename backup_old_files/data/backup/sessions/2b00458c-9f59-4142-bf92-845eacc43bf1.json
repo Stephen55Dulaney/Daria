@@ -1,0 +1,54 @@
+{
+  "id": "2b00458c-9f59-4142-bf92-845eacc43bf1",
+  "guide_id": "61b0f180-7e7b-4439-a2d7-88f37e4ea1fe",
+  "interviewee": {
+    "name": "Stehpen",
+    "email": "sdulaney@deloitte.com",
+    "role": "Researcher",
+    "department": "",
+    "company": ""
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "055e8ccc-fc4d-43b0-8c56-70a4a5a24811",
+      "content": "who are you",
+      "role": "user",
+      "timestamp": "2025-05-16T08:12:48.457303"
+    },
+    {
+      "id": "903991f6-fa9c-46f9-a2bc-05a46f17f8b9",
+      "content": "I am Skeptica. As Skeptica, I'm Deloitte's Assumption Buster.",
+      "role": "assistant",
+      "timestamp": "2025-05-16T08:12:51.473372"
+    },
+    {
+      "id": "984c8c15-62b4-40e8-a28b-c051f0af7da0",
+      "content": "these are working at all",
+      "role": "user",
+      "timestamp": "2025-05-16T08:13:40.555688"
+    },
+    {
+      "id": "42cd9fbd-4ae6-4b4d-ac35-136c0d891b9f",
+      "content": "I'm not quite sure I understand your statement. Could you provide more context or clarify what you mean by \"these are working at all\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T08:13:42.878147"
+    },
+    {
+      "id": "b7cdc79d-c2d3-4462-8568-30463e6cd311",
+      "content": "IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"What would you change?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: What would you change?\" or similar natural phrasing.",
+      "role": "system",
+      "timestamp": "2025-05-16T08:13:43.898546"
+    }
+  ],
+  "transcript": "\n\nParticipant: who are you\n\nModerator: I am Skeptica. As Skeptica, I'm Deloitte's Assumption Buster.\n\nParticipant: these are working at all\n\nModerator: I'm not quite sure I understand your statement. Could you provide more context or clarify what you mean by \"these are working at all\"?\n\nParticipant: IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: \"What would you change?\". Make it sound like you had this thought yourself by saying something like \"That's a good point, now I'd like to ask: What would you change?\" or similar natural phrasing.",
+  "analysis": null,
+  "created_at": "2025-05-16T07:57:56.996807",
+  "updated_at": "2025-05-16T08:13:43.899061",
+  "title": "Copy of Guide (5/16/2025)",
+  "project": "Test 4444",
+  "interview_type": "discovery_interview",
+  "character": "skeptica",
+  "character_select": "skeptica",
+  "voice_id": "AZnzlk1XvdvUeBnXmlld"
+}

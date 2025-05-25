@@ -1,0 +1,180 @@
+{% extends "base.html" %}
+
+{% block title %}Issues Tracker{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Issues Tracker</h1>
+        <div>
+            <a href="{{ url_for('issues.help_guide') }}" class="btn btn-outline-info me-2">
+                <i class="fas fa-question-circle"></i> How to Use
+            </a>
+            <a href="{{ url_for('issues.create_issue') }}" class="btn btn-primary">
+                <i class="fas fa-plus"></i> New Issue
+            </a>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">Filters</h5>
+        </div>
+        <div class="card-body">
+            <form action="{{ url_for('issues.issues_list') }}" method="get" id="filter-form">
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label for="status" class="form-label">Status</label>
+                        <select class="form-select" id="status" name="status">
+                            <option value="">All</option>
+                            <option value="open" {% if request.args.get('status') == 'open' %}selected{% endif %}>Open</option>
+                            <option value="in_progress" {% if request.args.get('status') == 'in_progress' %}selected{% endif %}>In Progress</option>
+                            <option value="resolved" {% if request.args.get('status') == 'resolved' %}selected{% endif %}>Resolved</option>
+                            <option value="closed" {% if request.args.get('status') == 'closed' %}selected{% endif %}>Closed</option>
+                            <option value="backlog" {% if request.args.get('status') == 'backlog' %}selected{% endif %}>Backlog</option>
+                            <option value="in_design" {% if request.args.get('status') == 'in_design' %}selected{% endif %}>In Design</option>
+                            <option value="ready_for_cursor" {% if request.args.get('status') == 'ready_for_cursor' %}selected{% endif %}>Ready for Cursor</option>
+                            <option value="prototyped" {% if request.args.get('status') == 'prototyped' %}selected{% endif %}>Prototyped</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="type" class="form-label">Type</label>
+                        <select class="form-select" id="type" name="type">
+                            <option value="">All</option>
+                            <option value="bug" {% if request.args.get('type') == 'bug' %}selected{% endif %}>Bug</option>
+                            <option value="feature" {% if request.args.get('type') == 'feature' %}selected{% endif %}>Feature</option>
+                            <option value="improvement" {% if request.args.get('type') == 'improvement' %}selected{% endif %}>Improvement</option>
+                            <option value="task" {% if request.args.get('type') == 'task' %}selected{% endif %}>Task</option>
+                            <option value="opportunity" {% if request.args.get('type') == 'opportunity' %}selected{% endif %}>Opportunity</option>
+                            <option value="epic" {% if request.args.get('type') == 'epic' %}selected{% endif %}>Epic</option>
+                            <option value="user_story" {% if request.args.get('type') == 'user_story' %}selected{% endif %}>User Story</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label for="assigned_to" class="form-label">Assigned To</label>
+                        <select class="form-select" id="assigned_to" name="assigned_to">
+                            <option value="">Anyone</option>
+                            <option value="{{ current_user.id }}" {% if request.args.get('assigned_to') == current_user.id %}selected{% endif %}>Me</option>
+                            <!-- TODO: Add other users dynamically -->
+                        </select>
+                    </div>
+                    <div class="col-md-3 mb-3 d-flex align-items-end">
+                        <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if issues %}
+    <div class="table-responsive">
+        <table class="table table-hover table-striped">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Title</th>
+                    <th>Type</th>
+                    <th>Status</th>
+                    <th>Priority</th>
+                    <th>Created By</th>
+                    <th>Assigned To</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issue in issues %}
+                <tr>
+                    <td>{{ issue.id[:8] }}</td>
+                    <td>
+                        <a href="{{ url_for('issues.view_issue', issue_id=issue.id) }}" class="text-decoration-none">
+                            {{ issue.title }}
+                        </a>
+                    </td>
+                    <td>
+                        {% if issue.issue_type == 'bug' %}
+                        <span class="badge bg-danger">Bug</span>
+                        {% elif issue.issue_type == 'feature' %}
+                        <span class="badge bg-success">Feature</span>
+                        {% elif issue.issue_type == 'improvement' %}
+                        <span class="badge bg-info">Improvement</span>
+                        {% elif issue.issue_type == 'opportunity' %}
+                        <span class="badge bg-warning">Opportunity</span>
+                        {% elif issue.issue_type == 'epic' %}
+                        <span class="badge bg-primary">Epic</span>
+                        {% elif issue.issue_type == 'user_story' %}
+                        <span class="badge bg-dark">User Story</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Task</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if issue.status == 'open' %}
+                        <span class="badge bg-primary">Open</span>
+                        {% elif issue.status == 'in_progress' %}
+                        <span class="badge bg-info">In Progress</span>
+                        {% elif issue.status == 'resolved' %}
+                        <span class="badge bg-warning">Resolved</span>
+                        {% elif issue.status == 'closed' %}
+                        <span class="badge bg-success">Closed</span>
+                        {% elif issue.status == 'in_design' %}
+                        <span class="badge bg-purple">In Design</span>
+                        {% elif issue.status == 'ready_for_cursor' %}
+                        <span class="badge bg-dark">Ready for Cursor</span>
+                        {% elif issue.status == 'prototyped' %}
+                        <span class="badge bg-info text-dark">Prototyped</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Backlog</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if issue.priority == 'critical' %}
+                        <span class="badge bg-danger">Critical</span>
+                        {% elif issue.priority == 'high' %}
+                        <span class="badge bg-warning">High</span>
+                        {% elif issue.priority == 'medium' %}
+                        <span class="badge bg-info">Medium</span>
+                        {% else %}
+                        <span class="badge bg-secondary">Low</span>
+                        {% endif %}
+                    </td>
+                    <td>{{ issue.creator_id }}</td> <!-- TODO: Show user's name instead of ID -->
+                    <td>{{ issue.assigned_to or 'Unassigned' }}</td> <!-- TODO: Show user's name instead of ID -->
+                    <td>{{ issue.created_at.split('T')[0] if 'T' in issue.created_at else issue.created_at }}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="{{ url_for('issues.view_issue', issue_id=issue.id) }}" class="btn btn-outline-primary" title="View">
+                                <i class="fas fa-eye"></i>
+                            </a>
+                            <a href="{{ url_for('issues.edit_issue', issue_id=issue.id) }}" class="btn btn-outline-secondary" title="Edit">
+                                <i class="fas fa-edit"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i> No issues found. 
+        <a href="{{ url_for('issues.create_issue') }}" class="alert-link">Create one</a>?
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Auto-submit form when select fields change
+        const selects = document.querySelectorAll('#filter-form select');
+        selects.forEach(select => {
+            select.addEventListener('change', function() {
+                document.getElementById('filter-form').submit();
+            });
+        });
+    });
+</script>
+{% endblock %} 

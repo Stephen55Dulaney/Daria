@@ -1,0 +1,115 @@
+{
+  "session_id": "a835d462-21cb-49c3-9a15-1599c9a40a2a",
+  "title": "Eurekia Find me an opportunity",
+  "description": "Testing character prompts and voice functionality",
+  "character": "eurekia",
+  "remote": true,
+  "status": "active",
+  "created_at": "2025-05-05T16:10:02.559661",
+  "last_updated": "2025-05-05T16:11:58.410668",
+  "expiration_date": "2025-05-12T16:10:02.559661",
+  "conversation_history": [
+    {
+      "role": "assistant",
+      "content": "Hello! I'm Eurekia, your insight synthesizer. I'll be conducting this interview today to help identify patterns and insights in your research. Let's get started. Could you please introduce yourself?",
+      "timestamp": "2025-05-05T16:10:02.559661"
+    },
+    {
+      "role": "user",
+      "content": "I'm speaking into the microphone and this is what I actually said.",
+      "timestamp": "2025-05-05T16:10:36.839994"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T16:10:36.839994"
+    },
+    {
+      "role": "user",
+      "content": "I'm speaking into the microphone and this is what I actually said.",
+      "timestamp": "2025-05-05T16:10:44.734491"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T16:10:44.734491"
+    },
+    {
+      "role": "user",
+      "content": "I'm speaking into the microphone and this is what I actually said.",
+      "timestamp": "2025-05-05T16:11:52.400839"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T16:11:52.400839"
+    },
+    {
+      "role": "user",
+      "content": "I'm speaking into the microphone and this is what I actually said.",
+      "timestamp": "2025-05-05T16:11:58.410668"
+    },
+    {
+      "role": "assistant",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T16:11:58.410668"
+    }
+  ],
+  "analysis": null,
+  "transcript": [
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Hello! I'm Eurekia, your insight synthesizer. I'll be conducting this interview today to help identify patterns and insights in your research. Let's get started. Could you please introduce yourself?",
+      "timestamp": "2025-05-05T16:10:02.559661"
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "I'm speaking into the microphone and this is what I actually said.",
+      "timestamp": "2025-05-05T16:10:36.839994"
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T16:10:36.839994"
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "I'm speaking into the microphone and this is what I actually said.",
+      "timestamp": "2025-05-05T16:10:44.734491"
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T16:10:44.734491"
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "I'm speaking into the microphone and this is what I actually said.",
+      "timestamp": "2025-05-05T16:11:52.400839"
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T16:11:52.400839"
+    },
+    {
+      "speaker": "Participant",
+      "speaker_name": "Participant",
+      "content": "I'm speaking into the microphone and this is what I actually said.",
+      "timestamp": "2025-05-05T16:11:58.410668"
+    },
+    {
+      "speaker": "Interviewer",
+      "speaker_name": "Interviewer",
+      "content": "Thank you for sharing that. Could you tell me more about your experience with this product?",
+      "timestamp": "2025-05-05T16:11:58.410668"
+    }
+  ]
+}

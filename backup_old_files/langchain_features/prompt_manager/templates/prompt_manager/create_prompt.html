@@ -1,0 +1,131 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Create New Prompt{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row py-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb">
+                    <li class="breadcrumb-item"><a href="{{ url_for('langchain_features.prompt_manager.list_prompts') }}">Prompt Manager</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Create New Prompt</li>
+                </ol>
+            </nav>
+            
+            <h1 class="h3 mb-4">Create New Prompt Configuration</h1>
+            
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">{{ message }}</div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">New Agent Prompt</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('langchain_features.prompt_manager.create_prompt') }}">
+                        <div class="mb-3">
+                            <label for="agent_name" class="form-label">Agent Name <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="agent_name" name="agent_name" required>
+                            <div class="form-text">Enter a unique name for the agent (e.g., "daria", "thesea").</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="version" class="form-label">Version</label>
+                            <input type="text" class="form-control" id="version" name="version" value="v1.0">
+                            <div class="form-text">Version number for the prompt configuration.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <div class="form-text">Brief description of the agent's purpose and capabilities.</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="role" class="form-label">Role</label>
+                            <input type="text" class="form-control" id="role" name="role" value="Assistant">
+                            <div class="form-text">The role of the agent (e.g., "Interviewer", "Analyzer").</div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="tone" class="form-label">Tone</label>
+                            <input type="text" class="form-control" id="tone" name="tone" value="Helpful, friendly">
+                            <div class="form-text">The tone of the agent's communication (e.g., "Professional, empathetic").</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('langchain_features.prompt_manager.list_prompts') }}" class="btn btn-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Create & Continue</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check for preset parameter
+        const urlParams = new URLSearchParams(window.location.search);
+        const preset = urlParams.get('preset');
+        
+        if (preset) {
+            document.getElementById('agent_name').value = preset;
+            
+            // Set predefined values based on preset
+            switch(preset) {
+                case 'daria':
+                    document.getElementById('description').value = 'Daria is Deloitte\'s Advanced Research and Interview Assistant who conducts qualitative user interviews to uncover background, motivations, behaviors, and pain points.';
+                    document.getElementById('role').value = 'Interviewer';
+                    document.getElementById('tone').value = 'Empathetic, professional, curious';
+                    break;
+                    
+                case 'thesea':
+                    document.getElementById('description').value = 'Thesea is a persona analyzer who gets to the heart of user needs, motivations, and pain points.';
+                    document.getElementById('role').value = 'Persona Analyzer';
+                    document.getElementById('tone').value = 'Insightful, analytical, thorough';
+                    break;
+                    
+                case 'odessia':
+                    document.getElementById('description').value = 'Odessia is a journey mapper who visualizes user experiences across touchpoints and stages.';
+                    document.getElementById('role').value = 'Journey Mapper';
+                    document.getElementById('tone').value = 'Structured, methodical, helpful';
+                    break;
+                    
+                case 'synthia':
+                    document.getElementById('description').value = 'Synthia is a discovery assistant who builds detailed 8-week plans for UX research projects.';
+                    document.getElementById('role').value = 'Discovery Assistant';
+                    document.getElementById('tone').value = 'Organized, practical, strategic';
+                    break;
+                    
+                case 'askia':
+                    document.getElementById('description').value = 'Askia is an interview question assistant who crafts effective scripts for user interviews.';
+                    document.getElementById('role').value = 'Question Designer';
+                    document.getElementById('tone').value = 'Clear, thoughtful, conversational';
+                    break;
+                    
+                case 'eurekia':
+                    document.getElementById('description').value = 'Eurekia is an opportunity identifier who detects patterns and insights from research data.';
+                    document.getElementById('role').value = 'Opportunity Finder';
+                    document.getElementById('tone').value = 'Analytical, perceptive, innovative';
+                    break;
+                    
+                case 'skeptica':
+                    document.getElementById('description').value = 'Skeptica is an assumption buster who challenges what everyone takes for granted.';
+                    document.getElementById('role').value = 'Assumption Challenger';
+                    document.getElementById('tone').value = 'Questioning, rigorous, constructive';
+                    break;
+            }
+        }
+    });
+</script>
+
+
+{% endblock %} 

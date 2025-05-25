@@ -1,0 +1,62 @@
+{
+  "id": "test_session_123456",
+  "title": "Test Interview Session",
+  "session_id": "test_session_123456",
+  "status": "active", 
+  "created_at": "2025-05-23T00:00:00.000000",
+  "updated_at": "2025-05-23T00:00:00.000000",
+  "character": "daria",
+  "messages": [
+    {
+      "content": "Hello! I'm DARIA, your Digital Automated Research Interview Assistant. I'll be conducting this interview today. Could you please introduce yourself?",
+      "role": "assistant",
+      "message_id": "msg-test-001",
+      "timestamp": "2025-05-23T00:01:00.000000"
+    },
+    {
+      "content": "Hi! I'm a user researcher testing the DARIA tool.",
+      "role": "user",
+      "message_id": "msg-test-002",
+      "timestamp": "2025-05-23T00:01:30.000000"
+    },
+    {
+      "content": "Thank you for introducing yourself. Could you tell me about your experience with user research?",
+      "role": "assistant",
+      "message_id": "msg-test-003",
+      "timestamp": "2025-05-23T00:02:00.000000"
+    },
+    {
+      "content": "I've been conducting user research for about 5 years, primarily using interviews and surveys.",
+      "role": "user",
+      "message_id": "msg-test-004",
+      "timestamp": "2025-05-23T00:02:30.000000"
+    }
+  ],
+  "conversation_history": [
+    {
+      "content": "Hello! I'm DARIA, your Digital Automated Research Interview Assistant. I'll be conducting this interview today. Could you please introduce yourself?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T00:01:00.000000"
+    },
+    {
+      "content": "Hi! I'm a user researcher testing the DARIA tool.",
+      "role": "user",
+      "timestamp": "2025-05-23T00:01:30.000000"
+    },
+    {
+      "content": "Thank you for introducing yourself. Could you tell me about your experience with user research?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T00:02:00.000000"
+    },
+    {
+      "content": "I've been conducting user research for about 5 years, primarily using interviews and surveys.",
+      "role": "user",
+      "timestamp": "2025-05-23T00:02:30.000000"
+    }
+  ],
+  "options": {
+    "analysis": true,
+    "record_transcript": true,
+    "use_tts": true
+  }
+}

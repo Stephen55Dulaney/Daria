@@ -1,0 +1,217 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "projects": {
+      "type": "object",
+      "patternProperties": {
+        "^proj_[0-9]+$": {
+          "type": "object",
+          "required": ["title", "description", "created_by", "created_date", "status", "team_members", "artifacts", "settings", "progress"],
+          "properties": {
+            "title": { "type": "string" },
+            "description": { "type": "string" },
+            "created_by": { "type": "string" },
+            "created_date": { "type": "string", "format": "date-time" },
+            "start_date": { "type": "string", "format": "date" },
+            "end_date": { "type": "string", "format": "date" },
+            "last_modified": { "type": "string", "format": "date-time" },
+            "status": { 
+              "type": "string",
+              "enum": ["active", "completed", "archived", "on_hold"]
+            },
+            "tags": {
+              "type": "array",
+              "items": { "type": "string" }
+            },
+            "team_members": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["user_id", "name", "role", "email", "status"],
+                "properties": {
+                  "user_id": { "type": "string" },
+                  "name": { "type": "string" },
+                  "role": { "type": "string" },
+                  "email": { "type": "string", "format": "email" },
+                  "status": {
+                    "type": "string",
+                    "enum": ["active", "inactive"]
+                  }
+                }
+              }
+            },
+            "artifacts": {
+              "type": "object",
+              "properties": {
+                "research_plans": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "title", "file", "created_date", "created_by", "status"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "title": { "type": "string" },
+                      "file": { "type": "string" },
+                      "created_date": { "type": "string", "format": "date-time" },
+                      "created_by": { "type": "string" },
+                      "status": {
+                        "type": "string",
+                        "enum": ["draft", "in_progress", "completed"]
+                      }
+                    }
+                  }
+                },
+                "interviews": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "title", "file", "conducted_by", "date", "participant"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "title": { "type": "string" },
+                      "file": { "type": "string" },
+                      "conducted_by": { "type": "string" },
+                      "date": { "type": "string", "format": "date-time" },
+                      "participant": {
+                        "type": "object",
+                        "required": ["name", "role"],
+                        "properties": {
+                          "name": { "type": "string" },
+                          "role": { "type": "string" },
+                          "demographics": { "type": "object" }
+                        }
+                      }
+                    }
+                  }
+                },
+                "surveys": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "title", "file", "created_date"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "title": { "type": "string" },
+                      "file": { "type": "string" },
+                      "created_date": { "type": "string", "format": "date-time" },
+                      "responses": { "type": "integer" }
+                    }
+                  }
+                },
+                "meeting_notes": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "title", "file", "date", "attendees"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "title": { "type": "string" },
+                      "file": { "type": "string" },
+                      "date": { "type": "string", "format": "date-time" },
+                      "attendees": {
+                        "type": "array",
+                        "items": { "type": "string" }
+                      }
+                    }
+                  }
+                },
+                "workshops": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "title", "file", "date", "facilitator"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "title": { "type": "string" },
+                      "file": { "type": "string" },
+                      "date": { "type": "string", "format": "date-time" },
+                      "facilitator": { "type": "string" }
+                    }
+                  }
+                },
+                "personas": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "title", "file", "created_date", "created_by"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "title": { "type": "string" },
+                      "file": { "type": "string" },
+                      "created_date": { "type": "string", "format": "date-time" },
+                      "created_by": { "type": "string" }
+                    }
+                  }
+                },
+                "journey_maps": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["id", "title", "file", "created_date", "created_by"],
+                    "properties": {
+                      "id": { "type": "string" },
+                      "title": { "type": "string" },
+                      "file": { "type": "string" },
+                      "created_date": { "type": "string", "format": "date-time" },
+                      "created_by": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "settings": {
+              "type": "object",
+              "required": ["default_sharing", "template_id", "notifications"],
+              "properties": {
+                "default_sharing": {
+                  "type": "string",
+                  "enum": ["private", "team_only", "organization"]
+                },
+                "template_id": { "type": "string" },
+                "notifications": {
+                  "type": "object",
+                  "properties": {
+                    "new_artifacts": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    },
+                    "status_changes": {
+                      "type": "array",
+                      "items": { "type": "string" }
+                    }
+                  }
+                }
+              }
+            },
+            "progress": {
+              "type": "object",
+              "required": ["planned_interviews", "completed_interviews", "planned_workshops", "completed_workshops", "milestones"],
+              "properties": {
+                "planned_interviews": { "type": "integer" },
+                "completed_interviews": { "type": "integer" },
+                "planned_workshops": { "type": "integer" },
+                "completed_workshops": { "type": "integer" },
+                "milestones": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": ["title", "due_date", "status"],
+                    "properties": {
+                      "title": { "type": "string" },
+                      "due_date": { "type": "string", "format": "date" },
+                      "status": {
+                        "type": "string",
+                        "enum": ["not_started", "in_progress", "completed", "blocked"]
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+} 

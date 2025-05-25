@@ -1,0 +1,88 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}History: {{ agent }} ({{ filename }}) - DARIA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <div>
+            <h1>Historical Version: {{ config.agent_name }}</h1>
+            <p class="text-muted">{{ config.role }} - Version {{ config.version }}</p>
+        </div>
+        <div class="d-flex gap-2">
+            <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Current
+            </a>
+            <a href="{{ url_for('prompts.restore_history', agent=agent, filename=filename) }}" class="btn btn-primary">
+                <i class="fas fa-history me-2"></i> Restore This Version
+            </a>
+        </div>
+    </div>
+
+    <div class="alert alert-info">
+        <i class="fas fa-info-circle me-2"></i> You are viewing a historical version of this prompt from {{ filename.split('-')[0] }}.
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h5>Prompt Configuration</h5>
+        </div>
+        <div class="card-body">
+            <h6>Description</h6>
+            <p>{{ config.description }}</p>
+
+            <h6 class="mt-4">Tone</h6>
+            <p>{{ config.tone }}</p>
+
+            <h6 class="mt-4">Core Objectives</h6>
+            <ul>
+                {% for objective in config.core_objectives %}
+                    <li>{{ objective }}</li>
+                {% endfor %}
+            </ul>
+
+            <h6 class="mt-4">Contextual Instructions</h6>
+            <pre class="p-3 bg-light rounded">{{ config.contextual_instructions }}</pre>
+
+            <h6 class="mt-4">Dynamic Prompt Prefix</h6>
+            <pre class="p-3 bg-light rounded">{{ config.dynamic_prompt_prefix }}</pre>
+
+            {% if config.example_questions %}
+                <h6 class="mt-4">Example Questions</h6>
+                <ul>
+                    {% for question in config.example_questions %}
+                        <li>{{ question }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if config.example_outputs %}
+                <h6 class="mt-4">Example Outputs</h6>
+                <ul>
+                    {% for output in config.example_outputs %}
+                        <li>{{ output }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if config.evaluation_metrics %}
+                <h6 class="mt-4">Evaluation Metrics</h6>
+                <ul>
+                    {% for key, metric in config.evaluation_metrics.items() %}
+                        <li><strong>{{ key }}</strong>: {{ metric }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {% if config.evaluation_notes %}
+                <h6 class="mt-4">Evaluation Notes</h6>
+                <ul>
+                    {% for note in config.evaluation_notes %}
+                        <li>{{ note }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %} 

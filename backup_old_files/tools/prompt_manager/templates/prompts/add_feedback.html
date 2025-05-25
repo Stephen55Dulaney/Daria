@@ -1,0 +1,137 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Add Feedback: {{ agent }} - DARIA{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="header">
+        <h1>Add Feedback for {{ agent }}</h1>
+        <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i> Back to Prompt
+        </a>
+    </div>
+
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header">
+                    <h5>Performance Feedback</h5>
+                </div>
+                <div class="card-body">
+                    <form method="POST" action="{{ url_for('prompts.prompt_feedback', agent=agent) }}">
+                        <div class="mb-3">
+                            <label for="session_id" class="form-label">Session ID (optional)</label>
+                            <input type="text" class="form-control" id="session_id" name="session_id" placeholder="Leave blank to auto-generate">
+                            <div class="form-text">Reference ID for the interview session where this prompt was used</div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label class="form-label">Overall Score (1-5)</label>
+                            <div class="rating-input d-flex gap-2">
+                                {% for i in range(1, 6) %}
+                                <div class="form-check">
+                                    <input class="form-check-input" type="radio" name="score" id="score{{ i }}" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                                    <label class="form-check-label" for="score{{ i }}">
+                                        {{ i }}
+                                    </label>
+                                </div>
+                                {% endfor %}
+                            </div>
+                            <div class="mt-2 d-flex justify-content-between text-muted">
+                                <small>Needs improvement</small>
+                                <small>Excellent</small>
+                            </div>
+                        </div>
+                        
+                        <!-- Detailed Evaluation Rubric -->
+                        <div class="mb-4">
+                            <h6 class="mb-3">Detailed Evaluation</h6>
+                            <div class="card bg-light">
+                                <div class="card-body">
+                                    <p class="text-muted small mb-3">Rate each aspect of the prompt's performance on a scale of 1-5</p>
+                                    
+                                    <!-- Clarity -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Clarity - How clear and understandable is the agent's response?</label>
+                                        <div class="d-flex">
+                                            {% for i in range(1, 6) %}
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="metric_clarity" id="clarity{{ i }}" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                                                <label class="form-check-label" for="clarity{{ i }}">{{ i }}</label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Relevance -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Relevance - How relevant is the response to the user's query?</label>
+                                        <div class="d-flex">
+                                            {% for i in range(1, 6) %}
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="metric_relevance" id="relevance{{ i }}" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                                                <label class="form-check-label" for="relevance{{ i }}">{{ i }}</label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Accuracy -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Accuracy - How accurate and factually correct is the information?</label>
+                                        <div class="d-flex">
+                                            {% for i in range(1, 6) %}
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="metric_accuracy" id="accuracy{{ i }}" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                                                <label class="form-check-label" for="accuracy{{ i }}">{{ i }}</label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Helpfulness -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Helpfulness - How helpful is the response in addressing needs?</label>
+                                        <div class="d-flex">
+                                            {% for i in range(1, 6) %}
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="metric_helpfulness" id="helpfulness{{ i }}" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                                                <label class="form-check-label" for="helpfulness{{ i }}">{{ i }}</label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Completeness -->
+                                    <div class="mb-3">
+                                        <label class="form-label">Completeness - How complete is the response in addressing all aspects?</label>
+                                        <div class="d-flex">
+                                            {% for i in range(1, 6) %}
+                                            <div class="form-check form-check-inline">
+                                                <input class="form-check-input" type="radio" name="metric_completeness" id="completeness{{ i }}" value="{{ i }}" {% if i == 3 %}checked{% endif %}>
+                                                <label class="form-check-label" for="completeness{{ i }}">{{ i }}</label>
+                                            </div>
+                                            {% endfor %}
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-4">
+                            <label for="notes" class="form-label">Feedback Notes</label>
+                            <textarea class="form-control" id="notes" name="notes" rows="5" required></textarea>
+                            <div class="form-text">Detailed feedback about how the prompt performed and areas for improvement</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('prompts.view_prompt', agent=agent) }}" class="btn btn-outline-secondary">Cancel</a>
+                            <button type="submit" class="btn btn-primary">Submit Feedback</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

@@ -1,0 +1,45 @@
+{
+  "id": "0817d402-97e0-4f8b-ba28-1c85f1c1e9f4",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "32632ff2-78d9-488b-bd44-336f8654e6d0",
+      "content": "hello I'm checking to see if we got something working or not",
+      "role": "user",
+      "timestamp": "2025-05-18T09:46:41.983669"
+    },
+    {
+      "id": "27602c0d-3220-4d11-9148-f90616140681",
+      "content": "Hello! Thank you for joining me. Can you tell me more about what you're checking to see if it's working or not?",
+      "role": "assistant",
+      "timestamp": "2025-05-18T09:46:45.031487"
+    },
+    {
+      "id": "88dd88e4-5180-4ac6-83c8-a8a1501075d6",
+      "content": "first about the interview and then also the voices aren't working on this page seems like",
+      "role": "user",
+      "timestamp": "2025-05-18T09:47:01.124454"
+    },
+    {
+      "id": "6504fbe4-c86d-4a3e-97e9-93fa06e734de",
+      "content": "Hello, thank you for joining me for this interview. Could you please tell me more about your experience with interviews in general?",
+      "role": "assistant",
+      "timestamp": "2025-05-18T09:47:03.754718"
+    }
+  ],
+  "transcript": "\n\nParticipant: hello I'm checking to see if we got something working or not\n\nModerator: Hello! Thank you for joining me. Can you tell me more about what you're checking to see if it's working or not?\n\nParticipant: first about the interview and then also the voices aren't working on this page seems like\n\nModerator: Hello, thank you for joining me for this interview. Could you please tell me more about your experience with interviews in general?",
+  "analysis": {
+    "content": "Error generating analysis: 1 validation error for LLMChain\nllm\n  Can't instantiate abstract class BaseLanguageModel without an implementation for abstract methods 'agenerate_prompt', 'apredict', 'apredict_messages', 'generate_prompt', 'invoke', 'predict', 'predict_messages' (type=type_error)",
+    "generated_at": "2025-05-21T14:23:22.426436"
+  },
+  "created_at": "2025-05-18T09:46:28.897200",
+  "updated_at": "2025-05-21T14:23:22.426567",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

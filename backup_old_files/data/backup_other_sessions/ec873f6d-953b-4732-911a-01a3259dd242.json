@@ -1,0 +1,73 @@
+{
+  "id": "ec873f6d-953b-4732-911a-01a3259dd242",
+  "guide_id": "61180742-01e7-4cc7-b4a6-39b1b8dea349",
+  "interviewee": {
+    "name": "Dora the explora",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "are you listening",
+      "role": "user",
+      "timestamp": "2025-05-13T12:05:33.500185"
+    },
+    {
+      "content": "I apologize for any confusion. I'm here and ready to continue our conversation. To better understand your experience with End to End Journey Map Testing, could you please share a specific challenge or pain point you have encountered while conducting this type of testing in the past?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:05:34.719590"
+    },
+    {
+      "content": "reload is no longer working",
+      "role": "user",
+      "timestamp": "2025-05-13T12:06:30.092927"
+    },
+    {
+      "content": "Could you elaborate on what you mean by \"reload is no longer working\" in the context of End to End Journey Map Testing? How has this issue impacted your testing process or outcomes?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:06:30.861401"
+    },
+    {
+      "content": "Reload did not work hear but the AI is generating replies that will show up on the monitorin page when I refresh there. what the hell is happening",
+      "role": "user",
+      "timestamp": "2025-05-13T12:07:38.182651"
+    },
+    {
+      "content": "Could you walk me through the specific steps you take when you encounter this issue with the reload function not working, but the AI generating replies that only show up after refreshing the monitoring page? How do you typically troubleshoot or work around this situation to ensure the accuracy of your End to End Journey Map Testing?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:07:39.238897"
+    },
+    {
+      "content": "Testing the updating of the new crazy page: http://127.0.0.1:5025/interview/ec873f6d-953b-4732-911a-01a3259dd242?voice_id=EXAVITQu4vr4xnSDxMaL&amp;remote=true&accepted=true&voice_id=EXAVITQu4vr4xnSDxMaL",
+      "role": "user",
+      "timestamp": "2025-05-13T12:09:18.280010"
+    },
+    {
+      "content": "Could you share more about the specific challenges or issues you have encountered while testing the updating of this new page you mentioned? How does this impact the overall End to End Journey Map Testing process you are conducting?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:09:19.099881"
+    },
+    {
+      "content": "That is crazy I am typing this in http://127.0.0.1:5025/interview/ec873f6d-953b-4732-911a-01a3259dd242?remote=true&accepted=true and it is showing up here with the LLM reply from langchain conversatino ",
+      "role": "user",
+      "timestamp": "2025-05-13T12:11:45.531537"
+    },
+    {
+      "content": "Participant, it sounds like you are experiencing some unexpected behavior during your End to End Journey Map Testing, where the input you provide in one location is showing up with a different reply in another location. Can you tell me more about how this discrepancy between input and output is affecting your testing process? Have you identified any potential reasons for this behavior, and how do you typically address or investigate such discrepancies to ensure the accuracy of your testing results?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T12:11:46.861809"
+    }
+  ],
+  "transcript": "\n\nParticipant: are you listening\n\nModerator: I apologize for any confusion. I'm here and ready to continue our conversation. To better understand your experience with End to End Journey Map Testing, could you please share a specific challenge or pain point you have encountered while conducting this type of testing in the past?\n\nParticipant: reload is no longer working\n\nModerator: Could you elaborate on what you mean by \"reload is no longer working\" in the context of End to End Journey Map Testing? How has this issue impacted your testing process or outcomes?\n\nParticipant: Reload did not work hear but the AI is generating replies that will show up on the monitorin page when I refresh there. what the hell is happening\n\nModerator: Could you walk me through the specific steps you take when you encounter this issue with the reload function not working, but the AI generating replies that only show up after refreshing the monitoring page? How do you typically troubleshoot or work around this situation to ensure the accuracy of your End to End Journey Map Testing?\n\nParticipant: Testing the updating of the new crazy page: http://127.0.0.1:5025/interview/ec873f6d-953b-4732-911a-01a3259dd242?voice_id=EXAVITQu4vr4xnSDxMaL&amp;remote=true&accepted=true&voice_id=EXAVITQu4vr4xnSDxMaL\n\nModerator: Could you share more about the specific challenges or issues you have encountered while testing the updating of this new page you mentioned? How does this impact the overall End to End Journey Map Testing process you are conducting?\n\nParticipant: That is crazy I am typing this in http://127.0.0.1:5025/interview/ec873f6d-953b-4732-911a-01a3259dd242?remote=true&accepted=true and it is showing up here with the LLM reply from langchain conversatino \n\nModerator: Participant, it sounds like you are experiencing some unexpected behavior during your End to End Journey Map Testing, where the input you provide in one location is showing up with a different reply in another location. Can you tell me more about how this discrepancy between input and output is affecting your testing process? Have you identified any potential reasons for this behavior, and how do you typically address or investigate such discrepancies to ensure the accuracy of your testing results?",
+  "analysis": null,
+  "created_at": "2025-05-13T12:00:12.910638",
+  "updated_at": "2025-05-13T12:11:46.862415"
+}

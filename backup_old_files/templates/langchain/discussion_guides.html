@@ -1,0 +1,609 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Discussion Guides{% endblock %}
+
+{% block extra_css %}
+<style>
+    .archive-container {
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .guide-list {
+        margin-bottom: 2rem;
+    }
+    
+    .archive-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+    }
+    
+    .search-container {
+        max-width: 400px;
+    }
+    
+    .guide-card {
+        border: 1px solid #dee2e6;
+        border-radius: 0.5rem;
+        overflow: hidden;
+        margin-bottom: 1rem;
+        transition: transform 0.2s, box-shadow 0.2s;
+    }
+    
+    .guide-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .card-header {
+        background-color: #f8f9fa;
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid #dee2e6;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .card-body {
+        padding: 1rem;
+    }
+    
+    .status-badge {
+        font-size: 0.75rem;
+        padding: 0.25rem 0.5rem;
+        border-radius: 0.25rem;
+    }
+    
+    .status-active {
+        background-color: #198754;
+        color: white;
+    }
+    
+    .status-archived {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .sessions-badge {
+        background-color: #4f46e5;
+        color: white;
+    }
+    
+    /* Character badge styles */
+    .character-badge {
+        font-size: 0.85rem;
+        padding: 0.35rem 0.6rem;
+        border-radius: 0.25rem;
+        display: inline-flex;
+        align-items: center;
+    }
+    
+    .character-badge i {
+        margin-right: 0.3rem;
+    }
+    
+    .character-daria {
+        background-color: #6610f2;
+        color: white;
+    }
+    
+    .character-eurekia {
+        background-color: #0dcaf0;
+        color: #212529;
+    }
+    
+    .character-skeptica {
+        background-color: #dc3545;
+        color: white;
+    }
+    
+    .character-askia {
+        background-color: #fd7e14;
+        color: white;
+    }
+    
+    .character-thesea {
+        background-color: #20c997;
+        color: #212529;
+    }
+    
+    .character-odessia {
+        background-color: #0d6efd;
+        color: white;
+    }
+    
+    .character-synthia {
+        background-color: #6f42c1;
+        color: white;
+    }
+    
+    .character-interviewer {
+        background-color: #6c757d;
+        color: white;
+    }
+    
+    .character-researcher {
+        background-color: #495057;
+        color: white;
+    }
+    
+    .empty-state {
+        text-align: center;
+        padding: 3rem;
+        background-color: white;
+        border-radius: 0.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .right-sidebar {
+        background-color: white;
+        border-radius: 0.5rem;
+        padding: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="archive-header">
+        <div>
+            <h1 class="h3">Discussion Guides</h1>
+            <p class="text-muted">Create and manage your research discussion guides</p>
+        </div>
+        <div class="d-flex gap-2">
+            <div class="dropdown">
+                <button class="btn btn-outline-secondary dropdown-toggle" type="button" id="filterDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                    <i class="bi bi-funnel me-1"></i> <span id="currentFilter">All Guides</span>
+                </button>
+                <ul class="dropdown-menu" aria-labelledby="filterDropdown">
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="all">All Guides</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="active">Active Guides</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="archived">Archived Guides</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><h6 class="dropdown-header">Filter by Character</h6></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="char-daria">Daria</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="char-eurekia">Eurekia</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="char-skeptica">Skeptica</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="char-askia">Askia</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="char-thesea">Thesea</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="char-odessia">Odessia</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="char-synthia">Synthia</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="char-interviewer">Interviewer</a></li>
+                    <li><a class="dropdown-item filter-option" href="#" data-filter="char-researcher">Researcher</a></li>
+                </ul>
+            </div>
+            <div class="search-container">
+                <div class="input-group">
+                    <input type="text" class="form-control" id="searchInput" placeholder="Search guides...">
+                    <button class="btn btn-outline-secondary" type="button" id="searchBtn">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    {% if guides %}
+    <div class="row">
+        <div class="col-md-8">
+            <div class="guide-list">
+                {% for guide in guides %}
+                <div class="guide-card">
+                    <div class="card-header">
+                        <h5 class="mb-0">{{ guide.title if guide.title else "Untitled Guide" }}</h5>
+                        <div>
+                            <span class="status-badge status-{{ guide.status }}">{{ guide.status|capitalize }}</span>
+                            {% if guide.sessions %}
+                            <span class="status-badge sessions-badge ms-2">{{ guide.sessions|length }} Session{% if guide.sessions|length != 1 %}s{% endif %}</span>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Project:</strong> {{ guide.project if guide.project else "Not specified" }}</p>
+                                <p class="mb-1"><strong>Created:</strong> {% if guide.created_at %}{{ guide.created_at.split('T')[0] if guide.created_at is string else guide.created_at.strftime('%b %d, %Y') }}{% else %}Unknown{% endif %}</p>
+                                <p class="mb-1">
+                                    <strong>Guide ID:</strong> 
+                                    <span class="text-monospace small">{{ guide.id }}</span>
+                                    <button class="btn btn-sm btn-outline-primary copy-id-btn" data-guide-id="{{ guide.id }}" title="Copy Guide ID to clipboard" data-bs-toggle="tooltip">
+                                        <i class="bi bi-clipboard"></i> Copy ID
+                                    </button>
+                                </p>
+                            </div>
+                            <div class="col-md-6">
+                                <p class="mb-1"><strong>Type:</strong> {{ guide.interview_type|replace('_', ' ')|capitalize if guide.interview_type else "Not specified" }}</p>
+                                <p class="mb-1"><strong>Last Updated:</strong> {% if guide.updated_at %}{{ guide.updated_at.split('T')[0] if guide.updated_at is string else guide.updated_at.strftime('%b %d, %Y') }}{% else %}Unknown{% endif %}</p>
+                            </div>
+                        </div>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <span class="character-badge character-{{ guide.character_select|default('daria')|lower }}">
+                                    <i class="bi bi-person-circle"></i> 
+                                    {{ guide.character_select|default('daria')|title }}
+                                </span>
+                            </div>
+                            <div class="btn-group">
+                                <a href="/discussion_guide/{{ guide.id }}" class="btn btn-primary">View Guide</a>
+                                <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteGuideModal" data-guide-id="{{ guide.id }}" data-guide-title="{{ guide.title }}">
+                                    <i class="bi bi-trash"></i> Delete
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="right-sidebar">
+                <h4>Quick Stats</h4>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Guides</span>
+                        <span class="badge bg-primary">{{ guides|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Active Guides</span>
+                        <span class="badge bg-success">{{ guides|selectattr('status', 'equalto', 'active')|list|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Archived Guides</span>
+                        <span class="badge bg-secondary">{{ guides|selectattr('status', 'equalto', 'archived')|list|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Total Sessions</span>
+                        <span class="badge bg-info">{{ guides|map(attribute='sessions')|map('length')|sum }}</span>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Character Stats</h4>
+                <div class="mb-4">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Daria</span>
+                        <span class="badge character-daria">{{ guides|selectattr('character_select', 'equalto', 'daria')|list|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Eurekia</span>
+                        <span class="badge character-eurekia">{{ guides|selectattr('character_select', 'equalto', 'eurekia')|list|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Skeptica</span>
+                        <span class="badge character-skeptica">{{ guides|selectattr('character_select', 'equalto', 'skeptica')|list|count }}</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Others</span>
+                        <span class="badge bg-secondary">{{ guides|rejectattr('character_select', 'in', ['daria', 'eurekia', 'skeptica'])|list|count }}</span>
+                    </div>
+                </div>
+                
+                <h4 class="mt-4">Actions</h4>
+                <div class="d-grid gap-2">
+                    <a href="/interview_setup" class="btn btn-outline-primary">
+                        <i class="bi bi-plus-circle me-2"></i>New Discussion Guide
+                    </a>
+                    <button class="btn btn-outline-secondary" id="exportDataBtn">
+                        <i class="bi bi-download me-2"></i>Export Data
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <i class="bi bi-archive fs-1 text-muted mb-3"></i>
+        <h4>No Discussion Guides Yet</h4>
+        <p class="text-muted">Create your first discussion guide to get started</p>
+        <a href="/interview_setup" class="btn btn-primary mt-2">Create Discussion Guide</a>
+    </div>
+    {% endif %}
+</div>
+
+<!-- Delete Guide Modal -->
+<div class="modal fade" id="deleteGuideModal" tabindex="-1" aria-labelledby="deleteGuideModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteGuideModalLabel">Delete Discussion Guide</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="guideTitle"></strong>?</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <strong>Warning:</strong> This action cannot be undone. Sessions associated with this guide will be marked as orphaned but will remain accessible.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const searchInput = document.getElementById('searchInput');
+        const searchBtn = document.getElementById('searchBtn');
+        const guideCards = document.querySelectorAll('.guide-card');
+        const exportDataBtn = document.getElementById('exportDataBtn');
+        const filterOptions = document.querySelectorAll('.filter-option');
+        const currentFilterText = document.getElementById('currentFilter');
+        
+        // Delete guide functionality
+        const deleteModal = document.getElementById('deleteGuideModal');
+        const guideTitleElement = document.getElementById('guideTitle');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+        let guideIdToDelete = null;
+        
+        if (deleteModal) {
+            deleteModal.addEventListener('show.bs.modal', function(event) {
+                const button = event.relatedTarget;
+                guideIdToDelete = button.getAttribute('data-guide-id');
+                const guideTitle = button.getAttribute('data-guide-title') || 'this guide';
+                guideTitleElement.textContent = guideTitle;
+            });
+            
+            confirmDeleteBtn.addEventListener('click', function() {
+                if (guideIdToDelete) {
+                    deleteGuide(guideIdToDelete);
+                }
+            });
+        }
+        
+        function deleteGuide(guideId) {
+            fetch(`/api/discussion_guide/${guideId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Close the modal
+                    const bsModal = bootstrap.Modal.getInstance(deleteModal);
+                    bsModal.hide();
+                    
+                    // Show success message and refresh the page
+                    alert('Discussion guide successfully deleted.');
+                    window.location.reload();
+                } else {
+                    alert(`Error: ${data.error || 'Failed to delete guide'}`);
+                }
+            })
+            .catch(error => {
+                console.error('Error deleting guide:', error);
+                alert('An error occurred while deleting the guide. Please try again.');
+            });
+        }
+        
+        let currentFilter = 'all';
+        
+        // Filter functionality
+        function applyFilters() {
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            guideCards.forEach(card => {
+                const cardText = card.textContent.toLowerCase();
+                const statusElement = card.querySelector('.status-badge');
+                const status = statusElement ? statusElement.textContent.toLowerCase() : '';
+                const characterElement = card.querySelector('.character-badge');
+                const character = characterElement ? characterElement.textContent.trim().toLowerCase() : '';
+                
+                // Check search term
+                const matchesSearch = cardText.includes(searchTerm);
+                
+                // Check status filter
+                let matchesFilter = true;
+                if (currentFilter === 'active') {
+                    matchesFilter = status.includes('active');
+                } else if (currentFilter === 'archived') {
+                    matchesFilter = status.includes('archived');
+                } else if (currentFilter.startsWith('char-')) {
+                    // Extract character name from filter (e.g., 'char-daria' -> 'daria')
+                    const characterFilter = currentFilter.substring(5);
+                    matchesFilter = character.includes(characterFilter);
+                }
+                
+                // Show/hide card based on combined filters
+                if (matchesSearch && matchesFilter) {
+                    card.style.display = 'block';
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+        }
+        
+        // Filter dropdown
+        filterOptions.forEach(option => {
+            option.addEventListener('click', function(e) {
+                e.preventDefault();
+                currentFilter = this.dataset.filter;
+                
+                // Set button text based on filter type
+                if (currentFilter.startsWith('char-')) {
+                    const characterName = this.textContent.trim();
+                    currentFilterText.textContent = `Character: ${characterName}`;
+                } else {
+                    currentFilterText.textContent = this.textContent;
+                }
+                
+                applyFilters();
+            });
+        });
+        
+        // Search functionality
+        function performSearch() {
+            applyFilters();
+        }
+        
+        searchBtn.addEventListener('click', performSearch);
+        searchInput.addEventListener('keyup', function(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        // Export data functionality (placeholder)
+        if (exportDataBtn) {
+            exportDataBtn.addEventListener('click', function() {
+                alert('Export functionality would go here');
+            });
+        }
+    });
+</script>
+{% endblock %}
+
+{% block extra_scripts %}
+<script>
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize all tooltips
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+
+    // Search functionality
+    document.getElementById('searchInput').addEventListener('input', function() {
+        filterGuides();
+    });
+    
+    document.getElementById('searchBtn').addEventListener('click', function() {
+        filterGuides();
+    });
+    
+    // Filter options
+    document.querySelectorAll('.filter-option').forEach(option => {
+        option.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Update filter display
+            const filterValue = this.dataset.filter;
+            document.getElementById('currentFilter').textContent = this.textContent;
+            
+            // Apply filter
+            filterGuides(filterValue);
+        });
+    });
+    
+    // Copy guide ID buttons
+    document.querySelectorAll('.copy-id-btn').forEach(button => {
+        button.addEventListener('click', function(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const guideId = this.getAttribute('data-guide-id');
+            
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(guideId)
+                    .then(() => {
+                        // Show a notification alert
+                        const alertHtml = `
+                            <div class="alert alert-success alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3" style="z-index: 9999;">
+                                <strong>Success!</strong> Guide ID copied to clipboard.
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        `;
+                        document.body.insertAdjacentHTML('beforeend', alertHtml);
+                        
+                        // Auto-dismiss after 3 seconds
+                        setTimeout(() => {
+                            const alertElement = document.querySelector('.alert');
+                            if (alertElement) {
+                                const bsAlert = new bootstrap.Alert(alertElement);
+                                bsAlert.close();
+                            }
+                        }, 3000);
+                        
+                        // Visual feedback on button
+                        const originalHTML = this.innerHTML;
+                        this.innerHTML = '<i class="bi bi-check"></i>';
+                        this.classList.add('btn-success');
+                        this.classList.remove('btn-outline-primary');
+                        
+                        setTimeout(() => {
+                            this.innerHTML = originalHTML;
+                            this.classList.remove('btn-success');
+                            this.classList.add('btn-outline-primary');
+                        }, 1500);
+                    })
+                    .catch(err => {
+                        console.error('Error copying to clipboard:', err);
+                        alert('Failed to copy to clipboard. Please try again.');
+                    });
+            } else {
+                // Fallback for browsers that don't support clipboard API
+                const tempTextArea = document.createElement('textarea');
+                tempTextArea.value = guideId;
+                document.body.appendChild(tempTextArea);
+                tempTextArea.select();
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        alert('Guide ID copied to clipboard');
+                    } else {
+                        alert('Failed to copy to clipboard');
+                    }
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    alert('Failed to copy to clipboard. Please try again.');
+                }
+                
+                document.body.removeChild(tempTextArea);
+            }
+        });
+    });
+    
+    // Filter guides based on search and filter
+    function filterGuides(filter = null) {
+        const searchQuery = document.getElementById('searchInput').value.toLowerCase();
+        const guideCards = document.querySelectorAll('.guide-card');
+        
+        guideCards.forEach(card => {
+            let shouldShow = true;
+            
+            // Apply search filter
+            if (searchQuery) {
+                const cardTitle = card.querySelector('h5').textContent.toLowerCase();
+                const projectElement = card.querySelector('strong');
+                let projectText = '';
+                
+                // Find the project text by looking for the strong element with "Project:" text
+                card.querySelectorAll('strong').forEach(elem => {
+                    if (elem.textContent.includes('Project:')) {
+                        // Get the text after the strong element
+                        projectText = elem.parentNode.textContent.replace('Project:', '').toLowerCase();
+                    }
+                });
+                
+                shouldShow = cardTitle.includes(searchQuery) || projectText.includes(searchQuery);
+            }
+            
+            // Apply category filter
+            if (filter && shouldShow) {
+                if (filter === 'active') {
+                    shouldShow = card.querySelector('.status-active') !== null;
+                } else if (filter === 'archived') {
+                    shouldShow = card.querySelector('.status-archived') !== null;
+                } else if (filter.startsWith('char-')) {
+                    const character = filter.replace('char-', '');
+                    shouldShow = card.querySelector('.character-' + character) !== null;
+                }
+            }
+            
+            // Show/hide the card
+            card.style.display = shouldShow ? 'block' : 'none';
+        });
+    }
+</script>
+{% endblock %} 

@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA Debug Tool - Interview TTS Testing</title>
+    <!-- Include jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2 {
+            color: #1a1a1a;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .debug-panel {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+        .control-panel {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #0078d4;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0069bd;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        textarea {
+            width: 100%;
+            height: 100px;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            resize: vertical;
+        }
+        .message-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+            padding: 15px;
+            margin-bottom: 20px;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 8px;
+        }
+        .assistant-message {
+            background-color: #f0f7ff;
+            border-left: 4px solid #0078d4;
+        }
+        .user-message {
+            background-color: #f9f9f9;
+            border-left: 4px solid #107c10;
+            text-align: right;
+        }
+        .log-container {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: #f9f9f9;
+            padding: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+        }
+        .timestamp {
+            color: #666;
+            font-size: 0.8em;
+        }
+        .tts-log {
+            color: #0078d4;
+        }
+        select {
+            padding: 8px;
+            border-radius: 4px;
+            border: 1px solid #ddd;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        .status-active {
+            background-color: #107c10;
+        }
+        .status-inactive {
+            background-color: #d83b01;
+        }
+        footer {
+            margin-top: 30px;
+            color: #666;
+            font-size: 0.8em;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+    <h1>DARIA Debug Tool - Interview TTS Testing</h1>
+    <p>This tool simulates the interview environment with TTS for testing without interference from STT.</p>
+    
+    <div class="container">
+        <div class="debug-panel">
+            <h2>Interview Simulation</h2>
+            <div class="control-panel">
+                <button id="start-interview">Start New Conversation</button>
+                <button id="get-session" disabled>Load Session</button>
+                <input type="text" id="session-id" placeholder="Session ID (optional)">
+                <div style="margin-left: auto;">
+                    <span class="status-indicator" id="interview-status"></span>
+                    <span id="status-text">Not Connected</span>
+                </div>
+            </div>
+            <div class="message-container" id="message-container">
+                <!-- Messages will appear here -->
+            </div>
+            <div>
+                <h3>Your Response:</h3>
+                <textarea id="user-input" placeholder="Type your response here..."></textarea>
+                <div class="control-panel">
+                    <button id="send-message">Send</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h2>Text-to-Speech Controls</h2>
+            <div class="control-panel">
+                <button id="tts-play">Play Last Message</button>
+                <button id="tts-stop">Stop Speech</button>
+                <button id="auto-tts-toggle">Auto TTS: OFF</button>
+                <select id="tts-voice">
+                    <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
+                    <option value="21m00Tcm4TlvDq8ikWAM">Adam (Male)</option>
+                    <option value="AZnzlk1XvdvUeBnXmlld">Domi (Female)</option>
+                    <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
+                    <option value="TxGEqnHWrfWFTfGW9XjX">Josh (Male)</option>
+                    <option value="yoZ06aMxZJJ28mfd3POQ">Sam (Male)</option>
+                </select>
+            </div>
+        </div>
+        
+        <div class="debug-panel">
+            <h2>Debug Log</h2>
+            <button id="clear-log">Clear Log</button>
+            <div class="log-container" id="log-container"></div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>DARIA Interview Tool Debug Component</p>
+    </footer>
+
+    <script>
+        // Global variables
+        const ttsAudio = new Audio();
+        let sessionId = null;
+        let lastAssistantMessage = "";
+        let autoTTS = false;
+        
+        // DOM elements
+        const startInterviewBtn = document.getElementById('start-interview');
+        const getSessionBtn = document.getElementById('get-session');
+        const sessionIdInput = document.getElementById('session-id');
+        const messageContainer = document.getElementById('message-container');
+        const userInput = document.getElementById('user-input');
+        const sendMessageBtn = document.getElementById('send-message');
+        const ttsPlayBtn = document.getElementById('tts-play');
+        const ttsStopBtn = document.getElementById('tts-stop');
+        const autoTtsToggleBtn = document.getElementById('auto-tts-toggle');
+        const ttsVoice = document.getElementById('tts-voice');
+        const clearLogBtn = document.getElementById('clear-log');
+        const logContainer = document.getElementById('log-container');
+        const interviewStatus = document.getElementById('interview-status');
+        const statusText = document.getElementById('status-text');
+        
+        // Initialize status indicators
+        interviewStatus.classList.add('status-inactive');
+        
+        // Logging function
+        function log(message, type = 'info') {
+            const entry = document.createElement('div');
+            entry.className = 'log-entry';
+            
+            const timestamp = document.createElement('span');
+            timestamp.className = 'timestamp';
+            timestamp.textContent = new Date().toLocaleTimeString() + ' - ';
+            
+            const content = document.createElement('span');
+            content.className = type + '-log';
+            content.textContent = message;
+            
+            entry.appendChild(timestamp);
+            entry.appendChild(content);
+            
+            logContainer.appendChild(entry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+        
+        // Update status indicator
+        function updateStatus(isActive, message) {
+            if (isActive) {
+                interviewStatus.classList.remove('status-inactive');
+                interviewStatus.classList.add('status-active');
+            } else {
+                interviewStatus.classList.remove('status-active');
+                interviewStatus.classList.add('status-inactive');
+            }
+            statusText.textContent = message;
+        }
+        
+        // Add message to conversation
+        function addMessage(content, role) {
+            const messageElem = document.createElement('div');
+            messageElem.className = 'message ' + (role === 'assistant' ? 'assistant-message' : 'user-message');
+            messageElem.textContent = content;
+            
+            messageContainer.appendChild(messageElem);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            
+            if (role === 'assistant') {
+                lastAssistantMessage = content;
+                if (autoTTS) {
+                    playTTS(content);
+                }
+            }
+        }
+        
+        // Create a new interview
+        async function startInterview() {
+            try {
+                updateStatus(false, 'Creating session...');
+                log('Creating new interview session');
+                
+                // Get available guides
+                const guidesResponse = await fetch('/api/discussion_guides');
+                const guidesData = await guidesResponse.json();
+                
+                if (!guidesData.success || !guidesData.guides || guidesData.guides.length === 0) {
+                    throw new Error('No discussion guides available');
+                }
+                
+                // Select the first guide
+                const guideId = guidesData.guides[0].id;
+                
+                // Create session with the guide
+                const createResponse = await fetch('/api/session/create', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        guide_id: guideId,
+                        interviewee: {
+                            name: 'Debug User'
+                        }
+                    })
+                });
+                
+                const createData = await createResponse.json();
+                
+                if (!createData.success) {
+                    throw new Error(createData.error || 'Failed to create session');
+                }
+                
+                sessionId = createData.session_id;
+                sessionIdInput.value = sessionId;
+                
+                log(`Created session with ID: ${sessionId}`);
+                updateStatus(true, 'Connected');
+                
+                // Get initial messages
+                const messagesResponse = await fetch(`/api/session/${sessionId}/messages`);
+                const messagesData = await messagesResponse.json();
+                
+                if (messagesData.success && messagesData.messages) {
+                    messageContainer.innerHTML = '';
+                    
+                    for (const message of messagesData.messages) {
+                        addMessage(message.content, message.role);
+                    }
+                } else {
+                    // Add default welcome message if no messages found
+                    addMessage("Hello, I'm your interview assistant. How can I help you today?", 'assistant');
+                }
+                
+                // Enable interaction
+                sendMessageBtn.disabled = false;
+                getSessionBtn.disabled = false;
+                
+            } catch (error) {
+                log(`Error starting interview: ${error.message}`, 'error');
+                updateStatus(false, 'Error');
+            }
+        }
+        
+        // Load existing session
+        async function loadSession() {
+            const sessionIdToLoad = sessionIdInput.value.trim();
+            
+            if (!sessionIdToLoad) {
+                log('No session ID provided', 'error');
+                return;
+            }
+            
+            try {
+                updateStatus(false, 'Loading session...');
+                log(`Loading session: ${sessionIdToLoad}`);
+                
+                const response = await fetch(`/api/session/${sessionIdToLoad}`);
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to load session');
+                }
+                
+                sessionId = sessionIdToLoad;
+                
+                // Get messages
+                const messagesResponse = await fetch(`/api/session/${sessionId}/messages`);
+                const messagesData = await messagesResponse.json();
+                
+                if (messagesData.success && messagesData.messages) {
+                    messageContainer.innerHTML = '';
+                    
+                    for (const message of messagesData.messages) {
+                        addMessage(message.content, message.role);
+                    }
+                    
+                    updateStatus(true, 'Connected');
+                    log(`Loaded session with ${messagesData.messages.length} messages`);
+                } else {
+                    throw new Error('No messages found in session');
+                }
+                
+                // Enable interaction
+                sendMessageBtn.disabled = false;
+                
+            } catch (error) {
+                log(`Error loading session: ${error.message}`, 'error');
+                updateStatus(false, 'Error');
+            }
+        }
+        
+        // Send user message
+        async function sendMessage() {
+            const message = userInput.value.trim();
+            
+            if (!message) {
+                log('No message to send', 'error');
+                return;
+            }
+            
+            if (!sessionId) {
+                log('No active session', 'error');
+                return;
+            }
+            
+            try {
+                updateStatus(true, 'Sending message...');
+                sendMessageBtn.disabled = true;
+                
+                // Add user message to UI
+                addMessage(message, 'user');
+                
+                log(`Sending message: ${message.substring(0, 30)}${message.length > 30 ? '...' : ''}`);
+                
+                // Send message to API
+                const response = await fetch(`/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: {
+                            role: 'user',
+                            content: message
+                        }
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to send message');
+                }
+                
+                // Clear input
+                userInput.value = '';
+                
+                // Wait for AI response (poll for new messages)
+                setTimeout(async () => {
+                    try {
+                        const messagesResponse = await fetch(`/api/session/${sessionId}/messages`);
+                        const messagesData = await messagesResponse.json();
+                        
+                        if (messagesData.success && messagesData.messages) {
+                            const newMessages = messagesData.messages;
+                            
+                            // Get latest assistant message
+                            for (let i = newMessages.length - 1; i >= 0; i--) {
+                                if (newMessages[i].role === 'assistant') {
+                                    // Check if this is a new message not already displayed
+                                    const messageContent = newMessages[i].content;
+                                    if (messageContent !== lastAssistantMessage) {
+                                        addMessage(messageContent, 'assistant');
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        
+                        updateStatus(true, 'Connected');
+                        sendMessageBtn.disabled = false;
+                        
+                    } catch (error) {
+                        log(`Error getting AI response: ${error.message}`, 'error');
+                        updateStatus(false, 'Error');
+                        sendMessageBtn.disabled = false;
+                    }
+                }, 1000);
+                
+            } catch (error) {
+                log(`Error sending message: ${error.message}`, 'error');
+                updateStatus(false, 'Error');
+                sendMessageBtn.disabled = false;
+            }
+        }
+        
+        // Text-to-Speech functions
+        function playTTS(text = null) {
+            const textToSpeak = text || lastAssistantMessage;
+            
+            if (!textToSpeak) {
+                log('No text to speak', 'error');
+                return;
+            }
+            
+            const voiceId = ttsVoice.value;
+            const url = '/api/text_to_speech_elevenlabs';
+            
+            log(`Playing TTS: ${textToSpeak.substring(0, 30)}${textToSpeak.length > 30 ? '...' : ''}`, 'tts');
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: textToSpeak,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(`API error: ${err.error || 'Unknown error'}`);
+                    });
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                ttsAudio.src = url;
+                ttsAudio.onplay = () => {
+                    log('TTS playing', 'tts');
+                };
+                ttsAudio.onended = () => {
+                    log('TTS finished', 'tts');
+                };
+                ttsAudio.onerror = (e) => {
+                    log(`TTS error: ${e.error || 'Audio playback error'}`, 'error');
+                };
+                ttsAudio.play();
+            })
+            .catch(error => {
+                log(`TTS error: ${error.message}`, 'error');
+            });
+        }
+        
+        function stopTTS() {
+            ttsAudio.pause();
+            ttsAudio.currentTime = 0;
+            log('TTS stopped', 'tts');
+        }
+        
+        // Event Listeners
+        startInterviewBtn.addEventListener('click', startInterview);
+        getSessionBtn.addEventListener('click', loadSession);
+        sendMessageBtn.addEventListener('click', sendMessage);
+        ttsPlayBtn.addEventListener('click', () => playTTS());
+        ttsStopBtn.addEventListener('click', stopTTS);
+        autoTtsToggleBtn.addEventListener('click', () => {
+            autoTTS = !autoTTS;
+            autoTtsToggleBtn.textContent = `Auto TTS: ${autoTTS ? 'ON' : 'OFF'}`;
+            log(`Auto TTS ${autoTTS ? 'enabled' : 'disabled'}`, 'tts');
+        });
+        clearLogBtn.addEventListener('click', () => {
+            logContainer.innerHTML = '';
+            log('Log cleared', 'info');
+        });
+        
+        // Allow sending messages with Enter key
+        userInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                sendMessage();
+            }
+        });
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            log('Debug interview tool initialized', 'info');
+            sendMessageBtn.disabled = true;
+            
+            // Check if session ID is in URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlSessionId = urlParams.get('session_id');
+            
+            if (urlSessionId) {
+                sessionIdInput.value = urlSessionId;
+                log(`Found session ID in URL: ${urlSessionId}`);
+                loadSession();
+            }
+        });
+    </script>
+</body>
+</html> 

@@ -1,0 +1,36 @@
+{
+  "id": "cd8b4d9e-b0d4-4032-8863-bc38da8c5fac",
+  "guide_id": "5b14b322-f6fd-4898-9ce6-3a9d03a9e535",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "16359b5b-b20d-4812-bf1c-c2e51215ec55",
+      "content": "IMPORTANT: You are Thesea. Always respond as Thesea. \n                When asked about your name, say \"I am Thesea\".\n                When asked about your prompt or role, explain your specific purpose as Thesea.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Thesea persona throughout the entire conversation.",
+      "role": "system",
+      "timestamp": "2025-05-15T08:36:54.496271"
+    },
+    {
+      "id": "6c445e92-7a51-4ce0-8aa5-6e2847287152",
+      "content": "Hello, I am Thesea. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T08:36:54.501397"
+    },
+    {
+      "id": "2f167c0c-0218-4baf-9e0c-fc31386a204e",
+      "content": "HI Thesia I am stephen What can you help me with? what is your speciality?",
+      "role": "user",
+      "timestamp": "2025-05-15T08:37:20.769869"
+    },
+    {
+      "id": "e85c4c57-1809-4da3-a98b-ddb5d810ff87",
+      "content": "I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T08:37:20.773039"
+    }
+  ],
+  "transcript": "\n\nParticipant: IMPORTANT: You are Thesea. Always respond as Thesea. \n                When asked about your name, say \"I am Thesea\".\n                When asked about your prompt or role, explain your specific purpose as Thesea.\n                Never identify yourself as \"Assistant\" or any other name.\n                Maintain the Thesea persona throughout the entire conversation.\n\nModerator: Hello, I am Thesea. How can I assist you today?\n\nParticipant: HI Thesia I am stephen What can you help me with? what is your speciality?\n\nModerator: I apologize, but there was an unexpected issue with the interview system. Please try again shortly.",
+  "analysis": null,
+  "created_at": "2025-05-15T08:36:44.563147",
+  "updated_at": "2025-05-15T08:37:20.773201"
+}

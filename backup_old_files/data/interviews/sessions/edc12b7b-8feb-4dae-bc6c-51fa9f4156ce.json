@@ -1,0 +1,45 @@
+{
+  "id": "edc12b7b-8feb-4dae-bc6c-51fa9f4156ce",
+  "guide_id": "90630eca-c166-4a6f-81c7-8d4b95f99fdc",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "96e33c6e-9417-452e-8e56-d71cd58d5489",
+      "content": "SYSTEM: Character set to eurekia. \n                                IMPORTANT: You are eurekia. Your name is eurekia.\n                                You MUST always respond as eurekia. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am eurekia.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"",
+      "role": "system",
+      "timestamp": "2025-05-24T11:15:35.581721"
+    },
+    {
+      "id": "9070ea41-90da-46c4-bc5e-28bc9a1a875c",
+      "content": "Hello, I am eurekia. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-24T11:15:37.681188"
+    },
+    {
+      "id": "6d60886d-b27e-4675-97d0-7a8686742e41",
+      "content": "just wanted to see if you're with me today",
+      "role": "user",
+      "timestamp": "2025-05-24T11:15:46.892061"
+    },
+    {
+      "id": "0c01a25a-8562-4e16-a626-c15d2697960b",
+      "content": "Absolutely, I'm here and ready to dive into our discussion on Deloitte's discovery research process. Let's explore the world of qualitative research together! So, tell me, how familiar are you with Deloitte's discovery research phases and practices?",
+      "role": "assistant",
+      "timestamp": "2025-05-24T11:15:49.510614"
+    }
+  ],
+  "transcript": "\n\nParticipant: SYSTEM: Character set to eurekia. \n                                IMPORTANT: You are eurekia. Your name is eurekia.\n                                You MUST always respond as eurekia. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am eurekia.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n\nModerator: Hello, I am eurekia. How can I assist you today?\n\nParticipant: just wanted to see if you're with me today\n\nModerator: Absolutely, I'm here and ready to dive into our discussion on Deloitte's discovery research process. Let's explore the world of qualitative research together! So, tell me, how familiar are you with Deloitte's discovery research phases and practices?",
+  "analysis": null,
+  "created_at": "2025-05-24T11:15:29.287710",
+  "updated_at": "2025-05-24T11:15:49.510835",
+  "title": "Daria User Research Interview Guide",
+  "project": "Daria Research of Researchers",
+  "interview_type": "discovery_interview",
+  "topic": "Understanding how Deloitte researchers conceive, plan, and execute discovery activities in order to improve and augment their processes through AI-assisted support.",
+  "context": "The Daria Research Project aims to explore how AI can meaningfully support qualitative discovery work by acting as a proactive, intelligent research assistant. At Deloitte, discovery research is often a multi-phase effort that involves planning fieldwork, conducting stakeholder interviews, synthesizing insights, and aligning findings with business strategy. Despite having deep expertise and structured processes, researchers often face recurring bottlenecks: time-consuming manual synthesis, inconsistent documentation, and the challenge of maintaining stakeholder alignment through each stage.\n\nDaria, as an AI-powered research assistant, is designed to enhance the researcher's capabilities\u2014not replace them. It helps conduct interviews, generate thematic summaries, tag insights semantically, and produce personas and journey maps\u2014all with the aim of accelerating time to insight and improving research traceability. Unlike generic AI tools, Daria is tailored to Deloitte\u2019s hybrid consultancy-research model, supporting both exploratory and evaluative work while adapting to domain-specific terminology and client contexts.\n\nThis interview explores the lived experience of Deloitte researchers in the earliest stages of discovery\u2014how they think about a research challenge, what methods and tools they reach for, and where they see opportunities for augmentation or automation. The goal is to uncover both obvious and latent friction points, and to understand how Daria might serve as a seamless extension of their thinking, capturing nuance while boosting research velocity.\n\nBy speaking with researchers who have repeatedly navigated Deloitte\u2019s discovery process, we hope to co-design features that resonate with real-world constraints and empower researchers to focus on judgment and synthesis\u2014not just data wrangling. Daria is here to elevate, not just expedite, research. These conversations will shape its roadmap.",
+  "goals": "Identify the typical phases and practices used in Deloitte discovery research.\nSurface pain points or inefficiencies in current discovery workflows.\nUnderstand how researchers select, adapt, and apply discovery methods.\nExplore attitudes toward AI involvement in qualitative research.\nGather feedback on where an AI assistant could offer the most value.",
+  "character": "eurekia",
+  "character_select": "eurekia",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

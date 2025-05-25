@@ -303,6 +303,63 @@ def send_static(path):
     """Serve static files"""
     return send_from_directory('static', path)
 
+@app.route('/api/sessions', methods=['GET'])
+def get_all_sessions():
+    """Get all interview sessions"""
+    try:
+        sessions = []
+        for file_path in Path(SESSIONS_DIR).glob("*.json"):
+            if not file_path.is_file() or file_path.name.startswith("."):
+                continue
+            
+            with open(file_path, 'r') as f:
+                session_data = json.load(f)
+                # Filter out sensitive or unnecessary information
+                filtered_data = {
+                    'id': session_data.get('id'),
+                    'title': session_data.get('title'),
+                    'project': session_data.get('project'),
+                    'topic': session_data.get('topic'),
+                    'context': session_data.get('context'),
+                    'goals': session_data.get('goals'),
+                    'created_at': session_data.get('created_at'),
+                    'updated_at': session_data.get('updated_at'),
+                    'interview_type': session_data.get('interview_type')
+                }
+                sessions.append(filtered_data)
+        
+        return jsonify(sessions)
+    except Exception as e:
+        logger.error(f"Error fetching sessions: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/transcript/<session_id>', methods=['GET'])
+def get_transcript(session_id):
+    """Get the full transcript and details for a session"""
+    try:
+        file_path = os.path.join(SESSIONS_DIR, f"{session_id}.json")
+        if not os.path.exists(file_path):
+            return jsonify({"error": f"Session {session_id} not found"}), 404
+        
+        with open(file_path, 'r') as f:
+            session_data = json.load(f)
+            # Return all data needed for transcript view
+            return jsonify({
+                'id': session_data.get('id'),
+                'title': session_data.get('title'),
+                'project': session_data.get('project'),
+                'topic': session_data.get('topic'),
+                'context': session_data.get('context'),
+                'goals': session_data.get('goals'),
+                'messages': session_data.get('messages', []),
+                'analysis': session_data.get('analysis'),
+                'created_at': session_data.get('created_at'),
+                'updated_at': session_data.get('updated_at')
+            })
+    except Exception as e:
+        logger.error(f"Error fetching transcript for session {session_id}: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
 # Main entry point
 if __name__ == "__main__":
     import argparse

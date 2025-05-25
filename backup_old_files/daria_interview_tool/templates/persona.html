@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block head %}
+<link rel="stylesheet" href="{{ url_for('static', filename='css/persona.css') }}">
+{% endblock %}
+
+{% block title %}Persona Generator{% endblock %}
+
+{% block content %}
+<div class="container">
+    <h1 class="page-title">Persona Generator</h1>
+    
+    <div class="form-section">
+        <div class="form-group">
+            <label for="projectSelect">Select Project</label>
+            <select id="projectSelect" class="form-control">
+                <option value="">Select a project...</option>
+                {% for project in projects %}
+                <option value="{{ project.id }}">{{ project.name }}</option>
+                {% endfor %}
+            </select>
+            <small class="text-muted">Choose a project to see available interviews</small>
+        </div>
+
+        <div class="form-group">
+            <label for="interviewSelect">Select Interviews</label>
+            <select id="interviewSelect" class="form-control" multiple>
+                <option value="">No interviews available</option>
+            </select>
+            <small class="text-muted">Hold Ctrl/Cmd to select multiple interviews</small>
+        </div>
+
+        <div class="form-group">
+            <label for="modelSelect">Select Model</label>
+            <select id="modelSelect" class="form-control">
+                <option value="gpt-4">GPT-4</option>
+                <option value="claude-3.7-sonnet">Claude 3.7 Sonnet</option>
+                <option value="gpt-3.5-turbo">GPT-3.5 Turbo</option>
+            </select>
+            <small class="text-muted">Choose the AI model to generate the persona</small>
+        </div>
+
+        <button id="generateBtn" class="btn btn-primary">
+            Generate Persona
+        </button>
+    </div>
+
+    <div id="loadingSection" class="loading d-none">
+        <div class="loading-spinner"></div>
+        <p class="ms-3">Generating Persona...</p>
+    </div>
+
+    <div id="generatedPersona" class="generated-persona d-none">
+        <h2>Generated Persona</h2>
+        <div id="personaContent" class="persona-card">
+            <!-- Generated content will be inserted here -->
+        </div>
+    </div>
+</div>
+
+<script src="{{ url_for('static', filename='js/persona.js') }}"></script>
+{% endblock %} 

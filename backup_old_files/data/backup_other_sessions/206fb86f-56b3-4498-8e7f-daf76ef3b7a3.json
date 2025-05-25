@@ -1,0 +1,69 @@
+{
+  "id": "206fb86f-56b3-4498-8e7f-daf76ef3b7a3",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "completed",
+  "messages": [
+    {
+      "content": "I'm going to another test interview to verify verify  that we are good to go",
+      "role": "user",
+      "timestamp": "2025-05-13T10:15:05.459060"
+    },
+    {
+      "content": "It sounds like you are actively involved in the testing process. Can you share a bit more about what specifically you are looking to verify in this upcoming test interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T10:15:06.798878"
+    },
+    {
+      "content": "a lot of things I want it best to fight like the  I want to verify the",
+      "role": "user",
+      "timestamp": "2025-05-13T10:15:27.807112"
+    },
+    {
+      "content": "It seems like there might be some important details missing in your response. Could you elaborate on what exactly you mean by \"a lot of things I want it best to fight like the I want to verify the\"? What are some specific aspects or functionalities that you are hoping to verify during this upcoming test interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-13T10:15:29.538649"
+    },
+    {
+      "content": "hello",
+      "role": "user",
+      "timestamp": "2025-05-13T10:20:55.075336"
+    },
+    {
+      "content": "I'm hoping to verify that the speech to text is capturing what I'm saying which it is very good",
+      "role": "user",
+      "timestamp": "2025-05-13T10:21:15.946620"
+    },
+    {
+      "content": "It needs to send my reply to the langchain conversation to get the next part of the conversation then TTS it to me then start listening",
+      "role": "user",
+      "timestamp": "2025-05-13T10:22:15.267399"
+    },
+    {
+      "content": "I don't have feedback that it is listening to me. I am typing this. I am going to reload and see if we get the LangChain conversation parts that we are not gettin here.",
+      "role": "user",
+      "timestamp": "2025-05-13T10:23:19.389337"
+    },
+    {
+      "content": "Are you going to the LangChain Conversaton and conversation history to get the next part of the interview? Can you check?",
+      "role": "user",
+      "timestamp": "2025-05-13T10:23:59.034170"
+    },
+    {
+      "content": "I want to verify that the speech to Texas capturing what I say that it is being sent to the land chain model for a second part of the conversation that the next question is being sent to the transcript and the text to speech is working and reading it out loud",
+      "role": "user",
+      "timestamp": "2025-05-13T10:30:36.250057"
+    },
+    {
+      "content": "Typing in the box and hitting enter. is working correctly",
+      "role": "user",
+      "timestamp": "2025-05-13T10:31:30.808481"
+    }
+  ],
+  "transcript": "\n\nParticipant: I'm going to another test interview to verify verify  that we are good to go\n\nModerator: It sounds like you are actively involved in the testing process. Can you share a bit more about what specifically you are looking to verify in this upcoming test interview?\n\nParticipant: a lot of things I want it best to fight like the  I want to verify the\n\nModerator: It seems like there might be some important details missing in your response. Could you elaborate on what exactly you mean by \"a lot of things I want it best to fight like the I want to verify the\"? What are some specific aspects or functionalities that you are hoping to verify during this upcoming test interview?\n\nParticipant: hello\n\nParticipant: I'm hoping to verify that the speech to text is capturing what I'm saying which it is very good\n\nParticipant: It needs to send my reply to the langchain conversation to get the next part of the conversation then TTS it to me then start listening\n\nParticipant: I don't have feedback that it is listening to me. I am typing this. I am going to reload and see if we get the LangChain conversation parts that we are not gettin here.\n\nParticipant: Are you going to the LangChain Conversaton and conversation history to get the next part of the interview? Can you check?\n\nParticipant: I want to verify that the speech to Texas capturing what I say that it is being sent to the land chain model for a second part of the conversation that the next question is being sent to the transcript and the text to speech is working and reading it out loud\n\nParticipant: Typing in the box and hitting enter. is working correctly",
+  "analysis": null,
+  "created_at": "2025-05-13T10:14:50.667321",
+  "updated_at": "2025-05-13T10:31:41.618430"
+}

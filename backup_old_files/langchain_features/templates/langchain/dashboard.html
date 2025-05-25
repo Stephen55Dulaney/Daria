@@ -1,0 +1,115 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Prompt Manager Dashboard - DARIA{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="header">
+        <h1>DARIA Prompt Manager Dashboard</h1>
+        <p class="lead">Manage, evaluate, and improve your interview agent prompts</p>
+    </div>
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5>Available Prompts</h5>
+                </div>
+                <div class="card-body">
+                    {% if prompts and prompts|length > 0 %}
+                        <div class="list-group">
+                            {% for prompt in prompts %}
+                                <a href="/prompts/{{ prompt }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                                    {{ prompt }}
+                                    <span class="badge bg-primary rounded-pill">
+                                        <i class="fas fa-chevron-right"></i>
+                                    </span>
+                                </a>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        <div class="text-center py-4">
+                            <p>No prompts available yet</p>
+                            <a href="/prompts/create" class="btn btn-primary mt-2">
+                                <i class="fas fa-plus me-2"></i> Create First Prompt
+                            </a>
+                        </div>
+                    {% endif %}
+                </div>
+                <div class="card-footer text-end">
+                    {% if prompts and prompts|length > 0 %}
+                        <a href="/prompts/create" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i> Create Prompt
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-6">
+            <div class="card h-100">
+                <div class="card-header">
+                    <h5>Quick Actions</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <div class="d-grid">
+                                <a href="/interview_test" class="btn btn-outline-primary">
+                                    <i class="fas fa-vial me-2"></i>
+                                    Test Interview
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-grid">
+                                <a href="/interview_setup" class="btn btn-outline-primary">
+                                    <i class="fas fa-cog me-2"></i>
+                                    Setup Interview
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-grid">
+                                <a href="/interview_archive" class="btn btn-outline-primary">
+                                    <i class="fas fa-archive me-2"></i>
+                                    Archives
+                                </a>
+                            </div>
+                        </div>
+                        <div class="col-6">
+                            <div class="d-grid">
+                                <a href="/prompts/" class="btn btn-outline-primary">
+                                    <i class="fas fa-comment-dots me-2"></i>
+                                    Manage Prompts
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5>About the Prompt Manager</h5>
+                </div>
+                <div class="card-body">
+                    <p>The DARIA Prompt Manager allows you to:</p>
+                    <ul>
+                        <li><strong>Create and edit</strong> structured prompts for different agent personas</li>
+                        <li><strong>Track performance metrics</strong> and score prompts based on effectiveness</li>
+                        <li><strong>Evaluate prompt versions</strong> with a comprehensive scoring system</li>
+                        <li><strong>Improve prompts</strong> based on feedback and actual usage</li>
+                        <li><strong>Maintain version history</strong> to revert to previous versions if needed</li>
+                    </ul>
+                    <p>This system is designed to help you iterate and improve on prompt engineering through systematic evaluation and feedback.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

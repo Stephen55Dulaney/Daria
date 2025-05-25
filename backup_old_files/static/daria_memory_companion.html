@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA - Your Project Companion</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        .chat-container {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            background-color: white;
+            padding: 1rem;
+        }
+        
+        .message {
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            border-radius: 0.5rem;
+            max-width: 80%;
+        }
+        
+        .user-message {
+            background-color: #e9ecef;
+            margin-left: auto;
+        }
+        
+        .daria-message {
+            background-color: #d4edda;
+        }
+        
+        .memory-panel {
+            height: 500px;
+            overflow-y: auto;
+            border: 1px solid #dee2e6;
+            border-radius: 0.5rem;
+            background-color: white;
+            padding: 1rem;
+        }
+        
+        .memory-section {
+            margin-bottom: 1.5rem;
+        }
+        
+        .memory-section h5 {
+            border-bottom: 1px solid #dee2e6;
+            padding-bottom: 0.5rem;
+            margin-bottom: 0.75rem;
+        }
+        
+        .boot-sequence {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            color: #d4edda;
+            font-family: monospace;
+            padding: 2rem;
+            overflow-y: auto;
+        }
+        
+        .cursor-blink {
+            animation: blink 1s infinite;
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+        
+        .timeline-item {
+            position: relative;
+            padding-left: 30px;
+            margin-bottom: 10px;
+        }
+        
+        .timeline-item:before {
+            content: '';
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background-color: #6c757d;
+        }
+        
+        .timeline-item:after {
+            content: '';
+            position: absolute;
+            left: 5px;
+            top: 12px;
+            height: calc(100% + 10px);
+            border-left: 2px solid #6c757d;
+        }
+        
+        .timeline-item:last-child:after {
+            display: none;
+        }
+        
+        .loader {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 3px solid rgba(0,0,0,.1);
+            border-radius: 50%;
+            border-top-color: #3498db;
+            animation: spin 1s ease-in-out infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .thinking {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            font-style: italic;
+            color: #6c757d;
+        }
+    </style>
+</head>
+<body>
+    <!-- Boot Sequence Screen -->
+    <div id="bootSequence" class="boot-sequence">
+        <div id="bootContent"></div>
+        <div id="bootCursor" class="cursor-blink">_</div>
+    </div>
+
+    <div class="container py-5">
+        <div class="row mb-4">
+            <div class="col">
+                <h1 class="display-5 fw-bold text-center">DARIA <small class="text-muted">Your Project Companion</small></h1>
+                <p class="text-center lead">The research assistant that remembers your project journey across sessions</p>
+            </div>
+        </div>
+        
+        <div class="row">
+            <!-- Chat Interface -->
+            <div class="col-lg-7">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-white">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <h4 class="mb-0">Conversation</h4>
+                            <div>
+                                <select id="modelSelector" class="form-select form-select-sm me-2" style="display: inline-block; width: auto;">
+                                    <option value="openai:gpt-4o-mini">GPT-4o Mini</option>
+                                    <option value="openai:gpt-4o">GPT-4o</option>
+                                    <option value="anthropic:claude-3-haiku-20240307">Claude 3 Haiku</option>
+                                    <option value="anthropic:claude-3-sonnet-20240229">Claude 3 Sonnet</option>
+                                </select>
+                                <button id="testConnectionBtn" class="btn btn-sm btn-outline-info me-2">Test API</button>
+                                <button id="resetButton" class="btn btn-sm btn-outline-secondary">New Day Simulation</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="chatContainer" class="chat-container mb-3"></div>
+                        <div class="input-group">
+                            <input type="text" id="userInput" class="form-control" placeholder="Ask Daria about your project...">
+                            <button id="sendButton" class="btn btn-primary">Send</button>
+                        </div>
+                        <div class="form-text text-muted mt-1">
+                            Daria is connected to a real LLM. API responses may take a moment to process.
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Memory Journal -->
+            <div class="col-lg-5">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-white">
+                        <h4 class="mb-0">Memory Journal</h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="memory-panel">
+                            <div class="memory-section">
+                                <h5>Project Overview</h5>
+                                <p id="projectOverview">Loading project data...</p>
+                            </div>
+                            
+                            <div class="memory-section">
+                                <h5>Current Sprint</h5>
+                                <p id="currentSprint">Loading...</p>
+                            </div>
+                            
+                            <div class="memory-section">
+                                <h5>Timeline</h5>
+                                <div id="timelineContainer">
+                                    <!-- Timeline items will be added dynamically -->
+                                    <p class="text-center"><small>Loading timeline...</small></p>
+                                </div>
+                            </div>
+                            
+                            <div class="memory-section">
+                                <h5>Opportunities</h5>
+                                <ul id="opportunitiesList" class="list-group list-group-flush">
+                                    <!-- Opportunities will be added dynamically -->
+                                    <p class="text-center"><small>Loading opportunities...</small></p>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // DOM elements
+        const chatContainer = document.getElementById('chatContainer');
+        const userInput = document.getElementById('userInput');
+        const sendButton = document.getElementById('sendButton');
+        const resetButton = document.getElementById('resetButton');
+        const bootSequence = document.getElementById('bootSequence');
+        const bootContent = document.getElementById('bootContent');
+        const projectOverview = document.getElementById('projectOverview');
+        const currentSprint = document.getElementById('currentSprint');
+        const timelineContainer = document.getElementById('timelineContainer');
+        const opportunitiesList = document.getElementById('opportunitiesList');
+        const modelSelector = document.getElementById('modelSelector');
+        const testConnectionBtn = document.getElementById('testConnectionBtn');
+
+        // Project data
+        let projectData = null;
+        
+        // Helper function to get color for priority badge
+        function getPriorityColor(priority) {
+            switch(priority.toLowerCase()) {
+                case 'high': return 'danger';
+                case 'medium': return 'warning';
+                case 'low': return 'info';
+                default: return 'secondary';
+            }
+        }
+
+        // Initialize memory journal content
+        async function initializeMemoryJournal() {
+            try {
+                const response = await fetch('http://localhost:5030/api/memory_companion/project_data');
+                projectData = await response.json();
+                
+                projectOverview.textContent = projectData.overview;
+                currentSprint.textContent = projectData.currentSprint;
+                
+                // Clear existing content
+                timelineContainer.innerHTML = '';
+                opportunitiesList.innerHTML = '';
+                
+                // Add timeline items
+                projectData.timeline.forEach(item => {
+                    const timelineItem = document.createElement('div');
+                    timelineItem.classList.add('timeline-item');
+                    timelineItem.innerHTML = `<strong>${item.date}</strong>: ${item.event}`;
+                    timelineContainer.appendChild(timelineItem);
+                });
+                
+                // Add opportunities
+                projectData.opportunities.forEach(opp => {
+                    const li = document.createElement('li');
+                    li.classList.add('list-group-item');
+                    li.innerHTML = `<strong>${opp.id}: ${opp.title}</strong> <span class="badge bg-${getPriorityColor(opp.priority)}">${opp.priority}</span><p class="mb-0 small text-muted">${opp.description}</p>`;
+                    opportunitiesList.appendChild(li);
+                });
+                
+            } catch (error) {
+                console.error('Error loading project data:', error);
+                
+                // Display error message in memory journal sections
+                projectOverview.innerHTML = '<span class="text-danger">Error loading project data. Please refresh.</span>';
+                currentSprint.innerHTML = '<span class="text-danger">Error loading sprint data.</span>';
+                timelineContainer.innerHTML = '<span class="text-danger">Error loading timeline data.</span>';
+                opportunitiesList.innerHTML = '<span class="text-danger">Error loading opportunities data.</span>';
+            }
+        }
+
+        // Function to add a message to the chat
+        function addMessage(text, sender) {
+            const message = document.createElement('div');
+            message.classList.add('message');
+            message.classList.add(sender === 'user' ? 'user-message' : 'daria-message');
+            message.textContent = text;
+            chatContainer.appendChild(message);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Function to show thinking indicator
+        function showThinking() {
+            const thinking = document.createElement('div');
+            thinking.id = 'thinking';
+            thinking.classList.add('thinking');
+            thinking.innerHTML = '<div class="spinner-border spinner-border-sm" role="status"></div> Daria is thinking...';
+            chatContainer.appendChild(thinking);
+            chatContainer.scrollTop = chatContainer.scrollHeight;
+        }
+        
+        // Function to hide thinking indicator
+        function hideThinking() {
+            const thinking = document.getElementById('thinking');
+            if (thinking) {
+                thinking.remove();
+            }
+        }
+
+        // Function to simulate Daria's boot sequence
+        function runBootSequence() {
+            bootSequence.style.display = 'block';
+            bootContent.innerHTML = '';
+            
+            const bootLines = [
+                "Initializing DARIA Memory System...",
+                "Loading project data...",
+                "Project: " + (projectData ? projectData.name : "Daria Interview Tool"),
+                "Reading memory journal...",
+                "Accessing LLM providers...",
+                "Establishing API connections...",
+                "Current model: " + modelSelector.value,
+                "Preparing conversation interface...",
+                "Memory restoration complete.",
+                "Hello! I'm Daria, your project companion."
+            ];
+            
+            let lineIndex = 0;
+            const typeInterval = setInterval(() => {
+                if (lineIndex < bootLines.length) {
+                    bootContent.innerHTML += bootLines[lineIndex] + "<br>";
+                    bootContent.scrollTop = bootContent.scrollHeight;
+                    lineIndex++;
+                } else {
+                    clearInterval(typeInterval);
+                    setTimeout(() => {
+                        bootSequence.style.display = 'none';
+                        
+                        // Add Daria's greeting message and get first response from API
+                        showThinking();
+                        getApiResponse("Hello! I've just booted up. Can you remind me what we're working on?").then(response => {
+                            hideThinking();
+                            addMessage(response, 'daria');
+                        }).catch(error => {
+                            hideThinking();
+                            addMessage("Hello! I seem to be having trouble connecting to my memory systems. Let me try again in a moment.", 'daria');
+                            console.error('Error getting initial response:', error);
+                        });
+                    }, 1500);
+                }
+            }, 300);
+        }
+
+        // Function to get LLM response from API
+        async function getApiResponse(message) {
+            const [provider, model] = modelSelector.value.split(':');
+            
+            const response = await fetch('http://localhost:5030/api/memory_companion/chat', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ 
+                    message,
+                    provider,
+                    model
+                }),
+            });
+            
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            return data.response;
+        }
+
+        // Process user message and get Daria's response
+        async function processMessage(message) {
+            if (!message.trim()) return;
+            
+            // Add user message to chat
+            addMessage(message, 'user');
+            
+            // Clear input field
+            userInput.value = '';
+            
+            // Show thinking indicator
+            showThinking();
+            
+            try {
+                // Get response from API
+                const response = await getApiResponse(message);
+                
+                // Hide thinking indicator
+                hideThinking();
+                
+                // Add Daria's response
+                addMessage(response, 'daria');
+                
+                // Update memory journal (refetch data)
+                initializeMemoryJournal();
+                
+            } catch (error) {
+                console.error('Error processing message:', error);
+                hideThinking();
+                addMessage("I'm sorry, I'm having trouble connecting to my memory systems. Please try again later.", 'daria');
+            }
+        }
+
+        // Event listeners
+        sendButton.addEventListener('click', () => {
+            processMessage(userInput.value);
+        });
+
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                processMessage(userInput.value);
+            }
+        });
+
+        resetButton.addEventListener('click', () => {
+            // Clear chat
+            chatContainer.innerHTML = '';
+            
+            // Run boot sequence again
+            runBootSequence();
+        });
+
+        // Test API connection
+        testConnectionBtn.addEventListener('click', async () => {
+            try {
+                const response = await fetch('http://localhost:5030/api/memory_companion/test');
+                const data = await response.json();
+                
+                if (response.ok) {
+                    alert(`API Test: ${data.message} (${data.version})`);
+                } else {
+                    alert(`API Error: ${data.error || 'Unknown error'}`);
+                }
+            } catch (error) {
+                alert(`Connection Error: ${error.message}\n\nThe Memory Companion API might not be running. Please check the server logs.`);
+            }
+        });
+
+        // Initialize the page
+        window.addEventListener('DOMContentLoaded', async () => {
+            await initializeMemoryJournal();
+            runBootSequence();
+        });
+    </script>
+</body>
+</html> 

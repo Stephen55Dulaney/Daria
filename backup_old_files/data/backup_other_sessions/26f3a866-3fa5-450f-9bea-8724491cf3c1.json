@@ -1,0 +1,98 @@
+{
+  "id": "26f3a866-3fa5-450f-9bea-8724491cf3c1",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "02ae4caa-99a9-4d9a-a803-7a36bb29e4d2",
+      "content": "I wonder what prompts are using if we could maybe change your prompt to be an interview debug prompt so let's think about that",
+      "role": "user",
+      "timestamp": "2025-05-14T09:27:45.604036"
+    },
+    {
+      "id": "e10f1ca1-217b-484d-876e-db33b220fdbd",
+      "content": "Could you clarify what you mean by an \"interview debug prompt\"? Are you looking for prompts to help with debugging issues that arise during an interview process?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:27:46.402956"
+    },
+    {
+      "id": "9ffdaf61-0818-494a-8585-eee5322866cd",
+      "content": "yes this is a comment for cursor when I paste these into the comments cursor what kind of debug prop can we put into the the tool the Daria debug tool on debug underscore interview underscore flow and if we had a debug prompt it can ask me questions or the interview could be focused on what's working and what's not and so that we could use that transcript and the developing console log to help you understand what's working and how we can fix it better",
+      "role": "user",
+      "timestamp": "2025-05-14T09:28:30.903771"
+    },
+    {
+      "id": "0042ca06-d29b-4b58-b7c5-e1b2be0a4f9c",
+      "content": "It sounds like you're mentioning using a debugging tool like Daria Debug Tool for interviews. Could you provide more details on what specific debugging features or prompts you are looking to incorporate into the tool for interview purposes? How do you envision this tool assisting in understanding what's working and what needs improvement during interviews?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:28:32.167569"
+    },
+    {
+      "id": "14d0abd1-94f4-41ca-b01b-609732696334",
+      "content": "what prompt is used for this session 26f3a866-3fa5-450f-9bea-8724491cf3c1",
+      "role": "user",
+      "timestamp": "2025-05-14T09:29:06.200743"
+    },
+    {
+      "id": "9cf1b93f-35a8-4a8a-a78e-1e2cbc600c1b",
+      "content": "For this session, the prompt used is \"General Interview\". It's designed to gather relevant information from participants on various topics related to interviews. Can you please share your thoughts or experiences on interviews?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:29:06.997365"
+    },
+    {
+      "id": "63cfe347-505e-47b2-9d5e-e4ebc3bb425e",
+      "content": "Is it in the prompt library?",
+      "role": "user",
+      "timestamp": "2025-05-14T09:29:27.040966"
+    },
+    {
+      "id": "650106f1-f5bb-421b-93fd-4ff2fb960665",
+      "content": "No, the prompt library does not have a specific prompt for \"General Interview.\" However, I can assist you with conducting an interview on this topic. What specific information are you looking to gather or discuss in this interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:29:28.122271"
+    },
+    {
+      "id": "a10bbd24-18fd-4f45-9330-a3318a87aa89",
+      "content": "What would a nice debuggin interview prompt look like?",
+      "role": "user",
+      "timestamp": "2025-05-14T09:29:55.843825"
+    },
+    {
+      "id": "9df80b82-9aa4-4af3-8385-d2182d318e22",
+      "content": "A good debugging interview prompt should present a realistic scenario where the candidate needs to identify and fix a specific issue in a piece of code. It should challenge the candidate to demonstrate their problem-solving skills and ability to troubleshoot effectively. The prompt should provide enough context for the candidate to understand the problem but also leave room for them to ask clarifying questions. Additionally, the prompt could include multiple layers or complexities to test the candidate's depth of debugging knowledge and experience. \n\nDo you have any specific examples of debugging interview prompts that you found particularly effective or challenging?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:29:57.211269"
+    },
+    {
+      "id": "fa26d202-62d3-49b2-9d52-6ed41004239a",
+      "content": "Do you have the ability to search the web?",
+      "role": "user",
+      "timestamp": "2025-05-14T09:30:55.298235"
+    },
+    {
+      "id": "42850056-10d1-4ad0-82a9-93e5672e3a8e",
+      "content": "I don't have the ability to search the web. However, I can provide information and answer questions based on the knowledge programmed into me. How can I assist you today in our interview on the topic of 'General Interview'?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:30:56.149286"
+    },
+    {
+      "id": "d430067a-e04a-458e-997c-017fa6f2f16f",
+      "content": "No I don't have specific debuggint prompt but this is our test script that we want to make the prompt support: \"## Test Script for Daria Interview Tool\n\n### Phase 1: Debug Interview Flow Tool\n1. Open http://127.0.0.1:5025/static/debug_interview_flow.html?port=5025\n2. Click \"Connect\" (no need to specify a session ID, it will create one)\n3. Verify the welcome message appears and TTS plays it\n4. Speak your test question: \"I would like to verify that we can do an interview and everything works for about three questions\"\n5. Verify STT captures your speech correctly\n6. Wait for the AI response (should now work with LangChain enabled)\n7. Verify the TTS plays the AI response\n8. Speak another question like \"What kind of information can you help me with during this interview?\"\n9. Verify the complete cycle works for 3-4 questions\n\n### Phase 2: Remote Interview Testing\n1. Go to http://127.0.0.1:5025/discussion_guides to select a guide\n2. Select one of the guides and create a new session\n3. Copy the session ID from the URL\n4. Open http://127.0.0.1:5025/interview/[SESSION_ID]?remote=true&accepted=true in a new tab\n5. Verify the welcome message appears and TTS plays it\n6. Test speaking responses and verify STT captures them correctly\n7. Test typing responses in the text input and clicking the send button\n8. Verify the AI responds appropriately to each input\n\n### Phase 3: Monitor Interview Testing\n1. While keeping the remote interview tab open, open http://127.0.0.1:5025/monitor_interview/[SESSION_ID] in another tab\n2. Verify that the monitor shows the conversation history correctly\n3. Continue the conversation in the remote interview tab\n4. Verify that the monitor updates in real-time\n5. Try sending a message from the monitor and verify it appears in the remote interview\n\n### Debugging Tips\n\nIf you encounter any issues:\n\n1. Check the browser console for JavaScript errors\n2. Look at the server logs for any backend issues\n3. Verify WebSocket connections are established correctly\n4. Check that the audio visualization shows microphone activity\n5. Ensure permissions for microphone access are granted\n6. Verify TTS audio is playing correctly\n\nThe most important thing was starting the server with the `--use-langchain` flag, which you were missing before. Now the LangChain integration is enabled, and you should get proper AI responses.\n\"",
+      "role": "user",
+      "timestamp": "2025-05-14T09:31:32.585170"
+    },
+    {
+      "id": "d881b3ae-4ff5-4d52-8885-bf9bf1be46a7",
+      "content": "Thank you for sharing the detailed test script for the Daria Interview Tool. It seems like you have a structured approach towards testing the tool's functionality in different phases. \n\nCould you elaborate on any specific challenges or successes you have encountered while conducting these testing phases for the interview tool?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T09:31:33.681189"
+    }
+  ],
+  "transcript": "\n\nParticipant: I wonder what prompts are using if we could maybe change your prompt to be an interview debug prompt so let's think about that\n\nModerator: Could you clarify what you mean by an \"interview debug prompt\"? Are you looking for prompts to help with debugging issues that arise during an interview process?\n\nParticipant: yes this is a comment for cursor when I paste these into the comments cursor what kind of debug prop can we put into the the tool the Daria debug tool on debug underscore interview underscore flow and if we had a debug prompt it can ask me questions or the interview could be focused on what's working and what's not and so that we could use that transcript and the developing console log to help you understand what's working and how we can fix it better\n\nModerator: It sounds like you're mentioning using a debugging tool like Daria Debug Tool for interviews. Could you provide more details on what specific debugging features or prompts you are looking to incorporate into the tool for interview purposes? How do you envision this tool assisting in understanding what's working and what needs improvement during interviews?\n\nParticipant: what prompt is used for this session 26f3a866-3fa5-450f-9bea-8724491cf3c1\n\nModerator: For this session, the prompt used is \"General Interview\". It's designed to gather relevant information from participants on various topics related to interviews. Can you please share your thoughts or experiences on interviews?\n\nParticipant: Is it in the prompt library?\n\nModerator: No, the prompt library does not have a specific prompt for \"General Interview.\" However, I can assist you with conducting an interview on this topic. What specific information are you looking to gather or discuss in this interview?\n\nParticipant: What would a nice debuggin interview prompt look like?\n\nModerator: A good debugging interview prompt should present a realistic scenario where the candidate needs to identify and fix a specific issue in a piece of code. It should challenge the candidate to demonstrate their problem-solving skills and ability to troubleshoot effectively. The prompt should provide enough context for the candidate to understand the problem but also leave room for them to ask clarifying questions. Additionally, the prompt could include multiple layers or complexities to test the candidate's depth of debugging knowledge and experience. \n\nDo you have any specific examples of debugging interview prompts that you found particularly effective or challenging?\n\nParticipant: Do you have the ability to search the web?\n\nModerator: I don't have the ability to search the web. However, I can provide information and answer questions based on the knowledge programmed into me. How can I assist you today in our interview on the topic of 'General Interview'?\n\nParticipant: No I don't have specific debuggint prompt but this is our test script that we want to make the prompt support: \"## Test Script for Daria Interview Tool\n\n### Phase 1: Debug Interview Flow Tool\n1. Open http://127.0.0.1:5025/static/debug_interview_flow.html?port=5025\n2. Click \"Connect\" (no need to specify a session ID, it will create one)\n3. Verify the welcome message appears and TTS plays it\n4. Speak your test question: \"I would like to verify that we can do an interview and everything works for about three questions\"\n5. Verify STT captures your speech correctly\n6. Wait for the AI response (should now work with LangChain enabled)\n7. Verify the TTS plays the AI response\n8. Speak another question like \"What kind of information can you help me with during this interview?\"\n9. Verify the complete cycle works for 3-4 questions\n\n### Phase 2: Remote Interview Testing\n1. Go to http://127.0.0.1:5025/discussion_guides to select a guide\n2. Select one of the guides and create a new session\n3. Copy the session ID from the URL\n4. Open http://127.0.0.1:5025/interview/[SESSION_ID]?remote=true&accepted=true in a new tab\n5. Verify the welcome message appears and TTS plays it\n6. Test speaking responses and verify STT captures them correctly\n7. Test typing responses in the text input and clicking the send button\n8. Verify the AI responds appropriately to each input\n\n### Phase 3: Monitor Interview Testing\n1. While keeping the remote interview tab open, open http://127.0.0.1:5025/monitor_interview/[SESSION_ID] in another tab\n2. Verify that the monitor shows the conversation history correctly\n3. Continue the conversation in the remote interview tab\n4. Verify that the monitor updates in real-time\n5. Try sending a message from the monitor and verify it appears in the remote interview\n\n### Debugging Tips\n\nIf you encounter any issues:\n\n1. Check the browser console for JavaScript errors\n2. Look at the server logs for any backend issues\n3. Verify WebSocket connections are established correctly\n4. Check that the audio visualization shows microphone activity\n5. Ensure permissions for microphone access are granted\n6. Verify TTS audio is playing correctly\n\nThe most important thing was starting the server with the `--use-langchain` flag, which you were missing before. Now the LangChain integration is enabled, and you should get proper AI responses.\n\"\n\nModerator: Thank you for sharing the detailed test script for the Daria Interview Tool. It seems like you have a structured approach towards testing the tool's functionality in different phases. \n\nCould you elaborate on any specific challenges or successes you have encountered while conducting these testing phases for the interview tool?",
+  "analysis": null,
+  "created_at": "2025-05-14T09:27:30.273895",
+  "updated_at": "2025-05-14T09:31:33.681422"
+}

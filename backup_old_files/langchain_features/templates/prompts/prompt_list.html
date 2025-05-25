@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block title %}Prompt Manager - DARIA{% endblock %}
+
+{% block breadcrumbs %}
+<li class="breadcrumb-item active" aria-current="page">Prompt Manager</li>
+{% endblock %}
+
+{% block inner_content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>Prompt Manager</h1>
+    <a href="{{ url_for('prompts.new_prompt') }}" class="btn btn-primary">
+        <i class="bi bi-plus-circle me-2"></i> New Prompt
+    </a>
+</div>
+
+<div class="row">
+    {% if agents %}
+        {% for agent in agents %}
+            <div class="col-md-6 col-lg-4 mb-4">
+                <div class="card h-100">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">{{ agent.name }}</h5>
+                        <span class="badge bg-primary">v{{ agent.version }}</span>
+                    </div>
+                    <div class="card-body">
+                        <p><strong>Role:</strong> {{ agent.role }}</p>
+                        <p>{{ agent.description }}</p>
+                        
+                        {% if agent.average_score is not none %}
+                            <div class="d-flex align-items-center mt-3">
+                                <div class="me-2">
+                                    <strong>Rating:</strong>
+                                </div>
+                                <div class="d-flex">
+                                    {% for i in range(1, 6) %}
+                                        <i class="bi bi-star-fill {% if i <= agent.average_score|round(0, 'floor') %}text-warning{% else %}text-muted{% endif %} me-1"></i>
+                                    {% endfor %}
+                                </div>
+                                <span class="ms-2 text-muted">({{ agent.total_sessions }} reviews)</span>
+                            </div>
+                        {% endif %}
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('prompts.view_prompt', agent=agent.name) }}" class="btn btn-sm btn-outline-primary">View Details</a>
+                        <a href="{{ url_for('prompts.edit_prompt', agent=agent.name) }}" class="btn btn-sm btn-primary">Edit</a>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+    {% else %}
+        <div class="col-12">
+            <div class="alert alert-info">
+                <p>No prompts have been created yet. <a href="{{ url_for('prompts.new_prompt') }}">Create your first prompt</a></p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %} 

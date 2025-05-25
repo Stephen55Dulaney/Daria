@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}View Persona{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-6">
+        <a href="{{ url_for('home') }}" class="text-blue-600 hover:text-blue-800">← Back to Home</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-900">Persona: {{ persona.project_name }}</h1>
+            <div class="flex space-x-4">
+                <button id="downloadBtn" class="bg-green-600 text-white px-4 py-2 rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-offset-2">
+                    Download
+                </button>
+                <button id="shareBtn" class="bg-purple-600 text-white px-4 py-2 rounded-md hover:bg-purple-700 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2">
+                    Share
+                </button>
+            </div>
+        </div>
+        
+        <div class="text-sm text-gray-500 mb-6">
+            Created: {{ persona.created_at }}
+        </div>
+        
+        <div id="personaContent" class="space-y-8">
+            <div class="demographics-section bg-blue-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-blue-800 mb-4">Demographics</h2>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Age Range</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.age_range }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Gender</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.gender }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Occupation</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.occupation }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Location</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.location }}</p>
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-blue-700">Education</p>
+                        <p class="text-gray-600">{{ persona.persona_data.demographics.education }}</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="goals-section bg-green-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-green-800 mb-4">Goals & Motivations</h2>
+                <div class="space-y-4">
+                    {% for goal in persona.persona_data.goals %}
+                    <div class="goal-card bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-green-700 mb-2">{{ goal.goal }}</h3>
+                        <p class="text-gray-600 mb-2">{{ goal.motivation }}</p>
+                        <div class="mt-2">
+                            <p class="text-sm font-medium text-green-600">Supporting Quotes:</p>
+                            <ul class="list-disc list-inside text-sm text-gray-600">
+                                {% for quote in goal.supporting_quotes %}
+                                <li>{{ quote }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="behaviors-section bg-yellow-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-yellow-800 mb-4">Behaviors & Habits</h2>
+                <div class="space-y-4">
+                    {% for behavior in persona.persona_data.behaviors %}
+                    <div class="behavior-card bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-yellow-700 mb-2">{{ behavior.behavior }}</h3>
+                        <p class="text-gray-600 mb-2">Frequency: {{ behavior.frequency }}</p>
+                        <p class="text-gray-600 mb-2">Context: {{ behavior.context }}</p>
+                        <div class="mt-2">
+                            <p class="text-sm font-medium text-yellow-600">Supporting Quotes:</p>
+                            <ul class="list-disc list-inside text-sm text-gray-600">
+                                {% for quote in behavior.supporting_quotes %}
+                                <li>{{ quote }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="pain-points-section bg-red-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-red-800 mb-4">Pain Points</h2>
+                <div class="space-y-4">
+                    {% for pain_point in persona.persona_data.pain_points %}
+                    <div class="pain-point-card bg-white p-4 rounded-lg shadow-sm">
+                        <h3 class="font-semibold text-red-700 mb-2">{{ pain_point.pain_point }}</h3>
+                        <p class="text-gray-600 mb-2">Impact: {{ pain_point.impact }}</p>
+                        <div class="mt-2">
+                            <p class="text-sm font-medium text-red-600">Supporting Quotes:</p>
+                            <ul class="list-disc list-inside text-sm text-gray-600">
+                                {% for quote in pain_point.supporting_quotes %}
+                                <li>{{ quote }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="needs-section bg-purple-50 p-6 rounded-lg shadow-md">
+                <h2 class="text-2xl font-bold text-purple-800 mb-4">Needs & Preferences</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div>
+                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Needs</h3>
+                        <div class="space-y-4">
+                            {% for need in persona.persona_data.needs %}
+                            <div class="need-card bg-white p-4 rounded-lg shadow-sm">
+                                <h4 class="font-semibold text-purple-600 mb-2">{{ need.need }}</h4>
+                                <p class="text-gray-600 mb-2">Priority: {{ need.priority }}</p>
+                                <div class="mt-2">
+                                    <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
+                                    <ul class="list-disc list-inside text-sm text-gray-600">
+                                        {% for quote in need.supporting_quotes %}
+                                        <li>{{ quote }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                    <div>
+                        <h3 class="text-xl font-semibold text-purple-700 mb-4">Preferences</h3>
+                        <div class="space-y-4">
+                            {% for preference in persona.persona_data.preferences %}
+                            <div class="preference-card bg-white p-4 rounded-lg shadow-sm">
+                                <h4 class="font-semibold text-purple-600 mb-2">{{ preference.preference }}</h4>
+                                <p class="text-gray-600 mb-2">Reason: {{ preference.reason }}</p>
+                                <div class="mt-2">
+                                    <p class="text-sm font-medium text-purple-600">Supporting Quotes:</p>
+                                    <ul class="list-disc list-inside text-sm text-gray-600">
+                                        {% for quote in preference.supporting_quotes %}
+                                        <li>{{ quote }}</li>
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const downloadBtn = document.getElementById('downloadBtn');
+    const shareBtn = document.getElementById('shareBtn');
+    
+    // Download functionality
+    downloadBtn.addEventListener('click', function() {
+        window.location.href = window.location.href + '?download=true';
+    });
+    
+    // Share functionality
+    shareBtn.addEventListener('click', function() {
+        // Get the current URL
+        const url = window.location.href;
+        
+        // Check if the browser supports the clipboard API
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+            navigator.clipboard.writeText(url)
+                .then(() => {
+                    alert('Link copied to clipboard!');
+                })
+                .catch(err => {
+                    console.error('Failed to copy: ', err);
+                    alert('Failed to copy link to clipboard');
+                });
+        } else {
+            // Fallback for browsers that don't support clipboard API
+            const textarea = document.createElement('textarea');
+            textarea.value = url;
+            document.body.appendChild(textarea);
+            textarea.select();
+            document.execCommand('copy');
+            document.body.removeChild(textarea);
+            alert('Link copied to clipboard!');
+        }
+    });
+});
+</script>
+{% endblock %} 

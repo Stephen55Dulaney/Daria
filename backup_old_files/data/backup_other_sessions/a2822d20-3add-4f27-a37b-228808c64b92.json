@@ -1,0 +1,38 @@
+{
+  "id": "a2822d20-3add-4f27-a37b-228808c64b92",
+  "guide_id": "431af968-a334-4dcd-9d2a-1e02d32785e6",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "wanted to test the speech to text system where I can see my response forming in there that's perfect  so I think that would work",
+      "role": "user",
+      "id": "59a67d15-8fa5-4f5f-af22-3106cf4cdc2f",
+      "timestamp": "2025-05-12T14:09:56.533601"
+    },
+    {
+      "content": "Can you tell me more about your experiences with the topic we've been discussing? How have those experiences shaped your perspective or influenced your actions in your personal or professional life?",
+      "role": "assistant",
+      "id": "a9c44772-ea94-4c9b-b2bb-9ea37a9aefa7",
+      "timestamp": "2025-05-12T14:09:57.254663"
+    },
+    {
+      "content": "okay well this response and your response where it shows what I'm saying in real time we could take that and put that in the bottom where the voice animation is if the voice animation is causing the errors on the interview page this would be a good substitute because this page is working correctly  so we should take lessons from what's working here and apply them I mean this is great I can see exactly what's going to go and I shut up and then it's going to go in the interview conversation",
+      "role": "user",
+      "id": "5d94e337-9464-411f-93ed-be178391db88",
+      "timestamp": "2025-05-12T14:10:41.172921"
+    },
+    {
+      "content": "Could you please tell me more about your experience with implementing new strategies in your previous role? How did you approach challenges and ensure successful outcomes?",
+      "role": "assistant",
+      "id": "6608809b-b0b1-4b1a-8dc9-0d04e76be98a",
+      "timestamp": "2025-05-12T14:10:42.117865"
+    }
+  ],
+  "transcript": "\n\nParticipant: wanted to test the speech to text system where I can see my response forming in there that's perfect  so I think that would work\n\nModerator: Can you tell me more about your experiences with the topic we've been discussing? How have those experiences shaped your perspective or influenced your actions in your personal or professional life?\n\nParticipant: okay well this response and your response where it shows what I'm saying in real time we could take that and put that in the bottom where the voice animation is if the voice animation is causing the errors on the interview page this would be a good substitute because this page is working correctly  so we should take lessons from what's working here and apply them I mean this is great I can see exactly what's going to go and I shut up and then it's going to go in the interview conversation\n\nModerator: Could you please tell me more about your experience with implementing new strategies in your previous role? How did you approach challenges and ensure successful outcomes?",
+  "analysis": null,
+  "created_at": "2025-05-12T14:09:41.246504",
+  "updated_at": "2025-05-12T14:10:42.118474"
+}

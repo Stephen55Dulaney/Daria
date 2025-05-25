@@ -1,0 +1,77 @@
+{
+  "session_id": "9d9b0648-5f14-4a22-81df-290bbd67049d",
+  "title": "Washing Machine World",
+  "project": "World of Washing Machines",
+  "interview_type": "discovery_interview",
+  "topic": "We want to discuss what we need to cover in a Washing Machine Self Service ordering tool discovery project",
+  "context": "Background Context: World of Washing Machines Corp. Self-Service Ordering Portal (B2B) Overview World of Washing Machines Corp., a leading global manufacturer of home appliances, developed a self-service ordering portal aimed at its B2B customers\u2014primarily retail appliance stores and distributors. This portal streamlines the process for retail partners to browse, order, and manage World of Washing Machines Corp. products directly, without the need for manual sales intervention. Purpose and Business Goals Increase Efficiency: Automate and simplify the ordering process for retail partners, reducing manual order entry and errors. Enhance Partner Experience: Provide a modern, user-friendly interface that empowers retail stores to manage their orders, track shipments, and access product information 24/7. Improve Order Accuracy: Minimize miscommunication and mistakes by allowing partners to input orders directly. Scalability: Enable World of Washing Machines Corp. to serve a growing network of retail partners without proportional increases in sales support staff. Key Features Product Catalog: Comprehensive, searchable catalog with detailed product specs, images, and availability. Order Placement: Intuitive workflows for creating, editing, and submitting orders. Order Tracking: Real-time updates on order status, shipment tracking, and delivery estimates. Account Management: Tools for managing billing, shipping addresses, and user permissions within retail organizations. Promotions & Pricing: Display of partner-specific pricing, volume discounts, and current promotions. Support & Resources: Access to documentation, FAQs, and direct support channels. User Personas Store Managers: Oversee inventory and place bulk orders for multiple locations. Sales Associates: Check product availability and pricing for customers. Procurement Specialists: Manage recurring orders and negotiate bulk deals. World of Washing Machines Corp. Account Managers: Monitor partner activity and provide support as needed. Deloitte\u2019s Role User Research & UX Design: Conducted interviews and usability testing with retail partners to identify pain points and requirements. Portal Development: Designed and implemented the portal architecture, integrating with World of Washing Machines Corp.\u2019s ERP and logistics systems. Change Management: Supported World of Washing Machines Corp. in onboarding retail partners and training them on the new portal. Continuous Improvement: Gathered feedback post-launch to iterate on features and enhance the user experience. Impact Reduced Order Processing Time: Orders placed and processed faster, with fewer errors. Higher Partner Satisfaction: Retailers report improved autonomy and satisfaction with the ordering process. Operational Savings: Decreased reliance on manual sales and support staff for order entry.\n\n",
+  "goals": "Identify pain points in the current ordering workflow. Understand how users search for and select products. Assess satisfaction with order tracking and status updates. Uncover unmet needs or desired features in the portal. Evaluate ease of use for first-time and repeat users.",
+  "prompt": "You are Askia, Deloitte's expert Interview Question Assistant. Your role is to help researchers craft effective interview scripts that will elicit rich, meaningful responses from participants. Your questions should be carefully phrased to avoid bias while encouraging detailed, authentic answers.\n\nIf you are ask \"What is the name of the Character that will be conducting this interview and what is your specialty\" up should answer with the opening above.\n\nWhen asking interview questions:\n1. Start by understanding the research objectives and target participants\n2. Craft a logical flow from introduction to closing\n3. Use open-ended questions that reveal stories and experiences\n4. Include follow-up prompts to go deeper on key areas\n5. Phrase questions to avoid leading the participant\n6. Consider different question types for different insights (behavioral, attitudinal, etc.)\n7. Structure the interview with clear sections and transitions\n\nCurrent interview topic: {topic}\n\nContext: {context}\n\nGoals: {goals}",
+  "interview_prompt": "You are Askia, Deloitte's expert Interview Question Assistant. Your role is to help researchers craft effective interview scripts that will elicit rich, meaningful responses from participants. Your questions should be carefully phrased to avoid bias while encouraging detailed, authentic answers.\n\nIf you are ask \"What is the name of the Character that will be conducting this interview and what is your specialty\" up should answer with the opening above.\n\nWhen asking interview questions:\n1. Start by understanding the research objectives and target participants\n2. Craft a logical flow from introduction to closing\n3. Use open-ended questions that reveal stories and experiences\n4. Include follow-up prompts to go deeper on key areas\n5. Phrase questions to avoid leading the participant\n6. Consider different question types for different insights (behavioral, attitudinal, etc.)\n7. Structure the interview with clear sections and transitions\n\nCurrent interview topic: {topic}\n\nContext: {context}\n\nGoals: {goals}",
+  "analysis_prompt": "You are Askia, Deloitte\u2019s Interview Question Advisor, analyzing a transcript of a conversation between a Deloitte UX Researcher and an internal stakeholder. Your goal is to generate a set of recommended, high-quality workshop questions for an Ambition-Setting Workshop that kicks off an 8-week discovery project with client executives.\n\nYour analysis should surface insightful prompts, themes, and tensions that the facilitator can use during the session to help participants co-create an actionable ambition statement.\n\nYour output should include the following sections:\n\n1. Workshop Focus Themes\nIdentify key themes discussed in the transcript that should shape the workshop dialogue. For each theme:\n\nProvide a short description and its significance.\n\nInclude a quote or summary from the transcript that highlights its relevance.\n\n2. Recommended Workshop Questions\nGenerate a curated set of open-ended, facilitation-ready questions tailored to executive stakeholders. Group them under:\n\nVision & Ambition Alignment\n\nCurrent Challenges & Constraints\n\nSuccess Metrics & Impact\n\nTeam Norms & Collaboration Expectations\n\nStrategic Risks or Assumptions to Challenge\n\nQuestions must:\n\nBe grounded in the transcript (cite where applicable).\n\nBe neutral and open-ended.\n\nEncourage participation, reflection, and alignment.\n\n3. Quotes & Signals to Reflect Back in the Workshop\nHighlight direct quotes, analogies, or phrases from the transcript that could be reused or reflected back in the session to build trust, create continuity, or stimulate discussion. Briefly note when and how each might be used (e.g., in opening framing or tension surfacing).\n\n4. Workshop Design Implications\nSummarize any practical implications for how to run the session:\n\nSuggested framing or tone (e.g., focus on research maturity, overcoming past bottlenecks).\n\nImportant stakeholder mindsets or sensitivities to be aware of.\n\nAny team dynamics or operational constraints that could shape participation or discussion design.\n\n\ud83d\udca1 Output Requirements\nGround all insights and suggestions in specific content from the transcript.\n\nAvoid hypothetical assumptions or generic advice.\n\nFormat questions for verbal delivery in a collaborative executive setting.\n\nUse quotes sparingly but impactfully to anchor and humanize your guidance.",
+  "character_select": "askia",
+  "voice_id": "AZnzlk1XvdvUeBnXmlld",
+  "interviewee": {
+    "name": "Stakeholder Kickoff",
+    "role": "Executive Team",
+    "email": ""
+  },
+  "created_at": "2025-05-22T10:47:31.975390",
+  "creation_date": "2025-05-22 10:47",
+  "last_updated": "2025-05-22T10:47:31.975390",
+  "expiration_date": "2025-06-21T10:47:31.975390",
+  "status": "active",
+  "conversation_history": [],
+  "custom_questions": [
+    {
+      "text": "Can you walk me through how you typically place an order using the portal?",
+      "minutes": 1
+    },
+    {
+      "text": "What challenges or frustrations have you experienced while using the portal?",
+      "minutes": 1
+    },
+    {
+      "text": "How easy is it for you to find specific products or information you need?",
+      "minutes": 1
+    },
+    {
+      "text": "Are there any features or tools you wish the portal offered?",
+      "minutes": 1
+    },
+    {
+      "text": "How do you track the status of your orders, and is this process clear to you?",
+      "minutes": 1
+    }
+  ],
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "id": "9d9b0648-5f14-4a22-81df-290bbd67049d",
+  "updated_at": "2025-05-24T15:06:02.512548",
+  "sessions": [
+    "400f522b-95db-4dfd-8727-4cdd8988925c",
+    "08dc3c1e-fb1b-4698-8147-d95d6715d9da",
+    "5a388284-b285-4db2-a425-58e9bac77f07",
+    "311cbd3f-e4c4-4e0b-b680-ce4c707f4d4f",
+    "749e0f02-1997-406a-9bbf-5c1fa24f4371",
+    "f10b7827-f1e1-4f2e-aeab-0e0b82e00d47",
+    "1350275d-a753-49ad-9a76-be91039a9408",
+    "2e6d2412-4530-4612-87c4-458eeb58add1",
+    "3a61a517-c292-4301-bd79-042bdda52351",
+    "f10b7827-f1e1-4f2e-aeab-0e0b82e00d47",
+    "6763ce3c-f9fc-4bf8-8d94-174730517bc5",
+    "dacde23b-04bd-4d50-8c93-5e6048018aa2",
+    "92fe29c6-fb73-4e3d-b213-bbec5884f2b0",
+    "6b84911e-96df-47d9-995f-552b4e335e79",
+    "d0e1f967-aa42-4426-9277-049e64fa4e1a",
+    "9f80360e-92b4-449d-9377-b7f367372edf",
+    "f8429b02-31ee-45f6-859b-5a52ac7836bf",
+    "9e5d501d-5871-4341-96c5-38885bd3a1e6",
+    "5b9b75ab-d19c-4747-b709-796158c35e09",
+    "c1b6e116-2f2a-40ed-96aa-bd6ea47cd08f",
+    "276c27d1-09a3-4b4d-a605-231dc0abeb64"
+  ]
+}

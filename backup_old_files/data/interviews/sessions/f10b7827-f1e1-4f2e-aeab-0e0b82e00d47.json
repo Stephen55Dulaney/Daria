@@ -1,0 +1,95 @@
+{
+  "id": "f10b7827-f1e1-4f2e-aeab-0e0b82e00d47",
+  "guide_id": "9d9b0648-5f14-4a22-81df-290bbd67049d",
+  "interviewee": {
+    "name": "Jason",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "825b6727-0441-4c22-a115-6a4be2eaa95e",
+      "content": "00:00 This is a test transcript.",
+      "role": "assistant",
+      "timestamp": "2025-05-22T22:02:32.162948"
+    },
+    {
+      "id": "efbf638c-d82c-4326-9701-11efad61d1fc",
+      "content": "01:00 Hello, I'm responding to the test transcript.",
+      "role": "user",
+      "timestamp": "2025-05-22T22:02:33.162948"
+    },
+    {
+      "id": "7765efa5-2d58-413f-ab35-c4fd09c59b6f",
+      "content": "02:00 Thank you for your response.",
+      "role": "assistant",
+      "timestamp": "2025-05-22T22:02:34.162948"
+    },
+    {
+      "id": "f6ef1c01-5c67-4dfe-b1b7-e84dce3d1df9",
+      "content": "Hello Jason, thank you for participating in this interview. To start, could you please describe the current process you follow when placing orders through the World of Washing Machines Corp. self-service ordering portal?",
+      "role": "assistant",
+      "timestamp": "2025-05-22T22:02:35.162948"
+    },
+    {
+      "id": "de01cc08-7ae8-4efe-b212-70a01e27a87b",
+      "content": "I check in every morning and the first thing I do is open the portal and I look for the shipments that are coming today and then after that I look for back orders and then at the very end of the day I go ahead and use the door to reorder what we sold that day.",
+      "role": "user",
+      "timestamp": "2025-05-22T22:02:36.162948"
+    },
+    {
+      "id": "dcff5863-b209-4750-9cb4-ecbf4018e6bd",
+      "content": "It sounds like you have a routine for using the ordering portal. Could you tell me more about the process of looking for shipments and back orders in the portal? How easy or challenging is it to find that information?",
+      "role": "assistant",
+      "timestamp": "2025-05-22T22:02:37.162948"
+    },
+    {
+      "id": "d4bd5879-d083-4db6-b13f-d615dc5d73c6",
+      "content": "Well, it's not that intuitive. I have to click through several menus to find the shipment tracking page, and often I have to log out and log back in because the system times out while I'm checking inventory. The back orders section is buried in a submenu that's hard to find. I've just memorized the steps after using it daily for months.",
+      "role": "user",
+      "timestamp": "2025-05-22T22:02:38.162948"
+    },
+    {
+      "id": "40f61082-d0ad-4558-b5fc-03d0a3fdaa5c",
+      "content": "Thank you for that detailed explanation. That's really helpful to understand the navigation challenges. When you mentioned you \"use the door to reorder\" at the end of the day, could you explain what you mean by that?",
+      "role": "assistant",
+      "timestamp": "2025-05-22T22:02:39.162948"
+    },
+    {
+      "id": "903d6f94-6933-4339-9634-6ca6df72f5da",
+      "content": "Oh sorry, that's just what we call the reordering system internally. It's actually the \"Daily Order Operations and Reordering\" module, so D.O.O.R. for short. It's where we input all the products we need to replenish based on daily sales.",
+      "role": "user",
+      "timestamp": "2025-05-22T22:02:40.162948"
+    },
+    {
+      "id": "57e51e0e-d5b0-454b-a048-09485ca8b780",
+      "content": "I see, thank you for clarifying. How would you describe your overall satisfaction with the ordering portal?",
+      "role": "assistant",
+      "timestamp": "2025-05-22T22:02:41.162948"
+    }
+  ],
+  "transcript": "Moderator: 00:00 This is a test transcript.\n\nParticipant: 01:00 Hello, I'm responding to the test transcript.\n\nModerator: 02:00 Thank you for your response.\n\nModerator: Hello Jason, thank you for participating in this interview. To start, could you please describe the current process you follow when placing orders through the World of Washing Machines Corp. self-service ordering portal?\n\nParticipant: I check in every morning and the first thing I do is open the portal and I look for the shipments that are coming today and then after that I look for back orders and then at the very end of the day I go ahead and use the door to reorder what we sold that day.\n\nModerator: It sounds like you have a routine for using the ordering portal. Could you tell me more about the process of looking for shipments and back orders in the portal? How easy or challenging is it to find that information?\n\nParticipant: Well, it's not that intuitive. I have to click through several menus to find the shipment tracking page, and often I have to log out and log back in because the system times out while I'm checking inventory. The back orders section is buried in a submenu that's hard to find. I've just memorized the steps after using it daily for months.\n\nModerator: Thank you for that detailed explanation. That's really helpful to understand the navigation challenges. When you mentioned you \"use the door to reorder\" at the end of the day, could you explain what you mean by that?\n\nParticipant: Oh sorry, that's just what we call the reordering system internally. It's actually the \"Daily Order Operations and Reordering\" module, so D.O.O.R. for short. It's where we input all the products we need to replenish based on daily sales.\n\nModerator: I see, thank you for clarifying. How would you describe your overall satisfaction with the ordering portal?",
+  "analysis": {
+    "content": "1. Workshop Focus Themes:\n\nTheme 1: User Experience Challenges\nDescription: The participant highlighted navigation challenges and lack of intuitiveness in the self-service ordering portal, leading to inefficiencies and workarounds.\nSignificance: Understanding user pain points is crucial for designing a more user-friendly and efficient system.\nQuote: \"Well, it's not that intuitive. I have to click through several menus to find the shipment tracking page, and often I have to log out and log back in because the system times out while I'm checking inventory.\"\n\nTheme 2: Internal Jargon and Processes\nDescription: The participant mentioned internal terminology like \"Daily Order Operations and Reordering\" module, indicating specific naming conventions within the organization.\nSignificance: Recognizing internal language and processes can help align external solutions with internal workflows.\nQuote: \"Oh sorry, that's just what we call the reordering system internally. It's actually the 'Daily Order Operations and Reordering' module, so D.O.O.R. for short.\"\n\n2. Recommended Workshop Questions:\n\nVision & Ambition Alignment:\n- How do you envision the ideal user experience for the ordering portal aligning with our overall business goals? \n- What ambitious outcomes would you like to achieve through enhancing the ordering process for both customers and internal users?\n\nCurrent Challenges & Constraints:\n- Can you share specific pain points or inefficiencies you encounter while using the current ordering portal?\n- What constraints, whether technical or operational, do you believe are hindering optimal performance in our ordering process?\n\nSuccess Metrics & Impact:\n- How would you measure success in improving the user experience of the ordering portal?\n- What impact do you anticipate a more user-friendly portal having on operational efficiency and customer satisfaction?\n\nTeam Norms & Collaboration Expectations:\n- How can cross-functional collaboration contribute to a more seamless ordering experience?\n- What norms or communication practices should be established to ensure alignment and transparency throughout the project?\n\nStrategic Risks or Assumptions to Challenge:\n- What assumptions do we currently hold about user needs that might need validation through research or testing?\n- Are there any risks associated with redesigning the ordering portal that we should proactively address?\n\n3. Quotes & Signals to Reflect Back in the Workshop:\n\n- \"Well, it's not that intuitive. I have to click through several menus to find the shipment tracking page...\" - Use this quote to emphasize the importance of improving navigation and intuitiveness in the portal during the workshop introduction or problem framing.\n- \"Oh sorry, that's just what we call the reordering system internally...\" - Introduce this internal jargon example to highlight the need for clarity and alignment on terminology within the team.\n\n4. Workshop Design Implications:\n\n- Suggested framing: Focus on user-centric design principles and the need to address specific pain points identified in the ordering process.\n- Stakeholder mindsets: Be mindful of potential resistance to change due to entrenched workflows or familiarity with existing systems.\n- Team dynamics: Encourage open communication and active participation from all stakeholders to ensure diverse perspectives are considered in co-creating the ambition statement.",
+    "generated_at": "2025-05-22T22:09:37.176940"
+  },
+  "created_at": "2025-05-22T22:02:32.162948",
+  "updated_at": "2025-05-22T22:09:37.177178",
+  "title": "Washing Machine Portal Interview",
+  "project": "World of Washing Machines",
+  "interview_type": "discovery_interview",
+  "topic": "We want to discuss what we need to cover in a Washing Machine Portal Interview project",
+  "context": "Background Context: World of Washing Machines Corp. Self-Service Ordering Portal (B2B) Overview World of Washing Machines Corp., a leading global manufacturer of home appliances, developed a self-service ordering portal aimed at its B2B customers\u2014primarily retail appliance stores and distributors. This portal streamlines the process for retail partners to browse, order, and manage World of Washing Machines Corp. products directly, without the need for manual sales intervention.",
+  "goals": "Identify pain points in the current ordering workflow. Understand how users search for and select products. Assess satisfaction with order tracking and status updates. Uncover unmet needs or desired features in the portal. Evaluate ease of use for first-time and repeat users.",
+  "character": "askia",
+  "character_select": "askia",
+  "voice_id": "AZnzlk1XvdvUeBnXmlld"
+}

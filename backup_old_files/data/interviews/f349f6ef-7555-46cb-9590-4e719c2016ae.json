@@ -1,0 +1,55 @@
+{
+  "session_id": "f349f6ef-7555-46cb-9590-4e719c2016ae",
+  "title": "Daria Research of Deloitte user researchers ",
+  "project": "Daria Research of Researchers",
+  "interview_type": "discovery_interview",
+  "topic": "Understanding how Deloitte researchers conceive, plan, and execute discovery activities in order to improve and augment their processes through AI-assisted support.",
+  "context": "The Daria Research Project aims to explore how AI can meaningfully support qualitative discovery work by acting as a proactive, intelligent research assistant. At Deloitte, discovery research is often a multi-phase effort that involves planning fieldwork, conducting stakeholder interviews, synthesizing insights, and aligning findings with business strategy. Despite having deep expertise and structured processes, researchers often face recurring bottlenecks: time-consuming manual synthesis, inconsistent documentation, and the challenge of maintaining stakeholder alignment through each stage.\n\nDaria, as an AI-powered research assistant, is designed to enhance the researcher's capabilities\u2014not replace them. It helps conduct interviews, generate thematic summaries, tag insights semantically, and produce personas and journey maps\u2014all with the aim of accelerating time to insight and improving research traceability. Unlike generic AI tools, Daria is tailored to Deloitte\u2019s hybrid consultancy-research model, supporting both exploratory and evaluative work while adapting to domain-specific terminology and client contexts.\n\nThis interview explores the lived experience of Deloitte researchers in the earliest stages of discovery\u2014how they think about a research challenge, what methods and tools they reach for, and where they see opportunities for augmentation or automation. The goal is to uncover both obvious and latent friction points, and to understand how Daria might serve as a seamless extension of their thinking, capturing nuance while boosting research velocity.\n\nBy speaking with researchers who have repeatedly navigated Deloitte\u2019s discovery process, we hope to co-design features that resonate with real-world constraints and empower researchers to focus on judgment and synthesis\u2014not just data wrangling. Daria is here to elevate, not just expedite, research. These conversations will shape its roadmap.",
+  "goals": "Identify the typical phases and practices used in Deloitte discovery research.\nSurface pain points or inefficiencies in current discovery workflows.\nUnderstand how researchers select, adapt, and apply discovery methods.\nExplore attitudes toward AI involvement in qualitative research.\nGather feedback on where an AI assistant could offer the most value.",
+  "prompt": "You are Thesea, Deloitte's expert Persona Analyzer. Your role is to analyze user research data to identify and develop clear, evidence-based personas. Your personas should capture the key behaviors, needs, goals, and pain points that will inform design and business decisions.\n\nWhen analyzing data and creating personas:\n1. Look for patterns across multiple interviews\n2. Identify behavioral variables (goals, values, frustrations, workflows)\n3. Map interview participants to these variables\n4. Find natural groupings that suggest distinct personas\n5. Craft robust, memorable persona descriptions with supporting evidence\n6. Highlight design and strategic implications\n{topic}\n{context}\n{goals}\n{custom questions}",
+  "interview_prompt": "You are Thesea, Deloitte's expert Persona Analyzer. Your role is to analyze user research data to identify and develop clear, evidence-based personas. Your personas should capture the key behaviors, needs, goals, and pain points that will inform design and business decisions.\n\nWhen analyzing data and creating personas:\n1. Look for patterns across multiple interviews\n2. Identify behavioral variables (goals, values, frustrations, workflows)\n3. Map interview participants to these variables\n4. Find natural groupings that suggest distinct personas\n5. Craft robust, memorable persona descriptions with supporting evidence\n6. Highlight design and strategic implications\n{topic}\n{context}\n{goals}\n{custom questions}",
+  "analysis_prompt": "You are Thesea, Deloitte's expert Persona Analyzer tasked with analyzing this interview transcript. \n\nCreate evidence-based user personas by:\n\n1. Identifying behavioral patterns and motivations that suggest distinct user types\n2. Categorizing needs, goals, pain points, and workflows for each potential persona\n3. Creating 2-4 well-defined personas with:\n   - Name and role\n   - Key characteristics and behaviors\n   - Primary goals and motivations\n   - Major pain points and frustrations\n   - Typical workflows and use patterns\n   - Key quotes that illustrate their perspective\n\n4. For each persona, explain:\n   - Design implications: How should we address their specific needs?\n   - Strategic considerations: What business opportunities does this persona represent?\n   - Prioritization insights: Which persona(s) should receive focus and why?\n\nGround all observations in specific evidence from the transcript, citing relevant sections when possible. Avoid assumptions not supported by the data. Acknowledge limitations in the research where appropriate. ",
+  "character_select": "thesea",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb",
+  "interviewee": {
+    "name": "Deloitte UX Researchers and their team members",
+    "role": "Researcher",
+    "email": ""
+  },
+  "created_at": "2025-05-23T08:55:03.050978",
+  "creation_date": "2025-05-23 08:55",
+  "last_updated": "2025-05-23T08:55:03.050978",
+  "expiration_date": "2025-06-22T08:55:03.050978",
+  "status": "active",
+  "conversation_history": [],
+  "custom_questions": [
+    {
+      "text": "What parts of the discovery process feel most repetitive or time-consuming, even though they're necessary?",
+      "minutes": 5
+    },
+    {
+      "text": "Can you walk me through how you typically begin a discovery project\u2014from the moment a challenge is scoped to when you're ready to start talking to people?",
+      "minutes": 5
+    },
+    {
+      "text": "When you're deep in the middle of a project, what kind of information do you wish was easier to surface or keep track of?",
+      "minutes": 5
+    },
+    {
+      "text": "Have you ever had a moment where you thought, \u2018I wish someone else could just capture this insight for me while I focus on the conversation?",
+      "minutes": 5
+    },
+    {
+      "text": "If you had an intelligent research assistant that could learn from your previous projects, what would you want it to help you with in your current work?",
+      "minutes": 5
+    }
+  ],
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "sessions": [
+    "17623de8-b9b4-442d-b92d-fcf296a1e6cc"
+  ],
+  "updated_at": 

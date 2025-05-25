@@ -1,0 +1,50 @@
+{
+  "id": "1cafdc9d-cbae-467d-8194-b9c1fb0d42d4",
+  "guide_id": null,
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "eadf56b7-4cc8-4d6c-a61e-8b4a4625f3b7",
+      "content": "the new features to see if everything's working",
+      "role": "user",
+      "timestamp": "2025-05-14T11:49:30.619489"
+    },
+    {
+      "id": "bca6bc7e-7229-4df4-a578-978c9ac6c479",
+      "content": "Can you tell me more about the new features that have been implemented?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T11:49:31.593927"
+    },
+    {
+      "id": "3aa72ce2-33a3-4d0f-a006-62c501a0c7d6",
+      "content": "I'm trying to make sure that I can give you a session  and give you a",
+      "role": "user",
+      "timestamp": "2025-05-14T11:49:47.068192"
+    },
+    {
+      "id": "1b3f9682-ac88-4fef-96a0-528dcbf46ef5",
+      "content": "Thank you for reaching out. It seems like you might have some questions or need assistance with something related to sessions. Could you please provide more details so I can better understand how to help you?",
+      "role": "assistant",
+      "timestamp": "2025-05-14T11:49:47.963785"
+    },
+    {
+      "id": "bbab684e-5ed4-494c-94b3-560f41f05de2",
+      "content": "I just want to understand if I could put a prompt in  you would you would run that interview with that prompt from a character of the in the prompt Library",
+      "role": "user",
+      "timestamp": "2025-05-14T11:50:16.382085"
+    },
+    {
+      "id": "206226b9-c31b-488e-9315-d632cbe2069b",
+      "content": "That sounds like an interesting idea! Could you please provide more details about the prompt you have in mind and the specific character from the library you're referring to? This will help me better understand how to conduct the interview based on that prompt.",
+      "role": "assistant",
+      "timestamp": "2025-05-14T11:50:17.357060"
+    }
+  ],
+  "transcript": "\n\nParticipant: the new features to see if everything's working\n\nModerator: Can you tell me more about the new features that have been implemented?\n\nParticipant: I'm trying to make sure that I can give you a session  and give you a\n\nModerator: Thank you for reaching out. It seems like you might have some questions or need assistance with something related to sessions. Could you please provide more details so I can better understand how to help you?\n\nParticipant: I just want to understand if I could put a prompt in  you would you would run that interview with that prompt from a character of the in the prompt Library\n\nModerator: That sounds like an interesting idea! Could you please provide more details about the prompt you have in mind and the specific character from the library you're referring to? This will help me better understand how to conduct the interview based on that prompt.",
+  "analysis": null,
+  "created_at": "2025-05-14T11:49:19.106934",
+  "updated_at": "2025-05-22T13:32:07.335230"
+}

@@ -1,0 +1,699 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain Interview Setup</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #0ea5e9;
+            --text-color: #1f2937;
+            --text-muted: #6b7280;
+            --light-bg: #f9fafb;
+            --card-bg: #ffffff;
+            --border-color: #e5e7eb;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        
+        .navbar {
+            background-color: var(--card-bg);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        
+        .sidebar {
+            background-color: var(--card-bg);
+            border-right: 1px solid var(--border-color);
+        }
+        
+        .nav-link {
+            color: var(--text-muted);
+            border-radius: 0.375rem;
+            padding: 0.5rem 1rem;
+            margin-bottom: 0.25rem;
+            transition: all 0.2s;
+        }
+        
+        .nav-link:hover {
+            background-color: rgba(79, 70, 229, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .nav-pills .nav-link.active {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+        
+        .btn-outline-primary {
+            color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .btn-outline-primary:hover {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+        
+        .card {
+            border: 1px solid var(--border-color);
+            border-radius: 0.5rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+        }
+        
+        .card-header {
+            background-color: rgba(249, 250, 251, 0.5);
+            border-bottom: 1px solid var(--border-color);
+            font-weight: 600;
+        }
+        
+        .form-control:focus, 
+        .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+        }
+        
+        .bg-primary {
+            background-color: var(--primary-color) !important;
+        }
+        
+        .text-primary {
+            color: var(--primary-color) !important;
+        }
+        
+        .badge {
+            font-weight: 500;
+            padding: 0.35em 0.65em;
+        }
+        
+        .table {
+            --bs-table-hover-bg: rgba(79, 70, 229, 0.05);
+        }
+        
+        /* Custom utilities */
+        .rounded-xl {
+            border-radius: 0.75rem;
+        }
+        
+        .shadow-sm {
+            box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+        }
+        
+        .shadow-md {
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+    </style>
+    
+</head>
+<body>
+    <div class="d-flex">
+        <!-- Sidebar -->
+        <div class="d-flex flex-column flex-shrink-0 p-3 bg-white" style="width: 280px; min-height: 100vh;">
+            <a href="/dashboard" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto link-dark text-decoration-none">
+                <span class="fs-4 fw-semibold">Remote Interview</span>
+            </a>
+            <hr>
+            <ul class="nav nav-pills flex-column mb-auto">
+                <li class="nav-item">
+                    <a href="/dashboard" class="nav-link link-dark">
+                        <i class="bi bi-speedometer2 me-2"></i> Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/interview_setup" class="nav-link active">
+                        <i class="bi bi-plus-circle me-2"></i> New Interview
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/interview_archive" class="nav-link link-dark">
+                        <i class="bi bi-archive me-2"></i> Interview Archive
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="/monitor_interview" class="nav-link link-dark">
+                        <i class="bi bi-display me-2"></i> Monitor Interviews
+                    </a>
+                </li>
+                <li>
+                    <a class="nav-link link-dark dropdown-toggle" href="#interview-management" data-bs-toggle="collapse" role="button" aria-expanded="false">
+                        <i class="bi bi-list-check me-2"></i>
+                        Manage Interviews
+                    </a>
+                    <div class="collapse" id="interview-management">
+                        <ul class="nav flex-column ms-3 small">
+                            
+                                <li>
+                                    <span class="nav-link text-muted py-1">No interviews yet</span>
+                                </li>
+                            
+                        </ul>
+                    </div>
+                </li>
+                <li>
+                    <a href="#" class="nav-link link-dark">
+                        <i class="bi bi-bar-chart me-2"></i>
+                        Analytics
+                    </a>
+                </li>
+                <li>
+                    <a href="/prompts/" class="nav-link link-dark">
+                        <i class="bi bi-chat-quote me-2"></i>
+                        Prompt Manager
+                    </a>
+                </li>
+            </ul>
+            <hr>
+            <div class="dropdown">
+                <a href="#" class="d-flex align-items-center link-dark text-decoration-none dropdown-toggle" id="dropdownUser2" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="https://github.com/mdo.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                    <strong>admin</strong>
+                </a>
+                <ul class="dropdown-menu text-small shadow" aria-labelledby="dropdownUser2">
+                    <li><a class="dropdown-item" href="/interview_setup">New interview...</a></li>
+                    <li><a class="dropdown-item" href="#">Settings</a></li>
+                    <li><a class="dropdown-item" href="#">Profile</a></li>
+                    <li><hr class="dropdown-divider"></li>
+                    <li><a class="dropdown-item" href="#">Sign out</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Main content -->
+        <div class="flex-grow-1 p-4">
+            
+<div class="container-fluid">
+    <div class="mb-4">
+        <h1 class="h3">Interview Setup</h1>
+        <p class="text-muted">Configure your LangChain-powered interview session</p>
+    </div>
+    
+    <div class="card">
+        <div class="card-body">
+            <form id="interview-setup-form" class="needs-validation" novalidate>
+                <!-- Project Information -->
+                <div class="row mb-4">
+                    <div class="col-md-6 mb-3">
+                        <label for="title" class="form-label">Interview Title <span class="text-danger">*</span></label>
+                        <input type="text" id="title" name="title" class="form-control" placeholder="E.g., UX Research Interview with John Smith" required>
+                    </div>
+                    
+                    <div class="col-md-6 mb-3">
+                        <label for="project" class="form-label">Project Name <span class="text-danger">*</span></label>
+                        <input type="text" id="project" name="project" class="form-control" placeholder="E.g., Mobile App Redesign" required>
+                    </div>
+                </div>
+                
+                <!-- Interview Type -->
+                <div class="mb-4">
+                    <label for="interview_type" class="form-label">Interview Type <span class="text-danger">*</span></label>
+                    <select id="interview_type" name="interview_type" class="form-select" required>
+                        <option value="application_interview">Application Interview</option>
+                        <option value="persona_interview">Persona Interview</option>
+                        <option value="journey_map_interview">Journey Map Interview</option>
+                        <option value="discovery_interview">Discovery Interview</option>
+                        <option value="custom_interview">Custom Interview</option>
+                    </select>
+                </div>
+
+                <!-- Interviewee Information -->
+                <div class="mb-4">
+                    <h3 class="h5 mb-3">Interviewee Information</h3>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="interviewee_name" class="form-label">Name</label>
+                            <input type="text" id="interviewee_name" name="interviewee_name" class="form-control" placeholder="Interviewee's name">
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="interviewee_role" class="form-label">Role</label>
+                            <input type="text" id="interviewee_role" name="interviewee_role" class="form-control" placeholder="E.g., Product Manager">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="experience_level" class="form-label">Experience Level</label>
+                            <select id="experience_level" name="experience_level" class="form-select">
+                                <option value="">Select experience level</option>
+                                <option value="Junior">Junior</option>
+                                <option value="Mid-Level">Mid-Level</option>
+                                <option value="Senior">Senior</option>
+                                <option value="Lead">Lead</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="department" class="form-label">Department</label>
+                            <input type="text" id="department" name="department" class="form-control" placeholder="E.g., Engineering, Design">
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Interview Prompts -->
+                <div class="mb-4">
+                    <h3 class="h5 mb-3">Interview Configuration</h3>
+                    
+                    <div class="mb-3">
+                        <label for="character_select" class="form-label">Select Character</label>
+                        <div class="form-text mb-2">Choose a pre-configured character to use for the interview</div>
+                        <select id="character_select" name="character_select" class="form-select">
+                            <option value="">Custom (No Character)</option>
+                            
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="interview_prompt" class="form-label">Interview Prompt <span class="text-danger">*</span></label>
+                        <div class="form-text mb-2">This will guide the AI interviewer's behavior and questions</div>
+                        <textarea id="interview_prompt" name="interview_prompt" rows="5" class="form-control" placeholder="Enter instructions for the AI interviewer..." required>You are an expert UX researcher conducting a user interview. Ask open-ended questions to understand the user&#39;s needs, goals, and pain points. Be conversational, empathetic, and curious.</textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="analysis_prompt" class="form-label">Analysis Prompt</label>
+                        <div class="form-text mb-2">This will guide how the interview is analyzed after completion</div>
+                        <textarea id="analysis_prompt" name="analysis_prompt" rows="5" class="form-control" placeholder="Enter instructions for analyzing the interview...">Based on the interview transcript, provide a detailed analysis including:
+
+1. Key user needs and goals
+2. Pain points and frustrations 
+3. Insights and opportunities
+4. Recommendations for improvement</textarea>
+                    </div>
+                </div>
+                
+                <!-- Custom Questions Section -->
+                <div class="mb-4">
+                    <h3 class="h5 mb-3">Custom Questions (Optional)</h3>
+                    <div class="form-text mb-2">Add specific questions you want included in the interview</div>
+                    
+                    <div id="custom-questions-container" class="mb-3">
+                        <div class="custom-question-row mb-2">
+                            <div class="row">
+                                <div class="col-md-7 mb-2 mb-md-0">
+                                    <input type="text" class="custom-question form-control" placeholder="Enter a specific question...">
+                                </div>
+                                <div class="col-md-4 mb-2 mb-md-0">
+                                    <select class="question-priority form-select">
+                                        <option value="high">High Priority</option>
+                                        <option value="medium" selected>Medium</option>
+                                        <option value="low">Low Priority</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-1">
+                                    <button type="button" class="remove-question btn btn-outline-danger">
+                                        <i class="bi bi-x"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <button type="button" id="add-question" class="btn btn-outline-primary">
+                        <i class="bi bi-plus me-1"></i> Add Question
+                    </button>
+                </div>
+                
+                <!-- Interview Settings -->
+                <div class="mb-4">
+                    <h3 class="h5 mb-3">Interview Settings</h3>
+                    
+                    <!-- Voice Selection -->
+                    <div class="mb-3">
+                        <label for="voice_id" class="form-label">Interviewer Voice</label>
+                        <select id="voice_id" name="voice_id" class="form-select">
+                            
+                            <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Female)</option>
+                            
+                            <option value="ErXwobaYiN019PkySvjV">Antoni (Male)</option>
+                            
+                            <option value="MF3mGyEYCl7XYWbV9V6O">Elli (Female)</option>
+                            
+                            <option value="AZnzlk1XvdvUeBnXmlld">Domi (Female)</option>
+                            
+                            <option value="JBFqnCBsd6RMkjVDRZzb">Fin (Male)</option>
+                            
+                        </select>
+                    </div>
+                    
+                    <!-- Test Voice Button -->
+                    <div class="mb-3">
+                        <button type="button" id="test-voice" class="btn btn-outline-primary">
+                            <i class="bi bi-soundwave me-1"></i> Test Voice
+                        </button>
+                        <div id="voice-test-status" class="mt-2 small d-none"></div>
+                    </div>
+                    
+                    <!-- Time Allocation -->
+                    <div class="mb-3">
+                        <label for="time_per_question" class="form-label">Average Time Per Custom Question (minutes)</label>
+                        <input type="number" id="time_per_question" name="time_per_question" min="1" max="15" value="3" class="form-control">
+                        <div class="form-text">Helps the AI pace the interview's custom questions appropriately</div>
+                    </div>
+                    
+                    <!-- Other Options -->
+                    <div class="mb-3">
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="record_transcript" name="record_transcript" checked>
+                            <label class="form-check-label" for="record_transcript">Save transcript</label>
+                        </div>
+                        <div class="form-check mb-2">
+                            <input class="form-check-input" type="checkbox" id="analysis" name="analysis" checked>
+                            <label class="form-check-label" for="analysis">Generate analysis after interview</label>
+                        </div>
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="use_tts" name="use_tts" checked>
+                            <label class="form-check-label" for="use_tts">Use text-to-speech for interviewer</label>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Submit Button -->
+                <div class="d-grid">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="bi bi-check-lg me-1"></i> Create Interview
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('interview-setup-form');
+    const testVoiceBtn = document.getElementById('test-voice');
+    const voiceTestStatus = document.getElementById('voice-test-status');
+    const addQuestionBtn = document.getElementById('add-question');
+    const customQuestionsContainer = document.getElementById('custom-questions-container');
+    const characterSelect = document.getElementById('character_select');
+    const interviewPrompt = document.getElementById('interview_prompt');
+    const analysisPrompt = document.getElementById('analysis_prompt');
+    
+    // Character selection
+    characterSelect.addEventListener('change', function() {
+        const selectedCharacter = this.value;
+        if (!selectedCharacter) {
+            return; // No character selected (custom option)
+        }
+        
+        console.log("Selected character:", selectedCharacter);
+        
+        // Fetch the character's prompts from the server
+        fetch(`/api/character/${selectedCharacter}`)
+            .then(response => {
+                console.log("Character API response status:", response.status);
+                return response.json();
+            })
+            .then(data => {
+                console.log("Character data:", data);
+                if (data.success) {
+                    // Populate the prompt fields with the character's prompts
+                    interviewPrompt.value = data.dynamic_prompt_prefix || '';
+                    if (data.analysis_prompt) {
+                        analysisPrompt.value = data.analysis_prompt;
+                    }
+                } else {
+                    console.error("Error fetching character:", data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching character data:', error);
+            });
+    });
+    
+    // Add custom question
+    addQuestionBtn.addEventListener('click', function() {
+        const questionRow = document.createElement('div');
+        questionRow.className = 'custom-question-row mb-2';
+        questionRow.innerHTML = `
+            <div class="row">
+                <div class="col-md-7 mb-2 mb-md-0">
+                    <input type="text" class="custom-question form-control" placeholder="Enter a specific question...">
+                </div>
+                <div class="col-md-4 mb-2 mb-md-0">
+                    <select class="question-priority form-select">
+                        <option value="high">High Priority</option>
+                        <option value="medium" selected>Medium</option>
+                        <option value="low">Low Priority</option>
+                    </select>
+                </div>
+                <div class="col-md-1">
+                    <button type="button" class="remove-question btn btn-outline-danger">
+                        <i class="bi bi-x"></i>
+                    </button>
+                </div>
+            </div>
+        `;
+        customQuestionsContainer.appendChild(questionRow);
+        
+        // Add remove event listener to the new remove button
+        questionRow.querySelector('.remove-question').addEventListener('click', function() {
+            questionRow.remove();
+        });
+    });
+    
+    // Remove custom question
+    customQuestionsContainer.addEventListener('click', function(e) {
+        if (e.target.closest('.remove-question')) {
+            e.target.closest('.custom-question-row').remove();
+        }
+    });
+    
+    // Test voice button - using ElevenLabs API with browser's speech synthesis as fallback
+    testVoiceBtn.addEventListener('click', function() {
+        const voiceId = document.getElementById('voice_id').value;
+        const testText = "Hello, I'm your AI interviewer. How are you today?";
+        
+        voiceTestStatus.textContent = "Converting text to speech...";
+        voiceTestStatus.classList.remove('d-none', 'text-success', 'text-danger');
+        voiceTestStatus.classList.add('text-muted');
+        
+        console.log("Calling ElevenLabs API with voice_id:", voiceId);
+        
+        // First try ElevenLabs API
+        fetch('/api/text_to_speech_elevenlabs', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ 
+                text: testText,
+                voice_id: voiceId
+            })
+        })
+        .then(response => {
+            console.log("ElevenLabs API response status:", response.status);
+            if (!response.ok) {
+                return response.json().then(data => {
+                    throw new Error(`ElevenLabs API error: ${data.error || response.statusText}`);
+                });
+            }
+            return response.blob();
+        })
+        .then(audioBlob => {
+            console.log("Received audio blob of type:", audioBlob.type, "size:", audioBlob.size);
+            const audioUrl = URL.createObjectURL(audioBlob);
+            const audio = new Audio(audioUrl);
+            
+            audio.onended = function() {
+                URL.revokeObjectURL(audioUrl);
+            };
+            
+            audio.onerror = function(e) {
+                console.error("Audio playback error:", e);
+                throw new Error("Error playing audio");
+            };
+            
+            audio.play();
+            voiceTestStatus.textContent = "Voice test completed using ElevenLabs";
+            voiceTestStatus.classList.remove('text-muted');
+            voiceTestStatus.classList.add('text-success');
+        })
+        .catch(error => {
+            console.error('ElevenLabs API error:', error);
+            
+            // Fall back to browser speech synthesis if ElevenLabs fails
+            try {
+                const synth = window.speechSynthesis;
+                const utterance = new SpeechSynthesisUtterance(testText);
+                utterance.rate = 1.0;
+                utterance.pitch = 1.0;
+                utterance.volume = 1.0;
+                
+                // Set completion handler
+                utterance.onend = function() {
+                    voiceTestStatus.textContent = "Voice test completed using browser speech synthesis (fallback)";
+                    voiceTestStatus.classList.remove('text-muted');
+                    voiceTestStatus.classList.add('text-success');
+                };
+                
+                // Set error handler
+                utterance.onerror = function(event) {
+                    console.error('Speech synthesis error:', event);
+                    voiceTestStatus.textContent = "Error with speech synthesis";
+                    voiceTestStatus.classList.remove('text-muted');
+                    voiceTestStatus.classList.add('text-danger');
+                };
+                
+                // Speak the text
+                synth.speak(utterance);
+            } catch (fallbackError) {
+                console.error('Browser speech synthesis error:', fallbackError);
+                voiceTestStatus.textContent = "Speech synthesis not available";
+                voiceTestStatus.classList.remove('text-muted');
+                voiceTestStatus.classList.add('text-danger');
+            }
+        });
+    });
+    
+    // Handle form submission
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        
+        // Check for required fields
+        const title = document.getElementById('title').value.trim();
+        const project = document.getElementById('project').value.trim();
+        const interviewType = document.getElementById('interview_type').value;
+        const interviewPrompt = document.getElementById('interview_prompt').value.trim();
+        
+        // Simple validation
+        if (!title || !project || !interviewType || !interviewPrompt) {
+            let errorMsg = "Please fill in all required fields: ";
+            if (!title) errorMsg += "Interview Title, ";
+            if (!project) errorMsg += "Project Name, ";
+            if (!interviewType) errorMsg += "Interview Type, ";
+            if (!interviewPrompt) errorMsg += "Interview Prompt, ";
+            
+            errorMsg = errorMsg.slice(0, -2); // Remove trailing comma
+            alert(errorMsg);
+            return;
+        }
+        
+        // Collect custom questions
+        const customQuestions = [];
+        document.querySelectorAll('.custom-question-row').forEach(row => {
+            const questionText = row.querySelector('.custom-question').value.trim();
+            const priority = row.querySelector('.question-priority').value;
+            
+            if (questionText) {
+                customQuestions.push({
+                    text: questionText,
+                    priority: priority
+                });
+            }
+        });
+        
+        const formData = new FormData(form);
+        const interview = {
+            title: formData.get('title'),
+            project: formData.get('project'),
+            interview_type: formData.get('interview_type'),
+            prompt: interviewPrompt, // Add the prompt field for backward compatibility
+            interview_prompt: interviewPrompt, // Main prompt field
+            analysis_prompt: formData.get('analysis_prompt'),
+            character_select: formData.get('character_select'), // Include selected character
+            voice_id: formData.get('voice_id'), // Include selected voice
+            interviewee: {
+                name: formData.get('interviewee_name') || 'Anonymous',
+                role: formData.get('interviewee_role') || '',
+                experience_level: formData.get('experience_level') || '',
+                department: formData.get('department') || ''
+            },
+            time_per_question: parseInt(formData.get('time_per_question')) || 3,
+            custom_questions: customQuestions,
+            options: {
+                record_transcript: formData.get('record_transcript') === 'on',
+                analysis: formData.get('analysis') === 'on',
+                use_tts: formData.get('use_tts') === 'on'
+            }
+        };
+        
+        console.log("Submitting interview data:", interview);
+        
+        // Disable the submit button and show loading state
+        const submitButton = form.querySelector('button[type="submit"]');
+        const originalButtonText = submitButton.innerHTML;
+        submitButton.disabled = true;
+        submitButton.innerHTML = '<i class="bi bi-hourglass-split me-1"></i> Creating Interview...';
+        
+        // Call the API to create the interview
+        fetch('/interview/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(interview)
+        })
+        .then(response => {
+            console.log("Response status:", response.status);
+            console.log("Response headers:", response.headers);
+            
+            if (!response.ok) {
+                if (response.status === 404) {
+                    throw new Error("Endpoint not found. Please check server configuration.");
+                }
+                return response.text().then(text => {
+                    try {
+                        // Try to parse as JSON first
+                        return JSON.parse(text);
+                    } catch (e) {
+                        // If not valid JSON, throw with the raw text
+                        throw new Error(`Server error: ${text.substring(0, 100)}...`);
+                    }
+                });
+            }
+            
+            return response.json();
+        })
+        .then(data => {
+            console.log("Response data:", data);
+            
+            // Re-enable the submit button
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+            
+            if (data.status === 'success') {
+                // Show success message
+                alert('Interview created successfully!');
+                console.log("Redirecting to:", data.redirect_url);
+                
+                // Redirect to the interview details page using the URL from the response
+                window.location.href = data.redirect_url || `/interview_details/${data.session_id}`;
+            } else {
+                alert('Error creating interview: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            
+            // Re-enable the submit button
+            submitButton.disabled = false;
+            submitButton.innerHTML = originalButtonText;
+            
+            alert('An error occurred while creating the interview. Please check the console for details.');
+        });
+    });
+});
+</script>
+
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+    
+</body>
+</html> 

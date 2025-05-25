@@ -1,0 +1,234 @@
+{% extends "base.html" %}
+
+{% block title %}Home{% endblock %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <!-- Project Header -->
+    <div class="mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h1 class="text-2xl font-bold text-gray-900">Research Dashboard</h1>
+                    <p class="text-gray-600 mt-1">Manage your UX research projects and activities</p>
+                </div>
+                <div class="flex space-x-4">
+                    <button onclick="window.location.href='{{ url_for('new_project') }}'" class="bg-indigo-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                        Start New Project
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Current Project -->
+    {% if projects %}
+    {% with project = projects[0] %}
+    <div class="mb-8">
+        <div class="bg-white rounded-lg shadow-lg p-6">
+            <div class="flex justify-between items-start">
+                <div>
+                    <h2 class="text-xl font-semibold text-gray-900">{{ project.name }}</h2>
+                    <p class="mt-1 text-gray-600">{{ project.description or "Research project to understand researcher workflows and needs" }}</p>
+                    <div class="mt-4">
+                        <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                            Active Project
+                        </span>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <a href="{{ url_for('project_dashboard', project_id=project.id) }}" 
+                       class="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                        View Project Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endwith %}
+    {% endif %}
+
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        <!-- Left Column -->
+        <div class="lg:col-span-4 space-y-8">
+            <!-- Quick Actions -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
+                <div class="space-y-3">
+                    <a href="/interview" class="block w-full text-left px-4 py-2 bg-gray-50 text-gray-700 rounded hover:bg-gray-100">
+                        New Interview
+                    </a>
+                    <a href="/upload_transcript" class="block w-full text-left px-4 py-2 bg-gray-50 text-gray-700 rounded hover:bg-gray-100">
+                        Upload Transcript
+                    </a>
+                    <a href="/persona" class="block w-full text-left px-4 py-2 bg-gray-50 text-gray-700 rounded hover:bg-gray-100">
+                        Create Persona
+                    </a>
+                    <a href="/journey_map" class="block w-full text-left px-4 py-2 bg-gray-50 text-gray-700 rounded hover:bg-gray-100">
+                        Create Journey Map
+                    </a>
+                </div>
+            </div>
+
+            <!-- Research Stats -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Research Stats</h2>
+                <div class="space-y-3">
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Interviews</span>
+                        <span class="font-medium">{{ recent_interviews|length }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Personas</span>
+                        <span class="font-medium">{{ recent_personas|length }}</span>
+                    </div>
+                    <div class="flex justify-between items-center">
+                        <span class="text-gray-600">Journey Maps</span>
+                        <span class="font-medium">{{ recent_journey_maps|length }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column -->
+        <div class="lg:col-span-8 space-y-8">
+            <!-- Recent Activity -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Activity</h2>
+                <div class="space-y-4">
+                    {% if recent_interviews %}
+                    {% for interview in recent_interviews %}
+                    <div class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                        <div class="flex justify-between items-start group">
+                            <div>
+                                <h3 class="font-medium text-gray-900">{{ interview.project_name }}</h3>
+                                <p class="text-sm text-gray-500">{{ interview.interview_type }}</p>
+                                <p class="text-xs text-gray-400 mt-1">{{ interview.date.split('T')[0] }}</p>
+                            </div>
+                            <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ url_for('view_transcript', interview_id=interview.id) }}" 
+                                   class="text-sm text-indigo-600 hover:text-indigo-500">Transcript</a>
+                                <a href="{{ url_for('view_analysis', interview_id=interview.id) }}" 
+                                   class="text-sm text-green-600 hover:text-green-500">Analysis</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% else %}
+                    <p class="text-gray-500 text-sm">No recent activity</p>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Recent Artifacts -->
+            <div class="bg-white rounded-lg shadow-lg p-6">
+                <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Artifacts</h2>
+                <div class="space-y-4">
+                    {% if recent_personas %}
+                    {% for persona in recent_personas[:2] %}
+                    <div class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                        <div class="flex justify-between items-start group">
+                            <div>
+                                <h3 class="font-medium text-gray-900">{{ persona.project_name }}</h3>
+                                <p class="text-xs text-gray-400 mt-1">{{ persona.created_at.split('T')[0] }}</p>
+                            </div>
+                            <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ url_for('view_persona', persona_id=persona.id) }}" 
+                                   class="text-sm text-indigo-600 hover:text-indigo-500">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if recent_journey_maps %}
+                    {% for journey_map in recent_journey_maps[:2] %}
+                    <div class="border-b border-gray-200 pb-4 last:border-0 last:pb-0">
+                        <div class="flex justify-between items-start group">
+                            <div>
+                                <h3 class="font-medium text-gray-900">{{ journey_map.project_name }}</h3>
+                                <p class="text-xs text-gray-400 mt-1">{{ journey_map.created_at.split('T')[0] }}</p>
+                            </div>
+                            <div class="flex space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                <a href="{{ url_for('view_journey_map', journey_map_id=journey_map.id) }}" 
+                                   class="text-sm text-indigo-600 hover:text-indigo-500">View</a>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                    {% endif %}
+
+                    {% if not recent_personas and not recent_journey_maps %}
+                    <p class="text-gray-500 text-sm">No recent artifacts</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div class="bg-white rounded-lg p-6 max-w-md w-full mx-4">
+        <h3 class="text-lg font-bold text-gray-900 mb-4">Confirm Delete</h3>
+        <p class="text-gray-700 mb-6">Are you sure you want to delete <span id="itemName" class="font-semibold"></span>? This action cannot be undone.</p>
+        <div class="flex justify-end space-x-4">
+            <button id="cancelDelete" class="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300">Cancel</button>
+            <button id="confirmDelete" class="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700">Delete</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    let itemToDelete = null;
+    let itemType = null;
+    
+    function confirmDelete(type, id, name) {
+        itemToDelete = id;
+        itemType = type;
+        document.getElementById('itemName').textContent = name;
+        document.getElementById('deleteModal').classList.remove('hidden');
+    }
+    
+    document.getElementById('cancelDelete').addEventListener('click', function() {
+        document.getElementById('deleteModal').classList.add('hidden');
+    });
+    
+    document.getElementById('confirmDelete').addEventListener('click', function() {
+        if (itemToDelete && itemType) {
+            let url = '';
+            if (itemType === 'interview') {
+                url = `/delete_interview/${itemToDelete}`;
+            } else if (itemType === 'persona') {
+                url = `/delete_persona/${itemToDelete}`;
+            } else if (itemType === 'journey_map') {
+                url = `/delete_journey_map/${itemToDelete}`;
+            } else if (itemType === 'project') {
+                url = `/delete_project/${itemToDelete}`;
+            }
+            
+            fetch(url, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    window.location.reload();
+                } else {
+                    alert('Error deleting item: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error deleting item. Please try again.');
+            });
+        }
+        
+        document.getElementById('deleteModal').classList.add('hidden');
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA Interview</title>
+    <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdn.socket.io/4.6.0/socket.io.min.js"></script>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f7f9fc;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        /* Header */
+        header {
+            background-color: #fff;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            padding: 15px 0;
+            margin-bottom: 20px;
+        }
+        
+        .header-content {
+            display: flex;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        .logo {
+            height: 40px;
+            margin-right: 15px;
+        }
+        
+        .title {
+            margin: 0;
+            font-size: 1.5rem;
+            color: #333;
+        }
+        
+        /* Chat container */
+        .message-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            margin-bottom: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        /* Message styles */
+        .message {
+            padding: 12px 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            max-width: 85%;
+            word-wrap: break-word;
+        }
+        
+        .user-message {
+            background-color: #e9f5ff;
+            color: #0066cc;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+        
+        .assistant-message {
+            background-color: #f0f4f8;
+            color: #333;
+            align-self: flex-start;
+        }
+        
+        .system-message {
+            background-color: #f8f9fa;
+            color: #666;
+            font-style: italic;
+            text-align: center;
+            max-width: 100%;
+            margin: 10px auto;
+        }
+        
+        .error-message {
+            background-color: #ffebee;
+            color: #c62828;
+            text-align: center;
+            max-width: 100%;
+            margin: 10px auto;
+        }
+        
+        /* Input container */
+        .input-container {
+            background-color: white;
+            border-radius: 8px;
+            padding: 16px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .input-row {
+            display: flex;
+            margin-bottom: 12px;
+        }
+        
+        .input-row:last-child {
+            margin-bottom: 0;
+        }
+        
+        .text-input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 16px;
+        }
+        
+        .btn {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            margin-left: 8px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-primary {
+            background-color: #0066cc;
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background-color: #0058b3;
+        }
+        
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+        
+        .btn-secondary:hover {
+            background-color: #5a6268;
+        }
+        
+        .btn-danger {
+            background-color: #dc3545;
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+        }
+        
+        /* Status indicators */
+        .status-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 12px;
+        }
+        
+        .status-item {
+            display: flex;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-disconnected {
+            background-color: #dc3545;
+        }
+        
+        .status-connected {
+            background-color: #28a745;
+        }
+        
+        .status-active {
+            background-color: #28a745;
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0.7);
+            }
+            
+            70% {
+                transform: scale(1);
+                box-shadow: 0 0 0 10px rgba(40, 167, 69, 0);
+            }
+            
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(40, 167, 69, 0);
+            }
+        }
+        
+        .pulsing {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Audio level visualization */
+        .audio-level-container {
+            height: 4px;
+            width: 100%;
+            background-color: #eee;
+            border-radius: 2px;
+            margin-top: 8px;
+        }
+        
+        .audio-level-bar {
+            height: 100%;
+            width: 0%;
+            background-color: #4CAF50;
+            border-radius: 2px;
+            transition: width 0.1s ease;
+        }
+        
+        /* Responsive design */
+        @media (max-width: 768px) {
+            .message {
+                max-width: 90%;
+            }
+            
+            .input-row {
+                flex-direction: column;
+            }
+            
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Research Interview</h1>
+        <p>Please speak naturally during this conversation. Your responses will be recorded for research purposes.</p>
+    </header>
+    
+    <div class="container">
+        <div class="interview-panel">
+            <h2>Interview Conversation</h2>
+            <div class="message-container" id="message-container">
+                <!-- Messages will appear here -->
+                <div class="message assistant-message">Loading conversation...</div>
+            </div>
+            
+            <h3>Your Response:</h3>
+            <div class="input-container">
+                <div class="input-row">
+                    <textarea id="user-input" class="text-input" placeholder="Type your message here..." rows="2" disabled></textarea>
+                </div>
+                <div class="input-row">
+                    <button id="send-message" class="btn btn-primary" disabled>Send</button>
+                    <button id="start-speaking" class="btn btn-secondary" disabled>Start Speaking</button>
+                    <button id="stop-speaking" class="btn btn-secondary" disabled>Stop</button>
+                    <button id="end-interview" class="btn btn-danger" disabled>End Interview</button>
+                </div>
+                <div class="status-container">
+                    <div class="status-item">
+                        <span class="status-indicator status-disconnected" id="connection-indicator"></span>
+                        <span id="connection-status-text">Disconnected</span>
+                    </div>
+                    <div class="status-item">
+                        <span class="status-indicator status-disconnected" id="mic-indicator"></span>
+                        <span id="mic-status-text">Microphone inactive</span>
+                    </div>
+                    <div class="status-item">
+                        <span id="timer">00:00</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Debug Log Panel (Collapsible) -->
+            <div class="debug-panel" style="margin-top: 20px; background-color: #f5f5f5; border: 1px solid #ddd; border-radius: 5px; padding: 10px; display: none;">
+                <div class="debug-header" onclick="toggleDebugPanel()">
+                    <h3 style="margin: 0; cursor: pointer;">DARIA Interview Debug Log</h3>
+                    <span id="debug-toggle" style="float: right; cursor: pointer;">+</span>
+                </div>
+                <div id="debug-content" style="display: none; margin-top: 10px;">
+                    <div id="debug-log" style="height: 200px; overflow-y: auto; padding: 10px; background-color: #000; color: #fff; font-family: monospace;"></div>
+                    <div style="margin-top: 10px;">
+                        <button onclick="clearDebugLog()" class="btn btn-secondary">Clear Log</button>
+                        <button onclick="toggleDebugPanel()" class="btn btn-secondary">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="footer">
+        <p>© DARIA Interview Tool</p>
+    </div>
+
+    <script>
+        // Global variables
+        let ttsAudio = new Audio();
+        let recognition = null;
+        let ttsActive = false;
+        let sttActive = false;
+        let apiPort = 5025;
+        let sessionId = null;
+        let characterParam = null;
+        let lastAssistantMessage = null;
+        let lastMessageTimestamp = 0;
+        let isConnected = false;
+        let startTime = null;
+        let timerInterval = null;
+        let guideInfo = null;
+        let messageContainer = null;
+        let audioContext = null;
+        let analyser = null;
+        let microphone = null;
+        let audioLevelInterval = null;
+        let apiUrl = `http://${window.location.hostname}:${apiPort}`;
+        let promptedForMic = false;
+        let pollInterval = null;
+        let socket = null;
+        let pendingSuggestions = [];
+
+        // UI Elements
+        let userInput = null;
+        let sendMessageBtn = null;
+        let startSpeakingBtn = null;
+        let stopSpeakingBtn = null;
+        let endInterviewBtn = null;
+        let connectionIndicator = null;
+        let connectionStatusText = null;
+        
+        // Debug log functions
+        function log(message, level = 'info') {
+            const logContainer = document.getElementById('debug-log');
+            if (!logContainer) return;
+            
+            const timestamp = new Date().toLocaleTimeString();
+            const logEntry = document.createElement('div');
+            logEntry.className = `log-entry ${level}-log`;
+            logEntry.textContent = `${timestamp} - ${message}`;
+            logContainer.appendChild(logEntry);
+            logContainer.scrollTop = logContainer.scrollHeight;
+            
+            // Also log to console
+            console.log(`${level.toUpperCase()}: ${message}`);
+        }
+        
+        function clearDebugLog() {
+            const logContainer = document.getElementById('debug-log');
+            if (logContainer) {
+                logContainer.innerHTML = '';
+            }
+        }
+        
+        function toggleDebugPanel() {
+            const panel = document.querySelector('.debug-panel');
+            const content = document.getElementById('debug-content');
+            const toggle = document.getElementById('debug-toggle');
+            
+            if (panel) {
+                if (panel.style.display === 'none') {
+                    panel.style.display = 'block';
+                    document.getElementById('debug-toggle').textContent = '-';
+                    content.style.display = 'block';
+                } else {
+                    if (content.style.display === 'none') {
+                        content.style.display = 'block';
+                        toggle.textContent = '-';
+                    } else {
+                        content.style.display = 'none';
+                        toggle.textContent = '+';
+                    }
+                }
+            }
+        }
+        
+        // Initialize the audio element
+        function initTTSAudio() {
+            if (!ttsAudio) {
+                console.log('Initializing TTS Audio object');
+                ttsAudio = new Audio();
+                ttsAudio.autoplay = false; // Disable autoplay to prevent unexpected behavior
+            }
+            return ttsAudio;
+        }
+        
+        // Get session ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        sessionId = urlParams.get('session_id') || "{{ session_id }}";
+        const port = urlParams.get('port') || "{{ port }}" || '5025';
+        characterParam = urlParams.get('character'); // Get character parameter
+        apiUrl = `http://${window.location.hostname}:${port}`;
+        
+        // Log character info for debugging
+        if (characterParam) {
+            console.log(`Character specified in URL: ${characterParam}`);
+        }
+        
+        // Ensure ttsAudio is initialized
+        initTTSAudio();
+        
+        // DOM Elements
+        messageContainer = document.getElementById('message-container');
+        userInput = document.getElementById('user-input');
+        sendMessageBtn = document.getElementById('send-message');
+        startSpeakingBtn = document.getElementById('start-speaking');
+        stopSpeakingBtn = document.getElementById('stop-speaking');
+        endInterviewBtn = document.getElementById('end-interview');
+        connectionIndicator = document.getElementById('connection-indicator');
+        connectionStatusText = document.getElementById('connection-status-text');
+        
+        // Add debug panel toggle
+        document.addEventListener('keydown', function(e) {
+            // Alt+D to toggle debug panel
+            if (e.altKey && e.key === 'd') {
+                const debugPanel = document.querySelector('.debug-panel');
+                if (debugPanel) {
+                    debugPanel.style.display = debugPanel.style.display === 'none' ? 'block' : 'none';
+                }
+            }
+        });
+
+        // Show debug panel by default for testing
+        document.querySelector('.debug-panel').style.display = 'block';
+        
+        // Initialize
+        updateConnectionStatus(false, 'Disconnected - Connecting...');
+        
+        // Connect to API server
+        async function checkConnection() {
+            try {
+                log('Connecting to API server at ' + apiUrl, 'info');
+                const response = await fetch(`${apiUrl}/api/health`);
+                
+                if (!response.ok) {
+                    throw new Error(`API server returned status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (data.status === 'ok') {
+                    log('API server health check successful', 'info');
+                    updateConnectionStatus(true, 'Connected');
+                    
+                    // Log character info for debugging
+                    if (characterParam) {
+                        log(`Will attempt to set character to ${characterParam} from URL parameter`, 'info');
+                    }
+                    
+                    // Check services after successful connection
+                    await checkAudioServices();
+                    
+                    // Enable UI when connected
+                    enableUI();
+                    
+                    return true;
+                } else {
+                    throw new Error('API server health check failed');
+                }
+            } catch (e) {
+                log(`API connection error: ${e.message}`, 'error');
+                updateConnectionStatus(false, `Disconnected - ${e.message}`);
+                return false;
+            }
+        }
+        
+        // Then load session data
+        async function loadSessionMessages() {
+            if (!sessionId) {
+                addErrorMessage('No session ID available');
+                return;
+            }
+            
+            try {
+                // Set character from URL parameter if available
+                if (characterParam) {
+                    log(`Setting character to ${characterParam} from URL parameter`, 'info');
+                    await setCharacterForSession(sessionId, characterParam);
+                }
+                
+                const messagesResponse = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
+                
+                if (!messagesResponse.ok) {
+                    throw new Error(`Failed to fetch messages: ${messagesResponse.status}`);
+                }
+                
+                const messagesData = await messagesResponse.json();
+                if (!messagesData.messages || !Array.isArray(messagesData.messages)) {
+                    log('No messages found or invalid data structure', 'warn');
+                    return;
+                }
+                
+                // Count the number of messages loaded
+                log(`Loaded ${messagesData.messages.length} messages`, 'info');
+                
+                // Clear existing messages
+                messageContainer.innerHTML = '';
+                
+                // Add each message to the container
+                messagesData.messages.forEach(message => {
+                    if (message.role === 'user') {
+                        addUserMessage(message.content);
+                    } else if (message.role === 'assistant') {
+                        addAssistantMessage(message.content);
+                    }
+                    // Skip system messages for display
+                });
+                
+                // Scroll to bottom
+                scrollToBottom();
+                
+                // Enable UI if session is active
+                if (isConnected) {
+                    enableUI();
+                }
+            } catch (e) {
+                log(`Error loading messages: ${e.message}`, 'error');
+                addErrorMessage(`Error loading conversation: ${e.message}`);
+            }
+        }
+        
+        // Update the connection status indicator
+        function updateConnectionStatus(connected, statusText) {
+            const indicator = document.getElementById('connection-indicator');
+            const statusTextElem = document.getElementById('connection-status-text');
+            
+            if (indicator) {
+                indicator.className = `status-indicator ${connected ? 'status-connected' : 'status-disconnected'}`;
+            }
+            
+            if (statusTextElem) {
+                statusTextElem.textContent = statusText || (connected ? 'Connected' : 'Disconnected');
+            }
+            
+            isConnected = connected;
+            log(`Updating connection status: ${statusText}`, 'info');
+        }
+        
+        // Update the microphone status indicator
+        function updateMicStatus(active, statusText) {
+            const indicator = document.getElementById('mic-indicator');
+            const statusTextElem = document.getElementById('mic-status-text');
+            
+            if (indicator) {
+                indicator.className = `status-indicator ${active ? 'status-active' : 'status-disconnected'}`;
+            }
+            
+            if (statusTextElem) {
+                statusTextElem.textContent = statusText || (active ? 'Active' : 'Inactive');
+            }
+            
+            sttActive = active;
+            log(`Microphone status updated: ${statusText}`, 'info');
+        }
+        
+        // Update audio visualization based on activity
+        function updateAudioVisualization(active) {
+            // This is a simple implementation - you can enhance this with more visual feedback
+            const micIndicator = document.getElementById('mic-indicator');
+            
+            if (micIndicator) {
+                if (active && sttActive) {
+                    micIndicator.classList.add('pulsing');
+                } else {
+                    micIndicator.classList.remove('pulsing');
+                }
+            }
+        }
+        
+        // Add an error message to the conversation
+        function addErrorMessage(message) {
+            addMessage(message, 'error');
+        }
+        
+        // Safely stop speech recognition
+        function safelyStopSpeechRecognition() {
+            try {
+                if (recognition) {
+                    recognition.stop();
+                    console.log("Speech recognition stopped safely");
+                }
+            } catch (error) {
+                console.warn("Error stopping speech recognition:", error);
+            }
+            
+            sttActive = false;
+            updateMicStatus(false, 'Ready');
+        }
+        
+        // End the session
+        function endSession() {
+            console.log("Ending interview session");
+            
+            // Add system message to conversation
+            addMessage("Interview session ending...", "system");
+            
+            // First, safely stop any speech recognition
+            safelyStopSpeechRecognition();
+            
+            // Then stop any TTS
+            if (ttsAudio) {
+                try {
+                    ttsAudio.pause();
+                    if (ttsAudio.src && ttsAudio.src.startsWith('blob:')) {
+                        URL.revokeObjectURL(ttsAudio.src);
+                    }
+                    ttsAudio = null;
+                } catch (error) {
+                    console.warn("Error stopping TTS:", error);
+                }
+            }
+            
+            // Disable input
+            if (userInput) userInput.disabled = true;
+            if (sendMessageBtn) sendMessageBtn.disabled = true;
+            if (startSpeakingBtn) startSpeakingBtn.disabled = true;
+            if (stopSpeakingBtn) stopSpeakingBtn.disabled = true;
+            
+            // Optionally, redirect to session page after delay
+            setTimeout(() => {
+                // Redirect to session details page
+                window.location.href = `${apiUrl}/session/${sessionId}`;
+            }, 2000);
+        }
+        
+        // Add system message
+        function addSystemMessage(content) {
+            const messageElem = document.createElement('div');
+            messageElem.className = 'message error-message';
+            messageElem.textContent = content;
+            messageContainer.appendChild(messageElem);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+        }
+        
+        // Helper to add a message to the conversation
+        function addMessage(content, role) {
+            if (!content) {
+                console.error("addMessage: Cannot add empty message");
+                return;
+            }
+            
+            console.log(`addMessage: Adding ${role} message: "${content.substring(0, 30)}${content.length > 30 ? '...' : ''}"`);
+            
+            const messageElem = document.createElement('div');
+            messageElem.className = 'message ' + (role === 'assistant' ? 'assistant-message' : 
+                                                role === 'user' ? 'user-message' : 'system-message');
+            messageElem.textContent = content;
+            
+            if (!messageContainer) {
+                messageContainer = document.getElementById('message-container');
+                if (!messageContainer) {
+                    console.error('addMessage: Message container not found, creating one');
+                    messageContainer = document.createElement('div');
+                    messageContainer.id = 'message-container';
+                    messageContainer.className = 'message-container';
+                    document.querySelector('.container').appendChild(messageContainer);
+                }
+            }
+            
+            messageContainer.appendChild(messageElem);
+            messageContainer.scrollTop = messageContainer.scrollHeight;
+            
+            if (role === 'assistant') {
+                lastAssistantMessage = content;
+                
+                // Play TTS for assistant messages with proper error handling
+                console.log(`addMessage: Attempting to play TTS for assistant message`);
+                
+                // SAFETY: Ensure ttsAudio is initialized
+                if (!ttsAudio) {
+                    console.log('addMessage: TTS Audio not initialized, creating new audio element');
+                    ttsAudio = new Audio();
+                }
+                
+                // Wrap in setTimeout to avoid blocking UI and ensure TTS is ready
+                setTimeout(() => {
+                    try {
+                        // Make sure audio is initialized
+                        ttsAudio = initTTSAudio();
+                        
+                        // Get a proper promise from playTTS
+                        const ttsPromise = playTTS(content);
+                        
+                        // Add proper promise handling
+                        if (ttsPromise && typeof ttsPromise.then === 'function') {
+                            ttsPromise
+                                .then(() => {
+                                    console.log(`addMessage: TTS playback completed for assistant message`);
+                                })
+                                .catch(err => {
+                                    console.error(`addMessage: TTS playback error:`, err);
+                                });
+                        } else {
+                            console.error(`addMessage: playTTS did not return a valid promise`);
+                        }
+                    } catch (err) {
+                        console.error(`addMessage: Failed to initiate TTS:`, err);
+                    }
+                }, 100);
+            }
+        }
+        
+        // Fetch latest messages from the server
+        async function fetchLatestMessages() {
+            if (!sessionId) {
+                console.error('fetchLatestMessages: No session ID available');
+                return Promise.resolve(false);
+            }
+            
+            if (!messageContainer) {
+                console.error('fetchLatestMessages: Message container not found');
+                return Promise.resolve(false);
+            }
+            
+            try {
+                console.log(`fetchLatestMessages: Requesting messages for session ${sessionId}`);
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
+                
+                if (!response.ok) {
+                    throw new Error(`API returned status ${response.status}`);
+                }
+                
+                const data = await response.json();
+                let hasNewMessages = false;
+                
+                if (data.messages && data.messages.length > 0) {
+                    console.log(`fetchLatestMessages: Received ${data.messages.length} messages`);
+                    
+                    // Filter messages by role for easier processing
+                    const userMessages = data.messages.filter(msg => msg.role === 'user');
+                    const assistantMessages = data.messages.filter(msg => msg.role === 'assistant');
+                    
+                    if (assistantMessages.length > 0) {
+                        const latestAssistantMsg = assistantMessages[assistantMessages.length - 1];
+                        
+                        // Skip if we've already displayed this exact message
+                        if (lastAssistantMessage !== latestAssistantMsg.content) {
+                            console.log(`fetchLatestMessages: New assistant message detected`);
+                            lastAssistantMessage = latestAssistantMsg.content;
+                            
+                            // Clear and rebuild message display
+                            messageContainer.innerHTML = '';
+                            hasNewMessages = true;
+                            
+                            // Re-add all messages in order
+                            data.messages.forEach(msg => {
+                                if (msg.role === 'user') {
+                                    addUserMessage(msg.content);
+                                } else if (msg.role === 'assistant') {
+                                    addAssistantMessage(msg.content);
+                                }
+                                // Skip system messages
+                            });
+                            
+                            // Check if we have pending suggestions to incorporate into the next AI response
+                            if (pendingSuggestions.length > 0 && latestAssistantMsg) {
+                                // Get the next suggestion
+                                const nextSuggestion = pendingSuggestions.shift();
+                                
+                                // Send a message to the AI to integrate the suggestion
+                                await incorporateSuggestion(nextSuggestion);
+                                
+                                // We'll let the normal polling pick up the AI's response
+                                return true;
+                            }
+                            
+                            // Play TTS for latest message
+                            setTimeout(() => {
+                                try {
+                                    console.log(`fetchLatestMessages: Playing TTS for latest assistant message`);
+                                    const msg = latestAssistantMsg;
+                                    
+                                    // Skip if TTS is already playing
+                                    if (ttsActive) {
+                                        console.log('fetchLatestMessages: TTS already active, skipping');
+                                        return;
+                                    }
+                                    
+                                    // Call playTTS with proper error handling
+                                    const ttsPromise = playTTS(msg.content);
+                                    
+                                    // Verify we have a valid promise before calling then
+                                    if (ttsPromise && typeof ttsPromise.then === 'function') {
+                                        console.log('fetchLatestMessages: Valid promise returned from playTTS');
+                                        
+                                        ttsPromise
+                                            .then(() => {
+                                                console.log("fetchLatestMessages: TTS completed successfully");
+                                            })
+                                            .catch(err => {
+                                                console.error("fetchLatestMessages: TTS playback error:", err);
+                                            });
+                                    } else {
+                                        console.error('fetchLatestMessages: Invalid promise returned from playTTS');
+                                    }
+                                } catch (err) {
+                                    console.error('fetchLatestMessages: Error calling playTTS:', err);
+                                }
+                            }, 500);
+                        } else {
+                            console.log(`fetchLatestMessages: Skipping duplicate message`);
+                        }
+                    }
+                    
+                    // Scroll to bottom if new messages were added
+                    if (hasNewMessages) {
+                        console.log('fetchLatestMessages: Scrolling to bottom due to new messages');
+                        messageContainer.scrollTop = messageContainer.scrollHeight;
+                    }
+                } else {
+                    console.log('fetchLatestMessages: No messages received from API');
+                }
+                
+                return Promise.resolve(true);
+            } catch (error) {
+                console.error('fetchLatestMessages: Error:', error);
+                return Promise.resolve(false);
+            }
+        }
+        
+        // Initialize speech recognition
+        function initSpeechRecognition() {
+            if (!('webkitSpeechRecognition' in window) && !('SpeechRecognition' in window)) {
+                console.warn('Speech recognition not supported in this browser');
+                updateMicStatus(false, 'Not supported');
+                return false;
+            }
+            
+            // Create recognition object
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
+            
+            // Configure
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
+            // Set up event handlers
+            recognition.onstart = function() {
+                sttActive = true;
+                updateMicStatus(true, 'Listening...');
+                console.log('Speech recognition started');
+            };
+            
+            recognition.onend = function() {
+                sttActive = false;
+                updateMicStatus(false, 'Ready');
+                console.log('Speech recognition ended');
+            };
+            
+            recognition.onerror = function(event) {
+                sttActive = false;
+                updateMicStatus(false, `Error: ${event.error}`);
+                console.error('Speech recognition error:', event.error);
+            };
+            
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    const transcript = event.results[i][0].transcript;
+                    
+                    if (event.results[i].isFinal) {
+                        finalTranscript += transcript;
+                    } else {
+                        interimTranscript += transcript;
+                    }
+                }
+                
+                // Handle final transcript
+                if (finalTranscript) {
+                    userInput.value = finalTranscript;
+                    
+                    // Check for voice commands
+                    checkForVoiceCommands(finalTranscript);
+                }
+                
+                // Show interim transcript
+                if (interimTranscript) {
+                    userInput.value = interimTranscript;
+                }
+            };
+            
+            return true;
+        }
+        
+        // Start speech recognition
+        function startSpeechRecognition() {
+            if (!recognition) {
+                initSpeechRecognition();
+            }
+            
+            if (recognition) {
+                try {
+                    recognition.start();
+                    updateMicStatus(true, 'Listening...');
+                } catch (error) {
+                    console.error('Error starting speech recognition:', error);
+                    updateMicStatus(false, 'Error starting');
+                }
+            }
+        }
+        
+        // Stop speech recognition
+        function stopSpeechRecognition() {
+            if (recognition) {
+                try {
+                    recognition.stop();
+                    updateMicStatus(false, 'Ready');
+                } catch (error) {
+                    console.error('Error stopping speech recognition:', error);
+                }
+            }
+        }
+        
+        // Check for voice commands
+        function checkForVoiceCommands(text) {
+            if (!text) return;
+            
+            const lowerText = text.toLowerCase();
+            
+            // Check for stop command
+            if (lowerText.includes('stop the interview')) {
+                console.log('Voice command detected: "stop the interview" in "' + text + '"');
+                endSession();
+                return true;
+            }
+            
+            // Other commands can be added here
+            
+            return false;
+        }
+        
+        // Play text to speech for a message
+        async function playTTS(text) {
+            // Handle empty text case
+            if (!text || text.trim() === '') {
+                console.error('TTS: Cannot play empty text');
+                return Promise.resolve(); // Return a resolved promise instead of undefined
+            }
+            
+            console.log(`TTS: Attempting to play text: "${text.substring(0, 50)}${text.length > 50 ? '...' : ''}"`);
+            
+            try {
+                // Set TTS active flag
+                ttsActive = true;
+                console.log('TTS: Setting active flag to true');
+                
+                // Ensure audio element is initialized
+                ttsAudio = initTTSAudio();
+                console.log('TTS: Ensuring audio element is properly initialized');
+                
+                // Create TTS request
+                console.log(`TTS: Sending request to ${apiUrl}/api/text_to_speech_elevenlabs`);
+                const response = await fetch(`${apiUrl}/api/text_to_speech_elevenlabs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        text: text,
+                        voice_id: 'EXAVITQu4vr4xnSDxMaL' // Default Daria voice
+                    })
+                }).catch(error => {
+                    console.error('TTS: Fetch error:', error);
+                    ttsActive = false;
+                    throw error; // Re-throw to be caught by outer try/catch
+                });
+                
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    console.error(`TTS: Request failed with status: ${response.status}`, errorText);
+                    ttsActive = false;
+                    return Promise.reject(new Error(`TTS request failed with status: ${response.status}`));
+                }
+                
+                // Get audio blob
+                console.log('TTS: Response received, getting audio blob');
+                const audioBlob = await response.blob();
+                console.log(`TTS: Received audio blob of size: ${audioBlob.size} bytes`);
+                
+                if (audioBlob.size === 0) {
+                    console.error('TTS: Received empty audio blob');
+                    ttsActive = false;
+                    return Promise.reject(new Error('Received empty audio blob'));
+                }
+                
+                // Create and play audio
+                const audioUrl = URL.createObjectURL(audioBlob);
+                console.log('TTS: Created URL for audio blob');
+                
+                // Make sure audio element exists and is initialized
+                ttsAudio = initTTSAudio();
+                console.log('TTS: Audio element initialized or reused');
+                
+                ttsAudio.src = audioUrl;
+                console.log('TTS: Set audio source URL');
+                
+                return new Promise((resolve, reject) => {
+                    let audioPlayStarted = false;
+                    let timeoutId = null;
+                    
+                    // Set a timeout in case the audio never plays
+                    timeoutId = setTimeout(() => {
+                        if (ttsActive) {
+                            console.warn('TTS: Timeout reached, audio may not have played');
+                            ttsActive = false;
+                            URL.revokeObjectURL(audioUrl);
+                            
+                            // Resolve anyway to prevent blocking
+                            resolve();
+                        }
+                    }, 10000);
+                    
+                    ttsAudio.onloadedmetadata = () => {
+                        console.log(`TTS: Audio loaded, duration: ${ttsAudio.duration}s`);
+                    };
+                    
+                    ttsAudio.oncanplaythrough = () => {
+                        console.log('TTS: Audio can play through, starting playback');
+                        
+                        try {
+                            if (audioPlayStarted) {
+                                console.log('TTS: Audio playback already started, skipping duplicate play attempt');
+                                return;
+                            }
+                            
+                            audioPlayStarted = true;
+                            const playPromise = ttsAudio.play();
+                            console.log('TTS: Play command issued');
+                            
+                            if (playPromise !== undefined) {
+                                playPromise.then(() => {
+                                    console.log('TTS: Playback started successfully');
+                                }).catch(error => {
+                                    console.error('TTS: Play promise rejected:', error);
+                                    ttsActive = false;
+                                    
+                                    if (timeoutId) {
+                                        clearTimeout(timeoutId);
+                                        timeoutId = null;
+                                    }
+                                    
+                                    URL.revokeObjectURL(audioUrl);
+                                    reject(error);
+                                });
+                            } else {
+                                console.log('TTS: Play returned undefined, assuming playback started');
+                            }
+                        } catch (error) {
+                            console.error('TTS: Error during play():', error);
+                            ttsActive = false;
+                            
+                            if (timeoutId) {
+                                clearTimeout(timeoutId);
+                                timeoutId = null;
+                            }
+                            
+                            URL.revokeObjectURL(audioUrl);
+                            reject(error);
+                        }
+                    };
+                    
+                    ttsAudio.onended = () => {
+                        console.log('TTS: Audio playback ended');
+                        ttsActive = false;
+                        
+                        if (timeoutId) {
+                            clearTimeout(timeoutId);
+                            timeoutId = null;
+                        }
+                        
+                        URL.revokeObjectURL(audioUrl);
+                        resolve();
+                    };
+                    
+                    ttsAudio.onerror = (event) => {
+                        console.error('TTS: Audio error event fired:', event, ttsAudio.error);
+                        ttsActive = false;
+                        
+                        if (timeoutId) {
+                            clearTimeout(timeoutId);
+                            timeoutId = null;
+                        }
+                        
+                        URL.revokeObjectURL(audioUrl);
+                        reject(new Error(`Audio playback error: ${ttsAudio.error ? ttsAudio.error.message : 'unknown error'}`));
+                    };
+                });
+            } catch (error) {
+                console.error('TTS: Error in playTTS:', error);
+                ttsActive = false;
+                return Promise.reject(error);
+            }
+        }
+        
+        // Send user message to API
+        async function sendMessage(text) {
+            if (!text || text.trim() === '') {
+                console.warn('Cannot send empty message');
+                return false;
+            }
+            
+            // Trim whitespace
+            text = text.trim();
+            
+            console.log('sendMessage function called with: ', text);
+            
+            // First check for voice commands
+            if (checkForVoiceCommands(text)) {
+                console.log('Voice command handled');
+                return true;
+            }
+            
+            // Add message to UI immediately
+            addMessage(text, 'user');
+            
+            // Clear input
+            if (userInput) {
+                userInput.value = '';
+            }
+            
+            // Stop STT if active
+            if (sttActive) {
+                stopSpeechRecognition();
+            }
+            
+            try {
+                // Send message to API
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        message: text,
+                        role: 'user'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API error: ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Failed to send message');
+                }
+                
+                // Show polling message
+                const waitMessage = document.createElement('div');
+                waitMessage.className = 'message system-message processing-message';
+                waitMessage.textContent = 'Waiting for response...';
+                messageContainer.appendChild(waitMessage);
+                messageContainer.scrollTop = messageContainer.scrollHeight;
+                
+                // Poll for response after a short delay
+                setTimeout(() => {
+                    // Remove waiting message before fetching
+                    const processingMessage = messageContainer.querySelector('.processing-message');
+                    if (processingMessage) {
+                        messageContainer.removeChild(processingMessage);
+                    }
+                    
+                    // Fetch new messages
+                    fetchLatestMessages();
+                    
+                    // Set polling interval if needed
+                    const pollInterval = setInterval(() => {
+                        fetchLatestMessages().then(result => {
+                            if (result) {
+                                clearInterval(pollInterval);
+                            }
+                        });
+                    }, 2000); // Poll every 2 seconds
+                    
+                    // Safety timeout to stop polling after 30 seconds
+                    setTimeout(() => {
+                        if (pollInterval) {
+                            clearInterval(pollInterval);
+                        }
+                    }, 30000);
+                }, 1000);
+                
+                return true;
+            } catch (error) {
+                console.error('Error sending message:', error);
+                
+                // Remove the message on error
+                const messages = messageContainer.querySelectorAll('.user-message');
+                const lastMessage = messages[messages.length - 1];
+                
+                if (lastMessage && lastMessage.textContent === text) {
+                    messageContainer.removeChild(lastMessage);
+                }
+                
+                // Show error message
+                addErrorMessage(`Failed to send message: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // Load session messages
+        async function loadSessionMessages() {
+            if (!sessionId) {
+                addErrorMessage('No session ID available');
+                return;
+            }
+            
+            try {
+                // Set character from URL parameter if available
+                if (characterParam) {
+                    log(`Setting character to ${characterParam} from URL parameter`, 'info');
+                    await setCharacterForSession(sessionId, characterParam);
+                }
+                
+                const messagesResponse = await fetch(`${apiUrl}/api/session/${sessionId}/messages`);
+                
+                if (!messagesResponse.ok) {
+                    throw new Error(`Failed to fetch messages: ${messagesResponse.status}`);
+                }
+                
+                const messagesData = await messagesResponse.json();
+                if (!messagesData.messages || !Array.isArray(messagesData.messages)) {
+                    log('No messages found or invalid data structure', 'warn');
+                    return;
+                }
+                
+                // Count the number of messages loaded
+                log(`Loaded ${messagesData.messages.length} messages`, 'info');
+                
+                // Clear existing messages
+                messageContainer.innerHTML = '';
+                
+                // Add each message to the container
+                messagesData.messages.forEach(message => {
+                    if (message.role === 'user') {
+                        addUserMessage(message.content);
+                    } else if (message.role === 'assistant') {
+                        addAssistantMessage(message.content);
+                    }
+                    // Skip system messages for display
+                });
+                
+                // Scroll to bottom
+                scrollToBottom();
+                
+                // Enable UI if session is active
+                if (isConnected) {
+                    enableUI();
+                }
+            } catch (e) {
+                log(`Error loading messages: ${e.message}`, 'error');
+                addErrorMessage(`Error loading conversation: ${e.message}`);
+            }
+        }
+        
+        // Connect to the API server
+        async function connectToServer() {
+            return new Promise((resolve, reject) => {
+                try {
+                    console.log(`Connecting to API server on port ${apiPort}`);
+                    fetch(`${apiUrl}/api/health`)
+                        .then(response => {
+                            if (response.ok) {
+                                isConnected = true;
+                                updateStatus();
+                                log('API server connection successful', 'info');
+                                
+                                // Enable UI
+                                userInput.disabled = false;
+                                sendMessageBtn.disabled = false;
+                                endInterviewBtn.disabled = false;
+                                
+                                // Fetch initial messages if session ID is provided
+                                if (sessionId) {
+                                    log(`Loading messages for session: ${sessionId}`, 'info');
+                                    fetchLatestMessages();
+                                } else {
+                                    console.error("No session ID provided!");
+                                    addMessage("Error: No session ID provided", 'error');
+                                    log('Error: No session ID provided', 'error');
+                                }
+                                
+                                // Start timer
+                                startTimer();
+                                
+                                resolve(true);
+                            } else {
+                                console.error("API server health check failed:", response.status);
+                                connectionStatusText.textContent = "Connection Failed";
+                                connectionStatus.classList.add('status-inactive');
+                                log(`API server health check failed: ${response.status}`, 'error');
+                                reject(new Error(`Health check failed: ${response.status}`));
+                            }
+                        })
+                        .catch(error => {
+                            console.error("Error connecting to server:", error);
+                            connectionStatusText.textContent = "Connection Error";
+                            connectionStatus.classList.add('status-inactive');
+                            log(`Connection error: ${error.message}`, 'error');
+                            reject(error);
+                        });
+                } catch (error) {
+                    console.error("Critical connection error:", error);
+                    updateStatus();
+                    reject(error);
+                }
+            });
+        }
+        
+        // Request microphone access
+        function checkMicrophonePermission() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                console.warn('Microphone access not supported in this browser');
+                updateMicStatus(false, 'Not supported');
+                return Promise.resolve(false);
+            }
+            
+            return navigator.mediaDevices.getUserMedia({ audio: true })
+                .then(function(stream) {
+                    console.log('Microphone access granted');
+                    // Stop the tracks to release the microphone
+                    stream.getTracks().forEach(track => track.stop());
+                    updateMicStatus(false, 'Ready');
+                    return true;
+                })
+                .catch(function(error) {
+                    console.error('Microphone access denied:', error);
+                    updateMicStatus(false, 'Access denied');
+                    return false;
+                });
+        }
+        
+        // Setup audio monitoring for microphone levels
+        async function setupAudioMonitoring() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                    console.warn("Audio monitoring not supported in this browser");
+                    updateMicStatus(false, 'Not supported');
+                    resolve(); // Resolve anyway to not block the flow
+                    return;
+                }
+                
+                try {
+                    // Request microphone access
+                    navigator.mediaDevices.getUserMedia({ audio: true })
+                        .then(stream => {
+                            // Create audio context
+                            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                            analyser = audioContext.createAnalyser();
+                            microphone = audioContext.createMediaStreamSource(stream);
+                            
+                            // Configure analyser
+                            analyser.fftSize = 256;
+                            analyser.smoothingTimeConstant = 0.8;
+                            microphone.connect(analyser);
+                            
+                            // Note: We don't connect the analyser to the destination
+                            // to avoid feedback. We're just using it to monitor levels.
+                            
+                            // Start monitoring audio levels
+                            const bufferLength = analyser.frequencyBinCount;
+                            const dataArray = new Uint8Array(bufferLength);
+                            
+                            audioLevelInterval = setInterval(() => {
+                                if (analyser && !ttsActive) {
+                                    analyser.getByteFrequencyData(dataArray);
+                                    
+                                    // Calculate average level
+                                    let sum = 0;
+                                    for (let i = 0; i < bufferLength; i++) {
+                                        sum += dataArray[i];
+                                    }
+                                    const average = sum / bufferLength;
+                                    
+                                    // Update UI based on audio level
+                                    updateAudioVisualization(average > 10);
+                                }
+                            }, 100);
+                            
+                            updateMicStatus(true, 'Ready');
+                            resolve();
+                        })
+                        .catch(error => {
+                            console.error("Error accessing microphone:", error);
+                            updateMicStatus(false, 'Access denied');
+                            reject(error);
+                        });
+                } catch (error) {
+                    console.error("Error setting up audio monitoring:", error);
+                    updateMicStatus(false, 'Setup failed');
+                    reject(error);
+                }
+            });
+        }
+        
+        // Function to initialize the page UI and event handlers
+        function initializePage() {
+            console.log("Creating missing chat container");
+            
+            // Create message container if it doesn't exist
+            if (!messageContainer) {
+                messageContainer = document.createElement('div');
+                messageContainer.id = 'message-container';
+                messageContainer.className = 'message-container';
+                document.querySelector('.container').appendChild(messageContainer);
+            }
+            console.log("Chat container initialized");
+            
+            // Create message controls if they don't exist
+            if (!sendMessageBtn || !userInput) {
+                console.log("Creating missing message controls");
+                
+                const inputContainer = document.createElement('div');
+                inputContainer.className = 'input-container';
+                
+                // Create input row
+                const inputRow = document.createElement('div');
+                inputRow.className = 'input-row';
+                
+                // Create text input
+                userInput = document.createElement('input');
+                userInput.type = 'text';
+                userInput.id = 'user-input';
+                userInput.className = 'text-input';
+                userInput.placeholder = 'Type your message here...';
+                inputRow.appendChild(userInput);
+                
+                // Create send button
+                sendMessageBtn = document.createElement('button');
+                sendMessageBtn.id = 'send-message';
+                sendMessageBtn.className = 'btn btn-primary';
+                sendMessageBtn.textContent = 'Send';
+                inputRow.appendChild(sendMessageBtn);
+                
+                inputContainer.appendChild(inputRow);
+                
+                // Create mic controls row
+                const micRow = document.createElement('div');
+                micRow.className = 'input-row';
+                
+                // Create start speaking button
+                startSpeakingBtn = document.createElement('button');
+                startSpeakingBtn.id = 'start-speaking';
+                startSpeakingBtn.className = 'btn btn-secondary';
+                startSpeakingBtn.textContent = 'Start Speaking';
+                micRow.appendChild(startSpeakingBtn);
+                
+                // Create stop speaking button
+                stopSpeakingBtn = document.createElement('button');
+                stopSpeakingBtn.id = 'stop-speaking';
+                stopSpeakingBtn.className = 'btn btn-secondary';
+                stopSpeakingBtn.textContent = 'Stop Speaking';
+                micRow.appendChild(stopSpeakingBtn);
+                
+                inputContainer.appendChild(micRow);
+                
+                // Create status container
+                const statusContainer = document.createElement('div');
+                statusContainer.className = 'status-container';
+                
+                // Create connection status
+                const connectionStatus = document.createElement('div');
+                connectionStatus.className = 'status-item';
+                
+                const connectionIndicator = document.createElement('span');
+                connectionIndicator.id = 'connection-indicator';
+                connectionIndicator.className = 'status-indicator status-disconnected';
+                connectionStatus.appendChild(connectionIndicator);
+                
+                const connectionText = document.createElement('span');
+                connectionText.id = 'connection-status-text';
+                connectionText.textContent = 'Disconnected';
+                connectionStatus.appendChild(connectionText);
+                
+                statusContainer.appendChild(connectionStatus);
+                
+                // Create mic status
+                const micStatus = document.createElement('div');
+                micStatus.className = 'status-item';
+                
+                const micIndicator = document.createElement('span');
+                micIndicator.id = 'mic-indicator';
+                micIndicator.className = 'status-indicator status-disconnected';
+                micStatus.appendChild(micIndicator);
+                
+                const micStatusText = document.createElement('span');
+                micStatusText.id = 'mic-status-text';
+                micStatusText.textContent = 'Microphone inactive';
+                micStatus.appendChild(micStatusText);
+                
+                statusContainer.appendChild(micStatus);
+                
+                inputContainer.appendChild(statusContainer);
+                
+                // Add input container to page
+                document.querySelector('.container').appendChild(inputContainer);
+            }
+            console.log("Message controls initialized");
+            
+            // Make sure the chat input area is visible
+            if (userInput) {
+                console.log("Chat input area exists, ensuring visibility");
+                userInput.style.display = 'block';
+                
+                // Add loading message if container is empty
+                if (messageContainer && messageContainer.childElementCount === 0) {
+                    const loadingMsg = document.createElement('div');
+                    loadingMsg.className = 'message system-message';
+                    loadingMsg.textContent = 'Loading conversation...';
+                    messageContainer.appendChild(loadingMsg);
+                }
+            }
+            
+            // Set up event listeners for buttons
+            console.log("Setting up send button click handler");
+            if (sendMessageBtn) {
+                sendMessageBtn.onclick = function() {
+                    console.log("Send button clicked");
+                    const message = userInput.value.trim();
+                    console.log("Sending text input: ", message);
+                    if (message) {
+                        sendMessage(message);
+                        userInput.value = '';
+                    }
+                };
+            }
+            
+            console.log("Setting up text input keypress handler");
+            if (userInput) {
+                userInput.onkeypress = function(e) {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (sendMessageBtn) {
+                            sendMessageBtn.click();
+                        }
+                    }
+                };
+            }
+            
+            // Set up audio element
+            if (!ttsAudio) {
+                ttsAudio = initTTSAudio();
+                console.log("Audio element initialized");
+            }
+            
+            console.log("Page UI initialization complete");
+            
+            // Important: Do not return a value that could be treated as a Promise
+        }
+        
+        // Initialize all event listeners in one function
+        function initEventListeners() {
+            console.log("Initializing event listeners");
+            
+            if (sendMessageBtn) {
+                console.log("Adding send button click listener");
+                sendMessageBtn.addEventListener('click', () => {
+                    const message = userInput.value.trim();
+                    if (message) {
+                        sendMessage(message);
+                        userInput.value = '';
+                    }
+                });
+            } else {
+                console.warn("Send button not found");
+            }
+            
+            if (startSpeakingBtn) {
+                console.log("Adding start speaking button listener");
+                startSpeakingBtn.addEventListener('click', startSpeechRecognition);
+            } else {
+                console.warn("Start speaking button not found");
+            }
+            
+            if (stopSpeakingBtn) {
+                console.log("Adding stop speaking button listener");
+                stopSpeakingBtn.addEventListener('click', stopSpeechRecognition);
+            } else {
+                console.warn("Stop speaking button not found");
+            }
+            
+            if (userInput) {
+                console.log("Adding keypress listener for text input");
+                userInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter' && !e.shiftKey) {
+                        e.preventDefault();
+                        if (sendMessageBtn) {
+                            sendMessageBtn.click();
+                        }
+                    }
+                });
+            } else {
+                console.warn("Text input not found");
+            }
+            
+            console.log("Event listeners initialization complete");
+        }
+        
+        // Start timer function
+        function startTimer() {
+            console.log("Starting session timer");
+            startTime = new Date();
+            
+            timerInterval = setInterval(() => {
+                if (startTime) {
+                    const now = new Date();
+                    const diff = now - startTime;
+                    
+                    // Format time as mm:ss
+                    const minutes = Math.floor(diff / 60000);
+                    const seconds = Math.floor((diff % 60000) / 1000);
+                    
+                    // Update timer display if element exists
+                    const timerDisplay = document.getElementById('timer');
+                    if (timerDisplay) {
+                        timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                    }
+                }
+            }, 1000);
+            
+            console.log("Timer started");
+        }
+        
+        // Update status of all UI elements
+        function updateStatus() {
+            console.log("Updating UI status indicators");
+            
+            // Update connection status
+            updateConnectionStatus(isConnected, isConnected ? 'Connected' : 'Disconnected');
+            
+            // Update mic status
+            updateMicStatus(sttActive, sttActive ? 'Active' : 'Ready');
+            
+            // Update TTS status
+            if (document.getElementById('tts-status')) {
+                const ttsStatus = document.getElementById('tts-status');
+                const ttsStatusText = document.getElementById('tts-status-text');
+                
+                if (ttsActive) {
+                    ttsStatus.className = 'status-indicator status-active';
+                    ttsStatusText.textContent = 'Speaking';
+                } else {
+                    ttsStatus.className = 'status-indicator status-connected';
+                    ttsStatusText.textContent = 'Ready';
+                }
+            }
+            
+            console.log("Status indicators updated");
+        }
+        
+        // Setup collapsible panels (accordions)
+        function setupCollapsiblePanels() {
+            console.log("Setting up collapsible panels");
+            
+            const headers = document.querySelectorAll('.collapsible-header');
+            if (!headers || headers.length === 0) {
+                console.warn("No collapsible headers found on page");
+                return;
+            }
+            
+            console.log(`Found ${headers.length} collapsible panels`);
+            
+            headers.forEach(header => {
+                header.addEventListener('click', () => {
+                    console.log(`Toggling panel: ${header.textContent}`);
+                    
+                    // Get the content panel
+                    const content = header.nextElementSibling;
+                    if (!content) {
+                        console.warn("No content element found for header:", header);
+                        return;
+                    }
+                    
+                    // Get the toggle icon
+                    const toggleIcon = header.querySelector('.toggle-icon');
+                    
+                    // Toggle the panel's expanded state
+                    if (content.style.maxHeight && content.style.maxHeight !== '0px') {
+                        // Panel is expanded, so collapse it
+                        content.style.maxHeight = null;
+                        if (toggleIcon) toggleIcon.textContent = '+';
+                        console.log("Panel collapsed");
+                    } else {
+                        // Panel is collapsed, so expand it
+                        content.style.maxHeight = content.scrollHeight + 'px';
+                        if (toggleIcon) toggleIcon.textContent = '−';
+                        console.log("Panel expanded");
+                    }
+                });
+                
+                console.log(`Added click handler to panel: ${header.textContent}`);
+            });
+            
+            console.log("Collapsible panels setup complete");
+        }
+        
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            try {
+                log('Document loaded, initializing interview interface', 'info');
+                log(`Initialized session ID: ${sessionId}`, 'info');
+                log(`API URL set to: ${apiUrl}`, 'info');
+                
+                // Show debug panel by default for testing
+                const debugPanel = document.querySelector('.debug-panel');
+                if (debugPanel) {
+                    debugPanel.style.display = 'block';
+                }
+                
+                // Set character from URL parameter FIRST - before any other initialization
+                if (characterParam) {
+                    log(`Setting character directly from URL parameter: ${characterParam}`, 'info');
+                    try {
+                        // Make a direct API call to set the character
+                        const response = await fetch(`${apiUrl}/api/session/${sessionId}/set_character`, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({ character: characterParam })
+                        });
+                        
+                        if (response.ok) {
+                            const data = await response.json();
+                            log(`Character set successfully to ${data.character}`, 'success');
+                        } else {
+                            log(`Failed to set character: ${response.status}`, 'error');
+                        }
+                    } catch (e) {
+                        log(`Error setting character: ${e.message}`, 'error');
+                    }
+                }
+                
+                // Log character if provided in URL
+                if (characterParam) {
+                    log(`Character specified in URL: ${characterParam}`, 'info');
+                }
+                
+                // Initialize WebSocket connection
+                const socketInitialized = initializeWebSocket();
+                log(`WebSocket initialization ${socketInitialized ? 'successful' : 'failed'}`, 'info');
+                
+                // Initialize event listeners
+                log('Initializing event listeners', 'info');
+                setupEventListeners();
+                
+                // Connect to API server
+                updateConnectionStatus(false, 'Disconnected - Connecting...');
+                const connected = await checkConnection();
+                
+                if (connected) {
+                    // If connection successful, load session messages
+                    await loadSessionMessages();
+                    
+                    // Start service checks
+                    startServiceChecks();
+                }
+            } catch (e) {
+                log(`Error during initialization: ${e.message}`, 'error');
+                addErrorMessage(`Initialization error: ${e.message}`);
+            }
+        });
+
+        // Check audio services
+        async function checkAudioServices() {
+            try {
+                const response = await fetch(`${apiUrl}/api/check_services`);
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.tts_service && data.stt_service) {
+                        log('TTS and STT services are operational', 'info');
+                    } else {
+                        if (!data.tts_service) {
+                            log('TTS service is not operational', 'error');
+                        }
+                        if (!data.stt_service) {
+                            log('STT service is not operational', 'error');
+                        }
+                    }
+                } else {
+                    log('Failed to check audio services: ' + response.status, 'error');
+                }
+            } catch (error) {
+                log('Error checking audio services: ' + error.message, 'error');
+            }
+        }
+
+        // Set character for the session
+        async function setCharacterForSession(sessionId, character) {
+            if (!sessionId || !character) {
+                log('Missing sessionId or character when trying to set character', 'error');
+                return false;
+            }
+            
+            log(`Setting character to ${character} for session ${sessionId}`, 'info');
+            
+            try {
+                // Call our new API endpoint to set the character
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/set_character`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ character: character })
+                });
+                
+                if (response.ok) {
+                    log(`Character set to ${character} successfully using API endpoint`, 'success');
+                    return true;
+                } else {
+                    log(`Failed to set character via API: ${response.status}`, 'warn');
+                    
+                    // Fallback: Add a system message to set the character
+                    const systemMessageResponse = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            content: `IMPORTANT: You are ${character}. Always respond as ${character}. 
+                            When asked about your name, say "I am ${character}".
+                            When asked about your prompt or role, explain your specific purpose as ${character}.
+                            Never identify yourself as "Assistant" or any other name.
+                            Maintain the ${character} persona throughout the entire conversation.`,
+                            role: 'system'
+                        })
+                    });
+                    
+                    if (systemMessageResponse.ok) {
+                        log(`Set character ${character} via system message`, 'info');
+                        return true;
+                    } else {
+                        log(`Failed to set character via system message: ${systemMessageResponse.status}`, 'error');
+                        return false;
+                    }
+                }
+            } catch (e) {
+                log(`Error setting character: ${e.message}`, 'error');
+                return false;
+            }
+        }
+
+        // Start periodic service checks
+        function startServiceChecks() {
+            log('Starting periodic service checks', 'info');
+            // Check audio services every 30 seconds
+            setInterval(async () => {
+                await checkAudioServices();
+            }, 30000);
+        }
+
+        // Initialize socket.io connection
+        function initializeWebSocket() {
+            try {
+                if (typeof io === 'undefined') {
+                    console.log('Socket.io library not found');
+                    return false;
+                }
+                
+                socket = io();
+                console.log('Socket.io initialized');
+                
+                // Set up event handlers
+                socket.on('connect', function() {
+                    console.log('WebSocket connected');
+                    
+                    // Join session room
+                    socket.emit('join_session', { session_id: sessionId }, function(response) {
+                        if (response && response.success) {
+                            console.log(`Joined session room for session: ${sessionId}`);
+                        } else {
+                            console.error(`Failed to join session room: ${response?.error || 'Unknown error'}`);
+                        }
+                    });
+                });
+                
+                socket.on('disconnect', function() {
+                    console.log('WebSocket disconnected');
+                });
+                
+                socket.on('new_message', function(data) {
+                    console.log(`Received new message via WebSocket:`, data);
+                    if (data && data.message) {
+                        if (data.message.role === 'user') {
+                            addUserMessage(data.message.content);
+                        } else if (data.message.role === 'assistant') {
+                            addAssistantMessage(data.message.content);
+                        }
+                    }
+                });
+                
+                // Handle suggestions from monitor
+                socket.on('new_suggestion', function(data) {
+                    console.log(`Received suggestion from monitor:`, data);
+                    if (data && data.suggestion && data.suggestion.content) {
+                        // Add suggestion to the queue
+                        pendingSuggestions.push(data.suggestion.content);
+                        console.log(`Added suggestion to queue: ${data.suggestion.content}`);
+                        
+                        // Show a subtle notification to the interviewer
+                        showSuggestionNotification(data.suggestion.content);
+                    }
+                });
+                
+                return true;
+            } catch (error) {
+                console.error(`Error initializing WebSocket: ${error.message}`);
+                return false;
+            }
+        }
+        
+        // Display suggestion notification
+        function showSuggestionNotification(suggestion) {
+            // Create a notification element if it doesn't exist
+            let notificationArea = document.getElementById('suggestion-notifications');
+            if (!notificationArea) {
+                notificationArea = document.createElement('div');
+                notificationArea.id = 'suggestion-notifications';
+                notificationArea.className = 'suggestion-notifications';
+                notificationArea.style.position = 'fixed';
+                notificationArea.style.bottom = '20px';
+                notificationArea.style.right = '20px';
+                notificationArea.style.zIndex = '1000';
+                notificationArea.style.maxWidth = '300px';
+                document.body.appendChild(notificationArea);
+            }
+            
+            // Create the notification
+            const notification = document.createElement('div');
+            notification.className = 'suggestion-notification';
+            notification.style.backgroundColor = 'rgba(25, 118, 210, 0.9)';
+            notification.style.color = 'white';
+            notification.style.padding = '10px 15px';
+            notification.style.marginBottom = '10px';
+            notification.style.borderRadius = '5px';
+            notification.style.boxShadow = '0 2px 5px rgba(0,0,0,0.2)';
+            notification.style.transition = 'all 0.3s ease';
+            
+            notification.innerHTML = `
+                <div style="font-weight: bold; margin-bottom: 5px;">Suggestion from Researcher:</div>
+                <div>${suggestion}</div>
+            `;
+            
+            // Add to notification area
+            notificationArea.appendChild(notification);
+            
+            // Remove after 10 seconds
+            setTimeout(() => {
+                notification.style.opacity = '0';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                }, 300);
+            }, 10000);
+        }
+
+        // Function to incorporate suggestion into AI's next response
+        async function incorporateSuggestion(suggestion) {
+            if (!sessionId || !isConnected) {
+                log("Cannot incorporate suggestion - not connected", 'error');
+                return false;
+            }
+            
+            log(`Incorporating suggestion into AI response: ${suggestion}`, 'info');
+            
+            try {
+                // Send a system message to the AI to incorporate the suggestion
+                const response = await fetch(`${apiUrl}/api/session/${sessionId}/add_message`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        content: `IMPORTANT INSTRUCTION: In your next response, acknowledge you've received a suggestion from the researcher, then naturally incorporate this suggestion into your dialogue: "${suggestion}". Make it sound like you had this thought yourself by saying something like "That's a good point, now I'd like to ask: ${suggestion}" or similar natural phrasing.`,
+                        role: 'system'
+                    })
+                });
+                
+                if (!response.ok) {
+                    throw new Error(`API returned status ${response.status}`);
+                }
+                
+                const data = await response.json();
+                
+                if (!data.success) {
+                    throw new Error(data.error || 'Unknown API error');
+                }
+                
+                log("Suggestion instruction sent successfully", 'info');
+                return true;
+            } catch (error) {
+                log(`Error incorporating suggestion: ${error.message}`, 'error');
+                return false;
+            }
+        }
+    </script>
+</body>
+</html> 

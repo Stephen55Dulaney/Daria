@@ -1,0 +1,42 @@
+{
+  "id": "1b763a34-0474-48e9-8b4d-b683792d0b7e",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "da6bba4b-1cba-4b7f-b705-a85bdceedc51",
+      "content": "I am",
+      "role": "user",
+      "timestamp": "2025-05-16T13:36:05.002652"
+    },
+    {
+      "id": "a781ace1-7753-4cc1-9f9c-47d0a8b13599",
+      "content": "Hello! Thank you for joining me today. Can you please start by telling me a bit about yourself and your background?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T13:36:06.715229"
+    },
+    {
+      "id": "4103d04b-b872-42d5-be13-be0f3bb5c48c",
+      "content": "I'm Steven Dulaney and I'm a user researcher who are you",
+      "role": "user",
+      "timestamp": "2025-05-16T13:36:22.735066"
+    },
+    {
+      "id": "45d8e5f4-fca5-46b4-89f8-433f37146d91",
+      "content": "My name is Thomas. I'm a test character for the DARIA interview system.",
+      "role": "assistant",
+      "timestamp": "2025-05-16T13:36:25.918472"
+    }
+  ],
+  "transcript": "\n\nParticipant: I am\n\nModerator: Hello! Thank you for joining me today. Can you please start by telling me a bit about yourself and your background?\n\nParticipant: I'm Steven Dulaney and I'm a user researcher who are you\n\nModerator: My name is Thomas. I'm a test character for the DARIA interview system.",
+  "analysis": null,
+  "created_at": "2025-05-16T13:35:55.905545",
+  "updated_at": "2025-05-16T13:36:25.918721",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

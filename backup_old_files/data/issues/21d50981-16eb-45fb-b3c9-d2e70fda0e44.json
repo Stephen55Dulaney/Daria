@@ -1,0 +1,55 @@
+{
+  "id": "21d50981-16eb-45fb-b3c9-d2e70fda0e44",
+  "title": "Remote Interview tool not loading correctly, Debug Log Accordion will now expand",
+  "description": "When I load the remote interview page nothing happens there is an error in the transcript area and I an unable to expand the debut logs. And I can not type a message in the text entry interview back up tool.",
+  "issue_type": "bug",
+  "status": "resolved",
+  "priority": "medium",
+  "creator_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+  "assigned_to": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+  "screenshots": [
+    "uploads/screenshots/20250514130614_Screenshot_2025-05-14_at_1.05.46_PM.png"
+  ],
+  "created_at": "2025-05-14T13:06:14.269190",
+  "updated_at": "2025-05-15T19:02:21.052020",
+  "environment": {
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "remote_addr": "127.0.0.1"
+  },
+  "tags": [],
+  "history": [
+    {
+      "timestamp": "2025-05-14T13:06:14.269205",
+      "action": "Issue created",
+      "user_id": null,
+      "details": null
+    },
+    {
+      "timestamp": "2025-05-14T13:08:44.675892",
+      "action": "Issue reassigned",
+      "user_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+      "details": {
+        "from": null,
+        "to": "b63bc956-15e1-4e59-8a30-47ef57a90db3"
+      }
+    },
+    {
+      "timestamp": "2025-05-14T13:08:49.775266",
+      "action": "Status updated",
+      "user_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+      "details": {
+        "from": "open",
+        "to": "in_progress"
+      }
+    },
+    {
+      "timestamp": "2025-05-15T19:02:21.052020",
+      "action": "Status updated",
+      "user_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+      "details": {
+        "from": "in_progress",
+        "to": "resolved"
+      }
+    }
+  ]
+}

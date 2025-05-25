@@ -1,0 +1,60 @@
+{
+  "id": "5b67db06-7227-462b-bc52-7700397538ce",
+  "guide_id": "b926091f-faf0-4a74-b253-33e5d5bb68d9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "7b16aab4-ac6a-4af9-94cb-9e45fb651543",
+      "content": "SYSTEM: Character set to researcher. \n                                IMPORTANT: You are researcher. Your name is researcher.\n                                You MUST always respond as researcher. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am researcher.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"",
+      "role": "system",
+      "timestamp": "2025-05-18T15:51:09.273484"
+    },
+    {
+      "id": "ddfa2cee-c301-40e8-819a-42a07d1199b8",
+      "content": "Hello, I am researcher. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-18T15:51:09.278658"
+    },
+    {
+      "id": "80f37707-8b07-48a1-b378-8a5e1477ff22",
+      "content": "hello this is Steven we're just testing all of the stuff together",
+      "role": "user",
+      "timestamp": "2025-05-18T15:51:20.737381"
+    },
+    {
+      "id": "05ed2de2-6887-44f8-bb48-03ee55ba4b0d",
+      "content": "Hello Steven, thank you for participating in this interview. Today we will be discussing the topic of fishing with a fly rod. To start off, can you tell me why you personally enjoy fishing with a fly rod?",
+      "role": "assistant",
+      "timestamp": "2025-05-18T15:51:21.858745"
+    },
+    {
+      "id": "a0a1009e-f710-4a34-81a8-7ed6a720e09f",
+      "content": "it's a little harder and you have to like throw it over your head back and forth plus your imitating the aquatic insect life cycle will catch fish",
+      "role": "user",
+      "timestamp": "2025-05-18T15:51:48.434830"
+    },
+    {
+      "id": "795a68b1-605e-4cf0-af9f-56c76a50b2ac",
+      "content": "That's an interesting perspective. Could you please elaborate on how imitating the aquatic insect life cycle while fishing with a fly rod can help catch fish?",
+      "role": "assistant",
+      "timestamp": "2025-05-18T15:51:49.106465"
+    }
+  ],
+  "transcript": "\n\nParticipant: SYSTEM: Character set to researcher. \n                                IMPORTANT: You are researcher. Your name is researcher.\n                                You MUST always respond as researcher. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am researcher.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n\nModerator: Hello, I am researcher. How can I assist you today?\n\nParticipant: hello this is Steven we're just testing all of the stuff together\n\nModerator: Hello Steven, thank you for participating in this interview. Today we will be discussing the topic of fishing with a fly rod. To start off, can you tell me why you personally enjoy fishing with a fly rod?\n\nParticipant: it's a little harder and you have to like throw it over your head back and forth plus your imitating the aquatic insect life cycle will catch fish\n\nModerator: That's an interesting perspective. Could you please elaborate on how imitating the aquatic insect life cycle while fishing with a fly rod can help catch fish?",
+  "analysis": {
+    "content": "Error generating analysis: 1 validation error for LLMChain\nllm\n  Can't instantiate abstract class BaseLanguageModel without an implementation for abstract methods 'agenerate_prompt', 'apredict', 'apredict_messages', 'generate_prompt', 'invoke', 'predict', 'predict_messages' (type=type_error)",
+    "generated_at": "2025-05-21T13:42:23.241630"
+  },
+  "created_at": "2025-05-18T15:50:46.021753",
+  "updated_at": "2025-05-21T13:42:23.241751",
+  "title": "Testing Goals",
+  "project": "Test 4444",
+  "interview_type": "persona_interview",
+  "topic": "Fly Fishing",
+  "context": "To teach the interviewee how to catch a fish on a fly rod.",
+  "goals": "understand why men fish.",
+  "character": "researcher",
+  "character_select": "researcher",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL"
+}

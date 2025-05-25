@@ -1,0 +1,136 @@
+{
+  "id": "cae050af-00ce-4670-939a-a0d103c2409c",
+  "guide_id": null,
+  "interviewee": {
+    "name": "Test to creat a json session correctly",
+    "email": "sdulaney@deloitte.com",
+    "role": "Researcher",
+    "department": "Research",
+    "company": "Fake Company",
+    "demographics": {
+      "age_range": "35-44",
+      "gender": "Female",
+      "location": "TEXAS"
+    }
+  },
+  "status": "orphaned",
+  "messages": [
+    {
+      "id": "9c789a9c-d1c0-4006-abd9-2694344f90e0",
+      "content": "this is Steven Delaney creating a fake session",
+      "role": "user",
+      "timestamp": "2025-05-23T09:15:18.190524"
+    },
+    {
+      "id": "85b0085d-0084-48fe-a959-d8425c6e5ddc",
+      "content": "Hello Steven, thank you for participating in this interview session. Could you please provide more information about the purpose of this fake session you are creating?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T09:15:19.457516"
+    },
+    {
+      "id": "42f160b8-326a-4826-bc02-9f2cd32c0a72",
+      "content": "how come you didn't do speech to text I thought you were going to read the answer to me",
+      "role": "user",
+      "timestamp": "2025-05-23T09:15:30.660588"
+    },
+    {
+      "id": "b3885664-3a41-46b9-b2bc-21ece1d9a638",
+      "content": "I apologize for any confusion. I am here to conduct an interview conversation with you. I will be asking questions and gathering information from you directly. Let's proceed with the interview. \n\nCould you tell me more about your experience with interviews?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T09:15:31.796849"
+    },
+    {
+      "id": "62bf226a-52fb-47f1-bf55-5935a541b814",
+      "content": "are you telling me that TTS service is down",
+      "role": "user",
+      "timestamp": "2025-05-23T09:15:38.841682"
+    },
+    {
+      "id": "18623e71-b5e9-4af1-bd40-ef644e06e42e",
+      "content": "I understand your concern. Could you please provide more information about the TTS service being down? When did you first notice the issue, and have you tried any troubleshooting steps to resolve it?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T09:15:40.140021"
+    },
+    {
+      "id": "28c2c3ce-5fc1-4635-8553-14c5801e45b5",
+      "content": " file that creates the session successfully maybe this is where we need to use for the other one",
+      "role": "user",
+      "timestamp": "2025-05-23T09:16:11.374947"
+    },
+    {
+      "id": "ef7733f0-0cc3-4214-b867-224ed8585c22",
+      "content": "It sounds like you're referring to a file that successfully creates a session. Could you please provide more details about what you mean by \"the other one\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T09:16:12.367985"
+    },
+    {
+      "id": "1bf9460b-a3ed-41ab-8d7d-5edcf6dc09c1",
+      "content": "I'm going to click the insession button",
+      "role": "user",
+      "timestamp": "2025-05-23T09:16:16.849797"
+    },
+    {
+      "id": "305ce48e-d3c4-4c0a-bab3-7bad1239c809",
+      "content": "Thank you for letting me know. Could you please tell me more about what you hope to achieve during this interview session?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T09:16:17.743061"
+    },
+    {
+      "id": "fe618aad-f99c-43be-bd48-a3cd575677f9",
+      "content": "trips are activated I want you to take note of what scripts are activated",
+      "role": "user",
+      "timestamp": "2025-05-23T09:16:25.965160"
+    },
+    {
+      "id": "0fd4e7bd-2d17-43b9-830d-2b176cf1c63f",
+      "content": "Could you please provide more context on what you mean by \"trips are activated\" and what you mean by \"scripts\"? I want to make sure I understand your question correctly before proceeding.",
+      "role": "assistant",
+      "timestamp": "2025-05-23T09:16:27.097345"
+    },
+    {
+      "id": "0ebab718-b096-44dd-9f56-e923450914be",
+      "content": "successful session and attack that session to the discussion guide",
+      "role": "user",
+      "timestamp": "2025-05-23T09:16:33.893133"
+    },
+    {
+      "id": "8886affb-bef4-4248-b198-f2a172c9691a",
+      "content": "Thank you for sharing about a successful session. Could you tell me more about what made that particular session successful? What elements or strategies do you think contributed to its success?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T09:16:35.374051"
+    },
+    {
+      "id": "107d681c-ac3a-4894-a1cc-bdaa0f985baf",
+      "content": "when I paste this in the debugging notes",
+      "role": "user",
+      "timestamp": "2025-05-23T09:16:41.353233"
+    },
+    {
+      "id": "b6a8c2e2-64c0-4297-a81d-c66998521b5e",
+      "content": "Could you please provide more context or details about what you are referring to when you mention pasting something in the debugging notes? Are you working on a specific project or task that involves debugging?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T09:16:42.261846"
+    },
+    {
+      "id": "6477e456-9dd9-454f-b2ea-399d96a6521c",
+      "content": " when we put in the debug that comment is for cursor to read in the debugging notes please pay attention cursor",
+      "role": "user",
+      "timestamp": "2025-05-23T09:16:54.038402"
+    },
+    {
+      "id": "e4e00d00-fd3a-4221-a424-59ffb035523d",
+      "content": "Could you please provide more context or details about the process you are referring to? It would be helpful to understand the specific situation in which the debug comment and cursor are being used.",
+      "role": "assistant",
+      "timestamp": "2025-05-23T09:16:55.210309"
+    }
+  ],
+  "transcript": "\n\nParticipant: this is Steven Delaney creating a fake session\n\nModerator: Hello Steven, thank you for participating in this interview session. Could you please provide more information about the purpose of this fake session you are creating?\n\nParticipant: how come you didn't do speech to text I thought you were going to read the answer to me\n\nModerator: I apologize for any confusion. I am here to conduct an interview conversation with you. I will be asking questions and gathering information from you directly. Let's proceed with the interview. \n\nCould you tell me more about your experience with interviews?\n\nParticipant: are you telling me that TTS service is down\n\nModerator: I understand your concern. Could you please provide more information about the TTS service being down? When did you first notice the issue, and have you tried any troubleshooting steps to resolve it?\n\nParticipant:  file that creates the session successfully maybe this is where we need to use for the other one\n\nModerator: It sounds like you're referring to a file that successfully creates a session. Could you please provide more details about what you mean by \"the other one\"?\n\nParticipant: I'm going to click the insession button\n\nModerator: Thank you for letting me know. Could you please tell me more about what you hope to achieve during this interview session?\n\nParticipant: trips are activated I want you to take note of what scripts are activated\n\nModerator: Could you please provide more context on what you mean by \"trips are activated\" and what you mean by \"scripts\"? I want to make sure I understand your question correctly before proceeding.\n\nParticipant: successful session and attack that session to the discussion guide\n\nModerator: Thank you for sharing about a successful session. Could you tell me more about what made that particular session successful? What elements or strategies do you think contributed to its success?\n\nParticipant: when I paste this in the debugging notes\n\nModerator: Could you please provide more context or details about what you are referring to when you mention pasting something in the debugging notes? Are you working on a specific project or task that involves debugging?\n\nParticipant:  when we put in the debug that comment is for cursor to read in the debugging notes please pay attention cursor\n\nModerator: Could you please provide more context or details about the process you are referring to? It would be helpful to understand the specific situation in which the debug comment and cursor are being used.",
+  "analysis": null,
+  "created_at": "2025-05-23T09:15:09.030167",
+  "updated_at": "2025-05-23T09:37:23.759978",
+  "title": "Daria Research of Deloitte user researchers ",
+  "project": "Daria Research of Researchers",
+  "interview_type": "imported_transcript",
+  "character": "daria",
+  "character_select": "daria"
+}

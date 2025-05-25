@@ -1,0 +1,40 @@
+{
+  "session_id": "b926091f-faf0-4a74-b253-33e5d5bb68d9",
+  "title": "Testing Goals",
+  "project": "Test 4444",
+  "interview_type": "persona_interview",
+  "topic": "Fly Fishing",
+  "context": "To teach the interviewee how to catch a fish on a fly rod.",
+  "goals": "understand why men fish.",
+  "prompt": "You are a research analyst examining interview data about {topic}.\nRead the following transcript(s) carefully and identify key themes, patterns, and insights.\nFocus on what the data actually says rather than assumptions or preconceptions.\n\nResearch questions:\n{questions}\n\nTranscript data:\n{data}",
+  "interview_prompt": "You are a research analyst examining interview data about {topic}.\nRead the following transcript(s) carefully and identify key themes, patterns, and insights.\nFocus on what the data actually says rather than assumptions or preconceptions.\n\nResearch questions:\n{questions}\n\nTranscript data:\n{data}",
+  "analysis_prompt": "Analyze the provided data systematically. Identify recurring themes, interesting outliers,\nand potential insights. Consider both explicit statements and implicit meanings.\nOrganize your findings into clear categories and note any limitations of the data.\n",
+  "character_select": "researcher",
+  "voice_id": "EXAVITQu4vr4xnSDxMaL",
+  "interviewee": {
+    "name": "Stephen Dulaney",
+    "role": "Researcher",
+    "email": ""
+  },
+  "created_at": "2025-05-16T15:49:05.851359",
+  "creation_date": "2025-05-16 15:49",
+  "last_updated": "2025-05-16T15:49:05.851359",
+  "expiration_date": "2025-06-15T15:49:05.851359",
+  "status": "active",
+  "conversation_history": [],
+  "id": "b926091f-faf0-4a74-b253-33e5d5bb68d9",
+  "updated_at": "2025-05-19T13:18:54.438877",
+  "sessions": [
+    "5b67db06-7227-462b-bc52-7700397538ce",
+    "ef90161d-06a9-47b7-ab03-c5bcd84f477f",
+    "b2d1ea59-c04f-4d3d-9232-86aba5cc4213",
+    "5a75578e-091b-453c-a1f9-97a781284a5d",
+    "7555f1d4-19f0-49ab-9641-64851257785a"
+  ],
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "custom_questions": []
+}

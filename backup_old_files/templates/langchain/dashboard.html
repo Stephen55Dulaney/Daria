@@ -1,0 +1,472 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Discussion Guide Dashboard - DARIA{% endblock %}
+
+{% block extra_css %}
+<style>
+    .card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+    
+    .card:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-badge {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+    
+    .card-hover {
+        cursor: pointer;
+    }
+    
+    .character-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.35rem 0.6rem;
+        border-radius: 0.25rem;
+        font-size: 0.85rem;
+    }
+    
+    .character-badge i {
+        margin-right: 0.3rem;
+    }
+    
+    .character-daria { background-color: #6610f2; color: white; }
+    .character-eurekia { background-color: #0dcaf0; color: #212529; }
+    .character-skeptica { background-color: #dc3545; color: white; }
+    .character-askia { background-color: #fd7e14; color: white; }
+    .character-thesea { background-color: #20c997; color: #212529; }
+    .character-odessia { background-color: #0d6efd; color: white; }
+    .character-synthia { background-color: #6f42c1; color: white; }
+    .character-interviewer { background-color: #6c757d; color: white; }
+    .character-researcher { background-color: #495057; color: white; }
+    .character-thomas { background-color: #198754; color: white; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Dashboard</h1>
+        <a href="/interview_setup" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-2"></i>
+            New Discussion Guide
+        </a>
+    </div>
+    
+    <!-- Status Cards -->
+    <div class="row mb-4">
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 me-3">
+                        <i class="bi bi-chat-text fs-4 text-primary"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Active Guides</h6>
+                        <h2 class="mb-0" id="active-count">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 me-3">
+                        <i class="bi bi-people fs-4 text-success"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Active Sessions</h6>
+                        <h2 class="mb-0" id="active-sessions-count">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <div class="card mb-3">
+                <div class="card-body d-flex align-items-center">
+                    <div class="rounded-circle bg-info bg-opacity-10 p-3 me-3">
+                        <i class="bi bi-archive fs-4 text-info"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-0">Total Guides</h6>
+                        <h2 class="mb-0" id="total-count">0</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Recent Guides -->
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">Recent Discussion Guides</h5>
+            <a href="/discussion_guides" class="btn btn-sm btn-outline-primary">View All</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Title</th>
+                            <th>Character</th>
+                            <th>Status</th>
+                            <th>Created</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="recent-guides">
+                        <!-- Guide rows will be added here -->
+                        <tr id="no-guides" class="text-center">
+                            <td colspan="5">No discussion guides found. Click "New Discussion Guide" to get started.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Access Cards -->
+    <h5 class="mb-3">Quick Access</h5>
+    <div class="row" id="quick-access">
+        <!-- Cards will be added here -->
+        <div class="col-md-3">
+            <div class="card card-hover mb-3" onclick="window.location.href='/interview_setup'">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-primary bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="bi bi-plus-circle fs-1 text-primary"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Create New Guide</h5>
+                    <p class="card-text text-muted mb-0">Start a new discussion guide</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-hover mb-3" onclick="window.location.href='/discussion_guides'">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-info bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="bi bi-journals fs-1 text-info"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Discussion Guides</h5>
+                    <p class="card-text text-muted mb-0">View all your guides</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-hover mb-3" onclick="window.location.href='/monitor_interview'">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-danger bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="bi bi-broadcast fs-1 text-danger"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Monitor Sessions</h5>
+                    <p class="card-text text-muted mb-0">View active sessions</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card card-hover mb-3" onclick="window.location.href='/prompts/'">
+                <div class="card-body text-center p-4">
+                    <div class="rounded-circle bg-success bg-opacity-10 p-3 d-inline-block mb-3">
+                        <i class="bi bi-chat-quote fs-1 text-success"></i>
+                    </div>
+                    <h5 class="card-title mb-2">Prompt Manager</h5>
+                    <p class="card-text text-muted mb-0">Manage interview characters</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Initialize the dashboard when the page loads
+    document.addEventListener('DOMContentLoaded', function() {
+        fetchDiscussionGuides();
+        checkServices();
+        
+        // Initialize Bootstrap components
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    });
+    
+    // Function to check if all services are running
+    function checkServices() {
+        fetch('/api/check_services')
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    const services = data.services;
+                    
+                    // Check audio service status
+                    const audioStatus = services.audio_service?.status;
+                    if (audioStatus && audioStatus !== 'running') {
+                        showServiceAlert(audioStatus);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error checking services:', error);
+            });
+    }
+    
+    // Function to show service alert
+    function showServiceAlert(status) {
+        const alertHtml = `
+            <div class="alert alert-warning alert-dismissible fade show mb-4" role="alert">
+                <strong>Service Issue:</strong> The ElevenLabs audio service is ${status === 'not_running' ? 'not running' : 'having issues'}.
+                Voice features may not work correctly until this is resolved.
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+            </div>
+        `;
+        
+        document.querySelector('.container-fluid').insertAdjacentHTML('afterbegin', alertHtml);
+    }
+    
+    // Function to fetch discussion guides from the API
+    function fetchDiscussionGuides() {
+        fetch('/api/discussion_guides')
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Error fetching discussion guides');
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.success) {
+                    updateDashboard(data.guides);
+                } else {
+                    console.error('Error:', data.error);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+    
+    // Function to update the dashboard with guide data
+    function updateDashboard(guides) {
+        // Sort guides by created_at, newest first
+        guides.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        
+        const activeGuides = guides.filter(guide => guide.status === 'active');
+        const totalGuides = guides.length;
+        
+        // Count total active sessions
+        let activeSessions = 0;
+        guides.forEach(guide => {
+            if (guide.sessions) {
+                const activeGuideSessions = guide.sessions.filter(session => 
+                    session.status === 'active' || session.status === 'in_progress'
+                ).length;
+                activeSessions += activeGuideSessions;
+            }
+        });
+        
+        // Update counts
+        document.getElementById('active-count').textContent = activeGuides.length;
+        document.getElementById('active-sessions-count').textContent = activeSessions;
+        document.getElementById('total-count').textContent = totalGuides;
+        
+        // Update recent guides table
+        const recentGuidesTable = document.getElementById('recent-guides');
+        const noGuidesRow = document.getElementById('no-guides');
+        
+        if (guides.length > 0) {
+            // Hide the "No guides" message
+            noGuidesRow.style.display = 'none';
+            
+            // Clear existing rows
+            recentGuidesTable.innerHTML = '';
+            
+            // Add guide rows (show up to 5 most recent)
+            const recentGuides = guides.slice(0, 5);
+            
+            recentGuides.forEach(guide => {
+                const createdDate = guide.created_at ? new Date(guide.created_at).toLocaleDateString() : 'Unknown';
+                
+                const statusBadge = guide.status === 'active' 
+                    ? '<span class="badge bg-success">Active</span>' 
+                    : '<span class="badge bg-secondary">Archived</span>';
+                
+                const character = guide.character_select || 'None';
+                const characterBadge = `<span class="character-badge character-${character.toLowerCase()}">
+                    <i class="bi bi-person-circle"></i> ${character}
+                </span>`;
+                
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td><a href="/discussion_guide/${guide.id}" class="text-decoration-none">${guide.title || 'Untitled Guide'}</a></td>
+                    <td>${characterBadge}</td>
+                    <td>${statusBadge}</td>
+                    <td>${createdDate}</td>
+                    <td>
+                        <div class="btn-group btn-group-sm">
+                            <a href="/discussion_guide/${guide.id}" class="btn btn-outline-primary" title="View Guide">
+                                <i class="bi bi-eye"></i>
+                            </a>
+                            <button class="btn btn-outline-success start-session-btn" data-guide-id="${guide.id}" data-guide-title="${guide.title || 'Untitled Guide'}" title="Start New Session">
+                                <i class="bi bi-play-fill"></i>
+                            </button>
+                            <button class="btn btn-outline-secondary duplicate-btn" data-guide-id="${guide.id}" title="Duplicate Guide">
+                                <i class="bi bi-files"></i>
+                            </button>
+                        </div>
+                    </td>
+                `;
+                recentGuidesTable.appendChild(row);
+            });
+            
+            // Add duplicate button event listeners
+            document.querySelectorAll('.duplicate-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const guideId = this.getAttribute('data-guide-id');
+                    duplicateGuide(guideId);
+                });
+            });
+            
+            // Add start session button event listeners
+            document.querySelectorAll('.start-session-btn').forEach(button => {
+                button.addEventListener('click', function() {
+                    const guideId = this.getAttribute('data-guide-id');
+                    const guideTitle = this.getAttribute('data-guide-title');
+                    document.getElementById('session-guide-id').value = guideId;
+                    document.getElementById('session-guide-title').textContent = guideTitle;
+                    const sessionModal = new bootstrap.Modal(document.getElementById('createSessionModal'));
+                    sessionModal.show();
+                });
+            });
+        }
+    }
+    
+    // Function to duplicate a guide
+    function duplicateGuide(guideId) {
+        const title = `Copy of Guide (${new Date().toLocaleDateString()})`;
+        
+        fetch(`/api/discussion_guide/${guideId}/duplicate`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                title: title
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.guide_id) {
+                window.location.href = '/discussion_guide/' + data.guide_id;
+            } else {
+                alert('Error duplicating guide: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error duplicating guide: ' + error);
+        });
+    }
+    
+    // Function to create a new session
+    function createSession(event) {
+        event.preventDefault();
+        
+        const guideId = document.getElementById('session-guide-id').value;
+        const participantName = document.getElementById('participant-name').value;
+        const participantEmail = document.getElementById('participant-email').value;
+        const participantRole = document.getElementById('participant-role').value;
+        const participantDepartment = document.getElementById('participant-department').value;
+        const participantCompany = document.getElementById('participant-company').value;
+        
+        // Create session data
+        const sessionData = {
+            guide_id: guideId,
+            interviewee: {
+                name: participantName,
+                email: participantEmail,
+                role: participantRole,
+                department: participantDepartment,
+                company: participantCompany
+            }
+        };
+        
+        // Send the request to create the session
+        fetch('/api/session/create', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(sessionData)
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success && data.session_id) {
+                // Redirect to the session page
+                window.location.href = data.redirect_url || '/session/' + data.session_id;
+            } else {
+                alert('Error creating session: ' + (data.error || 'Unknown error'));
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error creating session: ' + error);
+        });
+    }
+</script>
+{% endblock %}
+
+<!-- Add the Create Session Modal -->
+<div class="modal fade" id="createSessionModal" tabindex="-1" aria-labelledby="createSessionModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="createSessionModalLabel">Start New Research Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-3">Create a new session for guide: <span id="session-guide-title" class="fw-bold"></span></p>
+                <form id="create-session-form">
+                    <input type="hidden" id="session-guide-id" name="guide_id">
+                    
+                    <h6 class="mb-3">Participant Information</h6>
+                    <div class="mb-3">
+                        <label for="participant-name" class="form-label">Participant Name <span class="text-danger">*</span></label>
+                        <input type="text" class="form-control" id="participant-name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="participant-email" class="form-label">Participant Email</label>
+                        <input type="email" class="form-control" id="participant-email">
+                    </div>
+                    
+                    <h6 class="mb-3">Professional Information</h6>
+                    <div class="mb-3">
+                        <label for="participant-role" class="form-label">Role/Title</label>
+                        <input type="text" class="form-control" id="participant-role">
+                    </div>
+                    <div class="mb-3">
+                        <label for="participant-department" class="form-label">Department</label>
+                        <input type="text" class="form-control" id="participant-department">
+                    </div>
+                    <div class="mb-3">
+                        <label for="participant-company" class="form-label">Company/Organization</label>
+                        <input type="text" class="form-control" id="participant-company">
+                    </div>
+                    
+                    <div class="alert alert-info small">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Privacy Notice: Participant information will only be used for research purposes and will be associated with this session. Demographics are optional and help with research analysis.
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" onclick="createSession(event)">Create Session & Generate Link</button>
+            </div>
+        </div>
+    </div>
+</div> 

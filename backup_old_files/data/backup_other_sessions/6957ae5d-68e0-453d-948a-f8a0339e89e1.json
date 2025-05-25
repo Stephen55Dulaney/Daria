@@ -1,0 +1,54 @@
+{
+  "id": "6957ae5d-68e0-453d-948a-f8a0339e89e1",
+  "guide_id": "92814fb2-c811-4632-9b16-f278236d447f",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "content": "want to test you for four questions",
+      "role": "user",
+      "timestamp": "2025-05-12T19:44:13.485225"
+    },
+    {
+      "content": "That sounds great! I'm ready for your questions. What aspect of end-to-end testing are you particularly interested in exploring through these questions?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T19:44:14.803301"
+    },
+    {
+      "content": "I want to explore the interview because I need to have an interview working for an interview tool so we need to make sure that the debug interview works but we also need to make sure the actual interview works",
+      "role": "user",
+      "timestamp": "2025-05-12T19:44:41.683876"
+    },
+    {
+      "content": "That makes sense, ensuring both the debug interview and the actual interview work seamlessly is crucial. Can you share more about the specific challenges or pain points you have encountered in testing the interview tool for both scenarios?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T19:44:42.645426"
+    },
+    {
+      "content": "you and the interview",
+      "role": "user",
+      "timestamp": "2025-05-12T19:45:05.225839"
+    },
+    {
+      "content": "It sounds like you mentioned \"you and the interview.\" Could you please elaborate on what you mean by that? Are you referring to the interaction between the interviewer and the interviewee during the testing process, or is there another aspect you are highlighting?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T19:45:06.222718"
+    },
+    {
+      "content": "but it needs to have an actual working interview before it can you call Aiden on your phone  yeah",
+      "role": "user",
+      "timestamp": "2025-05-12T19:45:55.572115"
+    },
+    {
+      "content": "It seems like having a functioning interview is essential for your testing process. Could you elaborate on the importance of having an actual working interview before proceeding further with the testing tool? How does it impact the overall testing process and the outcomes you are aiming for?",
+      "role": "assistant",
+      "timestamp": "2025-05-12T19:45:56.965478"
+    }
+  ],
+  "transcript": "\n\nParticipant: want to test you for four questions\n\nModerator: That sounds great! I'm ready for your questions. What aspect of end-to-end testing are you particularly interested in exploring through these questions?\n\nParticipant: I want to explore the interview because I need to have an interview working for an interview tool so we need to make sure that the debug interview works but we also need to make sure the actual interview works\n\nModerator: That makes sense, ensuring both the debug interview and the actual interview work seamlessly is crucial. Can you share more about the specific challenges or pain points you have encountered in testing the interview tool for both scenarios?\n\nParticipant: you and the interview\n\nModerator: It sounds like you mentioned \"you and the interview.\" Could you please elaborate on what you mean by that? Are you referring to the interaction between the interviewer and the interviewee during the testing process, or is there another aspect you are highlighting?\n\nParticipant: but it needs to have an actual working interview before it can you call Aiden on your phone  yeah\n\nModerator: It seems like having a functioning interview is essential for your testing process. Could you elaborate on the importance of having an actual working interview before proceeding further with the testing tool? How does it impact the overall testing process and the outcomes you are aiming for?",
+  "analysis": null,
+  "created_at": "2025-05-12T19:44:00.956812",
+  "updated_at": "2025-05-12T19:45:56.966609"
+}

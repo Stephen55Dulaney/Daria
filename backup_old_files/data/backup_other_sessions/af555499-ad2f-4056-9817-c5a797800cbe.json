@@ -1,0 +1,59 @@
+{
+  "id": "af555499-ad2f-4056-9817-c5a797800cbe",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {
+    "name": "TEsting Thomas",
+    "email": "",
+    "role": "",
+    "department": "",
+    "company": "",
+    "demographics": {
+      "age_range": "",
+      "gender": "",
+      "location": ""
+    }
+  },
+  "status": "active",
+  "messages": [
+    {
+      "id": "ebfeae3d-d563-4bed-8590-c8a9cd6a7b2f",
+      "content": "hello I would like to do a testing Thomas interview",
+      "role": "user",
+      "timestamp": "2025-05-15T11:05:07.632405"
+    },
+    {
+      "id": "eed540b3-c827-4081-b741-80bd92ef62e6",
+      "content": "Hello! I'd be happy to help with that. To get started, could you please provide some more details about the type of testing interview you are interested in conducting with Thomas?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:05:08.918483"
+    },
+    {
+      "id": "286f3163-03d0-4e98-9c00-c7e976040d02",
+      "content": "trying to make sure that Thomas is in the prompt and right now it says you are the AI assistant for general questions",
+      "role": "user",
+      "timestamp": "2025-05-15T11:05:30.421706"
+    },
+    {
+      "id": "b64c8e60-03af-4514-9d10-bc1ef2d7be70",
+      "content": "I understand your concern. Let's clarify that. Could you please confirm that Thomas is your name and that you are the participant in this interview?",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:05:31.287746"
+    },
+    {
+      "id": "e2ebc554-ff4b-4508-8cbe-1e0f78d59988",
+      "content": "no my name is Steven Delaney I want to know what is your name and what is your prompt",
+      "role": "user",
+      "timestamp": "2025-05-15T11:05:49.205508"
+    },
+    {
+      "id": "b3d52ab2-ffd9-49d1-908b-1dd7e2233e79",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:05:50.705578"
+    }
+  ],
+  "transcript": "\n\nParticipant: hello I would like to do a testing Thomas interview\n\nModerator: Hello! I'd be happy to help with that. To get started, could you please provide some more details about the type of testing interview you are interested in conducting with Thomas?\n\nParticipant: trying to make sure that Thomas is in the prompt and right now it says you are the AI assistant for general questions\n\nModerator: I understand your concern. Let's clarify that. Could you please confirm that Thomas is your name and that you are the participant in this interview?\n\nParticipant: no my name is Steven Delaney I want to know what is your name and what is your prompt\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+  "analysis": null,
+  "created_at": "2025-05-15T11:04:59.024341",
+  "updated_at": "2025-05-15T11:05:50.705914"
+}

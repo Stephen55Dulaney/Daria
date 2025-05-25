@@ -1,0 +1,38 @@
+{
+  "id": "63efe009-8a9c-4a2d-926e-57838afc7820",
+  "guide_id": "09aeb837-4e2e-4ede-ab99-aab8babeaa47",
+  "interviewee": {
+    "name": "Debug User"
+  },
+  "status": "active",
+  "messages": [
+    {
+      "role": "user",
+      "content": "I would like to test the interview tool to make sure that we are getting a complete comprehensive",
+      "id": "63372f82-e3e4-405d-96ae-7866eaf430e6",
+      "timestamp": "2025-05-07T09:57:45.664762"
+    },
+    {
+      "role": "assistant",
+      "content": "Can you elaborate on what aspects of the interview tool you specifically want to test to ensure that you are getting a complete and comprehensive assessment?",
+      "id": "f4663f9b-d002-445e-a27c-90fead504a69",
+      "timestamp": "2025-05-07T09:57:48.690119"
+    },
+    {
+      "role": "user",
+      "content": "I would be speaking and you would be speaking at the same time so the speech to text would mix the partners get so I want to make sure that when it's my turn to talk I'm listening and then when there's an appropriate amount of Silence it captures instance to you",
+      "id": "3c1aeaeb-d331-47ba-8c74-e3367e1c385c",
+      "timestamp": "2025-05-07T09:58:22.062870"
+    },
+    {
+      "role": "assistant",
+      "content": "How do you currently handle instances where both you and the interviewer are speaking at the same time during an interview? Have you faced any challenges with speech-to-text technology accurately capturing the conversation in those situations?",
+      "id": "5724c6bd-3813-41f5-8cdc-c9860063e77f",
+      "timestamp": "2025-05-07T09:58:25.529215"
+    }
+  ],
+  "transcript": "\n\nParticipant: I would like to test the interview tool to make sure that we are getting a complete comprehensive\n\nModerator: Can you elaborate on what aspects of the interview tool you specifically want to test to ensure that you are getting a complete and comprehensive assessment?\n\nParticipant: I would be speaking and you would be speaking at the same time so the speech to text would mix the partners get so I want to make sure that when it's my turn to talk I'm listening and then when there's an appropriate amount of Silence it captures instance to you\n\nModerator: How do you currently handle instances where both you and the interviewer are speaking at the same time during an interview? Have you faced any challenges with speech-to-text technology accurately capturing the conversation in those situations?",
+  "analysis": null,
+  "created_at": "2025-05-07T09:57:24.147070",
+  "updated_at": "2025-05-07T09:58:25.529516"
+}

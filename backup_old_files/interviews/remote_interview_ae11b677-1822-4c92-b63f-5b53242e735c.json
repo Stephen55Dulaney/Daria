@@ -1,0 +1,36 @@
+{
+  "id": "ae11b677-1822-4c92-b63f-5b53242e735c",
+  "title": "Stephen's First Interview",
+  "prompt": null,
+  "project": "Daria Research of Researchers",
+  "interview_type": "discovery_interview",
+  "interview_prompt": "#Role: you are Daria, a UX researcher conducting an interview\n#Objective: You are conducting an interview to understand the interviewee's experience with a product or service\n#Instructions: Ask questions to understand the interviewee's role, experience, and needs related to the topic.\n#Important: Be conversational, empathetic, and ask follow-up questions based on their responses.",
+  "analysis_prompt": "Based on the interview transcript, provide a detailed analysis including:\n\n1. Key user needs and goals\n2. Pain points and frustrations \n3. Insights and opportunities\n4. Recommendations for improvement",
+  "interviewee": {
+    "name": "Stephen Dulaney",
+    "role": "UX Researcher",
+    "experience_level": "Lead",
+    "department": "NA"
+  },
+  "custom_questions": [
+    {
+      "text": "What is your favorite pet?",
+      "priority": "high"
+    }
+  ],
+  "time_per_question": 3,
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "participant_name": "Stephen Dulaney",
+  "participant_email": null,
+  "created_at": "2025-04-30T16:31:24.520632",
+  "updated_at": "2025-04-30T16:31:24.520632",
+  "messages": [],
+  "transcript": "",
+  "summary": "",
+  "analysis": "",
+  "status": "created"
+}

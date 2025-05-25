@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA Audio Services Test</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        h1, h2 {
+            color: #2c3e50;
+        }
+        .container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+        .card {
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            margin-bottom: 20px;
+            flex: 1;
+            min-width: 300px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        textarea, select, input[type="text"] {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            font-family: inherit;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .status {
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+        .info {
+            background-color: #e2f0fb;
+            color: #084298;
+        }
+        .visualizer-container {
+            height: 100px;
+            background-color: #f0f0f0;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            position: relative;
+        }
+        #visualizer {
+            width: 100%;
+            height: 100%;
+        }
+        .controls {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        audio {
+            width: 100%;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <h1>DARIA Audio Services Test Page</h1>
+    
+    <div class="container">
+        <div class="card">
+            <h2>Text-to-Speech Test</h2>
+            <div class="form-group">
+                <label for="ttsText">Text to Convert:</label>
+                <textarea id="ttsText" rows="5" placeholder="Enter text to convert to speech...">Hello, I am DARIA, your advanced research and interview assistant. I'm here to help you with your interview tasks.</textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="voiceId">Voice ID:</label>
+                <select id="voiceId">
+                    <option value="EXAVITQu4vr4xnSDxMaL">Rachel (Default)</option>
+                    <option value="21m00Tcm4TlvDq8ikWAM">Adam</option>
+                    <option value="AZnzlk1XvdvUeBnXmlld">Domi</option>
+                    <option value="MF3mGyEYCl7XYWbV9V6O">Elli</option>
+                    <option value="TxGEqnHWrfWFTfGW9XjX">Josh</option>
+                    <option value="yoZ06aMxZJJ28mfd3POQ">Sam</option>
+                </select>
+            </div>
+            
+            <div class="controls">
+                <button id="testTtsBtn">Test TTS</button>
+                <button id="stopTtsBtn" disabled>Stop</button>
+            </div>
+            
+            <div id="ttsStatus" class="status"></div>
+            <audio id="ttsAudio" controls style="display: none;"></audio>
+        </div>
+        
+        <div class="card">
+            <h2>Speech-to-Text Test</h2>
+            <div class="visualizer-container">
+                <canvas id="visualizer"></canvas>
+            </div>
+            
+            <div class="form-group">
+                <label for="actualSpeech">What You're Actually Saying (optional):</label>
+                <textarea id="actualSpeech" rows="3" placeholder="Type what you're actually saying for accurate test results..."></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="sttResult">Transcription Result:</label>
+                <textarea id="sttResult" rows="5" readonly placeholder="Transcription will appear here..."></textarea>
+            </div>
+            
+            <div class="controls">
+                <button id="startRecordingBtn">Start Recording</button>
+                <button id="stopRecordingBtn" disabled>Stop</button>
+            </div>
+            
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" id="silenceDetection" checked> 
+                    Enable silence detection (auto-stop after 2s of silence)
+                </label>
+            </div>
+            
+            <div id="sttStatus" class="status"></div>
+        </div>
+    </div>
+    
+    <div class="card">
+        <h2>Service Status</h2>
+        <div id="serviceStatus" class="status"></div>
+        <button id="checkServicesBtn">Check Services</button>
+    </div>
+
+    <script>
+        // Audio context for visualizer and silence detection
+        let audioContext;
+        let analyser;
+        let microphone;
+        let mediaRecorder;
+        let audioChunks = [];
+        let silenceDetector;
+        let canvasCtx;
+        let canvas;
+        let ttsAudio = document.getElementById('ttsAudio');
+        
+        // Configuration
+        const TTS_URL = 'http://localhost:5015/text_to_speech';
+        const STT_URL = 'http://localhost:5016/speech_to_text';
+        const CHECK_SERVICES_URL = 'http://localhost:5010/api/check_services';
+        
+        // DOM Elements
+        const testTtsBtn = document.getElementById('testTtsBtn');
+        const stopTtsBtn = document.getElementById('stopTtsBtn');
+        const startRecordingBtn = document.getElementById('startRecordingBtn');
+        const stopRecordingBtn = document.getElementById('stopRecordingBtn');
+        const ttsStatus = document.getElementById('ttsStatus');
+        const sttStatus = document.getElementById('sttStatus');
+        const serviceStatus = document.getElementById('serviceStatus');
+        const silenceDetectionCheckbox = document.getElementById('silenceDetection');
+        
+        // Setup audio visualizer
+        function setupVisualizer() {
+            canvas = document.getElementById('visualizer');
+            canvasCtx = canvas.getContext('2d');
+            
+            // Set canvas size
+            canvas.width = canvas.offsetWidth;
+            canvas.height = canvas.offsetHeight;
+            
+            // Fill with background color
+            canvasCtx.fillStyle = '#f0f0f0';
+            canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+        }
+        
+        // Initialize on page load
+        window.onload = function() {
+            setupVisualizer();
+            checkServices();
+        };
+        
+        // Check available services
+        document.getElementById('checkServicesBtn').addEventListener('click', checkServices);
+        
+        function checkServices() {
+            serviceStatus.className = 'status info';
+            serviceStatus.textContent = 'Checking services...';
+            
+            fetch(CHECK_SERVICES_URL)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`API server not responding (${response.status})`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    serviceStatus.className = 'status success';
+                    serviceStatus.innerHTML = `
+                        <strong>API Server:</strong> ${data.api_server ? '✅ Online' : '❌ Offline'}<br>
+                        <strong>TTS Service:</strong> ${data.tts_service ? '✅ Online' : '❌ Offline'}<br>
+                        <strong>STT Service:</strong> ${data.stt_service ? '✅ Online' : '❌ Offline'}<br>
+                        <strong>ElevenLabs API Key:</strong> ${data.elevenlabs ? '✅ Configured' : '❌ Not configured'}
+                    `;
+                })
+                .catch(error => {
+                    serviceStatus.className = 'status error';
+                    serviceStatus.textContent = `Error checking services: ${error.message}`;
+                });
+        }
+        
+        // Text-to-Speech
+        testTtsBtn.addEventListener('click', testTTS);
+        stopTtsBtn.addEventListener('click', stopTTS);
+        
+        function testTTS() {
+            const text = document.getElementById('ttsText').value.trim();
+            const voiceId = document.getElementById('voiceId').value;
+            
+            if (!text) {
+                ttsStatus.className = 'status error';
+                ttsStatus.textContent = 'Please enter text to convert to speech.';
+                return;
+            }
+            
+            ttsStatus.className = 'status info';
+            ttsStatus.textContent = 'Converting text to speech...';
+            testTtsBtn.disabled = true;
+            
+            // Hide previous audio player
+            ttsAudio.style.display = 'none';
+            ttsAudio.pause();
+            
+            fetch(TTS_URL, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    text: text,
+                    voice_id: voiceId
+                })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`TTS service error (${response.status})`);
+                }
+                return response.blob();
+            })
+            .then(blob => {
+                const url = URL.createObjectURL(blob);
+                ttsAudio.src = url;
+                ttsAudio.style.display = 'block';
+                ttsAudio.play();
+                
+                ttsStatus.className = 'status success';
+                ttsStatus.textContent = 'Text converted to speech successfully!';
+                stopTtsBtn.disabled = false;
+            })
+            .catch(error => {
+                ttsStatus.className = 'status error';
+                ttsStatus.textContent = `Error: ${error.message}`;
+            })
+            .finally(() => {
+                testTtsBtn.disabled = false;
+            });
+        }
+        
+        function stopTTS() {
+            if (ttsAudio) {
+                ttsAudio.pause();
+                ttsAudio.currentTime = 0;
+                stopTtsBtn.disabled = true;
+            }
+        }
+        
+        // Speech-to-Text
+        startRecordingBtn.addEventListener('click', startRecording);
+        stopRecordingBtn.addEventListener('click', stopRecording);
+        
+        async function startRecording() {
+            try {
+                audioChunks = [];
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                
+                // Setup audio context for analyzer
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                microphone = audioContext.createMediaStreamSource(stream);
+                microphone.connect(analyser);
+                
+                // Configure analyser
+                analyser.fftSize = 256;
+                const bufferLength = analyser.frequencyBinCount;
+                const dataArray = new Uint8Array(bufferLength);
+                
+                // For silence detection
+                let silenceStart = null;
+                const SILENCE_THRESHOLD = 10; // Adjust based on testing
+                const SILENCE_DURATION = 2000; // 2 seconds of silence
+                
+                // Create MediaRecorder
+                mediaRecorder = new MediaRecorder(stream);
+                
+                // Start recording
+                mediaRecorder.start();
+                
+                // Update UI
+                startRecordingBtn.disabled = true;
+                stopRecordingBtn.disabled = false;
+                sttStatus.className = 'status info';
+                sttStatus.textContent = 'Recording... Speak now.';
+                
+                // Visualize audio
+                function drawVisualizer() {
+                    requestAnimationFrame(drawVisualizer);
+                    
+                    analyser.getByteFrequencyData(dataArray);
+                    
+                    // Clear canvas
+                    canvasCtx.fillStyle = '#f0f0f0';
+                    canvasCtx.fillRect(0, 0, canvas.width, canvas.height);
+                    
+                    // Check for silence if enabled
+                    if (silenceDetectionCheckbox.checked) {
+                        let sum = 0;
+                        for (let i = 0; i < bufferLength; i++) {
+                            sum += dataArray[i];
+                        }
+                        const average = sum / bufferLength;
+                        
+                        if (average < SILENCE_THRESHOLD) {
+                            if (!silenceStart) {
+                                silenceStart = Date.now();
+                            } else if (Date.now() - silenceStart > SILENCE_DURATION) {
+                                stopRecording();
+                                return; // Exit the loop
+                            }
+                        } else {
+                            silenceStart = null;
+                        }
+                    }
+                    
+                    // Draw bars
+                    const barWidth = (canvas.width / bufferLength) * 2.5;
+                    let barHeight;
+                    let x = 0;
+                    
+                    for (let i = 0; i < bufferLength; i++) {
+                        barHeight = dataArray[i] / 2;
+                        
+                        canvasCtx.fillStyle = `rgb(${dataArray[i] + 100}, 50, 50)`;
+                        canvasCtx.fillRect(x, canvas.height - barHeight, barWidth, barHeight);
+                        
+                        x += barWidth + 1;
+                    }
+                }
+                
+                drawVisualizer();
+                
+                // Handle data available event
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        audioChunks.push(event.data);
+                    }
+                };
+                
+                // Handle recording stop
+                mediaRecorder.onstop = () => {
+                    // Stop all tracks
+                    stream.getTracks().forEach(track => track.stop());
+                    
+                    // Process audio
+                    processAudio();
+                };
+                
+            } catch (error) {
+                sttStatus.className = 'status error';
+                sttStatus.textContent = `Error starting recording: ${error.message}`;
+                startRecordingBtn.disabled = false;
+            }
+        }
+        
+        function stopRecording() {
+            if (mediaRecorder && mediaRecorder.state !== 'inactive') {
+                mediaRecorder.stop();
+                sttStatus.className = 'status info';
+                sttStatus.textContent = 'Processing audio...';
+                stopRecordingBtn.disabled = true;
+            }
+        }
+        
+        function processAudio() {
+            const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
+            
+            // Create form data to send the audio file
+            const formData = new FormData();
+            formData.append('file', audioBlob, 'recording.wav');
+            
+            // Add the actual speech text if provided
+            const actualSpeech = document.getElementById('actualSpeech').value.trim();
+            if (actualSpeech) {
+                formData.append('text', actualSpeech);
+            }
+            
+            // Send to server
+            fetch(STT_URL, {
+                method: 'POST',
+                body: formData
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error(`STT service error (${response.status})`);
+                }
+                return response.json();
+            })
+            .then(data => {
+                document.getElementById('sttResult').value = data.text || 'No text transcribed';
+                sttStatus.className = 'status success';
+                sttStatus.textContent = 'Audio transcribed successfully!';
+            })
+            .catch(error => {
+                sttStatus.className = 'status error';
+                sttStatus.textContent = `Error: ${error.message}`;
+            })
+            .finally(() => {
+                startRecordingBtn.disabled = false;
+            });
+        }
+    </script>
+</body>
+</html> 

@@ -1,0 +1,18 @@
+{
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.4"
+  },
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.0",
+    "@mui/icons-material": "^7.1.0",
+    "@mui/material": "^7.1.0",
+    "@types/next": "^8.0.7",
+    "@types/react-router-dom": "^5.3.3",
+    "framer-motion": "^12.12.2",
+    "next": "^15.1.8",
+    "react-router-dom": "^7.5.2"
+  }
+}

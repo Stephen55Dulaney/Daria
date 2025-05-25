@@ -1,0 +1,112 @@
+#root {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 2rem;
+  text-align: center;
+}
+
+.logo {
+  height: 6em;
+  padding: 1.5em;
+  will-change: filter;
+  transition: filter 300ms;
+}
+.logo:hover {
+  filter: drop-shadow(0 0 2em #646cffaa);
+}
+.logo.react:hover {
+  filter: drop-shadow(0 0 2em #61dafbaa);
+}
+
+@keyframes logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  a:nth-of-type(2) .logo {
+    animation: logo-spin infinite 20s linear;
+  }
+}
+
+.card {
+  padding: 2em;
+}
+
+.read-the-docs {
+  color: #888;
+}
+
+.daria-monitor {
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+  font-family: system-ui, -apple-system, sans-serif;
+}
+
+.monitor-title {
+  font-size: 24px;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+.status-card {
+  padding: 15px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.status-title {
+  font-size: 18px;
+  margin-bottom: 10px;
+  color: #4a5568;
+}
+
+.status-text {
+  font-weight: 600;
+}
+
+.status-text.healthy {
+  color: #48bb78;
+}
+
+.status-text.error {
+  color: #f56565;
+}
+
+.service-item {
+  margin-bottom: 10px;
+  padding: 8px;
+  border-radius: 4px;
+  background-color: #f7fafc;
+}
+
+.service-name {
+  font-weight: 600;
+  color: #2d3748;
+}
+
+.service-status {
+  margin-left: 8px;
+}
+
+.service-status.running {
+  color: #48bb78;
+}
+
+.service-status.stopped {
+  color: #f56565;
+}
+
+.service-uptime {
+  font-size: 0.875rem;
+  color: #718096;
+  margin-left: 4px;
+}

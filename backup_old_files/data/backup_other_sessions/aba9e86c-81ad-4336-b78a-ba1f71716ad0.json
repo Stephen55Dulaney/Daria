@@ -1,0 +1,24 @@
+{
+  "id": "aba9e86c-81ad-4336-b78a-ba1f71716ad0",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "829f44ef-151c-4ea0-868e-ef2842e36ccf",
+      "content": "what is your name",
+      "role": "user",
+      "timestamp": "2025-05-15T11:17:54.711042"
+    },
+    {
+      "id": "72b7ad5a-abf9-4c5b-a3a5-9eaeb07b2f11",
+      "content": "I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+      "role": "assistant",
+      "timestamp": "2025-05-15T11:17:55.869895"
+    }
+  ],
+  "transcript": "\n\nParticipant: what is your name\n\nModerator: I am {'Topic': 'General Interview', 'Context': 'This Is An Interview Conversation.', 'Goals': ['Gather Information From The Participant']}. I'm your interview assistant helping to gather information through our conversation.",
+  "analysis": null,
+  "created_at": "2025-05-15T11:17:12.989719",
+  "updated_at": "2025-05-15T11:17:55.869995"
+}

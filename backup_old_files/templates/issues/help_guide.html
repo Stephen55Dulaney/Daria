@@ -1,0 +1,283 @@
+{% extends "base.html" %}
+
+{% block title %}DARIA Issue Tracker Guide{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h1 class="mb-0">DARIA Issue Tracker Guide</h1>
+                </div>
+                <div class="card-body">
+                    <h2>Introduction</h2>
+                    <p>The DARIA Issue Tracker has been enhanced to support a complete UX research-to-prototype workflow. It now allows teams to track research findings, design opportunities, epics, and user stories, and generate AI-powered prototypes directly from your research.</p>
+                    
+                    <h2 class="mt-4">Research-to-Prototype Workflow</h2>
+                    <div class="alert alert-info">
+                        <h5>The enhanced workflow follows these steps:</h5>
+                        <ol>
+                            <li><strong>Insights</strong>: Capture research insights and observations in <code>Opportunity</code> issues</li>
+                            <li><strong>Design</strong>: Break down opportunities into <code>Epic</code> issues that represent major features</li>
+                            <li><strong>Implementation</strong>: Create detailed <code>User Story</code> issues for specific functionality</li>
+                            <li><strong>Prototyping</strong>: Generate Cursor AI prompts from your issues to automatically create working prototypes</li>
+                        </ol>
+                    </div>
+
+                    <h2 class="mt-4">Issue Types</h2>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>When to Use</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge bg-warning">Opportunity</span></td>
+                                    <td>A high-level insight or need identified through user research</td>
+                                    <td>When you've discovered a user need or problem space through interviews, observations, or data analysis</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-primary">Epic</span></td>
+                                    <td>A large feature or capability that addresses an opportunity</td>
+                                    <td>When you need to break down a large opportunity into manageable pieces of work</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-dark">User Story</span></td>
+                                    <td>A specific piece of functionality from a user's perspective</td>
+                                    <td>When you need to describe a specific interaction or capability for implementation</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-danger">Bug</span></td>
+                                    <td>A defect or error in existing functionality</td>
+                                    <td>When something isn't working as expected</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-success">Feature</span></td>
+                                    <td>A new capability or enhancement</td>
+                                    <td>When you want to add new functionality outside the research workflow</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-info">Improvement</span></td>
+                                    <td>An enhancement to existing functionality</td>
+                                    <td>When you want to improve something that already exists</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-secondary">Task</span></td>
+                                    <td>A general work item that doesn't fit other categories</td>
+                                    <td>For general tasks, maintenance work, or documentation</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 class="mt-4">Status Types</h2>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><span class="badge bg-primary">Open</span></td>
+                                    <td>Issue has been created but work hasn't started</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge text-white" style="background-color: purple;">In Design</span></td>
+                                    <td>Design work is in progress (for Opportunities, Epics, User Stories)</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-info">In Progress</span></td>
+                                    <td>Work is actively being done on the issue</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-dark">Ready for Cursor</span></td>
+                                    <td>Issue is ready to be converted to a Cursor AI prompt for prototyping</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-info text-dark">Prototyped</span></td>
+                                    <td>A prototype has been generated using Cursor AI</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-warning">Resolved</span></td>
+                                    <td>Work is complete but awaiting verification</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-success">Closed</span></td>
+                                    <td>Issue has been completed and verified</td>
+                                </tr>
+                                <tr>
+                                    <td><span class="badge bg-secondary">Backlog</span></td>
+                                    <td>Issue has been deferred for future consideration</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <h2 class="mt-4">Key Fields</h2>
+                    <div class="accordion" id="fieldAccordion">
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingParent">
+                                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseParent" aria-expanded="true" aria-controls="collapseParent">
+                                    Parent Issue
+                                </button>
+                            </h2>
+                            <div id="collapseParent" class="accordion-collapse collapse show" aria-labelledby="headingParent" data-bs-parent="#fieldAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Purpose:</strong> Establishes relationships between issues in the research-to-prototype workflow.</p>
+                                    <ul>
+                                        <li><strong>Epics</strong> should have an <strong>Opportunity</strong> as their parent</li>
+                                        <li><strong>User Stories</strong> should have an <strong>Epic</strong> as their parent</li>
+                                    </ul>
+                                    <p><strong>Example:</strong> If researching a "Simplified Onboarding" opportunity, you might create an "Account Creation" epic with several user stories like "Email Verification" and "Profile Setup".</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingPersona">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePersona" aria-expanded="false" aria-controls="collapsePersona">
+                                    Linked Persona
+                                </button>
+                            </h2>
+                            <div id="collapsePersona" class="accordion-collapse collapse" aria-labelledby="headingPersona" data-bs-parent="#fieldAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Purpose:</strong> Connects issues to specific user personas from your research.</p>
+                                    <p>Best used with Opportunities and User Stories to maintain focus on specific user needs.</p>
+                                    <p><strong>Example:</strong> "New User Nina" or "Expert User Eric" - these persona names should match your research documentation.</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingJourney">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseJourney" aria-expanded="false" aria-controls="collapseJourney">
+                                    Journey Stage
+                                </button>
+                            </h2>
+                            <div id="collapseJourney" class="accordion-collapse collapse" aria-labelledby="headingJourney" data-bs-parent="#fieldAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Purpose:</strong> Identifies where in the user journey this issue occurs.</p>
+                                    <p>Helps maintain context about when and where users encounter specific needs or problems.</p>
+                                    <p><strong>Example stages:</strong> "Discovery", "Onboarding", "Daily Use", "Advanced Usage", "Support"</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingInsights">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseInsights" aria-expanded="false" aria-controls="collapseInsights">
+                                    Insights
+                                </button>
+                            </h2>
+                            <div id="collapseInsights" class="accordion-collapse collapse" aria-labelledby="headingInsights" data-bs-parent="#fieldAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Purpose:</strong> Captures key research findings that inform the issue.</p>
+                                    <p>Most important for Opportunity issues, but can be relevant for all issue types to maintain the connection to research.</p>
+                                    <p><strong>Example:</strong> "Users struggle with too many options during onboarding" or "Interviews revealed confusion about navigation"</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingEthics">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapseEthics" aria-expanded="false" aria-controls="collapseEthics">
+                                    Ethics
+                                </button>
+                            </h2>
+                            <div id="collapseEthics" class="accordion-collapse collapse" aria-labelledby="headingEthics" data-bs-parent="#fieldAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Purpose:</strong> Highlights ethical considerations related to the issue.</p>
+                                    <p>Helps ensure responsible design that considers potential impacts on users and society.</p>
+                                    <p><strong>Example:</strong> "Consider accessibility for users with disabilities" or "Ensure data collection is transparent and minimized"</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="accordion-item">
+                            <h2 class="accordion-header" id="headingPrompt">
+                                <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#collapsePrompt" aria-expanded="false" aria-controls="collapsePrompt">
+                                    Cursor Prompt Template
+                                </button>
+                            </h2>
+                            <div id="collapsePrompt" class="accordion-collapse collapse" aria-labelledby="headingPrompt" data-bs-parent="#fieldAccordion">
+                                <div class="accordion-body">
+                                    <p><strong>Purpose:</strong> Contains a template for generating an AI prompt that will create a working prototype using Cursor AI.</p>
+                                    <p>Most relevant for User Stories when they reach the "Ready for Cursor" status.</p>
+                                    <p><strong>Example:</strong></p>
+                                    <pre><code>Create a component for email verification that:
+- Sends a verification code to the user's email
+- Allows the user to enter the code
+- Shows clear success/error messages
+- Works on both mobile and desktop
+
+The component should match our design system with blue primary buttons and should handle various error states gracefully.</code></pre>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <h2 class="mt-4">Workflow Example</h2>
+                    <div class="card">
+                        <div class="card-body">
+                            <h5 class="card-title">Example Research-to-Prototype Workflow</h5>
+                            <ol>
+                                <li>
+                                    <strong>User Research:</strong> Conduct interviews with users about their onboarding experience
+                                </li>
+                                <li>
+                                    <strong>Create an Opportunity:</strong>
+                                    <ul>
+                                        <li>Title: "Streamline User Onboarding"</li>
+                                        <li>Type: Opportunity</li>
+                                        <li>Linked Persona: "New User Nina"</li>
+                                        <li>Journey Stage: "Onboarding"</li>
+                                        <li>Insights: "Users abandon signup when asked for too much information", "Users expect to be able to try before creating account"</li>
+                                        <li>Ethics: "Consider privacy implications of data collection during signup"</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong>Create an Epic:</strong>
+                                    <ul>
+                                        <li>Title: "Progressive Registration Process"</li>
+                                        <li>Type: Epic</li>
+                                        <li>Parent Issue: "Streamline User Onboarding" (the Opportunity)</li>
+                                        <li>Description: "Create a multi-step registration process that collects minimal information upfront and progressively adds more details as users engage with the product."</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong>Create User Stories:</strong>
+                                    <ul>
+                                        <li>Title: "Email-only Initial Signup"</li>
+                                        <li>Type: User Story</li>
+                                        <li>Parent Issue: "Progressive Registration Process" (the Epic)</li>
+                                        <li>Linked Persona: "New User Nina"</li>
+                                        <li>Description: "As a new user, I want to create an account using only my email address, so I can quickly access the system without filling out a lengthy form."</li>
+                                        <li>Cursor Prompt Template: "Create a React component for an email-only signup form that validates email format, shows appropriate loading states, and handles server errors gracefully. The component should use our design system colors (#3366CC for primary buttons) and include responsive design for mobile and desktop."</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <strong>Move to Ready for Cursor:</strong> When the User Story is fully defined, move it to "Ready for Cursor" status
+                                </li>
+                                <li>
+                                    <strong>Generate Prototype:</strong> Use the Cursor Prompt Template to generate a working prototype with Cursor AI
+                                </li>
+                                <li>
+                                    <strong>Mark as Prototyped:</strong> Once the prototype is created, update the status to "Prototyped"
+                                </li>
+                            </ol>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

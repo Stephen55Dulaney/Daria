@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DARIA Character Test Debug Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 20px;
+            line-height: 1.6;
+            color: #333;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        h1 {
+            color: #2c3e50;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+        h2 {
+            color: #3498db;
+            margin-top: 30px;
+        }
+        p {
+            margin-bottom: 15px;
+        }
+        .container {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .instructions {
+            background-color: #e8f4f8;
+            padding: 15px;
+            border-left: 4px solid #3498db;
+            margin-bottom: 20px;
+        }
+        code {
+            background-color: #f0f0f0;
+            padding: 2px 5px;
+            border-radius: 3px;
+            font-family: Consolas, Monaco, 'Andale Mono', monospace;
+        }
+        pre {
+            background-color: #f0f0f0;
+            padding: 10px;
+            border-radius: 4px;
+            overflow-x: auto;
+        }
+        .button {
+            display: inline-block;
+            background-color: #3498db;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 4px;
+            text-decoration: none;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        .button:hover {
+            background-color: #2980b9;
+        }
+    </style>
+</head>
+<body>
+    <h1>DARIA Character Test Debug Tool</h1>
+    
+    <div class="instructions">
+        <p>This page helps you directly access the Character Test Debug Tool. The tool allows you to test character prompts and interview types.</p>
+    </div>
+    
+    <div class="container">
+        <h2>Access the Character Test Tool</h2>
+        <p>Click the button below to open the Character Test Debug Tool:</p>
+        <a href="http://127.0.0.1:5025/templates/debug_character_test.html" class="button" target="_blank">Open Character Test Tool</a>
+        
+        <h2>Manual Instructions</h2>
+        <p>If the button doesn't work, you can copy the HTML file to the static folder and access it from there:</p>
+        <pre>
+cp templates/debug_character_test.html static/
+# Then access via:
+# http://127.0.0.1:5025/static/debug_character_test.html
+        </pre>
+    </div>
+    
+    <div class="container">
+        <h2>Important Note</h2>
+        <p>If you're still having issues accessing the debug tool, ensure that:</p>
+        <ol>
+            <li>The Flask application is running on port 5025</li>
+            <li>The <code>templates</code> folder is properly configured</li>
+            <li>You can try copying the file to the <code>static</code> folder which is usually served directly</li>
+        </ol>
+    </div>
+</body>
+</html> 

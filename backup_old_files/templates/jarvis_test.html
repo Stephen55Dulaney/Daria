@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LangChain Interview Test</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/main.css') }}">
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>LangChain Interview Test</h1>
+        
+        <div id="setup-form">
+            <h2>Setup Interview</h2>
+            <div class="form-group">
+                <label for="project-name">Project Name:</label>
+                <input type="text" id="project-name" class="form-control" value="GreenEggsAndHam">
+            </div>
+            <div class="form-group">
+                <label for="intro-prompt">Custom Intro Prompt:</label>
+                <textarea id="intro-prompt" class="form-control" rows="5">You are conducting a contextual inquiry interview about GreenEggsAndHam. Ask open-ended questions about the user's experience, needs, and frustrations. NEVER repeat questions. Listen carefully to responses to ask meaningful follow-up questions.</textarea>
+            </div>
+            <div class="form-group">
+                <label for="eval-prompt">Custom Evaluation Prompt:</label>
+                <textarea id="eval-prompt" class="form-control" rows="5">Based on the interview transcript, provide a detailed analysis including user needs, pain points, and opportunities for improvement.</textarea>
+            </div>
+            <div class="form-group">
+                <label class="toggle-switch">
+                    <input type="checkbox" id="tts-toggle" checked>
+                    <span class="slider"></span>
+                    <span class="toggle-label">Text-to-Speech</span>
+                </label>
+            </div>
+            <button id="start-interview" class="btn btn-primary">Start Interview</button>
+        </div>
+        
+        <div id="interview-section" style="display: none;">
+            <h2>Interview in Progress</h2>
+            <div id="transcript" class="card" style="height: 400px; overflow-y: auto; margin-bottom: 20px; padding: 10px;"></div>
+            
+            <div class="form-group">
+                <label for="user-response">Your Response:</label>
+                <textarea id="user-response" class="form-control" rows="3"></textarea>
+                <div class="response-controls">
+                    <button id="start-listening" class="btn btn-secondary" title="Start listening">
+                        <span class="mic-icon">🎤</span>
+                    </button>
+                    <div id="speech-status" class="speech-status">Click mic to speak</div>
+                </div>
+            </div>
+            <button id="send-response" class="btn btn-primary">Send Response</button>
+            <button id="finish-interview" class="btn btn-success">Finish & Generate Summary</button>
+        </div>
+        
+        <div id="summary-section" style="display: none;">
+            <h2>Interview Summary</h2>
+            <div id="evaluation" class="card" style="padding: 15px;"></div>
+            <button id="new-interview" class="btn btn-primary" style="margin-top: 20px;">Start New Interview</button>
+        </div>
+    </div>
+
+    <script>
+        let sessionId = null;
+        let transcript = [];
+        let useTTS = true;  // Default TTS setting
+        let isListening = false;
+        let recognition = null;
+        
+        // Add Enter key submission (Ctrl+Enter or Cmd+Enter)
+        document.getElementById('user-response').addEventListener('keydown', function(e) {
+            // Check for Enter key + modifier (Ctrl or Cmd)
+            if (e.key === 'Enter' && (e.ctrlKey || e.metaKey)) {
+                e.preventDefault();  // Prevent default Enter behavior
+                document.getElementById('send-response').click();
+            }
+        });
+        
+        // Initialize speech recognition if available
+        function initSpeechRecognition() {
+            if ('webkitSpeechRecognition' in window) {
+                recognition = new webkitSpeechRecognition();
+            } else if ('SpeechRecognition' in window) {
+                recognition = new SpeechRecognition();
+            } else {
+                console.warn('Speech recognition not supported by this browser');
+                document.getElementById('start-listening').style.display = 'none';
+                document.getElementById('speech-status').textContent = 'Speech recognition not supported by this browser';
+                return false;
+            }
+            
+            // Configure recognition
+            recognition.continuous = true;
+            recognition.interimResults = true;
+            recognition.lang = 'en-US';
+            
+            // Set up event handlers
+            recognition.onstart = function() {
+                isListening = true;
+                document.getElementById('speech-status').textContent = 'Listening...';
+                document.getElementById('start-listening').classList.add('listening');
+            };
+            
+            recognition.onend = function() {
+                isListening = false;
+                document.getElementById('speech-status').textContent = 'Click mic to speak';
+                document.getElementById('start-listening').classList.remove('listening');
+            };
+            
+            recognition.onresult = function(event) {
+                let finalTranscript = '';
+                let interimTranscript = '';
+                
+                for (let i = event.resultIndex; i < event.results.length; i++) {
+                    if (event.results[i].isFinal) {
+                        finalTranscript += event.results[i][0].transcript;
+                    } else {
+                        interimTranscript += event.results[i][0].transcript;
+                    }
+                }
+                
+                if (finalTranscript) {
+                    // Add to existing text in the textarea
+                    const currentText = document.getElementById('user-response').value;
+                    document.getElementById('user-response').value = 
+                        currentText ? currentText + ' ' + finalTranscript : finalTranscript;
+                }
+                
+                if (interimTranscript) {
+                    document.getElementById('speech-status').textContent = 'Hearing: ' + interimTranscript;
+                }
+            };
+            
+            recognition.onerror = function(event) {
+                console.error('Speech recognition error', event.error);
+                document.getElementById('speech-status').textContent = 'Error: ' + event.error;
+                isListening = false;
+                document.getElementById('start-listening').classList.remove('listening');
+            };
+            
+            return true;
+        }
+        
+        // Toggle speech recognition
+        document.getElementById('start-listening').addEventListener('click', function() {
+            if (!recognition) {
+                if (!initSpeechRecognition()) {
+                    return;
+                }
+            }
+            
+            if (isListening) {
+                recognition.stop();
+            } else {
+                recognition.start();
+            }
+        });
+        
+        // Initialize speech synthesis
+        const synth = window.speechSynthesis;
+        
+        // Set up TTS toggle
+        document.getElementById('tts-toggle').addEventListener('change', function() {
+            useTTS = this.checked;
+            // Cancel any ongoing speech if turning off
+            if (!useTTS) {
+                synth.cancel();
+            }
+        });
+        
+        // Function to speak text using the browser's speech synthesis
+        function speakText(text) {
+            if (!useTTS || !synth) return;
+            
+            // Cancel any ongoing speech
+            synth.cancel();
+            
+            // Create a new utterance
+            const utterance = new SpeechSynthesisUtterance(text);
+            
+            // Set properties
+            utterance.rate = 1.0;  // Speech rate (0.1 to 10)
+            utterance.pitch = 1.0; // Speech pitch (0 to 2)
+            utterance.volume = 1.0; // Speech volume (0 to 1)
+            
+            // Speak the text
+            synth.speak(utterance);
+        }
+        
+        document.getElementById('start-interview').addEventListener('click', async () => {
+            try {
+                const projectName = document.getElementById('project-name').value;
+                const introPrompt = document.getElementById('intro-prompt').value;
+                const evalPrompt = document.getElementById('eval-prompt').value;
+                
+                const response = await axios.post('/api/start_langchain_interview', {
+                    project_name: projectName,
+                    intro_prompt: introPrompt,
+                    evaluation_prompt: evalPrompt,
+                    use_tts: useTTS
+                });
+                
+                sessionId = response.data.session_id;
+                transcript = response.data.transcript;
+                useTTS = response.data.use_tts;
+                updateTranscript();
+                
+                // Show first question
+                const firstQuestion = response.data.question;
+                addToTranscript('Interviewer', firstQuestion);
+                
+                // Speak the first question
+                speakText(firstQuestion);
+                
+                // Switch to interview view
+                document.getElementById('setup-form').style.display = 'none';
+                document.getElementById('interview-section').style.display = 'block';
+            } catch (error) {
+                console.error('Error starting interview:', error);
+                alert('Failed to start interview: ' + (error.response?.data?.error || error.message));
+            }
+        });
+        
+        document.getElementById('send-response').addEventListener('click', async () => {
+            if (!sessionId) return;
+            
+            try {
+                const userResponse = document.getElementById('user-response').value;
+                if (!userResponse.trim()) return;
+                
+                addToTranscript('You', userResponse);
+                document.getElementById('user-response').value = '';
+                
+                // Stop speech recognition if it's active
+                if (isListening && recognition) {
+                    recognition.stop();
+                }
+                
+                const response = await axios.post('/api/langchain_interview_response', {
+                    session_id: sessionId,
+                    response: userResponse
+                });
+                
+                transcript = response.data.transcript;
+                const question = response.data.question;
+                addToTranscript('Interviewer', question);
+                
+                // Speak the interviewer's question
+                speakText(question);
+            } catch (error) {
+                console.error('Error sending response:', error);
+                alert('Failed to send response: ' + (error.response?.data?.error || error.message));
+            }
+        });
+        
+        document.getElementById('finish-interview').addEventListener('click', async () => {
+            if (!sessionId) return;
+            
+            try {
+                const evalPrompt = document.getElementById('eval-prompt').value;
+                
+                const response = await axios.post('/api/langchain_interview_summary', {
+                    session_id: sessionId,
+                    evaluation_prompt: evalPrompt
+                });
+                
+                document.getElementById('evaluation').innerHTML = response.data.evaluation.replace(/\n/g, '<br>');
+                
+                // Switch to summary view
+                document.getElementById('interview-section').style.display = 'none';
+                document.getElementById('summary-section').style.display = 'block';
+            } catch (error) {
+                console.error('Error generating summary:', error);
+                alert('Failed to generate summary: ' + (error.response?.data?.error || error.message));
+            }
+        });
+        
+        document.getElementById('new-interview').addEventListener('click', () => {
+            // Reset and go back to setup
+            sessionId = null;
+            transcript = [];
+            document.getElementById('transcript').innerHTML = '';
+            document.getElementById('summary-section').style.display = 'none';
+            document.getElementById('setup-form').style.display = 'block';
+        });
+        
+        function addToTranscript(role, message) {
+            const transcriptEl = document.getElementById('transcript');
+            const messageEl = document.createElement('div');
+            messageEl.className = role === 'Interviewer' ? 'message interviewer' : 'message user';
+            messageEl.innerHTML = `<strong>${role}:</strong> ${message.replace(/\n/g, '<br>')}`;
+            transcriptEl.appendChild(messageEl);
+            transcriptEl.scrollTop = transcriptEl.scrollHeight;
+        }
+        
+        function updateTranscript() {
+            const transcriptEl = document.getElementById('transcript');
+            transcriptEl.innerHTML = '';
+            
+            transcript.forEach(entry => {
+                const role = entry.role === 'assistant' ? 'Interviewer' : 'You';
+                addToTranscript(role, entry.content);
+            });
+        }
+    </script>
+
+    <style>
+        .message {
+            margin-bottom: 15px;
+            padding: 10px;
+            border-radius: 5px;
+        }
+        .interviewer {
+            background-color: #e6f7ff;
+        }
+        .user {
+            background-color: #f0f0f0;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 8px;
+        }
+        .btn {
+            padding: 8px 15px;
+            margin-right: 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .card {
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background-color: white;
+        }
+        
+        /* Speech recognition styles */
+        .response-controls {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        
+        #start-listening {
+            background-color: #6c757d;
+            color: white;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s ease;
+        }
+        
+        #start-listening.listening {
+            background-color: #dc3545;
+            box-shadow: 0 0 0 5px rgba(220, 53, 69, 0.2);
+            animation: pulse 1.5s infinite;
+        }
+        
+        @keyframes pulse {
+            0% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+            }
+            70% {
+                box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+            }
+            100% {
+                box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+            }
+        }
+        
+        .speech-status {
+            margin-left: 10px;
+            color: #666;
+            font-size: 14px;
+            min-width: 150px;
+            max-width: 300px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        
+        /* Toggle switch styles */
+        .toggle-switch {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            cursor: pointer;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .slider {
+            position: relative;
+            display: inline-block;
+            width: 48px;
+            height: 24px;
+            background-color: #ccc;
+            border-radius: 24px;
+            transition: .4s;
+            margin-right: 10px;
+        }
+        
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 20px;
+            width: 20px;
+            left: 2px;
+            bottom: 2px;
+            background-color: white;
+            border-radius: 50%;
+            transition: .4s;
+        }
+        
+        input:checked + .slider {
+            background-color: #007bff;
+        }
+        
+        input:checked + .slider:before {
+            transform: translateX(24px);
+        }
+        
+        .toggle-label {
+            font-size: 14px;
+        }
+    </style>
+</body>
+</html> 

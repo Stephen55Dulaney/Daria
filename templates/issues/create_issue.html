@@ -223,6 +223,37 @@
                 }
             }
         });
+
+        // Pre-fill form fields from query parameters
+        function prefillFromQueryParams() {
+            const params = new URLSearchParams(window.location.search);
+            if (params.has('title')) document.getElementById('title').value = params.get('title');
+            if (params.has('description')) document.getElementById('description').value = params.get('description');
+            if (params.has('type')) {
+                issueTypeSelect.value = params.get('type').toLowerCase();
+                updateFormFields();
+            }
+            if (params.has('priority')) prioritySelect.value = params.get('priority').toLowerCase();
+            if (params.has('linked_persona')) document.getElementById('linked_persona').value = params.get('linked_persona');
+            if (params.has('journey_stage')) document.getElementById('journey_stage').value = params.get('journey_stage');
+            if (params.has('root_cause')) document.getElementById('root_cause').value = params.get('root_cause');
+            if (params.has('insights')) document.getElementById('insights').value = params.get('insights');
+            if (params.has('ethics')) document.getElementById('ethics').value = params.get('ethics');
+            if (params.has('cursor_prompt_template')) document.getElementById('cursor_prompt_template').value = params.get('cursor_prompt_template');
+            // Show research fields if type=opportunity
+            if (params.get('type') && params.get('type').toLowerCase() === 'opportunity') {
+                researchFields.style.display = 'block';
+                personaField.style.display = 'block';
+                journeyField.style.display = 'block';
+                rootCauseField.style.display = 'block';
+                insightsField.style.display = 'block';
+                ethicsField.style.display = 'block';
+                cursorPromptField.style.display = 'none';
+                parentField.style.display = 'none';
+            }
+            console.log('Prefilled from query params:', Object.fromEntries(params.entries()));
+        }
+        prefillFromQueryParams();
     });
 </script>
 {% endblock %} 

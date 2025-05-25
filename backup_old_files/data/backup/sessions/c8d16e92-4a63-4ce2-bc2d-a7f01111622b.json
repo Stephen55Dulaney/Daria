@@ -1,0 +1,54 @@
+{
+  "id": "c8d16e92-4a63-4ce2-bc2d-a7f01111622b",
+  "guide_id": "6484f57f-7fef-4bb7-8e9d-16ec498073a9",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "2eeee195-ac29-4b64-bab5-acde5b9eb6fb",
+      "content": "why you what is your prompt",
+      "role": "user",
+      "timestamp": "2025-05-16T10:04:47.261410"
+    },
+    {
+      "id": "28bf05dd-341c-4ff8-babb-16c866509117",
+      "content": "I apologize if there was any confusion. I am conducting an interview on the topic of 'General Interview'. Would you be willing to share your experiences or insights related to interviews?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T10:04:50.071453"
+    },
+    {
+      "id": "0707bcc1-54d7-43ca-9d35-ceb6777803c1",
+      "content": "that would be great",
+      "role": "user",
+      "timestamp": "2025-05-16T10:05:09.982733"
+    },
+    {
+      "id": "3e3cbbbd-9e9d-4ce4-8733-ce013c87b448",
+      "content": "Great! Let's start the interview. Can you please tell me about your experience with job interviews? How do you usually prepare for them?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T10:05:12.877959"
+    },
+    {
+      "id": "e600aa18-e7d3-4f2b-8f24-78d0672c98d9",
+      "content": "how did we reset the general interview",
+      "role": "user",
+      "timestamp": "2025-05-16T10:05:30.373022"
+    },
+    {
+      "id": "5876e283-14b3-46fd-9205-1f55a3f3541d",
+      "content": "I'm not sure I understand your question. Could you please clarify or provide more context about what you mean by \"resetting the general interview\"?",
+      "role": "assistant",
+      "timestamp": "2025-05-16T10:05:34.102012"
+    }
+  ],
+  "transcript": "\n\nParticipant: why you what is your prompt\n\nModerator: I apologize if there was any confusion. I am conducting an interview on the topic of 'General Interview'. Would you be willing to share your experiences or insights related to interviews?\n\nParticipant: that would be great\n\nModerator: Great! Let's start the interview. Can you please tell me about your experience with job interviews? How do you usually prepare for them?\n\nParticipant: how did we reset the general interview\n\nModerator: I'm not sure I understand your question. Could you please clarify or provide more context about what you mean by \"resetting the general interview\"?",
+  "analysis": null,
+  "created_at": "2025-05-16T10:04:38.093332",
+  "updated_at": "2025-05-16T10:05:34.102766",
+  "title": "Thomas Test discussion guide with Fin voice",
+  "project": "Test 4444",
+  "interview_type": "custom_interview",
+  "character": "thomas",
+  "character_select": "thomas",
+  "voice_id": "JBFqnCBsd6RMkjVDRZzb"
+}

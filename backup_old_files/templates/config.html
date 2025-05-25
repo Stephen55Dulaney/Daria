@@ -1,0 +1,368 @@
+{% extends "base.html" %}
+
+{% block title %}New Interview - DARIA{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto">
+    <h1 class="text-3xl font-bold mb-8">Start New Interview</h1>
+    
+    <div class="bg-white rounded-lg shadow-lg p-6">
+        <h2 class="text-xl font-semibold mb-6">Interview Guide Design</h2>
+        
+        <form id="interviewForm" class="space-y-6">
+            <!-- Step 1: Pre-Interview Information -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Step 1: Pre-Interview Information</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Researcher Name</label>
+                        <input type="text" id="researcherName" name="researcherName" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                               placeholder="Enter researcher's name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Researcher Role</label>
+                        <input type="text" id="researcherRole" name="researcherRole" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                               placeholder="Enter researcher's role">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Researcher Email</label>
+                        <input type="email" id="researcherEmail" name="researcherEmail" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                               placeholder="Enter researcher's email" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Researcher Phone</label>
+                        <input type="tel" id="researcherPhone" name="researcherPhone" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                               placeholder="Enter researcher's phone number">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Interview Configuration -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Step 2: Interview Configuration</h2>
+                
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Project Name</label>
+                    <input type="text" id="projectName" name="projectName" 
+                           class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                           placeholder="Enter project name" required>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Interview Type</label>
+                    <div class="space-y-2">
+                        <label class="flex items-center">
+                            <input type="radio" name="interviewType" value="Persona Interview" class="mr-2" required>
+                            Persona Interview
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="interviewType" value="Journey Map Interview" class="mr-2">
+                            Journey Map Interview
+                        </label>
+                        <label class="flex items-center">
+                            <input type="radio" name="interviewType" value="Application Interview" class="mr-2">
+                            Application Interview
+                        </label>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="block text-sm font-medium text-gray-700 mb-2">Project Description</label>
+                    <textarea id="projectDescription" name="projectDescription" 
+                              class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                              rows="4" placeholder="Describe the project (max 300 characters)" required></textarea>
+                </div>
+            </div>
+
+            <!-- Step 3: Post-Interview Information -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Step 3: Post-Interview Information</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Interviewee Name</label>
+                        <input type="text" id="intervieweeName" name="intervieweeName" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                               placeholder="Enter interviewee's name" required>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Age Range</label>
+                        <select id="intervieweeAge" name="intervieweeAge" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Select age range</option>
+                            <option value="18-24">18-24</option>
+                            <option value="25-34">25-34</option>
+                            <option value="35-44">35-44</option>
+                            <option value="45-54">45-54</option>
+                            <option value="55-64">55-64</option>
+                            <option value="65+">65+</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Gender</label>
+                        <select id="intervieweeGender" name="intervieweeGender" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Select gender</option>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                            <option value="non-binary">Non-binary</option>
+                            <option value="prefer-not-to-say">Prefer not to say</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Location</label>
+                        <input type="text" id="intervieweeLocation" name="intervieweeLocation" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                               placeholder="City, State">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Occupation</label>
+                        <input type="text" id="intervieweeOccupation" name="intervieweeOccupation" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                               placeholder="Enter occupation">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Industry</label>
+                        <input type="text" id="intervieweeIndustry" name="intervieweeIndustry" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                               placeholder="Enter industry">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Years of Experience</label>
+                        <input type="number" id="intervieweeExperience" name="intervieweeExperience" 
+                               class="w-full px-3 py-2 border border-gray-300 rounded-md"
+                               placeholder="Years in current role">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Education Level</label>
+                        <select id="intervieweeEducation" name="intervieweeEducation" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Select education level</option>
+                            <option value="high-school">High School</option>
+                            <option value="associates">Associate's Degree</option>
+                            <option value="bachelors">Bachelor's Degree</option>
+                            <option value="masters">Master's Degree</option>
+                            <option value="doctorate">Doctorate</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Technology Usage -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Step 4: Technology Usage</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Primary Device</label>
+                        <select id="primaryDevice" name="primaryDevice" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Select primary device</option>
+                            <option value="smartphone">Smartphone</option>
+                            <option value="tablet">Tablet</option>
+                            <option value="laptop">Laptop</option>
+                            <option value="desktop">Desktop</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Operating System</label>
+                        <select id="operatingSystem" name="operatingSystem" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Select operating system</option>
+                            <option value="windows">Windows</option>
+                            <option value="macos">macOS</option>
+                            <option value="ios">iOS</option>
+                            <option value="android">Android</option>
+                            <option value="linux">Linux</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Browser Preference</label>
+                        <select id="browserPreference" name="browserPreference" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Select browser preference</option>
+                            <option value="chrome">Chrome</option>
+                            <option value="firefox">Firefox</option>
+                            <option value="safari">Safari</option>
+                            <option value="edge">Edge</option>
+                            <option value="other">Other</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Technical Proficiency</label>
+                        <select id="technicalProficiency" name="technicalProficiency" 
+                                class="w-full px-3 py-2 border border-gray-300 rounded-md">
+                            <option value="">Select technical proficiency</option>
+                            <option value="beginner">Beginner</option>
+                            <option value="intermediate">Intermediate</option>
+                            <option value="advanced">Advanced</option>
+                            <option value="expert">Expert</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 5: Consent and Recording -->
+            <div class="bg-white p-6 rounded-lg shadow-md">
+                <h2 class="text-xl font-semibold mb-4">Step 5: Consent and Recording</h2>
+                
+                <div class="space-y-4">
+                    <div class="form-group">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="consentToParticipate" name="consentToParticipate" 
+                                   class="mr-2" required>
+                            <span class="text-sm text-gray-700">I consent to participate in this study</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="consentToRecord" name="consentToRecord" 
+                                   class="mr-2" required>
+                            <span class="text-sm text-gray-700">I consent to have this interview recorded</span>
+                        </label>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="flex items-center">
+                            <input type="checkbox" id="confidentialityAgreement" name="confidentialityAgreement" 
+                                   class="mr-2" required>
+                            <span class="text-sm text-gray-700">I agree to maintain confidentiality of the information shared</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex justify-end">
+                <button type="button" id="generateInterview" class="btn">Generate Interview</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    // Debug logging function
+    function debugLog(message, data = null) {
+        const timestamp = new Date().toISOString();
+        const logMessage = `[${timestamp}] ${message}`;
+        console.log(logMessage);
+        if (data) {
+            console.log('Data:', data);
+        }
+    }
+
+    // Generate Interview button
+    document.getElementById('generateInterview').addEventListener('click', async () => {
+        debugLog('Generate Interview button clicked');
+        
+        // Only validate the essential required fields
+        const requiredFields = [
+            'projectName',
+            'projectDescription',
+            'intervieweeName'
+        ];
+
+        // Check required input fields
+        const missingFields = requiredFields.filter(field => {
+            const element = document.getElementById(field);
+            debugLog(`Checking field ${field}`, { value: element?.value });
+            return !element?.value?.trim();
+        });
+
+        // Check radio button group separately
+        const interviewTypeSelected = document.querySelector('input[name="interviewType"]:checked');
+        debugLog('Interview type selection', { selected: interviewTypeSelected?.value });
+        
+        if (!interviewTypeSelected) {
+            alert('Please select an interview type');
+            return;
+        }
+
+        if (missingFields.length > 0) {
+            debugLog('Missing required fields', missingFields);
+            alert('Please fill in all required fields');
+            return;
+        }
+
+        // Collect all form data
+        const formData = {
+            researcher: {
+                name: document.getElementById('researcherName').value,
+                role: document.getElementById('researcherRole').value,
+                email: document.getElementById('researcherEmail').value,
+                phone: document.getElementById('researcherPhone').value
+            },
+            project: {
+                name: document.getElementById('projectName').value,
+                type: interviewTypeSelected.value,
+                description: document.getElementById('projectDescription').value
+            },
+            interviewee: {
+                name: document.getElementById('intervieweeName').value,
+                age: document.getElementById('intervieweeAge').value,
+                gender: document.getElementById('intervieweeGender').value,
+                location: document.getElementById('intervieweeLocation').value,
+                occupation: document.getElementById('intervieweeOccupation').value,
+                industry: document.getElementById('intervieweeIndustry').value,
+                experience: document.getElementById('intervieweeExperience').value,
+                education: document.getElementById('intervieweeEducation').value
+            },
+            technology: {
+                primaryDevice: document.getElementById('primaryDevice').value,
+                operatingSystem: document.getElementById('operatingSystem').value,
+                browserPreference: document.getElementById('browserPreference').value,
+                technicalProficiency: document.getElementById('technicalProficiency').value
+            },
+            consent: {
+                participate: document.getElementById('consentToParticipate')?.checked || false,
+                record: document.getElementById('consentToRecord')?.checked || false,
+                confidentiality: document.getElementById('confidentialityAgreement')?.checked || false
+            }
+        };
+
+        debugLog('Submitting form data', formData);
+        
+        try {
+            const response = await fetch('/save_interview', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData)
+            });
+            
+            debugLog('Server response received', { status: response.status });
+            const data = await response.json();
+            debugLog('Response data', data);
+            
+            if (data.status === 'success') {
+                // Open interview in new window
+                window.open(data.redirect_url, '_blank');
+            } else {
+                alert('Error: ' + (data.error || 'Failed to save interview configuration'));
+            }
+        } catch (error) {
+            console.error('Error saving interview:', error);
+            alert('Error saving interview configuration');
+        }
+    });
+</script>
+{% endblock %}

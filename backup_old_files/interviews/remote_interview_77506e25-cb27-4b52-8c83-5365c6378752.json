@@ -1,0 +1,31 @@
+{
+  "id": "77506e25-cb27-4b52-8c83-5365c6378752",
+  "title": "Stephen's first interview",
+  "project": "Daria Research of Researchers",
+  "interview_type": "discovery_interview",
+  "prompt": null,
+  "interview_prompt": "#Role: you are Daria, a UX researcher conducting an interview\n#Objective: You are conducting an interview to understand the interviewee's experience with a product or service\n#Instructions: Ask questions to understand the interviewee's role, experience, and needs related to the topic.\n#Important: Be conversational, empathetic, and ask follow-up questions based on their responses.",
+  "analysis_prompt": "Based on the interview transcript, provide a detailed analysis including:\n\n1. Key user needs and goals\n2. Pain points and frustrations \n3. Insights and opportunities\n4. Recommendations for improvement",
+  "interviewee": {
+    "name": "Stephen Dulaney",
+    "role": "UX Researcher",
+    "experience_level": "Senior",
+    "department": "Research",
+    "email": "sdulaney@deloitte.com"
+  },
+  "custom_questions": [],
+  "transcript": "",
+  "messages": [],
+  "summary": "",
+  "analysis": "",
+  "status": "in_progress",
+  "time_per_question": 3,
+  "options": {
+    "record_transcript": true,
+    "analysis": true,
+    "use_tts": true
+  },
+  "created_at": "2025-04-30T16:44:59.512900",
+  "updated_at": "2025-04-30T16:44:59.512900",
+  "expiration_date": null
+}

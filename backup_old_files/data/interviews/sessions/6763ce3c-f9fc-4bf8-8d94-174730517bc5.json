@@ -1,0 +1,57 @@
+{
+  "id": "6763ce3c-f9fc-4bf8-8d94-174730517bc5",
+  "guide_id": "9d9b0648-5f14-4a22-81df-290bbd67049d",
+  "interviewee": {},
+  "status": "active",
+  "messages": [
+    {
+      "id": "c685ac4a-db0b-4bbc-8e4f-73f303959ea3",
+      "content": "SYSTEM: Character set to askia. \n                                IMPORTANT: You are askia. Your name is askia.\n                                You MUST always respond as askia. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am askia.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"",
+      "role": "system",
+      "timestamp": "2025-05-23T07:05:29.886431"
+    },
+    {
+      "id": "84de2fee-a204-43e4-a0df-2f691b1ba2c4",
+      "content": "Hello, I am askia. How can I assist you today?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T07:05:29.889718"
+    },
+    {
+      "id": "0aecf504-f9df-4090-b367-4a2b4bb78f70",
+      "content": "I am just testing the debugging system and making sure you're still with me",
+      "role": "user",
+      "timestamp": "2025-05-23T07:05:41.653666"
+    },
+    {
+      "id": "e9d4df54-9b7d-4088-a9d2-27e65ae40e0f",
+      "content": "Absolutely, I'm still here and ready to continue with our interview on the World of Washing Machines Corp. self-service ordering portal. Let's dive back in! \n\nTo start, could you please walk me through the current process your retail partners follow when searching for and selecting products on the portal?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T07:05:43.570770"
+    },
+    {
+      "id": "4d0da6af-5e7a-4e77-a982-ed521c4b4994",
+      "content": "I noticed you're using the default voice but you're still talking to me which is good do you know if the land chain is services are failing",
+      "role": "user",
+      "timestamp": "2025-05-23T07:06:12.215363"
+    },
+    {
+      "id": "3a2ac1d7-4540-4b2c-8da9-65dfc431f397",
+      "content": "I appreciate your observation, but let's focus on the interview topic regarding the ordering portal. To start, can you describe the current process retail partners go through when searching for and selecting products on the self-service ordering portal?",
+      "role": "assistant",
+      "timestamp": "2025-05-23T07:06:13.350569"
+    }
+  ],
+  "transcript": "\n\nParticipant: SYSTEM: Character set to askia. \n                                IMPORTANT: You are askia. Your name is askia.\n                                You MUST always respond as askia. Never break character or reveal you are an AI.\n                                When asked \"who are you\" or \"what is your name\", you MUST respond with \"I am askia.\"\n                                If character is Thomas, always respond to identity questions with \"My name is Thomas.\"\n\nModerator: Hello, I am askia. How can I assist you today?\n\nParticipant: I am just testing the debugging system and making sure you're still with me\n\nModerator: Absolutely, I'm still here and ready to continue with our interview on the World of Washing Machines Corp. self-service ordering portal. Let's dive back in! \n\nTo start, could you please walk me through the current process your retail partners follow when searching for and selecting products on the portal?\n\nParticipant: I noticed you're using the default voice but you're still talking to me which is good do you know if the land chain is services are failing\n\nModerator: I appreciate your observation, but let's focus on the interview topic regarding the ordering portal. To start, can you describe the current process retail partners go through when searching for and selecting products on the self-service ordering portal?",
+  "analysis": null,
+  "created_at": "2025-05-23T07:05:24.413798",
+  "updated_at": "2025-05-23T07:06:13.350735",
+  "title": "Washing Machine World",
+  "project": "World of Washing Machines",
+  "interview_type": "discovery_interview",
+  "topic": "We want to discuss what we need to cover in a Washing Machine Self Service ordering tool discovery project",
+  "context": "Background Context: World of Washing Machines Corp. Self-Service Ordering Portal (B2B) Overview World of Washing Machines Corp., a leading global manufacturer of home appliances, developed a self-service ordering portal aimed at its B2B customers\u2014primarily retail appliance stores and distributors. This portal streamlines the process for retail partners to browse, order, and manage World of Washing Machines Corp. products directly, without the need for manual sales intervention. Purpose and Business Goals Increase Efficiency: Automate and simplify the ordering process for retail partners, reducing manual order entry and errors. Enhance Partner Experience: Provide a modern, user-friendly interface that empowers retail stores to manage their orders, track shipments, and access product information 24/7. Improve Order Accuracy: Minimize miscommunication and mistakes by allowing partners to input orders directly. Scalability: Enable World of Washing Machines Corp. to serve a growing network of retail partners without proportional increases in sales support staff. Key Features Product Catalog: Comprehensive, searchable catalog with detailed product specs, images, and availability. Order Placement: Intuitive workflows for creating, editing, and submitting orders. Order Tracking: Real-time updates on order status, shipment tracking, and delivery estimates. Account Management: Tools for managing billing, shipping addresses, and user permissions within retail organizations. Promotions & Pricing: Display of partner-specific pricing, volume discounts, and current promotions. Support & Resources: Access to documentation, FAQs, and direct support channels. User Personas Store Managers: Oversee inventory and place bulk orders for multiple locations. Sales Associates: Check product availability and pricing for customers. Procurement Specialists: Manage recurring orders and negotiate bulk deals. World of Washing Machines Corp. Account Managers: Monitor partner activity and provide support as needed. Deloitte\u2019s Role User Research & UX Design: Conducted interviews and usability testing with retail partners to identify pain points and requirements. Portal Development: Designed and implemented the portal architecture, integrating with World of Washing Machines Corp.\u2019s ERP and logistics systems. Change Management: Supported World of Washing Machines Corp. in onboarding retail partners and training them on the new portal. Continuous Improvement: Gathered feedback post-launch to iterate on features and enhance the user experience. Impact Reduced Order Processing Time: Orders placed and processed faster, with fewer errors. Higher Partner Satisfaction: Retailers report improved autonomy and satisfaction with the ordering process. Operational Savings: Decreased reliance on manual sales and support staff for order entry.\n\n",
+  "goals": "Identify pain points in the current ordering workflow. Understand how users search for and select products. Assess satisfaction with order tracking and status updates. Uncover unmet needs or desired features in the portal. Evaluate ease of use for first-time and repeat users.",
+  "character": "askia",
+  "character_select": "askia",
+  "voice_id": "AZnzlk1XvdvUeBnXmlld"
+}

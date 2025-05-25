@@ -1,0 +1,116 @@
+{% extends "base.html" %}
+
+{% block title %}Edit Issue{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a href="{{ url_for('issues.issues_list') }}">Issues</a></li>
+            <li class="breadcrumb-item"><a href="{{ url_for('issues.view_issue', issue_id=issue.id) }}">Issue #{{ issue.id[:8] }}</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Edit</li>
+        </ol>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-10">
+            <div class="card shadow">
+                <div class="card-header bg-light">
+                    <h4 class="mb-0">Edit Issue</h4>
+                </div>
+                <div class="card-body">
+                    <form action="{{ url_for('issues.edit_issue', issue_id=issue.id) }}" method="post" enctype="multipart/form-data">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Title <span class="text-danger">*</span></label>
+                            <input type="text" class="form-control" id="title" name="title" value="{{ issue.title }}" required>
+                        </div>
+                        
+                        <div class="row mb-3">
+                            <div class="col-md-6">
+                                <label for="issue_type" class="form-label">Type <span class="text-danger">*</span></label>
+                                <select class="form-select" id="issue_type" name="issue_type" required>
+                                    <option value="bug" {% if issue.issue_type == 'bug' %}selected{% endif %}>Bug</option>
+                                    <option value="feature" {% if issue.issue_type == 'feature' %}selected{% endif %}>Feature Request</option>
+                                    <option value="improvement" {% if issue.issue_type == 'improvement' %}selected{% endif %}>Improvement</option>
+                                    <option value="task" {% if issue.issue_type == 'task' %}selected{% endif %}>Task</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="priority" class="form-label">Priority <span class="text-danger">*</span></label>
+                                <select class="form-select" id="priority" name="priority" required>
+                                    <option value="low" {% if issue.priority == 'low' %}selected{% endif %}>Low</option>
+                                    <option value="medium" {% if issue.priority == 'medium' %}selected{% endif %}>Medium</option>
+                                    <option value="high" {% if issue.priority == 'high' %}selected{% endif %}>High</option>
+                                    <option value="critical" {% if issue.priority == 'critical' %}selected{% endif %}>Critical</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description <span class="text-danger">*</span></label>
+                            <textarea class="form-control" id="description" name="description" rows="6" required>{{ issue.description }}</textarea>
+                        </div>
+                        
+                        {% if issue.screenshots %}
+                        <div class="mb-3">
+                            <label class="form-label">Current Screenshots</label>
+                            <div class="row">
+                                {% for screenshot in issue.screenshots %}
+                                <div class="col-md-4 mb-3">
+                                    <div class="card">
+                                        <img src="{{ url_for('issues.get_screenshot', filename=screenshot) }}" class="card-img-top" alt="Screenshot">
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        {% endif %}
+                        
+                        <div class="mb-4">
+                            <label for="screenshots" class="form-label">Add More Screenshots (Optional)</label>
+                            <input class="form-control" type="file" id="screenshots" name="screenshots" multiple accept="image/*">
+                            <div class="form-text">Upload additional images (max 5 files, 2MB each)</div>
+                        </div>
+                        
+                        <div class="d-flex justify-content-between">
+                            <a href="{{ url_for('issues.view_issue', issue_id=issue.id) }}" class="btn btn-outline-secondary">
+                                Cancel
+                            </a>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-1"></i> Save Changes
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Preview screenshots
+        const screenshotsInput = document.getElementById('screenshots');
+        const maxFiles = 5;
+        const maxSize = 2 * 1024 * 1024; // 2MB
+        
+        screenshotsInput.addEventListener('change', function() {
+            if (this.files.length > maxFiles) {
+                alert(`Please select a maximum of ${maxFiles} files.`);
+                this.value = '';
+                return;
+            }
+            
+            for (let i = 0; i < this.files.length; i++) {
+                if (this.files[i].size > maxSize) {
+                    alert(`File "${this.files[i].name}" exceeds the maximum size of 2MB.`);
+                    this.value = '';
+                    return;
+                }
+            }
+        });
+    });
+</script>
+{% endblock %} 

@@ -1,0 +1,32 @@
+{
+  "id": "f629dcb3-dd41-41c1-88d8-e3faf1d8562c",
+  "title": "Streamlined Service Management",
+  "description": "Use ./run_latest_with_patch.sh to start all services (including Memory Companion) and ./stop_daria_services.sh to stop everything cleanly",
+  "issue_type": "bug",
+  "status": "open",
+  "priority": "high",
+  "creator_id": "system",
+  "assigned_to": null,
+  "screenshots": [],
+  "created_at": "2025-05-24T18:52:56.438821",
+  "updated_at": "2025-05-24T18:52:56.438827",
+  "environment": {},
+  "tags": [],
+  "history": [
+    {
+      "timestamp": "2025-05-24T18:52:56.438827",
+      "action": "Issue created",
+      "user_id": null,
+      "details": null
+    }
+  ],
+  "comments": [],
+  "linked_persona": null,
+  "journey_stage": null,
+  "insights": [],
+  "ethics": [],
+  "root_cause": null,
+  "parent_id": null,
+  "linked_prototype_prompt": null,
+  "cursor_prompt_template": null
+}

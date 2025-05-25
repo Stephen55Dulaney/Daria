@@ -268,6 +268,11 @@
                     <div class="tab-content" id="sessionTabContent">
                         <!-- Transcript Tab -->
                         <div class="tab-pane fade show active" id="transcript" role="tabpanel" aria-labelledby="transcript-tab">
+                            <div class="d-flex justify-content-end mb-2">
+                                <a href="/api/session/{{ session_id }}/export?download=true" class="btn btn-outline-primary btn-sm" download>
+                                    <i class="bi bi-download me-1"></i> Download JSON
+                                </a>
+                            </div>
                             <div class="transcript-container">
                                 {% if session.messages is defined and session.messages %}
                                     {% for message in session.messages %}
@@ -311,6 +316,16 @@
                         
                         <!-- Analysis Tab -->
                         <div class="tab-pane fade" id="analysis" role="tabpanel" aria-labelledby="analysis-tab">
+                            <div class="d-flex justify-content-end mb-2 gap-2">
+                                <a href="/api/session/{{ session_id }}/export?download=true" class="btn btn-outline-primary btn-sm" download>
+                                    <i class="bi bi-download me-1"></i> Download JSON
+                                </a>
+                                {% if session.analysis %}
+                                <button class="btn btn-outline-warning btn-sm" id="createOpportunityBtn">
+                                    <i class="bi bi-lightbulb me-1"></i> Create Opportunity from Analysis
+                                </button>
+                                {% endif %}
+                            </div>
                             {% if session.analysis %}
                                 <div class="analysis-container">
                                     <h5 class="mb-3">Research Insights</h5>
@@ -734,6 +749,56 @@ document.addEventListener('DOMContentLoaded', function() {
                     });
             } else {
                 prompt('Copy this ID:', sessionIdText);
+            }
+        });
+    }
+
+    // Create Opportunity from Analysis
+    const createOpportunityBtn = document.getElementById('createOpportunityBtn');
+    if (createOpportunityBtn) {
+        createOpportunityBtn.addEventListener('click', async function() {
+            createOpportunityBtn.disabled = true;
+            createOpportunityBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...';
+            const analysisForOpportunity = {{ session.analysis|tojson|safe }};
+            let analysisText = '';
+            if (typeof analysisForOpportunity === 'string') {
+                analysisText = analysisForOpportunity;
+            } else if (analysisForOpportunity && analysisForOpportunity.content) {
+                analysisText = analysisForOpportunity.content;
+            } else {
+                analysisText = JSON.stringify(analysisForOpportunity);
+            }
+            console.log('Sending analysis to LLM:', analysisText);
+            try {
+                const response = await fetch('/api/llm/extract_opportunity', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ analysis: analysisText })
+                });
+                const data = await response.json();
+                console.log('LLM response:', data);
+                if (data.success && data.fields) {
+                    // Build query string for /issues/new
+                    const params = new URLSearchParams();
+                    params.set('type', 'Opportunity');
+                    params.set('priority', 'Low');
+                    for (const [key, value] of Object.entries(data.fields)) {
+                        if (Array.isArray(value)) {
+                            params.set(key, value.join('\n'));
+                        } else {
+                            params.set(key, value);
+                        }
+                    }
+                    console.log('Opening /issues/new with params:', params.toString());
+                    window.open(`/issues/new?${params.toString()}`, '_blank');
+                } else {
+                    alert('Could not extract opportunity fields: ' + (data.error || 'Unknown error'));
+                }
+            } catch (err) {
+                alert('Error suggesting opportunity: ' + err);
+            } finally {
+                createOpportunityBtn.innerHTML = '<i class="bi bi-lightbulb me-1"></i> Create Opportunity from Analysis';
+                createOpportunityBtn.disabled = false;
             }
         });
     }
