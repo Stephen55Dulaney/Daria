@@ -165,6 +165,34 @@ const Analysis = () => {
         URL.revokeObjectURL(url);
     };
 
+    const handleSaveToGallery = async (analysis) => {
+        if (!analysis || !selectedCharacter) {
+            setError('No analysis or character selected to save.');
+            return;
+        }
+        try {
+            setStatus('Saving analysis to gallery...');
+            const response = await fetch('/api/gallery/analysis', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    ...analysis,
+                    assistantId: selectedCharacter // or use the correct property for your character ID
+                }),
+            });
+            const data = await response.json();
+            if (response.ok) {
+                setStatus('Analysis saved to gallery!');
+            } else {
+                setError('Failed to save analysis: ' + (data.error || 'Unknown error'));
+            }
+        } catch (err) {
+            setError('Failed to save analysis: ' + err.message);
+        }
+    };
+
     return (
         <Container className="py-4">
             <h2 className="mb-4">Research Analysis</h2>
@@ -281,6 +309,7 @@ const Analysis = () => {
                                 onChange={(e) => setSelectedModel(e.target.value)}
                             >
                                 <option value="gpt-4">GPT-4</option>
+                                <option value="gpt-4-1106-preview">GPT-4 1106 Preview</option>
                                 <option value="gpt-4-mini">GPT-4 Mini</option>
                                 <option value="claude-3-haiku">Claude 3 Haiku</option>
                                 <option value="claude-3-sonnet">Claude 3 Sonnet</option>
@@ -310,6 +339,12 @@ const Analysis = () => {
                         <h5 className="mb-0">Analysis Results</h5>
                         <Button variant="success" onClick={downloadAnalysis}>
                             Download Analysis
+                        </Button>
+                        <Button
+                            variant="outline"
+                            onClick={() => handleSaveToGallery(analysis)}
+                        >
+                            Save to Gallery test
                         </Button>
                     </Card.Header>
                     <Card.Body>
@@ -357,6 +392,8 @@ const Analysis = () => {
                     </Card.Body>
                 </Card>
             )}
+
+            
         </Container>
     );
 };

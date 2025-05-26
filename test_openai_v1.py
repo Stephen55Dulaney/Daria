@@ -39,9 +39,10 @@ def test_openai_v1():
     """
     
     try:
+        print("Testing model: gpt-4-1106-preview")
         # Call OpenAI API directly with v1.0+ syntax
         response = client.chat.completions.create(
-            model="gpt-3.5-turbo",
+            model="gpt-4-1106-preview",
             messages=[
                 {"role": "system", "content": "You are an expert interview analyst."},
                 {"role": "user", "content": prompt}

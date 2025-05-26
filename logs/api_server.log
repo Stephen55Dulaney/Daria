@@ -30,410 +30,369 @@ INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a
  * Running on http://127.0.0.1:5025
  * Running on http://192.168.86.42:5025
 INFO:werkzeug:[33mPress CTRL+C to quit[0m
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 400 Bad Request"
-ERROR:__main__:Error in OpenAI analysis: Error code: 400 - {'error': {'message': "This model's maximum context length is 8192 tokens. However, your messages resulted in 36550 tokens. Please reduce the length of the messages.", 'type': 'invalid_request_error', 'param': 'messages', 'code': 'context_length_exceeded'}}
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 12:59:04] "[35m[1mPOST /api/research_session/analyze HTTP/1.1[0m" 500 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:26] "[36mGET /static/debug_toolkit.html HTTP/1.1[0m" 304 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 12:59:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 12:59:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:00:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:00:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:26] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:26] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
 INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
 INFO:__main__:Loaded prompt config for synthia: Synthia
 INFO:__main__:Loaded prompt config for eurekia: eurekia
-ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
 INFO:__main__:Loaded prompt config for skeptica: Skeptica
 INFO:__main__:Loaded prompt config for thomas: thomas
-ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
 INFO:__main__:Loaded prompt config for askia: askia
 INFO:__main__:Loaded prompt config for odessia: odessia
 INFO:__main__:Loaded prompt config for interviewer: interviewer
 INFO:__main__:Loaded prompt config for researcher: researcher
 INFO:__main__:Loaded prompt config for thesea: Thesea
 INFO:__main__:Loaded prompt config for daria: Daria
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:11] "GET /api/characters HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:31] "GET /interview_setup HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:31] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:31] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:31] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:31] "GET /api/check_services HTTP/1.1" 200 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:31] "GET /api/discussion_guides HTTP/1.1" 200 -
 INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:11] "GET /api/characters HTTP/1.1" 200 -
-ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:11] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:37] "GET /api/characters HTTP/1.1" 200 -
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:11] "GET /api/discussion_guides HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:13] "GET /api/discussion_guide/28a3a5f7-a7ba-4b93-89b6-c77dac230cc0/sessions HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:21] "GET /api/character/synthia HTTP/1.1" 200 -
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:42] "POST /api/research_session/analyze HTTP/1.1" 200 -
-ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
-ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
-ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:55] "GET /discussion_guides HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:55] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:57] "GET /discussion_guide/28a3a5f7-a7ba-4b93-89b6-c77dac230cc0 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:01:57] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:23] "[36mGET /static/debug_toolkit.html HTTP/1.1[0m" 304 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:23] "GET /api/check_services HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:25] "[33mGET /api/issues?type=opportunity HTTP/1.1[0m" 404 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:28] "[36mGET /static/debug_character_test.html HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:37] "GET /api/discussion_guides HTTP/1.1" 200 -
 INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:33] "GET /api/health HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:33] "GET /api/discussion_guide/28a3a5f7-a7ba-4b93-89b6-c77dac230cc0 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:37] "GET /api/characters HTTP/1.1" 200 -
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:33] "GET /api/discussion_guides HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:33] "[33mGET /api/prompts HTTP/1.1[0m" 404 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:34] "GET /api/discussion_guide/28a3a5f7-a7ba-4b93-89b6-c77dac230cc0 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:35] "GET /api/discussion_guide/28a3a5f7-a7ba-4b93-89b6-c77dac230cc0 HTTP/1.1" 200 -
-INFO:langchain_features.services.discussion_service:Created session 50f9a29d-3e1b-4a12-9dff-0641c07de660 for guide 28a3a5f7-a7ba-4b93-89b6-c77dac230cc0 with character synthia
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:35] "POST /api/session/create HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:35] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:35] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/messages HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:38] "GET /static/debug_interview_flow.html?port=5025&session_id=50f9a29d-3e1b-4a12-9dff-0641c07de660&character=synthia HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:37] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:39] "GET /api/sessions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:39] "GET /api/sessions HTTP/1.1" 200 -
 INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:42] "GET /api/health HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:42] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/messages HTTP/1.1" 200 -
-INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 62 chars, voice: EXAVITQu4vr4xnSDxMaL
-INFO:__main__:Session message request for 50f9a29d-3e1b-4a12-9dff-0641c07de660: {'content': 'SYSTEM: Character set to synthia. \n                                IMPORTANT: You are synthia. Your name is synthia.\n                                You MUST always respond as synthia. Never break character or reveal you are an AI.\n                                When asked "who are you" or "what is your name", you MUST respond with "I am synthia."\n                                If character is Thomas, always respond to identity questions with "My name is Thomas."', 'role': 'system'}
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added message 0b6a8252-dd2c-4585-a9bb-98ddcad02993 to session 50f9a29d-3e1b-4a12-9dff-0641c07de660 via WebSocket: True
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:43] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:43] "[33mGET /favicon.ico HTTP/1.1[0m" 404 -
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:__main__:Emitted AI Observer analysis for message 0b6a8252-dd2c-4585-a9bb-98ddcad02993
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:44] "POST /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/add_message HTTP/1.1" 200 -
-INFO:__main__:Session message request for 50f9a29d-3e1b-4a12-9dff-0641c07de660: {'content': 'Hello, I am synthia. How can I assist you today?', 'role': 'assistant'}
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added message 5a4d859d-61f6-4e12-ade7-cbd7b6a974dd to session 50f9a29d-3e1b-4a12-9dff-0641c07de660 via WebSocket: True
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:__main__:Emitted AI Observer analysis for message 5a4d859d-61f6-4e12-ade7-cbd7b6a974dd
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:46] "POST /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/add_message HTTP/1.1" 200 -
-INFO:__main__:Setting character for session 50f9a29d-3e1b-4a12-9dff-0641c07de660 to synthia
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.discussion_service:Updated session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:46] "POST /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/set_character HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:50] "[36mGET /static/debug_ai_observer_with_controls.html HTTP/1.1[0m" 304 -
-INFO:__main__:Session message request for 50f9a29d-3e1b-4a12-9dff-0641c07de660: {'content': 'are doing some debug testing to make sure everything is working again', 'role': 'user'}
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added message 0d5f4bae-efe8-4890-82ee-abf4bf9d5ec0 to session 50f9a29d-3e1b-4a12-9dff-0641c07de660 via WebSocket: True
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:54] "GET /api/check_services HTTP/1.1" 200 -
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:__main__:Emitted AI Observer analysis for message 0d5f4bae-efe8-4890-82ee-abf4bf9d5ec0
-INFO:__main__:Generating AI response for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Using topic: General Interview, context length: 1850, goals: 285 items
-INFO:langchain_features.services.interview_service:generate_response: Using topic: General Interview, context length: 1850, goals: 1 items
-INFO:langchain_features.services.interview_service:generate_response: Loading session with ID 50f9a29d-3e1b-4a12-9dff-0641c07de660
-WARNING:langchain_features.services.interview_service:No conversation history found for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.interview_service:Using LLM model: gpt-3.5-turbo with temperature: 0.7
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:langchain_features.services.interview_service:Generated response of 218 characters
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added AI response (218 chars) to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:56] "POST /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/add_message HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:02:58] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/messages HTTP/1.1" 200 -
-INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 218 chars, voice: EXAVITQu4vr4xnSDxMaL
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:00] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
-INFO:__main__:Getting suggested questions for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.observer_service:Returning 0 suggested questions for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.observer_service:No questions available - generating questions for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-ERROR:langchain_features.services.observer_service:Error generating suggested questions on demand: type object 'DiscussionService' has no attribute 'get_instance'
-INFO:langchain_features.services.observer_service:Added 3 emergency fallback questions after error
-INFO:langchain_features.services.observer_service:Updated observer state for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.observer_service:Returning 3 questions for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.observer_service:Question: Can you elaborate on that point?
-INFO:langchain_features.services.observer_service:Question: What specific aspects would you like to discuss further?
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:06] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/messages HTTP/1.1" 200 -
-INFO:langchain_features.services.observer_service:Question: How has this affected your workflow or process?
-INFO:__main__:Returning 3 suggested questions for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:06] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/suggested_questions HTTP/1.1" 200 -
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:__main__:Emitted new observation for message 773bb7c1-5fe5-43c6-b31e-becf8a8c4251
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:09] "POST /api/observer/50f9a29d-3e1b-4a12-9dff-0641c07de660/analyze_message HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:24] "GET /api/check_services HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:27] "[32mGET /issues/ HTTP/1.1[0m" 302 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:27] "GET /login?next=/issues/ HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:27] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:29] "[32mPOST /login HTTP/1.1[0m" 302 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:29] "GET /dashboard HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:29] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:42] "GET /api/characters HTTP/1.1" 200 -
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:29] "GET /api/discussion_guides HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:29] "GET /api/check_services HTTP/1.1" 200 -
-INFO:__main__:Session message request for 50f9a29d-3e1b-4a12-9dff-0641c07de660: {'content': "keep getting a connection error websocket air that I don't quite understand  otherwise test 1 through 8 and pass went through 7 have passed successfully  and I will continue with a few other minor tests and we will see where we go", 'role': 'user'}
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added message 31820a02-6cdd-4c36-85fc-002b9ef15e77 to session 50f9a29d-3e1b-4a12-9dff-0641c07de660 via WebSocket: True
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:42] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:42] "GET /api/characters HTTP/1.1" 200 -
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:35] "GET /discussion_guides HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:35] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:36] "GET /discussion_guide/28a3a5f7-a7ba-4b93-89b6-c77dac230cc0 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:36] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:langchain_features.services.observer_service:Generated 3 new insights for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:37] "GET /session/50f9a29d-3e1b-4a12-9dff-0641c07de660 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:37] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:langchain_features.services.observer_service:Generated 3 question suggestions for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Emitted AI Observer analysis for message 31820a02-6cdd-4c36-85fc-002b9ef15e77
-INFO:__main__:Generating AI response for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Using topic: General Interview, context length: 1850, goals: 285 items
-INFO:langchain_features.services.interview_service:generate_response: Using topic: General Interview, context length: 1850, goals: 1 items
-INFO:langchain_features.services.interview_service:generate_response: Loading session with ID 50f9a29d-3e1b-4a12-9dff-0641c07de660
-WARNING:langchain_features.services.interview_service:No conversation history found for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.interview_service:Using LLM model: gpt-3.5-turbo with temperature: 0.7
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:langchain_features.services.interview_service:Generated response of 285 characters
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added AI response (285 chars) to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:42] "POST /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/add_message HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:45] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/messages HTTP/1.1" 200 -
-INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 285 chars, voice: EXAVITQu4vr4xnSDxMaL
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:48] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:42] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:45] "GET /api/discussion_guide/28a3a5f7-a7ba-4b93-89b6-c77dac230cc0/sessions HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:51] "GET /api/character/synthia HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:54] "GET /api/check_services HTTP/1.1" 200 -
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:langchain_features.services.interview_service:Successfully generated analysis of 1105 characters
-INFO:langchain_features.services.discussion_service:Added analysis to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:57] "POST /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/analyze HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:57] "GET /session/50f9a29d-3e1b-4a12-9dff-0641c07de660 HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:03:57] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:48:57] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:49:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:__main__:Session message request for 50f9a29d-3e1b-4a12-9dff-0641c07de660: {'content': "you're correct I need to have an AI that I can do debugging with so I'm going to create that  researcher primary assistant and see if that works so good job", 'role': 'user'}
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added message cb854359-5b94-4cf2-b144-e1b2b7afd40b to session 50f9a29d-3e1b-4a12-9dff-0641c07de660 via WebSocket: True
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:49:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:__main__:Emitted AI Observer analysis for message cb854359-5b94-4cf2-b144-e1b2b7afd40b
-INFO:__main__:Generating AI response for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Using topic: General Interview, context length: 1850, goals: 285 items
-INFO:langchain_features.services.interview_service:generate_response: Using topic: General Interview, context length: 1850, goals: 1 items
-INFO:langchain_features.services.interview_service:generate_response: Loading session with ID 50f9a29d-3e1b-4a12-9dff-0641c07de660
-WARNING:langchain_features.services.interview_service:No conversation history found for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.interview_service:Using LLM model: gpt-3.5-turbo with temperature: 0.7
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:langchain_features.services.interview_service:Generated response of 185 characters
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added AI response (185 chars) to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:22] "POST /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/add_message HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:24] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/messages HTTP/1.1" 200 -
-INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 185 chars, voice: EXAVITQu4vr4xnSDxMaL
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:49:10] "POST /api/research_session/analyze HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:24] "GET /api/check_services HTTP/1.1" 200 -
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:24] "POST /api/llm/extract_opportunity HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:24] "GET /issues/new?type=Opportunity&priority=Low&cursor_prompt_template=Ask+users+about+their+experience+with+connection+errors+and+how+it+impacts+their+testing+process.+Explore+technical+constraints+related+to+network+stability+and+WebSocket+implementation.+Discuss+with+stakeholders+the+alignment+between+business+goals+and+user+needs.&description=Opportunity+to+clarify+project+boundaries,+address+scope+creep,+and+understand+user+needs+for+stable+testing+environment.&ethics=Ensure+user+data+privacy+during+testing+activities.%0ARespect+user+feedback+and+incorporate+it+into+the+testing+process.&insights=User+needs+include+stable+connection+and+efficient+testing+processes.%0ATechnical+constraints+related+to+network+stability+and+WebSocket+implementation.%0ABusiness+objectives+focus+on+system+functionality+and+stability.&journey_stage=Discovery+Planning&linked_persona=Developers,+Testers,+Project+Managers&root_cause=Lack+of+clarity+on+project+boundaries+and+user+needs+leading+to+potential+scope+creep+and+ineffective+testing.&title=Project+Scope+Clarity+and+User+Understanding HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:24] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:24] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:26] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:42] "[32mPOST /issues/new HTTP/1.1[0m" 302 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:42] "GET /issues/786649df-651f-4cff-81b0-5070b0d5f4bc HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:42] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:42] "[36mGET /static/images/user-avatar.png HTTP/1.1[0m" 304 -
-INFO:__main__:Session message request for 50f9a29d-3e1b-4a12-9dff-0641c07de660: {'content': "I'm going to create this new  back", 'role': 'user'}
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added message 73e3fab2-6956-4a29-8a7f-024636e26585 to session 50f9a29d-3e1b-4a12-9dff-0641c07de660 via WebSocket: True
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:__main__:Emitted AI Observer analysis for message 73e3fab2-6956-4a29-8a7f-024636e26585
-INFO:__main__:Generating AI response for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Using topic: General Interview, context length: 1850, goals: 285 items
-INFO:langchain_features.services.interview_service:generate_response: Using topic: General Interview, context length: 1850, goals: 1 items
-INFO:langchain_features.services.interview_service:generate_response: Loading session with ID 50f9a29d-3e1b-4a12-9dff-0641c07de660
-WARNING:langchain_features.services.interview_service:No conversation history found for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.interview_service:Using LLM model: gpt-3.5-turbo with temperature: 0.7
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:47] "[32mGET / HTTP/1.1[0m" 302 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:47] "GET /dashboard HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:47] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:49:27] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:49:57] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:18] "[35m[1mPOST /api/gallery/analysis HTTP/1.1[0m" 201 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:27] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:30] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:30] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:30] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:30] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:43] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:43] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:43] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:43] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:49] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:49] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:49] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:49] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:49] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:49] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:49] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:49] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:50] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:50] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:50] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:50] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:53] "GET /api/characters HTTP/1.1" 200 -
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
 ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:47] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:53] "GET /api/characters HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:53] "GET /api/discussion_guides HTTP/1.1" 200 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:53] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:54] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:54] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:54] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:54] "GET /api/gallery/analysis HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:47] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:50:57] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:00] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:00] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:00] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:00] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:16] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:16] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:16] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:16] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:51:27] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:52:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:52:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:52:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:52:17] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:52:17] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:52:17] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:52:17] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:53:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:53:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:53:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:53:26] "[33mGET /api/issues?type=opportunity HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:53:57] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:53:57] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:53:57] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:53:57] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:54:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:54:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:54:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:55:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:55:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:55:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:56:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:56:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:56:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:56:40] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:56:40] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:56:40] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:56:40] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:57:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:57:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:57:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:58:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:58:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:58:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:59:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:59:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 17:59:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:00:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:00:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:00:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:01:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:01:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:01:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:01:54] "GET /api/characters HTTP/1.1" 200 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:01:54] "GET /api/characters HTTP/1.1" 200 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:01:54] "GET /api/discussion_guides HTTP/1.1" 200 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:01:54] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:02:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:02:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:02:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:03:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:03:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:03:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:03:26] "[33mGET /api/issues?type=opportunity HTTP/1.1[0m" 404 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:04] "GET /api/discussion_guide/28a3a5f7-a7ba-4b93-89b6-c77dac230cc0/sessions HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:11] "GET /api/character/thomas HTTP/1.1" 200 -
 INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:langchain_features.services.interview_service:Generated response of 157 characters
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added AI response (157 chars) to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:47] "POST /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/add_message HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:49] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/messages HTTP/1.1" 200 -
-INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 157 chars, voice: EXAVITQu4vr4xnSDxMaL
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:51] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:37] "POST /api/research_session/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:40] "[35m[1mPOST /api/gallery/analysis HTTP/1.1[0m" 201 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:53] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:53] "GET /api/gallery/analysis HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:53] "GET /api/research-assistants HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:04:53] "GET /api/gallery/analysis HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:04:54] "GET /api/check_services HTTP/1.1" 200 -
-INFO:__main__:Session message request for 50f9a29d-3e1b-4a12-9dff-0641c07de660: {'content': "I'm going to end at the interview", 'role': 'user'}
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added message dd8588c2-588c-4713-a17a-05cdb9da457f to session 50f9a29d-3e1b-4a12-9dff-0641c07de660 via WebSocket: True
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:__main__:Emitted AI Observer analysis for message dd8588c2-588c-4713-a17a-05cdb9da457f
-INFO:__main__:Generating AI response for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Using topic: General Interview, context length: 1850, goals: 285 items
-INFO:langchain_features.services.interview_service:generate_response: Using topic: General Interview, context length: 1850, goals: 1 items
-INFO:langchain_features.services.interview_service:generate_response: Loading session with ID 50f9a29d-3e1b-4a12-9dff-0641c07de660
-WARNING:langchain_features.services.interview_service:No conversation history found for session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:langchain_features.services.interview_service:Using LLM model: gpt-3.5-turbo with temperature: 0.7
-INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
-INFO:langchain_features.services.interview_service:Generated response of 222 characters
-INFO:langchain_features.services.discussion_service:Added message to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:__main__:Added AI response (222 chars) to session 50f9a29d-3e1b-4a12-9dff-0641c07de660
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:05:10] "POST /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/add_message HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:05:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:05:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:05:12] "GET /api/session/50f9a29d-3e1b-4a12-9dff-0641c07de660/messages HTTP/1.1" 200 -
-INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 222 chars, voice: EXAVITQu4vr4xnSDxMaL
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:05:14] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
-INFO:__main__:Forwarding TTS request to http://localhost:5015/text_to_speech: 97 chars, voice: EXAVITQu4vr4xnSDxMaL
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:05:20] "POST /api/text_to_speech_elevenlabs HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:43] "GET /api/character/thomas HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:43] "GET /api/characters HTTP/1.1" 200 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:43] "GET /api/discussion_guide/28a3a5f7-a7ba-4b93-89b6-c77dac230cc0/sessions HTTP/1.1" 200 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:43] "GET /api/discussion_guides HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:05:24] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:45] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:51] "GET /prompts/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:51] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:__main__:Loaded 66 interviews for archive page
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:51] "GET /interview_archive HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:51] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:52] "GET /discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:52] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:langchain_features.services.discussion_service:Loaded 66 sessions across all guides
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:52] "GET /monitor_interview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:52] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:53] "GET /interview_setup HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:53] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:53] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:53] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:53] "GET /api/discussion_guides HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:05:41] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:53] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:06:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:05:57] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:06:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:06:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:06:11] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:06:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:07:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:06:27] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:07:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:07:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:07:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:07:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:08:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:07:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:08:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:08:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:08:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:08:10] "GET /api/check_services HTTP/1.1" 200 -
 INFO:root:TTS service check: True, response: 200
 INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:09:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:09:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:09:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:10:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:10:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:10:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:11:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:11:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:11:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:12:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:12:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:12:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:12:25] "[33mGET /api/issues?type=opportunity HTTP/1.1[0m" 404 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:13:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:13:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:13:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:14:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:14:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:14:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:15:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:15:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:15:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:16:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:16:10] "GET /api/check_services HTTP/1.1" 200 -
-INFO:root:TTS service check: True, response: 200
-INFO:root:STT service check: True, response: 200
-INFO:werkzeug:127.0.0.1 - - [26/May/2025 13:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [26/May/2025 18:08:10] "GET /api/check_services HTTP/1.1" 200 -

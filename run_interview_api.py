@@ -4143,6 +4143,64 @@ def export_session(session_id):
         logger.error(f"Error exporting session {session_id}: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+
+
+# --- Research Assistants Endpoint ---
+@app.route('/api/research-assistants', methods=['GET'])
+def get_research_assistants():
+    # Replace with your real data source or file/database read
+    assistants = [
+        {"id": "1", "name": "Thomas", "description": "Expert in user research", "imageUrl": "/images/thomas.jpg"},
+        {"id": "2", "name": "Synthia", "description": "Qualitative data specialist", "imageUrl": "/images/synthia.jpg"}
+    ]
+    return jsonify(assistants)
+
+# --- Gallery Analyses Endpoint (GET) ---
+@app.route('/api/gallery/analysis', methods=['GET'])
+def get_gallery_analysis():
+    try:
+        gallery_dir = os.path.join('data', 'gallery')
+        analyses = []
+        
+        if os.path.exists(gallery_dir):
+            for filename in os.listdir(gallery_dir):
+                if filename.endswith('.json'):
+                    with open(os.path.join(gallery_dir, filename), 'r') as f:
+                        try:
+                            analysis_data = json.load(f)
+                            analyses.append(analysis_data)
+                        except Exception as e:
+                            logger.error(f"Error reading gallery file {filename}: {str(e)}")
+                            continue
+                            
+        return jsonify(analyses)
+    except Exception as e:
+        logger.error(f"Error getting gallery analyses: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
+# --- Save Analysis to Gallery (POST) ---
+@app.route('/api/gallery/analysis', methods=['POST'])
+def save_gallery_analysis():
+    data = request.json
+    try:
+        # Create gallery directory if it doesn't exist
+        gallery_dir = os.path.join('data', 'gallery')
+        os.makedirs(gallery_dir, exist_ok=True)
+        
+        # Generate a unique ID if not provided
+        if 'id' not in data:
+            data['id'] = str(uuid.uuid4())
+            
+        # Save to file
+        file_path = os.path.join(gallery_dir, f"{data['id']}.json")
+        with open(file_path, 'w') as f:
+            json.dump(data, f, indent=2)
+            
+        return jsonify(data), 201
+    except Exception as e:
+        logger.error(f"Error saving gallery analysis: {str(e)}")
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/api/sessions', methods=['GET'])
 def get_all_sessions():
     """Get all research sessions."""
@@ -4430,6 +4488,26 @@ def analyze_research_sessions():
             'error': f"Failed to analyze sessions: {str(e)}",
             'traceback': tb
         }), 500
+
+def chunk_messages(messages, max_tokens=3000):
+    chunks = []
+    current_chunk = []
+    current_length = 0
+
+    for message in messages:
+        # crude estimate: 1 word ≈ 1 token
+        message_tokens = len(message['content'].split())
+        if current_length + message_tokens > max_tokens:
+            chunks.append(current_chunk)
+            current_chunk = []
+            current_length = 0
+        current_chunk.append(message)
+        current_length += message_tokens
+
+    if current_chunk:
+        chunks.append(current_chunk)
+
+    return chunks
 
 # Start the app
 if __name__ == '__main__':

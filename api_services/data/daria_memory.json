@@ -1,0 +1,50 @@
+{
+  "name": "Daria Interview Tool",
+  "overview": "An AI-powered research interviewing platform with text-to-speech and speech-to-text capabilities for conducting and analyzing user interviews.",
+  "currentSprint": "Database Implementation and AWS Deployment (Phase 2)",
+  "timeline": [
+    {
+      "date": "May 6, 2025",
+      "event": "Released RC2 with improved interview flow and LangChain integration"
+    },
+    {
+      "date": "May 8, 2025",
+      "event": "Created project journal system for continuity between sessions"
+    },
+    {
+      "date": "May 10, 2025",
+      "event": "Started database schema implementation for core tables"
+    },
+    {
+      "date": "May 12, 2025",
+      "event": "Began testing AWS deployment with simple components"
+    }
+  ],
+  "opportunities": [
+    {
+      "id": "OPP-001",
+      "title": "Persistent Database for Interview Data",
+      "priority": "High",
+      "description": "Implement structured database to replace JSON file storage"
+    },
+    {
+      "id": "OPP-002",
+      "title": "AWS Deployment Strategy",
+      "priority": "Medium",
+      "description": "Create deployment process for AWS with proper security and scaling"
+    },
+    {
+      "id": "OPP-003",
+      "title": "Memory Companion Feature",
+      "priority": "Medium",
+      "description": "Implement Daria as project companion with persistent memory"
+    },
+    {
+      "id": "OPP-004",
+      "title": "Sprint Engine Capabilities",
+      "priority": "Low",
+      "description": "Add full agile artifact generation for UX research sprints"
+    }
+  ],
+  "conversation_history": []
+}

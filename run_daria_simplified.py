@@ -365,6 +365,37 @@ def interview_archive():
     interviews = load_interviews()
     return render_template('langchain/interview_archive.html', interviews=interviews)
 
+from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+# --- Research Assistants Endpoint ---
+@app.route('/api/research-assistants', methods=['GET'])
+def get_research_assistants():
+    # Replace with your real data source or file/database read
+    assistants = [
+        {"id": "1", "name": "Thomas", "description": "Expert in user research", "imageUrl": "/images/thomas.jpg"},
+        {"id": "2", "name": "Synthia", "description": "Qualitative data specialist", "imageUrl": "/images/synthia.jpg"}
+    ]
+    return jsonify(assistants)
+
+# --- Gallery Analyses Endpoint (GET) ---
+@app.route('/api/gallery/analysis', methods=['GET'])
+def get_gallery_analysis():
+    # Replace with your real data source or file/database read
+    analyses = [
+        {"id": "a1", "title": "Sample Analysis", "content": "Findings...", "createdAt": "2024-05-26", "assistantId": "1"}
+    ]
+    return jsonify(analyses)
+
+# --- Save Analysis to Gallery (POST) ---
+@app.route('/api/gallery/analysis', methods=['POST'])
+def save_gallery_analysis():
+    data = request.json
+    # Here you would save the data to your file/database
+    # For now, just echo it back
+    return jsonify(data), 201
+
 def load_interviews():
     directory = SESSIONS_DIR  # already defined as data/interviews/sessions
     interviews = []
