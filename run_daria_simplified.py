@@ -360,6 +360,21 @@ def get_transcript(session_id):
         logger.error(f"Error fetching transcript for session {session_id}: {str(e)}")
         return jsonify({"error": str(e)}), 500
 
+@app.route('/interview_archive')
+def interview_archive():
+    interviews = load_interviews()
+    return render_template('langchain/interview_archive.html', interviews=interviews)
+
+def load_interviews():
+    directory = SESSIONS_DIR  # already defined as data/interviews/sessions
+    interviews = []
+    for filename in os.listdir(directory):
+        if filename.endswith('.json'):
+            with open(os.path.join(directory, filename), 'r') as f:
+                data = json.load(f)
+                interviews.append(data)
+    return interviews
+
 # Main entry point
 if __name__ == "__main__":
     import argparse

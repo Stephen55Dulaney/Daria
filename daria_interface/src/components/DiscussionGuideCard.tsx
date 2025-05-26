@@ -14,6 +14,17 @@ interface DiscussionGuideCardProps {
     updated_at: string;
     status: string;
     character_select?: string;
+    interviewee?: {
+      name: string;
+      role: string;
+      email: string;
+    };
+    options?: {
+      record_transcript: boolean;
+      analysis: boolean;
+      use_tts: boolean;
+    };
+    expiration_date?: string;
   };
   onViewGuide?: (id: string) => void;
   onDelete?: (id: string) => void;
@@ -55,12 +66,38 @@ const DiscussionGuideCard: React.FC<DiscussionGuideCardProps> = ({
           <InfoRow label="Project" value={guide.project} />
           <InfoRow label="Created" value={formatDate(guide.created_at)} />
           <InfoRow label="Guide ID" value={<CopyableText text={guide.id} />} />
+          {guide.interviewee && (
+            <InfoRow 
+              label="Interviewee" 
+              value={`${guide.interviewee.name} (${guide.interviewee.role})`} 
+            />
+          )}
         </div>
         <div>
           <InfoRow label="Type" value={guide.interview_type} />
           <InfoRow label="Last Updated" value={formatDate(guide.updated_at)} />
+          {guide.expiration_date && (
+            <InfoRow 
+              label="Expires" 
+              value={formatDate(guide.expiration_date)} 
+            />
+          )}
         </div>
       </div>
+
+      {guide.options && (
+        <div className="mb-4 flex gap-2">
+          {guide.options.record_transcript && (
+            <Badge label="Record" color="blue" />
+          )}
+          {guide.options.analysis && (
+            <Badge label="Analysis" color="purple" />
+          )}
+          {guide.options.use_tts && (
+            <Badge label="TTS" color="green" />
+          )}
+        </div>
+      )}
 
       <div className="mt-4 flex justify-between items-center">
         {guide.character_select && (

@@ -93,13 +93,11 @@ from tools.prompt_manager import PromptManager
 prompt_mgr = PromptManager(prompt_dir=str(PROMPT_DIR))
 logger.info(f"Initialized PromptManager with prompt_dir={PROMPT_DIR}")
 
-# Initialize LangChain service if enabled
-use_langchain = args.use_langchain
+# Initialize LangChain service (enabled by default)
+use_langchain = not args.no_langchain
 
-# Check if --no-langchain was explicitly provided (it overrides --use-langchain)
 if args.no_langchain:
-    use_langchain = False
-    logger.info("LangChain explicitly disabled via --no-langchain flag")
+    logger.info("LangChain explicitly disabled via --no-langchain flag (troubleshooting mode)")
 
 interview_service = None
 discussion_service = None
@@ -212,20 +210,21 @@ def load_interview(session_id: str) -> Optional[Dict[str, Any]]:
         return None
 
 def load_all_interviews() -> Dict[str, Dict[str, Any]]:
-    """Load all interviews from the data directory."""
+    """Load all research sessions from the sessions directory."""
     interviews = {}
+    sessions_dir = SESSIONS_DIR  # data/interviews/sessions
     try:
-        for file_path in DATA_DIR.glob("*.json"):
+        for file_path in sessions_dir.glob("*.json"):
             try:
                 session_id = file_path.stem
-                interview_data = load_interview(session_id)
+                with open(file_path, 'r') as f:
+                    interview_data = json.load(f)
                 if interview_data:
                     interviews[session_id] = interview_data
             except Exception as e:
-                logger.error(f"Error loading interview {file_path}: {str(e)}")
+                logger.error(f"Error loading research session {file_path}: {str(e)}")
     except Exception as e:
-        logger.error(f"Error loading interviews: {str(e)}")
-    
+        logger.error(f"Error loading research sessions: {str(e)}")
     return interviews
 
 # ------ API Routes ------
@@ -4097,6 +4096,340 @@ def extract_opportunity():
             'ethics': 'Sample ethical consideration',
             'cursor_prompt_template': 'Sample cursor prompt template'
         }})
+
+@app.route('/api/session/<session_id>/export', methods=['GET'])
+def export_session(session_id):
+    """Export comprehensive session data including transcript and analysis"""
+    try:
+        file_path = DATA_DIR / f"{session_id}.json"
+        if not file_path.exists():
+            return jsonify({"error": f"Session {session_id} not found"}), 404
+        
+        with open(file_path, 'r') as f:
+            session_data = json.load(f)
+        
+        export_data = {
+            "session": {
+                "id": session_data.get('id'),
+                "title": session_data.get('title'),
+                "project": session_data.get('project'),
+                "interview_type": session_data.get('interview_type'),
+                "status": session_data.get('status'),
+                "created_at": session_data.get('created_at'),
+                "updated_at": session_data.get('updated_at')
+            },
+            "interviewee": session_data.get('interviewee', {}),
+            "content": {
+                "transcript": session_data.get('transcript'),
+                "messages": session_data.get('messages', []),
+                "analysis": session_data.get('analysis')
+            },
+            "metadata": {
+                "topic": session_data.get('topic'),
+                "context": session_data.get('context'),
+                "goals": session_data.get('goals'),
+                "character": session_data.get('character'),
+                "character_select": session_data.get('character_select'),
+                "voice_id": session_data.get('voice_id')
+            }
+        }
+        
+        if request.args.get('download') == 'true':
+            response = jsonify(export_data)
+            response.headers['Content-Disposition'] = f'attachment; filename=session_{session_id}.json'
+            return response
+        return jsonify(export_data)
+    except Exception as e:
+        logger.error(f"Error exporting session {session_id}: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/sessions', methods=['GET'])
+def get_all_sessions():
+    """Get all research sessions."""
+    sessions_dir = os.path.join('data', 'interviews', 'sessions')
+    sessions = []
+    if os.path.exists(sessions_dir):
+        for filename in os.listdir(sessions_dir):
+            if filename.endswith('.json'):
+                with open(os.path.join(sessions_dir, filename), 'r') as f:
+                    try:
+                        session_data = json.load(f)
+                        sessions.append(session_data)
+                    except Exception as e:
+                        # Optionally log error
+                        continue
+    return jsonify({'success': True, 'sessions': sessions})
+
+@app.route('/api/research_session/<session_id>', methods=['GET'])
+def get_research_session(session_id):
+    """Return the session JSON for the given ID."""
+    session_path = os.path.join('data/interviews/sessions', f'{session_id}.json')
+    if not os.path.exists(session_path):
+        return jsonify({'error': 'Session not found'}), 404
+    with open(session_path, 'r') as f:
+        session_data = json.load(f)
+    return jsonify({'session': session_data})
+
+@app.route('/api/research_session/<session_id>/analyze', methods=['POST'])
+def analyze_research_session(session_id):
+    """Analyze a research session focusing on user messages and return structured JSON."""
+    try:
+        # Load the session data
+        session_path = os.path.join('data/interviews/sessions', f'{session_id}.json')
+        if not os.path.exists(session_path):
+            return jsonify({
+                'success': False,
+                'error': f"Session with ID {session_id} not found."
+            }), 404
+
+        with open(session_path, 'r') as f:
+            session_data = json.load(f)
+
+        # Extract only user messages
+        user_messages = []
+        if 'messages' in session_data:
+            for message in session_data['messages']:
+                if message.get('role') == 'user':
+                    user_messages.append(message.get('content', ''))
+
+        # Prepare the analysis prompt
+        analysis_prompt = """
+        Analyze the following research session responses from the user. Focus on extracting key insights, patterns, and findings.
+        Return your analysis in a structured JSON format with the following sections:
+        {
+            "key_findings": [
+                {
+                    "insight": "Main insight or finding",
+                    "supporting_quotes": ["Relevant quotes from the user"],
+                    "importance": "Why this finding is significant"
+                }
+            ],
+            "user_needs": [
+                {
+                    "need": "Identified user need",
+                    "context": "Context or situation where this need was expressed",
+                    "priority": "High/Medium/Low"
+                }
+            ],
+            "pain_points": [
+                {
+                    "issue": "Identified problem or challenge",
+                    "impact": "How this affects the user",
+                    "frequency": "How often this was mentioned"
+                }
+            ],
+            "opportunities": [
+                {
+                    "opportunity": "Potential solution or improvement",
+                    "rationale": "Why this would be valuable",
+                    "feasibility": "High/Medium/Low"
+                }
+            ],
+            "summary": "Overall summary of the research findings"
+        }
+
+        Focus only on the user's responses and maintain objectivity in the analysis.
+        """
+
+        # Send to OpenAI for analysis
+        try:
+            import os
+            import openai
+            
+            api_key = os.environ.get('OPENAI_API_KEY')
+            if not api_key:
+                return jsonify({
+                    'success': False,
+                    'error': "OpenAI API key not found"
+                }), 500
+
+            client = openai.OpenAI(api_key=api_key)
+            
+            # Combine all user messages into a single transcript
+            transcript = "\n".join(user_messages)
+            
+            response = client.chat.completions.create(
+                model="gpt-4",
+                messages=[
+                    {"role": "system", "content": analysis_prompt},
+                    {"role": "user", "content": transcript}
+                ],
+                temperature=0.3,
+                response_format={ "type": "json_object" }
+            )
+            
+            # Parse the JSON response
+            analysis_result = json.loads(response.choices[0].message.content)
+            
+            # Add metadata
+            analysis_result['metadata'] = {
+                'session_id': session_id,
+                'analyzed_at': datetime.datetime.now().isoformat(),
+                'message_count': len(user_messages)
+            }
+            
+            return jsonify({
+                'success': True,
+                'analysis': analysis_result
+            })
+
+        except Exception as e:
+            logger.error(f"Error in OpenAI analysis: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': f"Failed to generate analysis: {str(e)}"
+            }), 500
+
+    except Exception as e:
+        logger.error(f"Error analyzing session {session_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f"Failed to analyze session: {str(e)}"
+        }), 500
+
+@app.route('/api/research_session/analyze', methods=['POST'])
+def analyze_research_sessions():
+    """Analyze multiple research sessions and return structured JSON."""
+    try:
+        data = request.json
+        session_ids = data.get('session_ids', [])
+        character = data.get('character')
+        prompt = data.get('prompt')
+        model = data.get('model', 'gpt-4')
+
+        if not session_ids or not character or not prompt:
+            return jsonify({
+                'success': False,
+                'error': "Missing required parameters: session_ids, character, or prompt"
+            }), 400
+
+        # Collect all user messages from selected sessions
+        all_user_messages = []
+        for session_id in session_ids:
+            session_path = os.path.join('data/interviews/sessions', f'{session_id}.json')
+            if not os.path.exists(session_path):
+                continue
+
+            with open(session_path, 'r') as f:
+                session_data = json.load(f)
+                if 'messages' in session_data:
+                    for message in session_data['messages']:
+                        if message.get('role') == 'user':
+                            all_user_messages.append({
+                                'session_id': session_id,
+                                'content': message.get('content', ''),
+                                'timestamp': message.get('timestamp', '')
+                            })
+
+        if not all_user_messages:
+            return jsonify({
+                'success': False,
+                'error': "No user messages found in selected sessions"
+            }), 400
+
+        # Prepare the analysis prompt
+        analysis_prompt = f"""
+        Analyze the following research session responses from users. Focus your analysis primarily on the messages where role is 'user', as these are the research subject's answers. Use other messages (role: 'assistant', 'system', etc.) only for context and understanding the flow of the interview. Extract key insights, patterns, and findings from the user responses.
+        The responses are from multiple sessions, so look for common themes and patterns across sessions.
+        Return your analysis in a structured JSON format with the following sections:
+        {{
+            "key_findings": [
+                {{
+                    "insight": "Main insight or finding",
+                    "supporting_quotes": ["Relevant quotes from the users (role: user)"],
+                    "importance": "Why this finding is significant"
+                }}
+            ],
+            "user_needs": [
+                {{
+                    "need": "Identified user need",
+                    "context": "Context or situation where this need was expressed",
+                    "priority": "High/Medium/Low"
+                }}
+            ],
+            "pain_points": [
+                {{
+                    "issue": "Identified problem or challenge",
+                    "impact": "How this affects the user",
+                    "frequency": "How often this was mentioned"
+                }}
+            ],
+            "opportunities": [
+                {{
+                    "opportunity": "Potential solution or improvement",
+                    "rationale": "Why this would be valuable",
+                    "feasibility": "High/Medium/Low"
+                }}
+            ],
+            "summary": "Overall summary of the research findings"
+        }}
+
+        Focus only on the user responses for insights, and maintain objectivity in the analysis. Consider the following character context: {character}
+        """
+
+        # Send to OpenAI for analysis
+        try:
+            #import os
+            #import openai
+            
+            api_key = os.environ.get('OPENAI_API_KEY')
+            if not api_key:
+                return jsonify({
+                    'success': False,
+                    'error': "OpenAI API key not found"
+                }), 500
+
+            client = openai.OpenAI(api_key=api_key)
+            
+            # Format messages for analysis
+            formatted_messages = "\n\n".join([
+                f"Session {msg['session_id']} ({msg['timestamp']}):\n{msg['content']}"
+                for msg in all_user_messages
+            ])
+            
+            response = client.chat.completions.create(
+                model=model,
+                messages=[
+                    {"role": "system", "content": analysis_prompt},
+                    {"role": "user", "content": formatted_messages}
+                ],
+                temperature=0.3,
+                #response_format={ "type": "json_object" }
+            )
+            
+            # Parse the JSON response
+            analysis_result = json.loads(response.choices[0].message.content)
+            
+            # Add metadata
+            analysis_result['metadata'] = {
+                'analyzed_at': datetime.datetime.now().isoformat(),
+                'sessions_analyzed': session_ids,
+                'character': character,
+                'model_used': model,
+                'message_count': len(all_user_messages)
+            }
+            
+            return jsonify({
+                'success': True,
+                'analysis': analysis_result
+            })
+
+        except Exception as e:
+            logger.error(f"Error in OpenAI analysis: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': f"Failed to generate analysis: {str(e)}"
+            }), 500
+
+    except Exception as e:
+        import traceback
+        logger.error(f"Error analyzing sessions: {str(e)}")
+        tb = traceback.format_exc()
+        return jsonify({
+            'success': False,
+            'error': f"Failed to analyze sessions: {str(e)}",
+            'traceback': tb
+        }), 500
 
 # Start the app
 if __name__ == '__main__':

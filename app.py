@@ -1699,11 +1699,32 @@ Structure the journey chronologically and highlight critical moments that impact
 
 @socketio.on('connect')
 def handle_connect():
-    print('Client connected')
+    """Handle client connection."""
+    logger.info(f"Client connected: {request.sid}")
+    emit('welcome', {'message': 'Connected to DARIA interview server'})
 
 @socketio.on('disconnect')
 def handle_disconnect():
-    print('Client disconnected')
+    """Handle client disconnection."""
+    logger.info(f"Client disconnected: {request.sid}")
+
+@socketio.on('join_session')
+def handle_join_session(data):
+    """Handle client joining a session room."""
+    session_id = data.get('session_id')
+    if session_id:
+        join_room(f'session_{session_id}')
+        logger.info(f"Client {request.sid} joined session room: session_{session_id}")
+        emit('room_joined', {'room': f'session_{session_id}'})
+
+@socketio.on('join_monitor_room')
+def handle_join_monitor_room(data):
+    """Handle client joining a monitor room."""
+    session_id = data.get('session_id')
+    if session_id:
+        join_room(f'monitor_{session_id}')
+        logger.info(f"Client {request.sid} joined monitor room: monitor_{session_id}")
+        emit('room_joined', {'room': f'monitor_{session_id}'})
 
 # Add new routes
 @app.route('/archive')
@@ -5381,6 +5402,135 @@ def jarvis_session(session_id):
         logger.error(f"Error retrieving Jarvis session: {str(e)}")
         logger.error(traceback.format_exc())
         return jsonify({'error': str(e)}), 500
+
+@app.route('/api/check_services', methods=['GET'])
+def check_services():
+    """Check if required services are available."""
+    try:
+        # Check if audio services are running
+        tts_service_running = False
+        stt_service_running = False
+        
+        try:
+            # Directly check health endpoints instead of just checking socket connection
+            try:
+                tts_response = requests.get('http://localhost:5015/health', timeout=1)
+                tts_service_running = tts_response.status_code == 200
+                logger.info(f"TTS service check: {tts_service_running}, response: {tts_response.status_code}")
+            except requests.exceptions.RequestException as e:
+                logger.error(f"TTS service check failed: {str(e)}")
+                tts_service_running = False
+                
+            try:
+                stt_response = requests.get('http://localhost:5016/health', timeout=1)
+                stt_service_running = stt_response.status_code == 200
+                logger.info(f"STT service check: {stt_service_running}, response: {stt_response.status_code}")
+            except requests.exceptions.RequestException as e:
+                logger.error(f"STT service check failed: {str(e)}")
+                stt_service_running = False
+        except Exception as e:
+            logger.error(f"Error checking service health: {str(e)}")
+            pass
+    
+        return jsonify({
+            'api_server': True,
+            'tts_service': tts_service_running,
+            'stt_service': stt_service_running,
+            'elevenlabs': bool(os.environ.get('ELEVENLABS_API_KEY'))
+        })
+    except Exception as e:
+        logger.error(f"Error checking services: {str(e)}")
+        return jsonify({
+            'api_server': True,
+            'tts_service': False,
+            'stt_service': False,
+            'elevenlabs': False,
+            'error': str(e)
+        })
+
+@app.route('/api/interview_archive', methods=['GET'])
+def get_interview_archive():
+    """Get list of archived interviews."""
+    try:
+        # Get all session files from the sessions directory
+        session_files = Path('data/interviews/sessions').glob('*.json')
+        interviews = []
+        
+        for file in session_files:
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    # Extract session ID from filename
+                    session_id = file.stem
+                    interviews.append({
+                        'id': session_id,
+                        'title': data.get('title', f'Interview {session_id}'),
+                        'participant_name': data.get('participant_name', 'Unknown Participant'),
+                        'created_at': data.get('created_at', ''),
+                        'preview': data.get('preview', ''),
+                        'tags': data.get('tags', []),
+                        'status': data.get('status', 'draft')
+                    })
+            except Exception as e:
+                logger.error(f"Error reading session file {file}: {str(e)}")
+                continue
+                
+        # Sort interviews by creation date, newest first
+        interviews.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        
+        return jsonify({
+            'status': 'success',
+            'interviews': interviews
+        })
+    except Exception as e:
+        logger.error(f"Error in interview archive API: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': str(e)
+        }), 500
+
+@app.route('/api/issues', methods=['GET'])
+def get_issues():
+    """Get list of issues/opportunities."""
+    try:
+        issue_type = request.args.get('type', 'all')
+        
+        # Get all session files from the sessions directory
+        session_files = Path('data/interviews/sessions').glob('*.json')
+        issues = []
+        
+        for file in session_files:
+            try:
+                with open(file, 'r') as f:
+                    data = json.load(f)
+                    session_issues = data.get('issues', [])
+                    
+                    # Filter by type if specified
+                    if issue_type != 'all':
+                        session_issues = [i for i in session_issues if i.get('type') == issue_type]
+                    
+                    # Add session info to each issue
+                    for issue in session_issues:
+                        issue['session_id'] = file.stem
+                        issue['session_title'] = data.get('title', f'Interview {file.stem}')
+                        issues.append(issue)
+            except Exception as e:
+                logger.error(f"Error reading session file {file}: {str(e)}")
+                continue
+        
+        # Sort issues by creation date, newest first
+        issues.sort(key=lambda x: x.get('created_at', ''), reverse=True)
+        
+        return jsonify({
+            'status': 'success',
+            'issues': issues
+        })
+    except Exception as e:
+        logger.error(f"Error in issues API: {str(e)}")
+        return jsonify({
+            'status': 'error',
+            'error': str(e)
+        }), 500
 
 if __name__ == '__main__':
     socketio.run(app, 

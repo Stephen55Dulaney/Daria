@@ -1,0 +1,297 @@
+{% extends "langchain/base.html" %}
+
+{% block title %}Research Sessions{% endblock %}
+
+{% block content %}
+<style>
+    .session-card {
+        transition: transform 0.2s, box-shadow 0.2s;
+        height: 100%;
+    }
+    
+    .session-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    }
+    
+    .search-container {
+        background-color: #f8f9fa;
+        padding: 2rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
+    }
+    
+    .search-input {
+        border-radius: 20px;
+        padding: 0.75rem 1.5rem;
+        border: 1px solid #e5e7eb;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+    
+    .search-input:focus {
+        border-color: #4f46e5;
+        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+    }
+    
+    .filter-tag {
+        background-color: #e5e7eb;
+        color: #4b5563;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.875rem;
+        margin-right: 0.5rem;
+        margin-bottom: 0.5rem;
+        display: inline-block;
+        cursor: pointer;
+        transition: background-color 0.2s;
+    }
+    
+    .filter-tag:hover {
+        background-color: #d1d5db;
+    }
+    
+    .filter-tag.active {
+        background-color: #4f46e5;
+        color: white;
+    }
+    
+    .session-status {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        padding: 0.25rem 0.75rem;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 500;
+    }
+    
+    .status-active {
+        background-color: #dcfce7;
+        color: #166534;
+    }
+    
+    .status-completed {
+        background-color: #dbeafe;
+        color: #1e40af;
+    }
+    
+    .status-analyzed {
+        background-color: #f3e8ff;
+        color: #6b21a8;
+    }
+</style>
+
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3">Research Sessions</h1>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#newSessionModal">
+            <i class="bi bi-plus-lg me-1"></i> New Session
+        </button>
+    </div>
+    
+    <!-- Search Section -->
+    <div class="search-container">
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                <div class="input-group">
+                    <input type="text" class="form-control search-input" id="sessionSearch" 
+                           placeholder="Search sessions by participant, project, topic, or content...">
+                    <button class="btn btn-primary" type="button" id="searchButton">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+                
+                <!-- Search Filters -->
+                <div class="mt-3">
+                    <div class="d-flex flex-wrap">
+                        <span class="filter-tag active" data-filter="all">All</span>
+                        <span class="filter-tag" data-filter="active">Active</span>
+                        <span class="filter-tag" data-filter="completed">Completed</span>
+                        <span class="filter-tag" data-filter="analyzed">Analyzed</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Sessions Grid -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4" id="sessionsGrid">
+        {% for session in sessions %}
+        <div class="col">
+            <div class="card session-card">
+                <div class="card-body">
+                    <span class="session-status status-{{ session.status }}">
+                        {{ session.status|capitalize }}
+                    </span>
+                    
+                    <h5 class="card-title mb-3">{{ session.title or 'Untitled Session' }}</h5>
+                    
+                    <div class="mb-3">
+                        <small class="text-muted d-block">
+                            <i class="bi bi-person me-1"></i>
+                            {{ session.participant_name or 'Anonymous Participant' }}
+                        </small>
+                        <small class="text-muted d-block">
+                            <i class="bi bi-calendar me-1"></i>
+                            {{ session.created_at.split('T')[0] if session.created_at else 'Unknown date' }}
+                        </small>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <span class="badge bg-light text-dark me-1">
+                            {{ session.project or 'No Project' }}
+                        </span>
+                        <span class="badge bg-light text-dark">
+                            {{ session.interview_type|replace('_', ' ')|title if session.interview_type else 'No Type' }}
+                        </span>
+                    </div>
+                    
+                    <p class="card-text text-muted small">
+                        {{ session.preview or 'No preview available' }}
+                    </p>
+                    
+                    <div class="d-flex justify-content-between align-items-center mt-3">
+                        <a href="/session/{{ session.id }}" class="btn btn-outline-primary btn-sm">
+                            View Details
+                        </a>
+                        <small class="text-muted">
+                            {{ session.messages|length if session.messages else 0 }} messages
+                        </small>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+
+<!-- New Session Modal -->
+<div class="modal fade" id="newSessionModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Start New Research Session</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="newSessionForm">
+                    <div class="mb-3">
+                        <label class="form-label">Discussion Guide</label>
+                        <select class="form-select" id="guideSelect" required>
+                            <option value="">Select a guide...</option>
+                            {% for guide in guides %}
+                            <option value="{{ guide.id }}">{{ guide.title }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Participant Name</label>
+                        <input type="text" class="form-control" id="participantName" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label class="form-label">Project (optional)</label>
+                        <input type="text" class="form-control" id="projectName">
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-primary" id="startSessionBtn">Start Session</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Search functionality
+    const searchInput = document.getElementById('sessionSearch');
+    const searchButton = document.getElementById('searchButton');
+    const sessionsGrid = document.getElementById('sessionsGrid');
+    const filterTags = document.querySelectorAll('.filter-tag');
+    
+    let currentFilter = 'all';
+    
+    // Handle search
+    function performSearch() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const cards = sessionsGrid.getElementsByClassName('session-card');
+        
+        Array.from(cards).forEach(card => {
+            const title = card.querySelector('.card-title').textContent.toLowerCase();
+            const participant = card.querySelector('.text-muted').textContent.toLowerCase();
+            const preview = card.querySelector('.card-text').textContent.toLowerCase();
+            const status = card.querySelector('.session-status').textContent.toLowerCase();
+            
+            const matchesSearch = title.includes(searchTerm) || 
+                                participant.includes(searchTerm) || 
+                                preview.includes(searchTerm);
+                                
+            const matchesFilter = currentFilter === 'all' || status.includes(currentFilter);
+            
+            card.closest('.col').style.display = matchesSearch && matchesFilter ? 'block' : 'none';
+        });
+    }
+    
+    searchButton.addEventListener('click', performSearch);
+    searchInput.addEventListener('keyup', function(e) {
+        if (e.key === 'Enter') {
+            performSearch();
+        }
+    });
+    
+    // Handle filters
+    filterTags.forEach(tag => {
+        tag.addEventListener('click', function() {
+            filterTags.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            currentFilter = this.dataset.filter;
+            performSearch();
+        });
+    });
+    
+    // New session functionality
+    const startSessionBtn = document.getElementById('startSessionBtn');
+    startSessionBtn.addEventListener('click', function() {
+        const guideId = document.getElementById('guideSelect').value;
+        const participantName = document.getElementById('participantName').value;
+        const projectName = document.getElementById('projectName').value;
+        
+        if (!guideId || !participantName) {
+            alert('Please fill in all required fields');
+            return;
+        }
+        
+        // Create new session
+        fetch('/api/sessions', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                guide_id: guideId,
+                participant_name: participantName,
+                project: projectName
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                window.location.href = `/session/${data.session_id}`;
+            } else {
+                alert('Failed to create session: ' + data.error);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Failed to create session');
+        });
+    });
+});
+</script>
+{% endblock %} 

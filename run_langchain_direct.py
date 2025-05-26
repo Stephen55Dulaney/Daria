@@ -1278,6 +1278,16 @@ def save_notes():
             "error": str(e)
         }), 500
 
+@app.route('/api/research_session/<session_id>', methods=['GET'])
+def get_research_session(session_id):
+    """Return the session JSON for the given ID."""
+    session_path = os.path.join('data/interviews/sessions', f'{session_id}.json')
+    if not os.path.exists(session_path):
+        return jsonify({'error': 'Session not found'}), 404
+    with open(session_path, 'r') as f:
+        session_data = json.load(f)
+    return jsonify({'session': session_data})
+
 if __name__ == '__main__':
     port = args.port
     print(f"Starting LangChain Interview Prototype on port {port}...")

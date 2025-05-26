@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import Layout from './components/shared/Layout';
 import Sessions from './pages/Sessions';
 import GuideSessions from './pages/guides/[guideId]/sessions';
+import AnalysisPage from './pages/analysis';
 
 function App() {
   return (
@@ -20,8 +21,11 @@ function App() {
           <Route path="/guides/:guideId/sessions" element={<GuideSessions />} />
           <Route path="/guides/:guideId/sessions/:sessionId" element={<div>Guide Session Details (Coming Soon)</div>} />
           
+          {/* Analysis route */}
+          <Route path="/analysis" element={<AnalysisPage />} />
+          
           {/* 404 route */}
-          <Route path="*" element={<div>404 - Not Found</div>} />
+          <Route path="*" element={<div style={{ color: '#666666', textAlign: 'center', marginTop: '10vh', fontSize: '2rem' }}>404 - Not Found</div>} />
         </Routes>
       </Layout>
     </Router>

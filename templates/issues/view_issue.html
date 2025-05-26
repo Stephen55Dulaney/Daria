@@ -73,7 +73,8 @@
             </div>
         </div>
         <div class="card-body">
-            <div class="row mb-3">
+            <!-- Basic Information -->
+            <div class="row mb-4">
                 <div class="col-md-6">
                     <div class="mb-2">
                         <small class="text-muted d-block">Status:</small>
@@ -85,8 +86,14 @@
                         <span class="badge bg-warning">Resolved</span>
                         {% elif issue.status == 'closed' %}
                         <span class="badge bg-success">Closed</span>
-                        {% else %}
+                        {% elif issue.status == 'backlog' %}
                         <span class="badge bg-secondary">Backlog</span>
+                        {% elif issue.status == 'in_design' %}
+                        <span class="badge bg-info">In Design</span>
+                        {% elif issue.status == 'ready_for_cursor' %}
+                        <span class="badge bg-primary">Ready for Cursor</span>
+                        {% elif issue.status == 'prototyped' %}
+                        <span class="badge bg-success">Prototyped</span>
                         {% endif %}
                     </div>
                     
@@ -98,6 +105,12 @@
                         <span class="badge bg-success">Feature</span>
                         {% elif issue.issue_type == 'improvement' %}
                         <span class="badge bg-info">Improvement</span>
+                        {% elif issue.issue_type == 'opportunity' %}
+                        <span class="badge bg-warning">Opportunity</span>
+                        {% elif issue.issue_type == 'epic' %}
+                        <span class="badge bg-primary">Epic</span>
+                        {% elif issue.issue_type == 'user_story' %}
+                        <span class="badge bg-dark">User Story</span>
                         {% else %}
                         <span class="badge bg-secondary">Task</span>
                         {% endif %}
@@ -135,6 +148,7 @@
                 </div>
             </div>
             
+            <!-- Description -->
             <div class="mb-4">
                 <h5>Description</h5>
                 <div class="p-3 bg-light rounded">
@@ -142,6 +156,143 @@
                 </div>
             </div>
             
+            <!-- Research-to-Prototype Fields (for Opportunity, Epic, User Story) -->
+            {% if issue.issue_type in ['opportunity', 'epic', 'user_story'] %}
+            <div class="mb-4">
+                <h5>Research & Design Details</h5>
+                <div class="p-3 bg-light rounded">
+                    {% if issue.issue_type == 'opportunity' %}
+                        {% if issue.linked_persona %}
+                        <div class="mb-3">
+                            <strong>Linked Persona:</strong>
+                            <p class="mb-0">{{ issue.linked_persona }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.journey_stage %}
+                        <div class="mb-3">
+                            <strong>Journey Stage:</strong>
+                            <p class="mb-0">{{ issue.journey_stage }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.root_cause %}
+                        <div class="mb-3">
+                            <strong>Root Cause:</strong>
+                            <p class="mb-0">{{ issue.root_cause }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.insights %}
+                        <div class="mb-3">
+                            <strong>Key Insights:</strong>
+                            <ul class="mb-0">
+                                {% for insight in issue.insights %}
+                                <li>{{ insight }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.ethics %}
+                        <div class="mb-3">
+                            <strong>Ethical Considerations:</strong>
+                            <ul class="mb-0">
+                                {% for ethic in issue.ethics %}
+                                <li>{{ ethic }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if issue.issue_type == 'epic' %}
+                        {% if issue.linked_persona %}
+                        <div class="mb-3">
+                            <strong>Linked Persona:</strong>
+                            <p class="mb-0">{{ issue.linked_persona }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.journey_stage %}
+                        <div class="mb-3">
+                            <strong>Journey Stage:</strong>
+                            <p class="mb-0">{{ issue.journey_stage }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.insights %}
+                        <div class="mb-3">
+                            <strong>Key Insights:</strong>
+                            <ul class="mb-0">
+                                {% for insight in issue.insights %}
+                                <li>{{ insight }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.ethics %}
+                        <div class="mb-3">
+                            <strong>Ethical Considerations:</strong>
+                            <ul class="mb-0">
+                                {% for ethic in issue.ethics %}
+                                <li>{{ ethic }}</li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.parent_id %}
+                        <div class="mb-3">
+                            <strong>Parent Opportunity:</strong>
+                            <p class="mb-0">
+                                <a href="{{ url_for('issues.view_issue', issue_id=issue.parent_id) }}">
+                                    View Parent Opportunity
+                                </a>
+                            </p>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                    
+                    {% if issue.issue_type == 'user_story' %}
+                        {% if issue.linked_persona %}
+                        <div class="mb-3">
+                            <strong>Linked Persona:</strong>
+                            <p class="mb-0">{{ issue.linked_persona }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.journey_stage %}
+                        <div class="mb-3">
+                            <strong>Journey Stage:</strong>
+                            <p class="mb-0">{{ issue.journey_stage }}</p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.parent_id %}
+                        <div class="mb-3">
+                            <strong>Parent Epic:</strong>
+                            <p class="mb-0">
+                                <a href="{{ url_for('issues.view_issue', issue_id=issue.parent_id) }}">
+                                    View Parent Epic
+                                </a>
+                            </p>
+                        </div>
+                        {% endif %}
+                        
+                        {% if issue.cursor_prompt_template %}
+                        <div class="mb-3">
+                            <strong>Cursor Prompt Template:</strong>
+                            <pre class="mb-0 bg-white p-2 rounded"><code>{{ issue.cursor_prompt_template }}</code></pre>
+                        </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Screenshots -->
             {% if issue.screenshots %}
             <div class="mb-4">
                 <h5>Screenshots</h5>
@@ -157,6 +308,7 @@
             </div>
             {% endif %}
             
+            <!-- Environment Information -->
             {% if issue.environment %}
             <div class="mb-4">
                 <h5>Environment Information</h5>
@@ -167,6 +319,18 @@
                         <dd class="col-sm-9">{{ value }}</dd>
                         {% endfor %}
                     </dl>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Tags -->
+            {% if issue.tags %}
+            <div class="mb-4">
+                <h5>Tags</h5>
+                <div class="d-flex flex-wrap gap-2">
+                    {% for tag in issue.tags %}
+                    <span class="badge bg-secondary">{{ tag }}</span>
+                    {% endfor %}
                 </div>
             </div>
             {% endif %}

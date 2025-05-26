@@ -16,46 +16,199 @@ INFO:__main__:Initialized PromptManager with prompt_dir=/Users/sdulaney/DariaInt
 INFO:langchain_features.services.discussion_service:Initialized DiscussionService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
 INFO:__main__:Discussion service initialized successfully
 INFO:__main__:Observer service initialized successfully
-INFO:__main__:Using simple response generation (LangChain disabled)
+INFO:langchain_features.services.interview_service:Initialized InterviewService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:LangChain interview service initialized successfully
+WARNING:werkzeug:Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
 Starting DARIA Interview API on port 5025
 Health check endpoint: http://127.0.0.1:5025/api/health
 Interview start endpoint: http://127.0.0.1:5025/api/interview/start
 Monitor interviews: http://127.0.0.1:5025/monitor_interview
  * Serving Flask app 'run_interview_api'
- * Debug mode: off
+ * Debug mode: on
 INFO:werkzeug:[31m[1mWARNING: This is a development server. Do not use it in a production deployment. Use a production WSGI server instead.[0m
  * Running on all addresses (0.0.0.0)
  * Running on http://127.0.0.1:5025
  * Running on http://192.168.86.42:5025
 INFO:werkzeug:[33mPress CTRL+C to quit[0m
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:09] "GET /socket.io/?EIO=4&transport=polling&t=PR-C22- HTTP/1.1" 200 -
-INFO:__main__:Client connected: oR-W0fcV3joFJStqAAAB
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:09] "POST /socket.io/?EIO=4&transport=polling&t=PR-C23B&sid=wal5LWFAmziDLwO4AAAA HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:09] "GET /socket.io/?EIO=4&transport=polling&t=PR-C23D&sid=wal5LWFAmziDLwO4AAAA HTTP/1.1" 200 -
-INFO:__main__:Client oR-W0fcV3joFJStqAAAB joined session room for session cae050af-00ce-4670-939a-a0d103c2409c
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c07290>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c073d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:11] "GET /api/check_services HTTP/1.1" 200 -
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c176d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c21710>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:11] "GET /api/check_services HTTP/1.1" 200 -
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x1147fbe90>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c17490>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:11] "GET /api/check_services HTTP/1.1" 200 -
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c06710>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c23b10>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:11] "GET /api/check_services HTTP/1.1" 200 -
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c23910>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c21bd0>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:11] "GET /api/check_services HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:18] "[36mGET /static/debug_toolkit.html HTTP/1.1[0m" 304 -
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c4e9d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c50450>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:18] "GET /api/check_services HTTP/1.1" 200 -
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:18] "[36mGET /static/debug_toolkit.html HTTP/1.1[0m" 304 -
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c53790>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c4ef10>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:18] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug: * Restarting with stat
+/Users/sdulaney/DariaInterviewTool/venv/lib/python3.11/site-packages/langchain/chat_models/__init__.py:33: LangChainDeprecationWarning: Importing chat models from langchain is deprecated. Importing from langchain will no longer be supported as of langchain==0.2.0. Please import from langchain-community instead:
+
+`from langchain_community.chat_models import ChatOpenAI`.
+
+To install langchain-community run `pip install -U langchain-community`.
+  warnings.warn(
+/Users/sdulaney/DariaInterviewTool/venv/lib/python3.11/site-packages/langchain/chat_models/__init__.py:33: LangChainDeprecationWarning: Importing chat models from langchain is deprecated. Importing from langchain will no longer be supported as of langchain==0.2.0. Please import from langchain-community instead:
+
+`from langchain_community.chat_models import ChatOpenAI`.
+
+To install langchain-community run `pip install -U langchain-community`.
+  warnings.warn(
+INFO:__main__:CORS enabled for all origins with extended header support
+INFO:__main__:SocketIO initialized for real-time communication
+INFO:__main__:Initialized PromptManager with prompt_dir=/Users/sdulaney/DariaInterviewTool/tools/prompt_manager/prompts
+INFO:langchain_features.services.discussion_service:Initialized DiscussionService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:Discussion service initialized successfully
+INFO:__main__:Observer service initialized successfully
+INFO:langchain_features.services.interview_service:Initialized InterviewService with data_dir=/Users/sdulaney/DariaInterviewTool/data/interviews
+INFO:__main__:LangChain interview service initialized successfully
+WARNING:werkzeug:Werkzeug appears to be used in a production deployment. Consider switching to a production web server instead.
+WARNING:werkzeug: * Debugger is active!
+INFO:werkzeug: * Debugger PIN: 145-911-391
+INFO:__main__:Client connected: adF0R8HuSr0y3Qy7AAAB
+INFO:__main__:Client adF0R8HuSr0y3Qy7AAAB joined monitoring room for session beedcaa7-c02e-4bd8-9fb5-55b9593c99ba
+INFO:langchain_features.services.observer_service:Returning 0 suggested questions for session beedcaa7-c02e-4bd8-9fb5-55b9593c99ba
+INFO:langchain_features.services.observer_service:No questions available - generating questions for session beedcaa7-c02e-4bd8-9fb5-55b9593c99ba
+ERROR:langchain_features.services.observer_service:Error generating suggested questions on demand: type object 'DiscussionService' has no attribute 'get_instance'
+INFO:langchain_features.services.observer_service:Added 3 emergency fallback questions after error
+INFO:langchain_features.services.observer_service:Updated observer state for session beedcaa7-c02e-4bd8-9fb5-55b9593c99ba
+INFO:langchain_features.services.observer_service:Returning 3 questions for session beedcaa7-c02e-4bd8-9fb5-55b9593c99ba
+INFO:langchain_features.services.observer_service:Question: Can you elaborate on that point?
+INFO:langchain_features.services.observer_service:Question: What specific aspects would you like to discuss further?
+INFO:langchain_features.services.observer_service:Question: How has this affected your workflow or process?
+INFO:__main__:Sent initial suggested questions to new monitor client for session beedcaa7-c02e-4bd8-9fb5-55b9593c99ba
+INFO:__main__:Sent initial insights to new monitor client for session beedcaa7-c02e-4bd8-9fb5-55b9593c99ba
+INFO:__main__:Client connected: LVq0Wpf_ca1k8mAwAAAD
+INFO:__main__:Client LVq0Wpf_ca1k8mAwAAAD joined monitoring room for session a66e6016-52e0-43bd-a752-015d021d89c0
+INFO:langchain_features.services.observer_service:Returning 0 suggested questions for session a66e6016-52e0-43bd-a752-015d021d89c0
+INFO:langchain_features.services.observer_service:No questions available - generating questions for session a66e6016-52e0-43bd-a752-015d021d89c0
+ERROR:langchain_features.services.observer_service:Error generating suggested questions on demand: type object 'DiscussionService' has no attribute 'get_instance'
+INFO:langchain_features.services.observer_service:Added 3 emergency fallback questions after error
+INFO:langchain_features.services.observer_service:Updated observer state for session a66e6016-52e0-43bd-a752-015d021d89c0
+INFO:langchain_features.services.observer_service:Returning 3 questions for session a66e6016-52e0-43bd-a752-015d021d89c0
+INFO:langchain_features.services.observer_service:Question: Can you elaborate on that point?
+INFO:langchain_features.services.observer_service:Question: What specific aspects would you like to discuss further?
+INFO:langchain_features.services.observer_service:Question: How has this affected your workflow or process?
+INFO:__main__:Sent initial suggested questions to new monitor client for session a66e6016-52e0-43bd-a752-015d021d89c0
+INFO:__main__:Sent initial insights to new monitor client for session a66e6016-52e0-43bd-a752-015d021d89c0
+INFO:__main__:Client connected: -mGDfDNQZR0_B4ldAAAF
+INFO:__main__:Client -mGDfDNQZR0_B4ldAAAF joined monitoring room for session cd936bce-b1ba-4b06-9b87-e0f70e9a7676
+INFO:langchain_features.services.observer_service:Returning 0 suggested questions for session cd936bce-b1ba-4b06-9b87-e0f70e9a7676
+INFO:langchain_features.services.observer_service:No questions available - generating questions for session cd936bce-b1ba-4b06-9b87-e0f70e9a7676
+ERROR:langchain_features.services.observer_service:Error generating suggested questions on demand: type object 'DiscussionService' has no attribute 'get_instance'
+INFO:langchain_features.services.observer_service:Added 3 emergency fallback questions after error
+INFO:langchain_features.services.observer_service:Updated observer state for session cd936bce-b1ba-4b06-9b87-e0f70e9a7676
+INFO:langchain_features.services.observer_service:Returning 3 questions for session cd936bce-b1ba-4b06-9b87-e0f70e9a7676
+INFO:langchain_features.services.observer_service:Question: Can you elaborate on that point?
+INFO:langchain_features.services.observer_service:Question: What specific aspects would you like to discuss further?
+INFO:langchain_features.services.observer_service:Question: How has this affected your workflow or process?
+INFO:__main__:Sent initial suggested questions to new monitor client for session cd936bce-b1ba-4b06-9b87-e0f70e9a7676
+INFO:__main__:Sent initial insights to new monitor client for session cd936bce-b1ba-4b06-9b87-e0f70e9a7676
+ERROR:__main__:Error loading interview data: Expecting value: line 10 column 17 (char 366)
+ERROR:__main__:Error loading interview data: Expecting value: line 55 column 17 (char 6894)
+ERROR:__main__:Error loading interview data: Expecting value: line 23 column 17 (char 3378)
+INFO:__main__:Loaded 9 interviews for archive page
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:11:43] "GET /interview_archive HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:11:43] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:__main__:Error loading interview data: Expecting value: line 10 column 17 (char 366)
+ERROR:__main__:Error loading interview data: Expecting value: line 55 column 17 (char 6894)
+ERROR:__main__:Error loading interview data: Expecting value: line 23 column 17 (char 3378)
+INFO:__main__:Loaded 9 interviews for archive page
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:11:44] "GET /interview_archive HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:11:44] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:__main__:Error loading interview data: Expecting value: line 10 column 17 (char 366)
+ERROR:__main__:Error loading interview data: Expecting value: line 55 column 17 (char 6894)
+ERROR:__main__:Error loading interview data: Expecting value: line 23 column 17 (char 3378)
+INFO:__main__:Loaded 9 interviews for archive page
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:11:45] "GET /interview_archive HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:11:45] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:__main__:Error loading interview data: Expecting value: line 10 column 17 (char 366)
+ERROR:__main__:Error loading interview data: Expecting value: line 55 column 17 (char 6894)
+ERROR:__main__:Error loading interview data: Expecting value: line 23 column 17 (char 3378)
+INFO:__main__:Loaded 9 interviews for archive page
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:11:46] "GET /interview_archive HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:11:46] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:12:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:langchain_features.services.discussion_service:Loaded 62 sessions across all guides
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:40] "GET /monitor_interview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:40] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:41] "GET /discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:41] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
 INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
 INFO:__main__:Loaded prompt config for synthia: Synthia
 INFO:__main__:Loaded prompt config for eurekia: eurekia
@@ -67,13 +220,206 @@ INFO:__main__:Loaded prompt config for interviewer: interviewer
 INFO:__main__:Loaded prompt config for researcher: researcher
 INFO:__main__:Loaded prompt config for thesea: Thesea
 INFO:__main__:Loaded prompt config for daria: Daria
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:27] "GET /api/health HTTP/1.1" 200 -
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c58510>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c670d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:32] "GET /api/check_services HTTP/1.1" 200 -
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c23810>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c4f610>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:28:49] "GET /api/check_services HTTP/1.1" 200 -
-ERROR:root:TTS service check failed: HTTPConnectionPool(host='localhost', port=5015): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114712950>: Failed to establish a new connection: [Errno 61] Connection refused'))
-ERROR:root:STT service check failed: HTTPConnectionPool(host='localhost', port=5016): Max retries exceeded with url: /health (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x114c53e90>: Failed to establish a new connection: [Errno 61] Connection refused'))
-INFO:werkzeug:127.0.0.1 - - [23/May/2025 12:29:02] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:42] "GET /interview_setup HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:42] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:42] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:42] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:42] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:42] "GET /api/check_services HTTP/1.1" 200 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:43] "GET /discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:43] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:langchain_features.services.discussion_service:Loaded 62 sessions across all guides
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:45] "GET /monitor_interview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:45] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:49] "GET /discussion_guide/3e0c3c1d-78ed-4ff5-bd5a-8703b18c5770 HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:49] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:52] "GET /session/fa03fc8d-792a-4a81-887f-9d673e22c00c HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:13:52] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:httpx:HTTP Request: POST https://api.openai.com/v1/chat/completions "HTTP/1.1 200 OK"
+INFO:langchain_features.services.interview_service:Successfully generated analysis of 1371 characters
+INFO:langchain_features.services.discussion_service:Added analysis to session fa03fc8d-792a-4a81-887f-9d673e22c00c
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:05] "POST /api/session/fa03fc8d-792a-4a81-887f-9d673e22c00c/analyze HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:05] "GET /session/fa03fc8d-792a-4a81-887f-9d673e22c00c HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:05] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:46] "GET /session/fa03fc8d-792a-4a81-887f-9d673e22c00c HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:46] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:47] "GET /session/fa03fc8d-792a-4a81-887f-9d673e22c00c HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:47] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:47] "GET /session/fa03fc8d-792a-4a81-887f-9d673e22c00c HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:47] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:48] "GET /session/fa03fc8d-792a-4a81-887f-9d673e22c00c HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:48] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:48] "GET /session/fa03fc8d-792a-4a81-887f-9d673e22c00c HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:14:48] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:10] "GET /api/check_services HTTP/1.1" 200 -
+ERROR:__main__:Error loading interview data: Expecting value: line 10 column 17 (char 366)
+ERROR:__main__:Error loading interview data: Expecting value: line 55 column 17 (char 6894)
+ERROR:__main__:Error loading interview data: Expecting value: line 23 column 17 (char 3378)
+INFO:__main__:Loaded 9 interviews for archive page
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:13] "GET /interview_archive HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:13] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:39] "GET /discussion_guides HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:39] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:langchain_features.services.discussion_service:Loaded 62 sessions across all guides
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:40] "GET /monitor_interview HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:40] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:41] "GET /interview_setup HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:41] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:43] "GET /dashboard HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:43] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/17623de8-b9b4-442d-b92d-fcf296a1e6cc.json: Expecting value: line 10 column 17 (char 366)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/f349f6ef-7555-46cb-9590-4e719c2016ae.json: Expecting value: line 55 column 17 (char 6894)
+ERROR:langchain_features.services.discussion_service:Error loading guide from /Users/sdulaney/DariaInterviewTool/data/interviews/daa1355c-6c0c-4345-8c71-77841fd5f896.json: Expecting value: line 23 column 17 (char 3378)
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:43] "GET /api/discussion_guides HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:43] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:45] "GET /prompts/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:45] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:50] "GET /prompts/view/odessia HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:15:50] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /prompts/edit/odessia HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:root:TTS service check: True, response: 200
+INFO:root:STT service check: True, response: 200
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:10] "GET /api/check_services HTTP/1.1" 200 -
+INFO:__main__:Found 10 agent prompts: ['synthia', 'eurekia', 'skeptica', 'thomas', 'askia', 'odessia', 'interviewer', 'researcher', 'thesea', 'daria']
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:38] "GET /prompts/ HTTP/1.1" 200 -
+INFO:werkzeug:127.0.0.1 - - [25/May/2025 16:16:38] "[36mGET /static/images/daria-logo.png HTTP/1.1[0m" 304 -
+/opt/homebrew/Cellar/python@3.11/3.11.12_1/Frameworks/Python.framework/Versions/3.11/lib/python3.11/multiprocessing/resource_tracker.py:254: UserWarning: resource_tracker: There appear to be 1 leaked semaphore objects to clean up at shutdown
+  warnings.warn('resource_tracker: There appear to be %d '

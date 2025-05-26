@@ -1,0 +1,42 @@
+{
+  "id": "786649df-651f-4cff-81b0-5070b0d5f4bc",
+  "title": "Project Scope Clarity and User Understanding",
+  "description": "Opportunity to clarify project boundaries, address scope creep, and understand user needs for stable testing environment.",
+  "issue_type": "opportunity",
+  "status": "open",
+  "priority": "low",
+  "creator_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+  "assigned_to": null,
+  "screenshots": [],
+  "created_at": "2025-05-26T13:04:42.163850",
+  "updated_at": "2025-05-26T13:04:42.163875",
+  "environment": {
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "remote_addr": "127.0.0.1"
+  },
+  "tags": [],
+  "history": [
+    {
+      "timestamp": "2025-05-26T13:04:42.163875",
+      "action": "Issue created",
+      "user_id": null,
+      "details": null
+    }
+  ],
+  "comments": [],
+  "linked_persona": "Developers, Testers, Project Managers",
+  "journey_stage": "Discovery Planning",
+  "insights": [
+    "User needs include stable connection and efficient testing processes.",
+    "Technical constraints related to network stability and WebSocket implementation.",
+    "Business objectives focus on system functionality and stability."
+  ],
+  "ethics": [
+    "Ensure user data privacy during testing activities.",
+    "Respect user feedback and incorporate it into the testing process."
+  ],
+  "root_cause": "Lack of clarity on project boundaries and user needs leading to potential scope creep and ineffective testing.",
+  "parent_id": "",
+  "linked_prototype_prompt": null,
+  "cursor_prompt_template": "Ask users about their experience with connection errors and how it impacts their testing process. Explore technical constraints related to network stability and WebSocket implementation. Discuss with stakeholders the alignment between business goals and user needs."
+}

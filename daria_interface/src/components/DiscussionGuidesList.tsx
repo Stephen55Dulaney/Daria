@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import DiscussionGuideCard from './DiscussionGuideCard';
+import { useNavigate } from 'react-router-dom';
 
 interface Session {
   id: string;
@@ -19,6 +20,17 @@ interface DiscussionGuide {
   updated_at: string;
   status: string;
   character_select?: string;
+  interviewee?: {
+    name: string;
+    role: string;
+    email: string;
+  };
+  options?: {
+    record_transcript: boolean;
+    analysis: boolean;
+    use_tts: boolean;
+  };
+  expiration_date?: string;
 }
 
 interface DiscussionGuidesResponse {
@@ -30,6 +42,7 @@ const DiscussionGuidesList: React.FC = () => {
   const [guides, setGuides] = useState<DiscussionGuide[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchGuides = async () => {
@@ -47,8 +60,7 @@ const DiscussionGuidesList: React.FC = () => {
   }, []);
 
   const handleViewGuide = (guideId: string) => {
-    // TODO: Implement guide viewing functionality
-    console.log('View guide:', guideId);
+    navigate(`/guides/${guideId}`);
   };
 
   const handleDeleteGuide = async (guideId: string) => {

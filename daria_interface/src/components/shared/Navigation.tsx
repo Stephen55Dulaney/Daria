@@ -54,6 +54,16 @@ const Navigation: React.FC = () => {
               >
                 Guides
               </Link>
+              <Link
+                to="/analysis"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  isActive('/analysis')
+                    ? 'border-purple-400 text-white'
+                    : 'border-transparent text-purple-200 hover:border-purple-300 hover:text-white'
+                }`}
+              >
+                Analysis
+              </Link>
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">

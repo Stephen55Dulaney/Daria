@@ -29,15 +29,6 @@ from models.user import User, UserRepository
 import re
 import traceback
 
-
-# Custom JSON encoder for datetime objects
-class DateTimeEncoder(json.JSONEncoder):
-    def default(self, obj):
-        import datetime
-        if isinstance(obj, (datetime.date, datetime.datetime)):
-            return obj.isoformat()
-        return super().default(obj)
-
 # Import user routes
 from user_routes import user_bp
 from auth_routes import auth_bp
@@ -68,22 +59,6 @@ app = Flask(__name__,
 # Configure secret key for sessions
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'daria-interview-tool-secret-key')
 
-
-# Initialize base directories
-BASE_DIR = Path(__file__).parent.absolute()
-DATA_DIR = BASE_DIR / "data" / "interviews"
-SESSIONS_DIR = DATA_DIR / 'sessions'
-
-# Ensure directories exist
-DATA_DIR.mkdir(parents=True, exist_ok=True)
-SESSIONS_DIR.mkdir(parents=True, exist_ok=True)
-
-# Configure app paths
-app.config['INTERVIEW_DATA_DIR'] = str(DATA_DIR)
-app.config['INTERVIEW_SESSIONS_DIR'] = str(SESSIONS_DIR)
-
-
-
 # Initialize Flask-Login
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -104,11 +79,13 @@ socketio = SocketIO(app, cors_allowed_origins="*", async_mode='threading')
 logger.info("SocketIO initialized for real-time communication")
 
 # Define paths
+BASE_DIR = Path(__file__).parent.absolute()
+DATA_DIR = BASE_DIR / "data" / "interviews"
+SESSIONS_DIR = DATA_DIR / 'sessions'
 PROMPT_DIR = BASE_DIR / "tools" / "prompt_manager" / "prompts"
 
 # Ensure directories exist
-
-# Configure directory paths
+DATA_DIR.mkdir(parents=True, exist_ok=True)
 PROMPT_DIR.mkdir(parents=True, exist_ok=True)
 
 # Initialize PromptManager
@@ -204,7 +181,7 @@ def save_interview(session_id: str, interview_data: Dict[str, Any]) -> bool:
         # Save to file
         file_path = DATA_DIR / f"{session_id}.json"
         with open(file_path, 'w') as f:
-            json.dump(serializable_data, f, cls=DateTimeEncoder, indent=2)
+            json.dump(serializable_data, f, indent=2)
         
         return True
     except Exception as e:
@@ -238,8 +215,6 @@ def load_all_interviews() -> Dict[str, Dict[str, Any]]:
     """Load all interviews from the data directory."""
     interviews = {}
     try:
-
-# Configure directory paths
         for file_path in DATA_DIR.glob("*.json"):
             try:
                 session_id = file_path.stem
@@ -257,13 +232,62 @@ def load_all_interviews() -> Dict[str, Dict[str, Any]]:
 
 @app.route('/api/health', methods=['GET'])
 def health_check():
-    """Health check endpoint."""
-    prompts = list(load_all_prompts().keys())
+    """Robust health check endpoint for DARIA."""
+    import requests
+    import socket
+    import time
+    
+    # Check available prompts/characters
+    try:
+        prompts = list(load_all_prompts().keys())
+    except Exception as e:
+        prompts = []
+    
+    # Check LangChain status
+    langchain_status = bool(globals().get('use_langchain', False))
+    
+    # Check TTS service
+    tts_ok = False
+    try:
+        tts_resp = requests.get('http://localhost:5015/health', timeout=2)
+        tts_ok = tts_resp.status_code == 200 and tts_resp.json().get('status') == 'ok'
+    except Exception:
+        tts_ok = False
+    
+    # Check STT service
+    stt_ok = False
+    try:
+        stt_resp = requests.get('http://localhost:5016/health', timeout=2)
+        stt_ok = stt_resp.status_code == 200 and stt_resp.json().get('status') == 'ok'
+    except Exception:
+        stt_ok = False
+    
+    # Check Memory Companion service
+    memory_ok = False
+    try:
+        mem_resp = requests.get('http://localhost:5030/health', timeout=2)
+        memory_ok = mem_resp.status_code == 200 and mem_resp.json().get('status') == 'ok'
+    except Exception:
+        memory_ok = False
+    
+    # Compose result
     return jsonify({
-        'status': 'ok',
+        'status': 'ok' if (tts_ok and stt_ok and memory_ok and langchain_status and len(prompts) > 0) else 'error',
         'version': '1.0.0',
+        'langchain_enabled': langchain_status,
         'available_prompts': prompts,
-        'langchain_enabled': use_langchain
+        'characters_loaded': len(prompts),
+        'tts_service': tts_ok,
+        'stt_service': stt_ok,
+        'memory_companion': memory_ok,
+        'timestamp': time.strftime('%Y-%m-%dT%H:%M:%S'),
+        'details': {
+            'tts': tts_ok,
+            'stt': stt_ok,
+            'memory': memory_ok,
+            'langchain': langchain_status,
+            'characters': prompts
+        }
     })
 
 @app.route('/api/interview/start', methods=['POST'])
@@ -1242,28 +1266,6 @@ def create_interview():
                 'use_tts': True
             })
         }
-        
-        
-        # Update the guide with the new session ID
-        if guide_id:
-            guide_file = os.path.join(DATA_DIR, f"{guide_id}.json")
-            if os.path.exists(guide_file):
-                try:
-                    with open(guide_file, 'r') as f:
-                        guide_data = json.load(f)
-                    
-                    # Add the session ID to the guide's sessions list if not already there
-                    if "sessions" not in guide_data:
-                        guide_data["sessions"] = []
-                    if session_id not in guide_data["sessions"]:
-                        guide_data["sessions"].append(session_id)
-                        guide_data["updated_at"] = now
-                    
-                    # Save the updated guide data
-                    with open(guide_file, 'w') as f:
-                        json.dump(guide_data, f, indent=2)
-                except Exception as e:
-                    logger.error(f"Error updating guide {guide_id} with session {session_id}: {str(e)}")
         
         # Save the interview data
         save_interview(session_id, interview_data)
@@ -3242,539 +3244,99 @@ app.register_blueprint(langchain_blueprint)
 
 # ------ Upload Transcript Routes ------
 
-def save_transcript_to_session_format(transcript_content, metadata, file_path):
-    """
-    Convert transcript content to standardized session format and save to file.
-    
-    Args:
-        transcript_content (str): The raw transcript text
-        metadata (dict): Dictionary containing session metadata
-        file_path (str): Path to save the session file
-    
-    Returns:
-        dict: The created session data object
-    """
-    try:
-        # Extract metadata
-        session_id = metadata.get('session_id', str(uuid.uuid4()))
-        guide_id = metadata.get('guide_id', '9d9b0648-5f14-4a22-81df-290bbd67049d')
-        title = metadata.get('title', 'Untitled Interview')
-        project = metadata.get('project', '')
-        interview_type = metadata.get('interview_type', 'discovery_interview')
-        participant_name = metadata.get('participant_name', 'Anonymous')
-        participant_role = metadata.get('participant_role', '')
-        participant_email = metadata.get('participant_email', '')
-        
-        # Process transcript lines
-        lines = transcript_content.strip().split('\n')
-        
-        # Extract speaker turns using patterns
-        transcript_chunks = []
-        current_speaker = None
-        current_content = []
-        
-        # Apply simple colon-based pattern for most transcripts
-        for line in lines:
-            line = line.strip()
-            if not line:
-                continue
-                
-            # Check if line starts with a new speaker
-            colon_match = re.match(r'^([^:]+):\s*(.*)', line)
-            if colon_match:
-                # Save previous speaker's content
-                if current_speaker and current_content:
-                    transcript_chunks.append({
-                        'speaker': current_speaker,
-                        'content': ' '.join(current_content)
-                    })
-                    current_content = []
-                
-                # Start new speaker
-                current_speaker = colon_match.group(1).strip()
-                content = colon_match.group(2).strip()
-                if content:
-                    current_content.append(content)
-            elif current_speaker:
-                # Continue current speaker
-                current_content.append(line)
-        
-        # Add the last speaker's content
-        if current_speaker and current_content:
-            transcript_chunks.append({
-                'speaker': current_speaker,
-                'content': ' '.join(current_content)
-            })
-        
-        # Determine moderator vs participant based on names
-        researchers = ['interviewer', 'moderator', 'researcher', 'dulaney', 'stephen']
-        participants = ['participant', 'interviewee', 'respondent', 'user', 'jason']
-        
-        # Create messages array
-        messages = []
-        raw_transcript = ""
-        now = datetime.datetime.now()
-        
-        for i, chunk in enumerate(transcript_chunks):
-            speaker = chunk['speaker']
-            content = chunk['content']
-            
-            # Default: if name contains researcher terms -> assistant, otherwise -> user
-            is_researcher = any(r.lower() in speaker.lower() for r in researchers)
-            is_participant = any(p.lower() in speaker.lower() for p in participants)
-            
-            role = 'assistant' if is_researcher else 'user'
-            
-            # For transcript building
-            speaker_label = "Moderator" if role == 'assistant' else "Participant"
-            raw_transcript += f"\n\n{speaker_label}: {content}"
-            
-            # Create message object
-            timestamp = (now + datetime.timedelta(seconds=i)).isoformat()
-            messages.append({
-                'id': str(uuid.uuid4()),
-                'content': content,
-                'role': role,
-                'timestamp': timestamp
-            })
-        
-        # Create full session object
-        character = "askia"  # Default character
-        voice_id = "AZnzlk1XvdvUeBnXmlld"  # Default voice ID
-        
-        session_data = {
-            "id": session_id,
-            "guide_id": guide_id,
-            "interviewee": {
-                "name": participant_name,
-                "email": participant_email or "",
-                "role": participant_role or "",
-                "department": "",
-                "company": "",
-                "demographics": {
-                    "age_range": "",
-                    "gender": "",
-                    "location": ""
-                }
-            },
-            "status": "active",
-            "messages": messages,
-            "transcript": raw_transcript.strip(),
-            "analysis": None,
-            "created_at": now.isoformat(),
-            "updated_at": now.isoformat(),
-            "title": title,
-            "project": project,
-            "interview_type": interview_type,
-            "topic": f"We want to discuss what we need to cover in a {title} project",
-            "context": "",
-            "goals": "Identify pain points in the current workflow. Understand how users search for and select products. Assess satisfaction with the process. Uncover unmet needs or desired features.",
-            "character": character,
-            "character_select": character,
-            "voice_id": voice_id
-        }
-        
-        # Ensure the directory exists
-        os.makedirs(os.path.dirname(file_path), exist_ok=True)
-        
-        # Save to file
-        with open(file_path, 'w') as f:
-            json.dump(session_data, f, indent=2)
-            
-        return session_data
-        
-    except Exception as e:
-        logger.error(f"Error converting transcript: {str(e)}")
-        raise e
-
 @app.route('/api/upload_transcript', methods=['POST'])
 def api_upload_transcript():
     """Handle transcript upload and conversion to interview format."""
     try:
-        # Ensure files were uploaded
+        # 1. Validate form and file
         if 'transcript_file' not in request.files:
+            logger.error("No transcript_file in request.files")
             return jsonify({'success': False, 'error': 'No transcript file provided'}), 400
-        
+
         transcript_file = request.files['transcript_file']
-        if transcript_file.filename == '':
-            return jsonify({'success': False, 'error': 'No file selected'}), 400
-        
-        # Get metadata from form
+        guide_id = request.form.get('guide_id')
+        participant_name = request.form.get('participant_name', 'Anonymous')
+        participant_email = request.form.get('participant_email', '')
+        participant_role = request.form.get('participant_role', '')
         title = request.form.get('title', 'Untitled Interview')
         project = request.form.get('project', '')
-        interview_type = request.form.get('interview_type', 'discovery_interview')
-        researcher_name = request.form.get('researcher_name', '')
-        researcher_email = request.form.get('researcher_email', '')
-        participant_name = request.form.get('participant_name', 'Anonymous')
-        participant_role = request.form.get('participant_role', '')
-        participant_email = request.form.get('participant_email', '')
-        guide_id = request.form.get('guide_id', '9d9b0648-5f14-4a22-81df-290bbd67049d')  # Default to a valid guide ID
-        
-        # Generate a unique session ID
-        session_id = str(uuid.uuid4())
-        
-        # Read and process the transcript content
-        try:
-            transcript_content = transcript_file.read().decode('utf-8')
-        except UnicodeDecodeError:
-            # Try another common encoding if utf-8 fails
-            transcript_file.seek(0)
-            transcript_content = transcript_file.read().decode('latin-1')
-            
-        # Debug: Log the first 10 lines to understand format
-        preview_lines = transcript_content.strip().split('\n')[:10]
-        logger.info(f"Transcript preview (first 10 lines):\n{''.join([line + '\n' for line in preview_lines])}")
-        
-        # Process transcript into conversation chunks
-        lines = transcript_content.strip().split('\n')
-        transcript_chunks = []
-        current_speaker = None
-        current_timestamp = None
-        current_content = []
-        
-        # Detect format patterns
-        zoom_bracket_pattern = r'^\s*\[(.*?)\]\s*(\d{1,2}:\d{1,2}:\d{1,2})'  # [Name] 00:00:00
-        simple_bracket_pattern = r'^\s*\[(.*?)\]'  # [Name]
-        colon_pattern = r'^([^:]+):\s*(.*)'  # Name: text
-        time_pattern = r'^(\d{1,2}:\d{1,2}:\d{1,2})\s+(.+)'  # 00:00:00 text
-        
-        format_type = None
-        
-        # Check first few lines to determine format
-        for line in [l for l in lines[:15] if l.strip()][:5]:
-            if re.match(zoom_bracket_pattern, line):
-                format_type = "zoom_bracket"
-                break
-            elif re.match(simple_bracket_pattern, line):
-                format_type = "simple_bracket"
-                break
-            elif re.match(colon_pattern, line):
-                format_type = "colon"
-                break
-            elif re.match(time_pattern, line):
-                format_type = "time_prefixed"
-                break
-        
-        logger.info(f"Detected transcript format: {format_type or 'unknown'}")
-        
-        # Process transcript based on detected format
-        for line in lines:
+        interview_type = request.form.get('interview_type', 'imported_transcript')
+
+        # 2. Get the guide and copy over metadata
+        guide = discussion_service.get_guide(guide_id) if guide_id else None
+        if not guide:
+            logger.error(f"Guide not found for ID: {guide_id}")
+            return jsonify({'success': False, 'error': 'Guide not found'}), 400
+
+        # 3. Create a new session using the same method as the modal
+        interviewee = {
+            'name': participant_name,
+            'email': participant_email,
+            'role': participant_role,
+            'department': '',
+            'company': '',
+            'demographics': {
+                'age_range': '',
+                'gender': '',
+                'location': ''
+            }
+        }
+        session_id = discussion_service.create_session(guide_id, interviewee)
+        if not session_id:
+            logger.error("Failed to create session")
+            return jsonify({'success': False, 'error': 'Failed to create session'}), 500
+
+        # 4. Parse the transcript file into messages
+        transcript_text = transcript_file.read().decode('utf-8')
+        # Simple line-based parsing: alternate user/assistant, or use a smarter parser if you have one
+        messages = []
+        for line in transcript_text.splitlines():
             line = line.strip()
             if not line:
                 continue
-            
-            if format_type == "zoom_bracket":
-                # Try to match [Speaker] 00:00:00 pattern (Zoom format)
-                match = re.match(zoom_bracket_pattern, line)
-                if match:
-                    # Save previous speaker's content if we're switching speakers
-                    if current_speaker and current_content:
-                        transcript_chunks.append({
-                            'speaker': current_speaker,
-                            'speaker_name': current_speaker,
-                            'content': ' '.join(current_content),
-                            'timestamp': current_timestamp or ''
-                        })
-                        current_content = []
-                    
-                    # Extract new speaker and timestamp
-                    current_speaker = match.group(1).strip()
-                    current_timestamp = match.group(2)
-                    
-                    # Get content after timestamp
-                    timestamp_start = line.find(current_timestamp)
-                    if timestamp_start > 0:
-                        content_start = timestamp_start + len(current_timestamp)
-                        content = line[content_start:].strip()
-                        if content:
-                            current_content.append(content)
-                else:
-                    # If no match, treat as continuation of current speaker
-                    if current_speaker:
-                        current_content.append(line)
-            
-            elif format_type == "simple_bracket":
-                # Try to match [Speaker] pattern (without timestamp)
-                match = re.match(simple_bracket_pattern, line)
-                if match:
-                    # Save previous speaker's content if we're switching speakers
-                    if current_speaker and current_content:
-                        transcript_chunks.append({
-                            'speaker': current_speaker,
-                            'speaker_name': current_speaker,
-                            'content': ' '.join(current_content),
-                            'timestamp': current_timestamp or ''
-                        })
-                        current_content = []
-                    
-                    # Extract new speaker
-                    current_speaker = match.group(1).strip()
-                    
-                    # Get content after bracket
-                    bracket_end = line.find(']')
-                    if bracket_end > 0:
-                        content = line[bracket_end+1:].strip()
-                        if content:
-                            current_content.append(content)
-                else:
-                    # If no match, treat as continuation of current speaker
-                    if current_speaker:
-                        current_content.append(line)
-            
-            elif format_type == "colon":
-                # Try to match Name: Content pattern
-                match = re.match(colon_pattern, line)
-                if match:
-                    # Save previous speaker's content if we're switching speakers
-                    if current_speaker and current_content:
-                        transcript_chunks.append({
-                            'speaker': current_speaker,
-                            'speaker_name': current_speaker,
-                            'content': ' '.join(current_content),
-                            'timestamp': current_timestamp or ''
-                        })
-                        current_content = []
-                    
-                    # Extract new speaker and content
-                    current_speaker = match.group(1).strip()
-                    content = match.group(2).strip()
-                    if content:
-                        current_content.append(content)
-                else:
-                    # If no match, treat as continuation of current speaker
-                    if current_speaker:
-                        current_content.append(line)
-            
-            elif format_type == "time_prefixed":
-                # Try to match 00:00:00 Content pattern
-                match = re.match(time_pattern, line)
-                if match:
-                    timestamp = match.group(1)
-                    remaining_text = match.group(2).strip()
-                    
-                    # Check if remaining text has speaker designation
-                    speaker_match = re.match(colon_pattern, remaining_text)
-                    if speaker_match:
-                        # This is a new speaker entry
-                        if current_speaker and current_content:
-                            transcript_chunks.append({
-                                'speaker': current_speaker,
-                                'speaker_name': current_speaker,
-                                'content': ' '.join(current_content),
-                                'timestamp': current_timestamp or ''
-                            })
-                            current_content = []
-                        
-                        current_speaker = speaker_match.group(1).strip()
-                        current_timestamp = timestamp
-                        content = speaker_match.group(2).strip()
-                        if content:
-                            current_content.append(content)
-                    else:
-                        # No speaker designation, continue with current speaker
-                        current_timestamp = timestamp
-                        if current_speaker:
-                            current_content.append(remaining_text)
-                        else:
-                            # No current speaker, create a generic one
-                            current_speaker = "Speaker"
-                            current_content.append(remaining_text)
-                else:
-                    # If no match, treat as continuation of current speaker
-                    if current_speaker:
-                        current_content.append(line)
-            
+            # Heuristic: if line starts with "Moderator:" or "Assistant:", role=assistant, else user
+            if line.lower().startswith(('moderator:', 'assistant:')):
+                content = line.split(':', 1)[-1].strip()
+                role = 'assistant'
+            elif line.lower().startswith(('participant:', 'user:')):
+                content = line.split(':', 1)[-1].strip()
+                role = 'user'
             else:
-                # Fallback processing for unknown formats
-                # Try bracket format first (most common in Zoom transcripts)
-                bracket_match = re.match(simple_bracket_pattern, line)
-                if bracket_match:
-                    # Save previous speaker's content if we're switching speakers
-                    if current_speaker and current_content:
-                        transcript_chunks.append({
-                            'speaker': current_speaker,
-                            'speaker_name': current_speaker,
-                            'content': ' '.join(current_content),
-                            'timestamp': current_timestamp or ''
-                        })
-                        current_content = []
-                    
-                    # Extract new speaker
-                    current_speaker = bracket_match.group(1).strip()
-                    
-                    # Get content after bracket
-                    bracket_end = line.find(']')
-                    if bracket_end > 0:
-                        content = line[bracket_end+1:].strip()
-                        if content:
-                            current_content.append(content)
-                else:
-                    # Try colon pattern
-                    colon_match = re.match(colon_pattern, line)
-                    if colon_match:
-                        # Save previous speaker's content if we're switching speakers
-                        if current_speaker and current_content:
-                            transcript_chunks.append({
-                                'speaker': current_speaker,
-                                'speaker_name': current_speaker,
-                                'content': ' '.join(current_content),
-                                'timestamp': current_timestamp or ''
-                            })
-                            current_content = []
-                        
-                        # Extract new speaker and content
-                        current_speaker = colon_match.group(1).strip()
-                        content = colon_match.group(2).strip()
-                        if content:
-                            current_content.append(content)
-                    elif current_speaker:
-                        # If no pattern match, treat as continuation
-                        current_content.append(line)
-                    else:
-                        # No current speaker, create a generic one
-                        current_speaker = "Speaker"
-                        current_content.append(line)
-        
-        # Add the last speaker's content
-        if current_speaker and current_content:
-            transcript_chunks.append({
-                'speaker': current_speaker,
-                'speaker_name': current_speaker,
-                'content': ' '.join(current_content),
-                'timestamp': current_timestamp or ''
-            })
-        
-        # Log the extracted chunks for debugging
-        logger.info(f"Extracted {len(transcript_chunks)} chunks from transcript")
-        if transcript_chunks:
-            logger.info(f"First chunk: {transcript_chunks[0]}")
-        
-        # Auto-identify researcher and participant based on names in transcript
-        researcher_speakers = []
-        participant_speakers = []
-        
-        # Extract unique speaker names from transcript
-        all_speakers = list(set(chunk['speaker'] for chunk in transcript_chunks))
-        logger.info(f"Detected speakers: {all_speakers}")
-        
-        # If researcher_name is provided, try to identify their messages
-        if researcher_name:
-            researcher_speakers = [s for s in all_speakers if researcher_name.lower() in s.lower()]
-        
-        # If participant_name is provided, try to identify their messages
-        if participant_name and participant_name != 'Anonymous':
-            participant_speakers = [s for s in all_speakers if participant_name.lower() in s.lower()]
-        
-        # If not found by name, look for typical interviewer/interviewee patterns
-        if not researcher_speakers:
-            researcher_patterns = ['interviewer', 'researcher', 'moderator', 'dulaney', 'stephen']
-            researcher_speakers = [s for s in all_speakers if any(p in s.lower() for p in researcher_patterns)]
-        
-        if not participant_speakers:
-            participant_patterns = ['participant', 'interviewee', 'respondent', 'stark', 'ted', 'theodore', 'jason']
-            participant_speakers = [s for s in all_speakers if any(p in s.lower() for p in participant_patterns)]
-        
-        logger.info(f"Identified researcher speakers: {researcher_speakers}")
-        logger.info(f"Identified participant speakers: {participant_speakers}")
-        
-        # Create formatted transcript text
-        formatted_transcript = ""
-        for chunk in transcript_chunks:
-            speaker = chunk['speaker']
-            is_researcher = speaker in researcher_speakers
-            speaker_label = "Moderator" if is_researcher else "Participant"
-            formatted_transcript += f"\n\n{speaker_label}: {chunk['content']}"
-        
-        # Format messages in the required structure
-        messages = []
-        now = datetime.datetime.now()
-        
-        # Create messages with the correct format and IDs
-        for i, chunk in enumerate(transcript_chunks):
-            speaker = chunk['speaker']
-            # Determine role based on whether speaker is identified as researcher
-            role = 'assistant' if speaker in researcher_speakers else 'user'
-            timestamp = now + datetime.timedelta(seconds=i)
-            message_id = str(uuid.uuid4())
-            
+                # Default to user
+                content = line
+                role = 'user'
             messages.append({
-                'id': message_id,
-                'content': chunk['content'],
+                'id': str(uuid.uuid4()),
+                'content': content,
                 'role': role,
-                'timestamp': timestamp.isoformat()
+                'timestamp': datetime.datetime.now().isoformat()
             })
-        
-        # Create the session data structure in the format needed
-        character = "askia"  # Default character
-        voice_id = "AZnzlk1XvdvUeBnXmlld"  # Default voice
-        
-        # Create session data in the required format
-        session_data = {
-            "id": session_id,
-            "guide_id": guide_id,
-            "interviewee": {
-                "name": participant_name,
-                "email": participant_email or "",
-                "role": participant_role or "",
-                "department": "",
-                "company": "",
-                "demographics": {
-                    "age_range": "",
-                    "gender": "",
-                    "location": ""
-                }
-            },
-            "status": "active",
-            "messages": messages,
-            "transcript": formatted_transcript.strip(),
-            "analysis": None,
-            "created_at": now.isoformat(),
-            "updated_at": now.isoformat(),
-            "title": title,
-            "project": project,
-            "interview_type": interview_type,
-            "topic": f"We want to discuss what we need to cover in a {title} project",
-            "context": "",
-            "goals": "Identify pain points in the current workflow. Understand how users search for and select products. Assess satisfaction with order tracking and status updates. Uncover unmet needs or desired features in the portal.",
-            "character": character,
-            "character_select": character,
-            "voice_id": voice_id
-        }
-        
-        # Create the sessions directory if it doesn't exist
-        os.makedirs(os.path.join(DATA_DIR, "interviews", "sessions"), exist_ok=True)
-        
-        # Save the session data to the file
-        session_file_path = os.path.join(DATA_DIR, "interviews", "sessions", f"{session_id}.json")
-        with open(session_file_path, 'w') as f:
-            json.dump(session_data, f, indent=2)
-        
-        logger.info(f"Saved session data to {session_file_path}")
-        
-        # If a guide ID was provided, update the guide to include this session
-        if guide_id and discussion_service:
-            try:
-                guide = discussion_service.get_guide(guide_id)
-                if guide:
-                    if "sessions" not in guide:
-                        guide["sessions"] = []
-                    if session_id not in guide["sessions"]:
-                        guide["sessions"].append(session_id)
-                        discussion_service._save_guide(guide_id, guide)
-                        logger.info(f"Added session {session_id} to guide {guide_id}")
-            except Exception as e:
-                logger.error(f"Error updating guide with new session: {str(e)}")
-        
-        # Return success with the session ID
-        redirect_url = f"/discussion_guide/{guide_id}" if guide_id else f"/session/{session_id}"
-        
+
+        # 5. Update the session JSON with messages, transcript, and guide metadata
+        session = discussion_service.get_session(session_id)
+        if not session:
+            logger.error("Session not found after creation")
+            return jsonify({'success': False, 'error': 'Session not found after creation'}), 500
+
+        session['messages'] = messages
+        session['transcript'] = transcript_text
+        session['title'] = title
+        session['project'] = project
+        session['interview_type'] = interview_type
+        session['updated_at'] = datetime.datetime.now().isoformat()
+        # Copy over guide metadata fields if present
+        for field in ['topic', 'context', 'goals', 'character', 'character_select', 'voice_id', 'custom_questions']:
+            if field in guide:
+                session[field] = guide[field]
+
+        discussion_service.update_session(session_id, session)
+
+        # 6. Return a redirect to the session detail page
         return jsonify({
             'success': True,
             'session_id': session_id,
-            'message': 'Transcript uploaded successfully',
-            'redirect_url': redirect_url
+            'redirect_url': f"/session/{session_id}"
         })
-        
     except Exception as e:
         logger.error(f"Error uploading transcript: {str(e)}")
         logger.error(traceback.format_exc())
@@ -3782,4 +3344,823 @@ def api_upload_transcript():
             'success': False, 
             'error': f"Error processing transcript: {str(e)}"
         }), 500
+
+@app.route('/upload_transcript', methods=['GET'])
+def upload_transcript_page():
+    """Render the upload transcript page."""
+    return render_template('langchain/upload_transcript.html', title="Upload Transcript")
+
+# Add a route to test WebSocket connection on monitor
+@app.route('/api/test_monitor_ws/<session_id>', methods=['GET'])
+def test_monitor_websocket(session_id):
+    """Test WebSocket connection to monitor interface."""
+    try:
+        # Send a test message to the monitor room
+        socketio.emit('new_message', {
+            'session_id': session_id,
+            'message': {
+                'id': str(uuid.uuid4()),
+                'role': 'system',
+                'content': 'This is a test message from the server. WebSocket connection is working!',
+                'type': 'system_message',
+                'timestamp': datetime.datetime.now().isoformat()
+            }
+        }, room=f"monitor_{session_id}")
         
+        # Also send a test observation
+        socketio.emit('new_observation', {
+            'session_id': session_id,
+            'observation': {
+                'id': str(uuid.uuid4()),
+                'message_id': str(uuid.uuid4()),
+                'content': 'Test observation from the server',
+                'tags': ['test', 'observation'],
+                'timestamp': datetime.datetime.now().isoformat()
+            }
+        }, room=f"monitor_{session_id}")
+        
+        # Send test suggested questions
+        socketio.emit('suggested_questions', {
+            'session_id': session_id,
+            'questions': [
+                'Test question 1 from server?',
+                'Test question 2 from server?',
+                'Test question 3 from server?'
+            ]
+        }, room=f"monitor_{session_id}")
+        
+        return jsonify({'success': True, 'message': 'Test events sent to WebSocket'})
+    except Exception as e:
+        logger.error(f"Error in test endpoint: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/test_message_add/<session_id>', methods=['GET'])
+def test_add_message(session_id):
+    """Test adding a message to a session using the add_message_to_session method."""
+    try:
+        if not discussion_service:
+            return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+        
+        # Test message content
+        test_content = "This is a test message for debugging the add_message_to_session method"
+        
+        # Try to add the message to the session
+        message_id = discussion_service.add_message_to_session(
+            session_id,
+            test_content,
+            'user'
+        )
+        
+        logger.info(f"Test message added with ID {message_id} to session {session_id}")
+        
+        return jsonify({
+            'success': True, 
+            'message': 'Test message added successfully',
+            'message_id': message_id
+        })
+    except Exception as e:
+        logger.error(f"Error in test_add_message: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Add this after the API route for analyzing interviews or in the API routes section
+
+@app.route('/api/interview/delete/<interview_id>', methods=['POST'])
+def delete_interview_api(interview_id):
+    """Delete an interview by ID."""
+    try:
+        # Check if the interview exists
+        interview_file = os.path.join(DATA_DIR, f"{interview_id}.json")
+        if not os.path.exists(interview_file):
+            return jsonify({
+                'success': False,
+                'error': f"Interview with ID {interview_id} not found."
+            }), 404
+        
+        # Delete the interview file
+        try:
+            os.remove(interview_file)
+            logger.info(f"Deleted interview file for {interview_id}")
+            
+            # If using discussion service, try to delete the session there too
+            if discussion_service:
+                try:
+                    discussion_service.delete_session(interview_id)
+                    logger.info(f"Deleted session {interview_id} from discussion service")
+                except Exception as e:
+                    logger.warning(f"Could not delete session from discussion service: {str(e)}")
+            
+            return jsonify({
+                'success': True,
+                'message': "Interview deleted successfully."
+            })
+        except Exception as e:
+            logger.error(f"Error deleting interview file: {str(e)}")
+            return jsonify({
+                'success': False,
+                'error': f"Error deleting interview file: {str(e)}"
+            }), 500
+    
+    except Exception as e:
+        logger.error(f"Error deleting interview {interview_id}: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f"Error deleting interview: {str(e)}"
+        }), 500
+
+@app.route('/api/session/<session_id>/intervention', methods=['POST'])
+def handle_intervention(session_id):
+    """Handle an intervention request from the researcher."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Service not available'}), 500
+    
+    try:
+        # Get intervention data
+        data = request.json
+        if not data or 'type' not in data:
+            return jsonify({'success': False, 'error': 'No intervention type provided'}), 400
+        
+        intervention_type = data['type']
+        
+        # Log the intervention
+        logger.info(f"Intervention requested for session {session_id}: {intervention_type}")
+        
+        # Different actions based on intervention type
+        if intervention_type == 'change-topic':
+            # Create a system message
+            message = {
+                'role': 'system',
+                'content': 'The researcher has suggested changing the topic. Please transition to a new relevant area.',
+                'timestamp': datetime.datetime.now().isoformat(),
+                'id': str(uuid.uuid4()),
+                'intervention': 'change-topic'
+            }
+            discussion_service.add_message(session_id, message)
+            
+        elif intervention_type == 'pause':
+            # Create a system message
+            message = {
+                'role': 'system',
+                'content': 'The researcher has suggested a brief pause. Take a moment before continuing.',
+                'timestamp': datetime.datetime.now().isoformat(),
+                'id': str(uuid.uuid4()),
+                'intervention': 'pause'
+            }
+            discussion_service.add_message(session_id, message)
+            
+        elif intervention_type == 'go-deeper':
+            # Create a system message
+            message = {
+                'role': 'system',
+                'content': 'The researcher suggests exploring this topic in more depth. Ask follow-up questions to get more details.',
+                'timestamp': datetime.datetime.now().isoformat(),
+                'id': str(uuid.uuid4()),
+                'intervention': 'go-deeper'
+            }
+            discussion_service.add_message(session_id, message)
+            
+        elif intervention_type == 'summarize':
+            # Create a system message
+            message = {
+                'role': 'system',
+                'content': 'The researcher suggests summarizing what has been discussed so far.',
+                'timestamp': datetime.datetime.now().isoformat(),
+                'id': str(uuid.uuid4()),
+                'intervention': 'summarize'
+            }
+            discussion_service.add_message(session_id, message)
+        
+        # Notify all clients in the room about the intervention
+        if socketio:
+            socketio.emit('intervention', {
+                'session_id': session_id,
+                'type': intervention_type,
+                'timestamp': datetime.datetime.now().isoformat()
+            }, room=f"monitor_{session_id}")
+        
+        return jsonify({'success': True})
+    
+    except Exception as e:
+        logger.error(f"Error handling intervention: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/test_message_send/<session_id>', methods=['GET'])
+def test_send_message(session_id):
+    """Test the message sending endpoint directly."""
+    try:
+        # A simple test message
+        test_message = "This is a test message from the diagnostic endpoint"
+        
+        # Log the test 
+        logger.info(f"Test message endpoint called for session {session_id}")
+        
+        # Add the message to the session
+        if discussion_service:
+            # This should match the logic in the add_message endpoint
+            message_id = discussion_service.add_message_to_session(
+                session_id, 
+                test_message, 
+                'user'
+            )
+            
+            # If successful, return message details
+            if message_id:
+                # Emit the message via WebSocket if enabled
+                if socketio:
+                    try:
+                        room = f"session_{session_id}"
+                        socketio.emit('new_message', {
+                            'session_id': session_id,
+                            'message': {
+                                'content': test_message,
+                                'role': 'user',
+                                'id': message_id
+                            }
+                        }, room=room)
+                        socketio.emit('new_message', {
+                            'session_id': session_id,
+                            'message': {
+                                'content': test_message,
+                                'role': 'user',
+                                'id': message_id
+                            }
+                        }, room=f"monitor_{session_id}")
+                        
+                        logger.info(f"Added message {message_id} to session {session_id} via WebSocket: {True}")
+                    except Exception as e:
+                        logger.error(f"Error emitting message via WebSocket: {str(e)}")
+                
+                return jsonify({
+                    'success': True,
+                    'message': 'Test message sent successfully',
+                    'message_id': message_id
+                })
+            else:
+                return jsonify({
+                    'success': False,
+                    'error': 'Failed to add message to session'
+                }), 500
+        else:
+            return jsonify({
+                'success': False,
+                'error': 'Discussion service not available'
+            }), 503
+    except Exception as e:
+        logger.error(f"Error in test message endpoint: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': f"Exception: {str(e)}"
+        }), 500
+
+@app.route('/remote_interview')
+def remote_interview():
+    """
+    Render the simplified remote interview page
+    """
+    try:
+        # Get session ID from query parameter
+        session_id = request.args.get('session_id')
+        accepted = request.args.get('accepted', 'false').lower() == 'true'
+        character = request.args.get('character')  # Get character parameter from URL
+        
+        if not session_id:
+            error_msg = "No session ID provided"
+            logger.error(error_msg)
+            return render_template('error.html', message=error_msg)
+            
+        # Verify session exists
+        session_info = discussion_service.get_session(session_id)
+        
+        if not session_info:
+            error_msg = f"Session {session_id} not found"
+            logger.error(error_msg)
+            return render_template('error.html', message=error_msg)
+        
+        # If character parameter is provided, set it on the session immediately
+        if character and accepted:
+            try:
+                logger.info(f"Setting character for session {session_id} to {character} from URL parameter")
+                session_info['character'] = character
+                discussion_service.update_session(session_id, session_info)
+                
+                # Add system message to reinforce character identity
+                system_msg = f"IMPORTANT: You are {character}. Always respond as {character}. When asked about your name, say 'I am {character}'."
+                discussion_service.add_message_to_session(session_id, system_msg, "system")
+                logger.info(f"Character {character} set for session {session_id} from URL parameter")
+                
+                # Check if there are any existing assistant messages
+                messages = discussion_service.get_session_messages(session_id)
+                has_assistant_msg = any(msg.get('role') == 'assistant' for msg in messages if isinstance(msg, dict))
+                
+                # If no assistant messages yet, add a welcome message
+                if not has_assistant_msg:
+                    logger.info(f"Adding welcome message for remote session {session_id} as character {character}")
+                    # Choose appropriate welcome message based on character
+                    welcome_msg = f"Hello! I'm {character}, your interview assistant. Thank you for joining me today to talk about {session_info.get('topic', 'this topic')}. I'd love to hear more about your interest in this activity. Can you share with me what initially drew you to {session_info.get('topic', 'this')}?"
+                    
+                    # Use character-specific welcome messages for better engagement
+                    if character.lower() == 'odessia':
+                        welcome_msg = f"Welcome! I'm Odessia, your journey guide for this interview. I believe every conversation is a unique journey of discovery. I'd love to hear more about your interest in {session_info.get('topic', 'this topic')}. Can you share with me what initially drew you to it?"
+                    
+                    # Add the welcome message
+                    discussion_service.add_message_to_session(session_id, welcome_msg, "assistant")
+                    logger.info(f"Welcome message added for session {session_id}")
+            except Exception as e:
+                logger.error(f"Error setting character from URL parameter: {str(e)}")
+            
+        # If not accepted, show welcome page first
+        if not accepted:
+            # Get guide info for context
+            guide_id = session_info.get('guide_id')
+            guide_info = discussion_service.get_guide(guide_id) if guide_id else None
+            guide_name = guide_info.get('name', 'Research Session') if guide_info else 'Research Session'
+            
+            return render_template('welcome.html', 
+                                 session_id=session_id,
+                                 guide_name=guide_name,
+                                 port=request.host.split(':')[-1] if ':' in request.host else '5025',
+                                 character=character)  # Pass character to template
+        
+        # Render the interview page
+        return render_template('remote_interview_fixed.html',
+                             session_id=session_id,
+                             port=request.host.split(':')[-1] if ':' in request.host else '5025')
+    except Exception as e:
+        logger.exception(f"Error rendering remote interview: {str(e)}")
+        return render_template('error.html', message=f"Error rendering interview: {str(e)}")
+
+@app.route('/api/session/<session_id>/set_character', methods=['POST'])
+def set_session_character(session_id):
+    """Set or update the character for a session."""
+    if not discussion_service:
+        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+    
+    try:
+        data = request.json
+        if not data or 'character' not in data:
+            return jsonify({'success': False, 'error': 'Missing character parameter'}), 400
+        
+        character = data['character']
+        logger.info(f"Setting character for session {session_id} to {character}")
+        print(f"Debug: API call to set_character for session {session_id} with character {character}")
+        
+        # Get current session data
+        session = discussion_service.get_session(session_id)
+        if not session:
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
+            
+        # Update session with new character
+        session['character'] = character
+        session['character_select'] = character  # Update both fields for consistency
+        
+        # Add system message to reinforce character identity
+        system_msg = f"""SYSTEM: Character set to {character}. 
+        IMPORTANT: You are {character}. Your name is {character}.
+        You MUST always respond as {character}. Never break character or reveal you are an AI.
+        When asked "who are you" or "what is your name", you MUST respond with "I am {character}."
+        If character is Thomas, always respond to identity questions with "My name is Thomas."
+        """
+        
+        # Use add_message_to_session instead of add_message with incorrect parameters
+        discussion_service.add_message_to_session(session_id, system_msg, "system")
+        
+        # Save session
+        discussion_service.update_session(session_id, session)
+        
+        return jsonify({'success': True, 'character': character})
+    except Exception as e:
+        logger.error(f"Error setting character: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/debug_suggestion')
+def debug_suggestion_tool():
+    """Debug page for testing suggestions between monitor and remote interview pages."""
+    return render_template('debug_suggestion_tool.html')
+
+# Add the API endpoint for suggestions as a fallback method
+@app.route('/api/session/<session_id>/suggestion', methods=['POST'])
+def handle_api_suggestion(session_id):
+    """API endpoint for handling suggestions (fallback method)."""
+    if not request.json:
+        return jsonify({'success': False, 'error': 'No data provided'}), 400
+    
+    try:
+        suggestion = request.json
+        logger.info(f"Handling API suggestion for session {session_id}: {suggestion}")
+        
+        # Emit to all clients in the room
+        socketio.emit('new_suggestion', {
+            'session_id': session_id,
+            'suggestion': suggestion
+        }, room=f"session_{session_id}")
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error handling API suggestion: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Add a test endpoint for WebSocket connections
+@app.route('/api/test_monitor_suggestion/<session_id>', methods=['GET'])
+def test_monitor_suggestion(session_id):
+    """Test endpoint to send a suggestion to a session via Socket.IO."""
+    try:
+        test_suggestion = {
+            'content': 'This is a test suggestion from the API',
+            'type': 'suggestion'
+        }
+        
+        # Emit to the session room
+        socketio.emit('new_suggestion', {
+            'session_id': session_id,
+            'suggestion': test_suggestion
+        }, room=f"session_{session_id}")
+        
+        return jsonify({
+            'success': True,
+            'message': f'Test suggestion sent to session {session_id}',
+            'details': 'If the remote interview page is open and connected to the socket, it should receive this suggestion.'
+        })
+    except Exception as e:
+        logger.error(f"Error in test_monitor_suggestion: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# New endpoint to explicitly generate questions
+@app.route('/api/observer/<session_id>/generate_questions', methods=['POST'])
+def generate_observer_questions(session_id):
+    """
+    Force generation of question suggestions for a session.
+    """
+    try:
+        # Make sure we have observer service
+        if not observer_service:
+            return jsonify({
+                'success': False,
+                'error': 'Observer service not available'
+            }), 500
+        
+        logger.info(f"Manually generating questions for session {session_id}")
+        
+        # Get the latest messages for context
+        if discussion_service:
+            messages = discussion_service.get_session_messages(session_id, limit=10)
+            logger.info(f"Found {len(messages)} messages for question generation")
+        else:
+            logger.warning("No discussion service available for fetching messages")
+            messages = []
+        
+        # Call the internal method to generate questions
+        observer_service._generate_question_suggestions(session_id, messages)
+        
+        # Get the newly generated questions
+        questions = observer_service.get_suggested_questions(session_id)
+        
+        # Log what's been generated
+        logger.info(f"Generated {len(questions)} questions for session {session_id}")
+        
+        # Emit to all clients watching this session
+        if len(questions) > 0:
+            socketio.emit('suggested_questions', {
+                'session_id': session_id,
+                'questions': questions
+            }, room=f"monitor_{session_id}")
+            logger.info(f"Emitted {len(questions)} questions to monitor room")
+        
+        return jsonify({
+            'success': True,
+            'count': len(questions),
+            'message': f"Generated {len(questions)} questions"
+        })
+    except Exception as e:
+        logger.error(f"Error generating questions: {str(e)}", exc_info=True)
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# ------ Static Debug Routes ------
+
+@app.route('/static/debug_character_test.html')
+def debug_character_test():
+    """Serve the debug character test page."""
+    return send_from_directory('static', 'debug_character_test.html')
+
+@app.route('/static/debug_ai_observer.html')
+def debug_ai_observer():
+    """Serve the AI Observer debug tool page."""
+    return send_from_directory('static', 'debug_ai_observer.html')
+
+@app.route('/api/session/<session_id>/send_confirmed_suggestion', methods=['POST'])
+def send_confirmed_suggestion(session_id):
+    """API endpoint for sending a confirmed suggestion to the remote interview."""
+    try:
+        if not request.json or 'suggestion' not in request.json:
+            return jsonify({'success': False, 'error': 'Missing suggestion content'}), 400
+        
+        suggestion = request.json['suggestion']
+        logger.info(f"Sending confirmed suggestion to session {session_id}: {suggestion}")
+                # Create a formatted message for the suggestion
+        message = {
+            'id': str(uuid.uuid4()),
+            'role': 'system',
+            'content': suggestion,
+            'type': 'suggestion',
+            'timestamp': datetime.datetime.now().isoformat()
+        }
+        
+        # Emit to the remote interview session
+        socketio.emit('new_suggestion', {'suggestion': message}, room=f"session_{session_id}")
+        
+        # Also notify the monitor session
+        socketio.emit('suggestion_sent', {
+            'session_id': session_id,
+            'suggestion': message
+        }, room=f"monitor_{session_id}")
+        
+        return jsonify({'success': True})
+    except Exception as e:
+        logger.error(f"Error sending confirmed suggestion: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/debug/observer/<session_id>/state', methods=['GET'])
+def debug_observer_state(session_id):
+    """
+    Debug endpoint to return the raw observer state for a session.
+    This is helpful for troubleshooting observer issues.
+    """
+    try:
+        if not observer_service:
+            return jsonify({
+                'success': False,
+                'error': 'Observer service not available'
+            }), 500
+        
+        # Get the raw observer state
+        state = observer_service.get_observer_state(session_id)
+        
+        # Log what we're returning
+        logger.info(f"Debug: Returning observer state for session {session_id}")
+        
+        # Extract the suggested_questions specifically for easier debugging
+        questions = state.get('suggested_questions', [])
+        
+        return jsonify({
+            'success': True,
+            'session_id': session_id,
+            'state': state,
+            'suggested_questions': questions
+        })
+    except Exception as e:
+        logger.error(f"Error getting observer state: {str(e)}")
+        return jsonify({
+            'success': False,
+            'error': str(e)
+        }), 500
+
+# Add the API endpoint for suggested questions
+@app.route('/api/session/<session_id>/suggested_questions', methods=['GET'])
+def get_suggested_questions_api(session_id):
+    """API endpoint for getting AI-suggested interview questions."""
+    try:
+        # Make sure we have observer service
+        if not observer_service:
+            # Return fallback questions if observer service is not available
+            fallback_questions = [
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Could you tell me more about that?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "How did that make you feel?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Can you provide a specific example?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "What would you change or improve about that?"
+                },
+                {
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': "Why do you think that happened?"
+                }
+            ]
+            
+            logger.warning(f"Observer service not available - returning fallback questions for session {session_id}")
+            return jsonify({
+                'session_id': session_id,
+                'questions': fallback_questions
+            })
+        
+        logger.info(f"Getting suggested questions for session {session_id}")
+        questions = observer_service.get_suggested_questions(session_id)
+        
+        # Ensure questions are properly formatted
+        formatted_questions = []
+        for q in questions:
+            # Make sure each question has the expected format
+            if isinstance(q, dict) and 'text' in q:
+                formatted_questions.append(q)
+            elif isinstance(q, str):
+                # If it's just a string, convert to proper format
+                formatted_questions.append({
+                    'id': str(uuid.uuid4()),
+                    'timestamp': datetime.datetime.now().isoformat(),
+                    'text': q
+                })
+        
+        logger.info(f"Returning {len(formatted_questions)} suggested questions for session {session_id}")
+        return jsonify({
+            'session_id': session_id,
+            'questions': formatted_questions
+        })
+        
+    except Exception as e:
+        logger.error(f"Error getting suggested questions via API: {str(e)}", exc_info=True)
+        # Return emergency fallback questions on error
+        emergency_questions = [
+            {
+                'id': str(uuid.uuid4()),
+                'timestamp': datetime.datetime.now().isoformat(),
+                'text': "Can you explain more about your experience?"
+            },
+            {
+                'id': str(uuid.uuid4()),
+                'timestamp': datetime.datetime.now().isoformat(),
+                'text': "What else would you like to share?"
+            }
+        ]
+        
+        return jsonify({
+            'session_id': session_id,
+            'questions': emergency_questions
+        })
+
+@app.route('/api/issues/new', methods=['POST'])
+def api_create_issue():
+    """API endpoint to create a new issue."""
+    try:
+        from models.issue_tracker import IssueManager, IssueType, IssuePriority
+        issue_manager = IssueManager(data_dir=os.path.join(BASE_DIR, 'data', 'issues'))
+        
+        data = request.json
+        if not data:
+            return jsonify({"error": "No data provided"}), 400
+        
+        # Required fields
+        title = data.get('title')
+        description = data.get('description')
+        
+        if not title or not description:
+            return jsonify({"error": "Title and description are required"}), 400
+        
+        # Optional fields with defaults
+        issue_type = data.get('issue_type', IssueType.BUG)
+        priority = data.get('priority', IssuePriority.MEDIUM)
+        creator_id = data.get('creator_id', 'api_user')
+        
+        # Create the issue
+        issue = issue_manager.create_issue(
+            title=title,
+            description=description,
+            creator_id=creator_id,
+            issue_type=issue_type,
+            priority=priority
+        )
+        
+        # Return the created issue
+        return jsonify({
+            "success": True,
+            "message": "Issue created successfully",
+            "issue": issue.to_dict()
+        })
+    except Exception as e:
+        logger.error(f"Error creating issue: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/llm/extract_opportunity', methods=['POST'])
+def extract_opportunity():
+    data = request.get_json()
+    analysis_text = data.get('analysis', '')
+    if not analysis_text:
+        return jsonify({'success': False, 'error': 'No analysis text provided'}), 400
+
+    api_key = os.environ.get('OPENAI_API_KEY')
+    prompt = (
+        "Extract the following fields from the research analysis below and return as JSON:\n"
+        "- title: A concise opportunity title\n"
+        "- description: A summary of the opportunity and its context\n"
+        "- linked_persona: The main user persona(s) involved\n"
+        "- journey_stage: The stage in the user journey\n"
+        "- root_cause: The underlying cause of the problem\n"
+        "- insights: Key research insights (one per line)\n"
+        "- ethics: Ethical considerations (one per line)\n"
+        "- cursor_prompt_template: A template for generating prototype prompts for Cursor AI\n"
+        "\nResearch Analysis:\n" + analysis_text + "\n\nJSON:"
+    )
+    if api_key:
+        try:
+            import openai
+            client = openai.OpenAI(api_key=api_key)
+            response = client.chat.completions.create(
+                model="gpt-3.5-turbo",
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=512,
+                temperature=0.2
+            )
+            import json as pyjson
+            content = response.choices[0].message.content
+            start = content.find('{')
+            end = content.rfind('}')
+            if start != -1 and end != -1:
+                json_str = content[start:end+1]
+                fields = pyjson.loads(json_str)
+                return jsonify({'success': True, 'fields': fields})
+            else:
+                return jsonify({'success': False, 'error': 'Could not parse LLM response'}), 500
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    else:
+        # Mock response for local testing
+        return jsonify({'success': True, 'fields': {
+            'title': 'Sample Opportunity Title',
+            'description': 'Sample description of the opportunity and its context.',
+            'linked_persona': 'Sample Persona',
+            'journey_stage': 'Discovery',
+            'root_cause': 'Sample root cause',
+            'insights': 'Sample insight 1\nSample insight 2',
+            'ethics': 'Sample ethical consideration',
+            'cursor_prompt_template': 'Sample cursor prompt template'
+        }})
+
+@app.route('/api/session/<session_id>/export', methods=['GET'])
+def export_session(session_id):
+    """Export comprehensive session data including transcript and analysis"""
+    try:
+        file_path = DATA_DIR / f"{session_id}.json"
+        if not file_path.exists():
+            return jsonify({"error": f"Session {session_id} not found"}), 404
+        
+        with open(file_path, 'r') as f:
+            session_data = json.load(f)
+        
+        export_data = {
+            "session": {
+                "id": session_data.get('id'),
+                "title": session_data.get('title'),
+                "project": session_data.get('project'),
+                "interview_type": session_data.get('interview_type'),
+                "status": session_data.get('status'),
+                "created_at": session_data.get('created_at'),
+                "updated_at": session_data.get('updated_at')
+            },
+            "interviewee": session_data.get('interviewee', {}),
+            "content": {
+                "transcript": session_data.get('transcript'),
+                "messages": session_data.get('messages', []),
+                "analysis": session_data.get('analysis')
+            },
+            "metadata": {
+                "topic": session_data.get('topic'),
+                "context": session_data.get('context'),
+                "goals": session_data.get('goals'),
+                "character": session_data.get('character'),
+                "character_select": session_data.get('character_select'),
+                "voice_id": session_data.get('voice_id')
+            }
+        }
+        
+        if request.args.get('download') == 'true':
+            response = jsonify(export_data)
+            response.headers['Content-Disposition'] = f'attachment; filename=session_{session_id}.json'
+            return response
+        return jsonify(export_data)
+    except Exception as e:
+        logger.error(f"Error exporting session {session_id}: {str(e)}")
+        return jsonify({"error": str(e)}), 500
+
+# Start the app
+if __name__ == '__main__':
+    debug_mode = False
+    if '--debug' in sys.argv:
+        debug_mode = True
+    
+    # Check if a custom port is specified
+    port = 5025
+    port_index = -1
+    if '--port' in sys.argv:
+        port_index = sys.argv.index('--port')
+        if port_index >= 0 and port_index + 1 < len(sys.argv):
+            port = int(sys.argv[port_index + 1])
+            
+    print(f"Starting DARIA Interview API on port {port}")
+    print(f"Health check endpoint: http://127.0.0.1:{port}/api/health")
+    print(f"Interview start endpoint: http://127.0.0.1:{port}/api/interview/start")
+    print(f"Monitor interviews: http://127.0.0.1:{port}/monitor_interview")
+    
+    socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode, allow_unsafe_werkzeug=True) 

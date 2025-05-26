@@ -9,13 +9,285 @@
 2025-05-25 14:23:57,464 - issue_memory_sync - ERROR - Failed to get issues: 404
 2025-05-25 14:33:57,489 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
 2025-05-25 14:33:57,497 - issue_memory_sync - ERROR - Failed to get issues: 404
-2025-05-25 14:39:17,397 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
-2025-05-25 14:39:17,402 - issue_memory_sync - ERROR - Failed to get issues: 404
-2025-05-25 14:23:57,459 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
-2025-05-25 14:23:57,464 - issue_memory_sync - ERROR - Failed to get issues: 404
-2025-05-25 14:29:17,354 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
-2025-05-25 14:29:17,364 - issue_memory_sync - ERROR - Failed to get issues: 404
-2025-05-25 14:33:57,489 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
-2025-05-25 14:33:57,497 - issue_memory_sync - ERROR - Failed to get issues: 404
-2025-05-25 14:39:17,397 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
-2025-05-25 14:39:17,402 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 14:43:57,530 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 14:43:57,534 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 14:49:17,434 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 14:49:17,451 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 14:59:17,484 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 14:59:17,498 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 15:09:17,536 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 15:09:17,546 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 15:19:17,580 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 15:19:17,591 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 15:29:17,622 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 15:29:17,628 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 15:40:17,626 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 15:40:17,631 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 15:50:17,660 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 15:50:17,668 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 16:00:17,719 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 16:00:17,723 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 16:10:17,754 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 16:10:17,763 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 16:20:17,797 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 16:20:17,804 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 16:30:17,826 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 16:30:17,834 - issue_memory_sync - ERROR - Error connecting to Issue Tracker: HTTPConnectionPool(host='localhost', port=5025): Max retries exceeded with url: /api/issues?type=opportunity (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101cfb9d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-05-25 16:40:17,869 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 16:40:17,883 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 16:50:17,915 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 16:50:17,926 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 17:00:17,961 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 17:00:17,967 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 17:10:18,004 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 17:10:18,012 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 17:20:18,061 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 17:20:18,067 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 17:30:18,105 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 17:30:18,112 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 17:40:18,136 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 17:40:18,142 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 17:50:18,181 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 17:50:18,191 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 18:00:18,247 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 18:00:18,252 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 18:10:18,275 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 18:10:18,284 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 18:20:18,325 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 18:20:18,341 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 18:30:18,371 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 18:30:18,375 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 18:40:18,413 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 18:40:18,422 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 18:50:18,471 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 18:50:18,478 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 19:00:18,515 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 19:00:18,523 - issue_memory_sync - ERROR - Error connecting to Issue Tracker: HTTPConnectionPool(host='localhost', port=5025): Max retries exceeded with url: /api/issues?type=opportunity (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101d15310>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-05-25 19:10:18,554 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 19:10:18,560 - issue_memory_sync - ERROR - Error connecting to Issue Tracker: HTTPConnectionPool(host='localhost', port=5025): Max retries exceeded with url: /api/issues?type=opportunity (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101d17650>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-05-25 19:20:18,570 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 19:20:18,573 - issue_memory_sync - ERROR - Error connecting to Issue Tracker: HTTPConnectionPool(host='localhost', port=5025): Max retries exceeded with url: /api/issues?type=opportunity (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101d25710>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-05-25 19:30:18,626 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 19:30:18,633 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 19:40:18,671 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 19:40:18,678 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 19:50:18,720 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 19:50:18,725 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 20:00:18,771 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 20:00:18,779 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 20:10:18,830 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 20:10:18,843 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 20:20:18,893 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 20:20:18,897 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 20:30:18,940 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 20:30:18,949 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 20:40:19,003 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 20:40:19,010 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 20:50:19,061 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 20:50:19,076 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 21:00:19,113 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 21:00:19,128 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 21:10:19,192 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 21:10:19,203 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 21:20:19,252 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 21:20:19,265 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 21:30:19,354 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 21:30:19,365 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 21:40:19,370 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 21:40:19,378 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 21:50:19,448 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 21:50:19,459 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 22:00:19,505 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 22:00:19,521 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 22:10:19,562 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 22:10:19,571 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 22:20:19,605 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 22:20:19,611 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 22:30:19,647 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 22:30:19,653 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 22:40:19,701 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 22:40:19,716 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 22:50:19,746 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 22:50:19,756 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 23:00:19,789 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 23:00:19,798 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 23:10:19,853 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 23:10:19,864 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 23:20:19,909 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 23:20:19,924 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 23:31:19,914 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 23:31:19,925 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 23:41:19,954 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 23:41:19,960 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-25 23:51:19,993 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-25 23:51:20,007 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 00:01:20,040 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 00:01:20,048 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 00:11:20,103 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 00:11:20,126 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 00:21:20,149 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 00:21:20,162 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 00:31:20,187 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 00:31:20,194 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 00:41:20,208 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 00:41:20,223 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 00:51:20,255 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 00:51:20,266 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 01:01:20,310 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 01:01:20,318 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 01:11:20,380 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 01:11:20,391 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 01:21:20,502 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 01:21:20,512 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 01:31:20,578 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 01:31:20,592 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 01:41:20,680 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 01:41:20,689 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 01:51:20,752 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 01:51:20,760 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 02:01:20,841 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 02:01:20,852 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 02:11:20,937 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 02:11:20,946 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 02:21:20,987 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 02:21:20,997 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 02:31:21,063 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 02:31:21,073 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 02:41:21,148 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 02:41:21,155 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 02:51:21,213 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 02:51:21,224 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 03:01:21,274 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 03:01:21,284 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 03:11:21,337 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 03:11:21,347 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 03:21:21,420 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 03:21:21,434 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 03:31:21,479 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 03:31:21,489 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 03:41:21,531 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 03:41:21,539 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 03:51:21,615 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 03:51:21,625 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 04:01:21,735 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 04:01:21,742 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 04:11:21,806 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 04:11:21,814 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 04:21:21,879 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 04:21:21,887 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 04:31:21,973 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 04:31:21,985 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 04:41:22,059 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 04:41:22,068 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 04:51:22,091 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 04:51:22,097 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 05:01:22,163 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 05:01:22,173 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 05:11:22,243 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 05:11:22,252 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 05:21:22,320 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 05:21:22,329 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 05:31:22,357 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 05:31:22,367 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 05:41:22,436 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 05:41:22,448 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 05:51:22,520 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 05:51:22,550 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 06:01:22,622 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 06:01:22,631 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 06:11:22,684 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 06:11:22,695 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 06:21:22,771 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 06:21:22,783 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 06:31:22,816 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 06:31:22,828 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 06:41:22,900 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 06:41:22,913 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 06:51:22,965 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 06:51:22,973 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 07:01:23,033 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 07:01:23,045 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 07:11:23,139 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 07:11:23,150 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 07:21:23,214 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 07:21:23,240 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 07:31:23,306 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 07:31:23,317 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 07:41:23,407 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 07:41:23,421 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 07:51:23,486 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 07:51:23,498 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 08:01:23,545 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 08:01:23,554 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 08:11:23,602 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 08:11:23,613 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 08:21:23,670 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 08:21:23,683 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 08:31:23,764 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 08:31:23,776 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 08:41:23,801 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 08:41:23,811 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 08:51:23,870 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 08:51:23,883 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 09:01:24,003 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 09:01:24,014 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 09:11:24,088 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 09:11:24,100 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 09:21:24,182 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 09:21:24,194 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 09:31:24,259 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 09:31:24,270 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 09:41:24,348 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 09:41:24,357 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 09:51:24,429 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 09:51:24,439 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 10:01:24,510 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 10:01:24,519 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 10:11:24,584 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 10:11:24,594 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 10:21:24,631 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 10:21:24,646 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 10:32:24,633 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 10:32:24,640 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 10:42:24,675 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 10:42:24,691 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 10:52:24,740 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 10:52:24,753 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 11:02:24,787 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 11:02:24,799 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 11:12:24,827 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 11:12:24,839 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 11:22:24,875 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 11:22:24,893 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 11:32:24,928 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 11:32:24,933 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 11:42:24,976 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 11:42:24,989 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 11:52:25,027 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 11:52:25,039 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 12:02:25,068 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 12:02:25,072 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 12:12:25,080 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 12:12:25,093 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 12:22:25,115 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 12:22:25,125 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 12:32:25,200 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 12:32:25,215 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 12:42:25,256 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 12:42:25,270 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 12:52:25,307 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 12:52:25,320 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 13:02:25,345 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 13:02:25,357 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 13:12:25,393 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 13:12:25,404 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 12:32:25,200 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 12:32:25,215 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 12:42:25,256 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 12:42:25,270 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 12:52:25,307 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 12:52:25,320 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 13:02:25,345 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 13:02:25,357 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-26 13:12:25,393 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-26 13:12:25,404 - issue_memory_sync - ERROR - Failed to get issues: 404

@@ -1,0 +1,51 @@
+{
+  "id": "f2179086-ba40-48d0-b4cd-d7236601e603",
+  "title": "User Research Workshop Design",
+  "description": "Designing a workshop to address challenges in user research integration and advocate for its importance in project success.",
+  "issue_type": "opportunity",
+  "status": "open",
+  "priority": "low",
+  "creator_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+  "assigned_to": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+  "screenshots": [],
+  "created_at": "2025-05-25T15:19:59.398911",
+  "updated_at": "2025-05-25T15:20:42.930182",
+  "environment": {
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "remote_addr": "127.0.0.1"
+  },
+  "tags": [],
+  "history": [
+    {
+      "timestamp": "2025-05-25T15:19:59.398930",
+      "action": "Issue created",
+      "user_id": null,
+      "details": null
+    },
+    {
+      "timestamp": "2025-05-25T15:20:42.930182",
+      "action": "Issue reassigned",
+      "user_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+      "details": {
+        "from": null,
+        "to": "b63bc956-15e1-4e59-8a30-47ef57a90db3"
+      }
+    }
+  ],
+  "comments": [],
+  "linked_persona": "Researcher, Designer, Stakeholder",
+  "journey_stage": "Discovery",
+  "insights": [
+    "Streamlining research process enhances efficiency and effectiveness",
+    "User-centric design is crucial for project success",
+    "Educating stakeholders on the value of user research is essential"
+  ],
+  "ethics": [
+    "Ensure participant consent and data privacy in research activities",
+    "Avoid bias in research design and interpretation of findings"
+  ],
+  "root_cause": "Lack of understanding and advocacy for user research in project planning and execution",
+  "parent_id": "",
+  "linked_prototype_prompt": null,
+  "cursor_prompt_template": "How can we leverage user research insights to enhance the project's impact on user experience and business outcomes?"
+}
