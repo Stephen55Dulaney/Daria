@@ -31,9 +31,13 @@ const Sessions: React.FC = () => {
       try {
         setLoading(true);
         const response = await axios.get<Session[]>('http://127.0.0.1:5025/api/sessions');
-        // The API returns the sessions directly in the response data
-        setSessions(response.data);
-        setFilteredSessions(response.data);
+        // Support both array and object-with-sessions-array API responses
+        const data = response.data as any;
+        const sessionsArray = Array.isArray(data)
+          ? data
+          : (data && Array.isArray(data.sessions) ? data.sessions : []);
+        setSessions(sessionsArray);
+        setFilteredSessions(sessionsArray);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch sessions');
       } finally {
