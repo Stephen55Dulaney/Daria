@@ -9,6 +9,7 @@ interface Message {
 }
 
 interface Session {
+  interviewee(interviewee: any, arg1: null, arg2: number): React.ReactNode;
   id: string;
   title: string;
   project?: string;
@@ -119,6 +120,10 @@ export default function SessionDetail() {
                     : 'bg-gray-50 mr-8'
                 }`}
               >
+
+<pre>{JSON.stringify(session, null, 2)}</pre>
+      <pre>{JSON.stringify(session.interviewee, null, 2)}</pre>
+
                 <div className="flex items-center mb-2">
                   <span className="font-medium text-sm text-gray-600">
                     {message.role === 'user' ? 'Participant' : session.character || 'Assistant'}

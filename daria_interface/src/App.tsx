@@ -8,6 +8,7 @@ import Layout from './components/shared/Layout';
 import Sessions from './pages/Sessions';
 import GuideSessions from './pages/guides/[guideId]/sessions';
 import AnalysisPage from './pages/analysis';
+import SessionDetailPage from './pages/SessionDetailPage';
 
 const App: React.FC = () => {
   return (
@@ -63,6 +64,7 @@ const App: React.FC = () => {
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/gallery/:assistantId" element={<Gallery />} />
             <Route path="/" element={<Analysis />} />
+            <Route path="/sessions/:sessionId" element={<SessionDetailPage />} />
           </Routes>
         </main>
       </div>

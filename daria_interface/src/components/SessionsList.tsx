@@ -11,6 +11,7 @@ interface Session {
   created_at: string;
   updated_at: string;
   interview_type: string;
+  name?: string;
 }
 
 const SessionsList: React.FC = () => {
@@ -22,7 +23,11 @@ const SessionsList: React.FC = () => {
     const fetchSessions = async () => {
       try {
         const response = await axios.get('http://127.0.0.1:5025/api/sessions');
-        setSessions(response.data);
+        const sessionsWithName = response.data.map((session: any) => ({
+          ...session,
+          name: session.interviewee?.name || '',
+        }));
+        setSessions(sessionsWithName);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch sessions');
       } finally {
@@ -64,6 +69,7 @@ const SessionsList: React.FC = () => {
                 <p>Project: {session.project}</p>
                 <p>Topic: {session.topic}</p>
                 <p>Type: {session.interview_type}</p>
+                <p>Name: {session.name}</p>
                 <p>Created: {new Date(session.created_at).toLocaleDateString()}</p>
               </div>
               <div className="mb-4">
@@ -76,10 +82,10 @@ const SessionsList: React.FC = () => {
               </div>
               <div className="mt-4">
                 <button 
-                  onClick={() => window.location.href = `/transcript/${session.id}`}
+                  onClick={() => window.location.href = `/sessions/${session.id}`}
                   className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 transition-colors duration-200"
                 >
-                  View Transcript
+                  Session Details
                 </button>
               </div>
             </div>

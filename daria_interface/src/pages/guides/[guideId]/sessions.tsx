@@ -7,11 +7,21 @@ interface Session {
   id: string;
   title: string;
   project?: string;
+  name?: string;
   interview_type?: string;
   character?: string;
   created_at: string;
-  status: string;
+  status?: string;
   participant_name?: string;
+  messages?: any[];
+  interviewee?: {
+    name?: string;
+    email?: string;
+    role?: string;
+    department?: string;
+  };
+  duration?: string;
+  transcript_length?: number;
 }
 
 interface GuideDetails {
@@ -118,7 +128,29 @@ const GuideSessions: React.FC = () => {
             key={session.id}
             session={session}
             onClick={() => handleSessionClick(session)}
-          />
+          >
+            {session.interviewee && (
+              <div className="mb-2">
+                <div className="font-semibold">Participant Information</div>
+                <InfoRow label="Name" value={session.interviewee.name || 'N/A'} />
+                <InfoRow label="Email" value={session.interviewee.email || 'N/A'} />
+                <InfoRow label="Role" value={session.interviewee.role || 'N/A'} />
+                <InfoRow label="Department" value={session.interviewee.department || 'N/A'} />
+              </div>
+            )}
+
+            <div className="mb-2">
+              <div className="font-semibold">Session Stats</div>
+              <InfoRow label="Duration" value={session.duration || 'N/A'} />
+              <InfoRow label="Messages" value={Array.isArray(session.messages) ? session.messages.length.toString() : '0'} />
+              <InfoRow label="Transcript Length" value={
+                typeof session.transcript_length === 'number'
+                  ? `${(session.transcript_length / 1000).toFixed(1)}k characters`
+                  : '0.0k characters'
+              } />
+            </div>
+            <InfoRow label="Session ID" value={session.id} />
+          </SessionCard>
         ))}
       </div>
 
