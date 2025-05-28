@@ -28,6 +28,13 @@ from flask_login import LoginManager, current_user, login_required
 from models.user import User, UserRepository
 import re
 import traceback
+import numpy as np
+import umap
+from transcript_processor import TranscriptProcessor
+
+# Import semantic pipeline
+from semantic_pipeline import chunk_transcript, embed_chunks, tag_chunk
+from vector_store import add_chunks_to_vector_store, semantic_search
 
 # Import user routes
 from user_routes import user_bp
@@ -1420,6 +1427,33 @@ def interview_setup():
     except Exception as e:
         logger.error(f"Error loading interview setup page: {str(e)}")
         return render_template('langchain/interview_setup.html', characters=[])
+
+# add semantic search routes
+@app.route('/api/semantic_ingest', methods=['POST'])
+def semantic_ingest():
+    data = request.json
+    transcript = data['transcript']
+    metadata = data.get('metadata', {})
+    chunks = chunk_transcript(transcript)
+    embeddings = embed_chunks(chunks)
+    tags = [tag_chunk(chunk, metadata) for chunk in chunks]
+    add_chunks_to_vector_store(chunks, embeddings, [metadata]*len(chunks))
+    return jsonify({"chunks": chunks, "tags": tags})
+
+@app.route('/api/semantic_search', methods=['POST'])
+def semantic_search_api():
+    try:
+        data = request.json
+        print("Semantic search request data:", data)  # Debug print
+        query = data['query']
+        query_embedding = embed_chunks([query])[0]
+        results = semantic_search(query_embedding)
+        return jsonify(results)
+    except Exception as e:
+        import traceback
+        print("Semantic search error:", e)
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/interview_archive')
 def interview_archive():
@@ -4291,9 +4325,6 @@ def analyze_research_session(session_id):
 
         # Send to OpenAI for analysis
         try:
-            import os
-            import openai
-            
             api_key = os.environ.get('OPENAI_API_KEY')
             if not api_key:
                 return jsonify({
@@ -4312,32 +4343,52 @@ def analyze_research_session(session_id):
                     {"role": "system", "content": analysis_prompt},
                     {"role": "user", "content": transcript}
                 ],
-                temperature=0.3,
-                response_format={ "type": "json_object" }
+                temperature=0.3
             )
             
-            # Parse the JSON response
-            analysis_result = json.loads(response.choices[0].message.content)
-            
+            llm_content = response.choices[0].message.content
+            import json as pyjson
+            analysis_result = None
+            error_message = None
+            # Try to parse as JSON directly
+            try:
+                analysis_result = pyjson.loads(llm_content)
+            except Exception as e1:
+                # Try to extract JSON substring
+                import re
+                match = re.search(r'\{[\s\S]*\}', llm_content)
+                if match:
+                    json_str = match.group(0)
+                    try:
+                        analysis_result = pyjson.loads(json_str)
+                    except Exception as e2:
+                        error_message = f"Failed to parse extracted JSON: {str(e2)}"
+                        logger.error(error_message)
+                else:
+                    error_message = f"No JSON object found in LLM output."
+                    logger.error(error_message)
+            if analysis_result is None:
+                # Fallback: return raw text
+                analysis_result = {
+                    'raw_text': llm_content,
+                    'parsing_error': error_message or 'Could not parse LLM output as JSON.'
+                }
             # Add metadata
             analysis_result['metadata'] = {
                 'session_id': session_id,
                 'analyzed_at': datetime.datetime.now().isoformat(),
                 'message_count': len(user_messages)
             }
-            
             return jsonify({
                 'success': True,
                 'analysis': analysis_result
             })
-
         except Exception as e:
             logger.error(f"Error in OpenAI analysis: {str(e)}")
             return jsonify({
                 'success': False,
                 'error': f"Failed to generate analysis: {str(e)}"
             }), 500
-
     except Exception as e:
         logger.error(f"Error analyzing session {session_id}: {str(e)}")
         return jsonify({
@@ -4508,6 +4559,76 @@ def chunk_messages(messages, max_tokens=3000):
         chunks.append(current_chunk)
 
     return chunks
+
+@app.route('/api/cluster_transcript', methods=['POST'])
+def cluster_transcript():
+    data = request.json
+    session_id = data.get('session_id')
+    n_neighbors = data.get('n_neighbors', 10)
+    min_dist = data.get('min_dist', 0.1)
+    n_components = data.get('n_components', 2)
+
+    processor = TranscriptProcessor()
+    # Query all chunks for this session
+    results = processor.collection.get(where={"session_id": session_id})
+    embeddings = np.array(results['embeddings'])
+    metadatas = results['metadatas']
+
+    reducer = umap.UMAP(n_neighbors=n_neighbors, min_dist=min_dist, n_components=n_components, random_state=42)
+    coords = reducer.fit_transform(embeddings)
+
+    # Return coordinates and metadata for each chunk
+    return jsonify([
+        {
+            "x": float(coord[0]),
+            "y": float(coord[1]),
+            "metadata": meta
+        }
+        for coord, meta in zip(coords, metadatas)
+    ])
+
+#@app.route('/api/semantic_advanced_search', methods=['POST'])
+@app.route('/api/semantic_advanced_search', methods=['GET', 'POST'])
+def semantic_advanced_search():
+    data = request.json
+    query = data.get('query')
+    where = data.get('where', {})
+    n_results = data.get('n_results', 5)
+    processor = TranscriptProcessor()
+    results = processor.search_transcript(query, n_results=n_results, where=where)
+    return jsonify(results)
+
+@app.route('/api/export_clusters', methods=['POST'])
+def export_clusters():
+    data = request.json
+    session_id = data.get('session_id')
+    processor = TranscriptProcessor()
+    results = processor.collection.get(where={"session_id": session_id})
+    # You can export as CSV or JSON
+    export_data = [
+        {
+            "embedding": emb,
+            "metadata": meta
+        }
+        for emb, meta in zip(results['embeddings'], results['metadatas'])
+    ]
+    return jsonify(export_data)
+
+@app.route('/api/save_annotation', methods=['POST'])
+def save_annotation():
+    data = request.json
+    session_id = data.get('session_id')
+    chunk_id = data.get('chunk_id')
+    annotation = data.get('annotation')
+    processor = TranscriptProcessor()
+    # Update the metadata for the chunk
+    results = processor.collection.get(where={"session_id": session_id, "chunk_id": chunk_id})
+    if not results['ids']:
+        return jsonify({"success": False, "error": "Chunk not found"}), 404
+    # ChromaDB does not support update, so you may need to delete and re-add with new metadata
+    # (Or, store annotations in a separate table/file)
+    # For now, just return success
+    return jsonify({"success": True, "message": "Annotation saved (not really, demo only)"})
 
 # Start the app
 if __name__ == '__main__':

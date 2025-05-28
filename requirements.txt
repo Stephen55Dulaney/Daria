@@ -26,4 +26,6 @@ markdown2==2.4.12
 # huggingface_hub[hf_xet]>=0.20.0
 flask_cors
 flask_login
-flask_wtf 
+flask_wtf
+umap-learn
+scikit-learn 

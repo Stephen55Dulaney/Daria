@@ -1,0 +1,43 @@
+{
+  "id": "76a51a7a-581a-42b6-9392-5b973d9b428d",
+  "title": "Inconsistent Identity in Interview Responses",
+  "description": "Thomas, the participant, displayed a lack of consistent identity and purpose in his responses during the interview, leading to confusion and lack of clarity in the conversation.",
+  "issue_type": "opportunity",
+  "status": "open",
+  "priority": "low",
+  "creator_id": "b63bc956-15e1-4e59-8a30-47ef57a90db3",
+  "assigned_to": null,
+  "screenshots": [],
+  "created_at": "2025-05-27T12:08:59.701325",
+  "updated_at": "2025-05-27T12:08:59.701335",
+  "environment": {
+    "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/136.0.0.0 Safari/537.36",
+    "remote_addr": "127.0.0.1"
+  },
+  "tags": [],
+  "history": [
+    {
+      "timestamp": "2025-05-27T12:08:59.701335",
+      "action": "Issue created",
+      "user_id": null,
+      "details": null
+    }
+  ],
+  "comments": [],
+  "linked_persona": "Thomas (User Persona)",
+  "journey_stage": "User Interview Stage",
+  "insights": [
+    "Thomas struggled to provide clear and direct answers to questions",
+    "Lack of coherence in maintaining a consistent identity throughout the conversation",
+    "Responses lacked context and explanation, leading to confusion"
+  ],
+  "ethics": [
+    "Ensuring transparency and honesty in responses to maintain trust",
+    "Respecting the interviewer's questions and providing relevant information",
+    "Avoiding misleading or vague responses that can lead to misinterpretation"
+  ],
+  "root_cause": "Failure to maintain a clear identity and purpose in responses",
+  "parent_id": "",
+  "linked_prototype_prompt": null,
+  "cursor_prompt_template": "Ask Thomas to provide a clear and direct response to the question, ensuring transparency and coherence in his answers."
+}

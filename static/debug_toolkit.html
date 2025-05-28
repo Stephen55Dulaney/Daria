@@ -307,6 +307,17 @@
                             <a href="/api/research_session/482fccf5-4845-43c4-bb2a-e526d23bdcc4" target="_blank" class="endpoint-url">/api/research_session/482fccf5-4845-43c4-bb2a-e526d23bdcc4</a>
                         </div>
 
+                        <h6 class="mt-4 mb-3">Analysis Tests</h6>
+                        <div class="d-grid gap-2">
+                            <button onclick="testSingleAnalysis()" class="btn btn-outline-primary">
+                                Test Single Session Analysis
+                            </button>
+                            <button onclick="testBatchAnalysis()" class="btn btn-outline-primary">
+                                Test Batch Analysis
+                            </button>
+                            <div id="analysisResult" class="mt-3 p-3 bg-light rounded" style="display: none;"></div>
+                        </div>
+
                         <h6 class="mt-4 mb-3">Setup Pages</h6>
                         <div class="d-grid gap-2">
                             <a href="/dashboard" class="btn btn-outline-secondary" target="_blank">Dashboard</a>
@@ -394,10 +405,47 @@
         // Initialize when page loads
         document.addEventListener('DOMContentLoaded', () => {
             fetchServiceStatus();
-            
-            // Refresh status every 30 seconds
             setInterval(fetchServiceStatus, 30000);
         });
+
+        async function testSingleAnalysis() {
+            const resultDiv = document.getElementById('analysisResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="spinner-border text-primary" role="status"></div> Running analysis...';
+            
+            try {
+                const response = await fetch('/api/research_session/d46aeffa-e147-4273-b59a-f86d76733544/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' }
+                });
+                const data = await response.json();
+                resultDiv.innerHTML = `<pre class="mb-0">${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function testBatchAnalysis() {
+            const resultDiv = document.getElementById('analysisResult');
+            resultDiv.style.display = 'block';
+            resultDiv.innerHTML = '<div class="spinner-border text-primary" role="status"></div> Running batch analysis...';
+            
+            try {
+                const response = await fetch('/api/research_session/analyze', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        session_ids: ['d46aeffa-e147-4273-b59a-f86d76733544'],
+                        character: 'researcher',
+                        prompt: 'Analyze these interview sessions for key insights and themes.'
+                    })
+                });
+                const data = await response.json();
+                resultDiv.innerHTML = `<pre class="mb-0">${JSON.stringify(data, null, 2)}</pre>`;
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
     </script>
 </body>
 </html> 
