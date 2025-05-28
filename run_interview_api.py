@@ -1433,23 +1433,42 @@ def interview_setup():
 @app.route('/api/semantic_ingest', methods=['POST'])
 def semantic_ingest():
     data = request.json
+    print("Received data:", data)
     transcript = data['transcript']
     metadata = data.get('metadata', {})
+    print("About to chunk transcript")
     chunks = chunk_transcript(transcript)
+    print("Chunks:", chunks)
+    print("About to embed chunks")
     embeddings = embed_chunks(chunks)
+    print("Embeddings:", embeddings)
+    print("About to tag chunks")
     tags = [tag_chunk(chunk, metadata) for chunk in chunks]
+    print("Tags:", tags)
+    print("About to add to vector store")
     add_chunks_to_vector_store(chunks, embeddings, [metadata]*len(chunks))
+    print("semantic_ingest received:", data)
     return jsonify({"chunks": chunks, "tags": tags})
 
 @app.route('/api/semantic_search', methods=['POST'])
 def semantic_search_api():
     try:
         data = request.json
-        print("Semantic search request data:", data)  # Debug print
         query = data['query']
         query_embedding = embed_chunks([query])[0]
-        results = semantic_search(query_embedding)
-        return jsonify(results)
+        raw_results = semantic_search(query_embedding)
+        # Format results for frontend
+        formatted = []
+        docs = raw_results.get('documents', [[]])[0]
+        metas = raw_results.get('metadatas', [[]])[0]
+        dists = raw_results.get('distances', [[]])[0]
+        for doc, meta, dist in zip(docs, metas, dists):
+            formatted.append({
+                'content': doc,
+                'metadata': meta,
+                'score': dist
+            })
+        return jsonify({'results': formatted})
     except Exception as e:
         import traceback
         print("Semantic search error:", e)
