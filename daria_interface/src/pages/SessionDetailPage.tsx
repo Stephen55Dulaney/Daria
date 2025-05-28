@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import SessionCard from '../components/shared/SessionCard';
-import MessageList from '../components/shared/MessageList';
+import TranscriptExplorer from '../components/TranscripExplorer';
 import axios from 'axios';
 
 interface Message {
@@ -22,6 +22,7 @@ interface Session {
   status?: string;
   participant_name?: string;
   messages?: Message[];
+  analysis?: { content: string };
 }
 
 const SessionDetailPage: React.FC = () => {
@@ -68,37 +69,15 @@ const SessionDetailPage: React.FC = () => {
   return (
     <div className="flex flex-col md:flex-row gap-8 container mx-auto px-4 py-8">
       <div className="md:w-1/3 w-full mb-8 md:mb-0">
-        
         <SessionCard session={session.session} hideDetailsButton />
       </div>
       <div className="md:w-2/3 w-full">
-        <div className="flex gap-4 border-b mb-4">
-          <button
-            className={`pb-2 px-4 font-semibold ${activeTab === 'transcript' ? 'border-b-2 border-purple-600 text-purple-700' : 'text-gray-500'}`}
-            onClick={() => setActiveTab('transcript')}
-          >
-            Transcript
-          </button>
-          <button
-            className={`pb-2 px-4 font-semibold ${activeTab === 'analysis' ? 'border-b-2 border-purple-600 text-purple-700' : 'text-gray-500'}`}
-            onClick={() => setActiveTab('analysis')}
-          >
-            Analysis
-          </button>
-        </div>
-        {activeTab === 'transcript' ? (
-          <MessageList messages={session.session.messages || []} />
-        ) : (
-          <div className="prose max-w-none">
-            {session.session.analysis?.content
-              ? <pre className="whitespace-pre-wrap">{session.session.analysis.content}</pre>
-              : <div className="text-gray-500 italic">No analysis available</div>
-            }
-          </div>
-        )}
+        <TranscriptExplorer
+          messages={session.session.messages || []}
+          analysis={session.session.analysis}
+        />
       </div>
     </div>
-    
   );
 };
 
