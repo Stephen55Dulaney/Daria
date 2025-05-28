@@ -10,6 +10,7 @@ import logging
 import argparse
 import datetime
 import uuid
+import csv
 from pathlib import Path
 from typing import List, Dict, Any, Optional, Tuple
 from flask import Flask, request, jsonify, render_template, redirect, Response, flash, send_file, url_for, session, send_from_directory
@@ -4630,6 +4631,57 @@ def save_annotation():
     # For now, just return success
     return jsonify({"success": True, "message": "Annotation saved (not really, demo only)"})
 
+@app.route('/api/session/<session_id>/export_csv', methods=['GET'])
+def export_session_csv(session_id):
+    fields = request.args.get('fields', '')
+    fields = [f.strip() for f in fields.split(',')] if fields else []
+    session_path = os.path.join('data/interviews/sessions', f'{session_id}.json')
+    if not os.path.exists(session_path):
+        return jsonify({"error": "Session not found"}), 404
+    with open(session_path, 'r') as f:
+        session_data = json.load(f)
+    # Flatten and filter for CSV
+    rows = []
+    for field in fields or session_data.keys():
+        value = session_data.get(field, '')
+        if isinstance(value, list):
+            value = '; '.join(str(v) for v in value)
+        rows.append({'field': field, 'value': value})
+    # Create CSV response
+    def generate():
+        writer = csv.DictWriter(Response(), fieldnames=['field', 'value'])
+        yield ','.join(['field', 'value']) + '\n'
+        for row in rows:
+            yield f"{row['field']},{row['value']}\n"
+    response = Response(generate(), mimetype='text/csv')
+    response.headers['Content-Disposition'] = f'attachment; filename=session_{session_id}.csv'
+    return response
+
+@app.route('/api/sessions/export_csv', methods=['POST'])
+def export_sessions_csv():
+    data = request.json
+    session_ids = data.get('session_ids', [])
+    fields = data.get('fields', [])
+    rows = []
+    for session_id in session_ids:
+        session_path = os.path.join('data/interviews/sessions', f'{session_id}.json')
+        if not os.path.exists(session_path):
+            continue
+        with open(session_path, 'r') as f:
+            session_data = json.load(f)
+        row = {field: session_data.get(field, '') for field in fields}
+        row['session_id'] = session_id
+        rows.append(row)
+    # Create CSV
+    def generate():
+        writer = csv.DictWriter(Response(), fieldnames=['session_id'] + fields)
+        yield ','.join(['session_id'] + fields) + '\n'
+        for row in rows:
+            yield ','.join(str(row.get(f, '')) for f in ['session_id'] + fields) + '\n'
+    response = Response(generate(), mimetype='text/csv')
+    response.headers['Content-Disposition'] = 'attachment; filename=sessions_export.csv'
+    return response
+
 # Start the app
 if __name__ == '__main__':
     debug_mode = False
@@ -4650,3 +4702,90 @@ if __name__ == '__main__':
     print(f"Monitor interviews: http://127.0.0.1:{port}/monitor_interview")
     
     socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode, allow_unsafe_werkzeug=True) 
+
+@app.route('/api/annotation', methods=['POST'])
+def save_annotation():
+    data = request.json
+    session_id = data['session_id']
+    chunk_id = data['chunk_id']
+    annotation = data['annotation']  # must include 'user'
+    ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
+    try:
+        if os.path.exists(ann_path):
+            with open(ann_path, 'r') as f:
+                ann_data = json.load(f)
+        else:
+            ann_data = {}
+        if chunk_id not in ann_data:
+            ann_data[chunk_id] = []
+        ann_data[chunk_id].append(annotation)
+        with open(ann_path, 'w') as f:
+            json.dump(ann_data, f, indent=2)
+        return jsonify({"success": True, "message": "Annotation saved"})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/annotations/<session_id>', methods=['GET'])
+def get_annotations(session_id):
+    ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
+    if not os.path.exists(ann_path):
+        return jsonify({})
+    with open(ann_path, 'r') as f:
+        ann_data = json.load(f)
+    return jsonify(ann_data)
+
+@app.route('/api/annotations/<session_id>/consensus', methods=['GET'])
+def get_consensus(session_id):
+    ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
+    if not os.path.exists(ann_path):
+        return jsonify({})
+    with open(ann_path, 'r') as f:
+        ann_data = json.load(f)
+    consensus = {}
+    for chunk_id, annotations in ann_data.items():
+        tag_counts = {}
+        for ann in annotations:
+            tag = ann.get('tag')
+            if tag:
+                tag_counts[tag] = tag_counts.get(tag, 0) + 1
+        consensus[chunk_id] = tag_counts
+    return jsonify(consensus)
+
+@app.route('/api/annotations/<session_id>/all', methods=['GET'])
+def list_all_annotations(session_id):
+    ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
+    if not os.path.exists(ann_path):
+        return jsonify({})
+    with open(ann_path, 'r') as f:
+        ann_data = json.load(f)
+    return jsonify(ann_data)
+
+@app.route('/api/annotation/<session_id>/<chunk_id>/<int:index>', methods=['PUT', 'DELETE'])
+def edit_or_delete_annotation(session_id, chunk_id, index):
+    ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
+    if not os.path.exists(ann_path):
+        return jsonify({"error": "No annotations found"}), 404
+    with open(ann_path, 'r') as f:
+        ann_data = json.load(f)
+    if chunk_id not in ann_data or index >= len(ann_data[chunk_id]):
+        return jsonify({"error": "Annotation not found"}), 404
+    if request.method == 'PUT':
+        new_data = request.json.get('annotation')
+        ann_data[chunk_id][index] = new_data
+    elif request.method == 'DELETE':
+        ann_data[chunk_id].pop(index)
+    with open(ann_path, 'w') as f:
+        json.dump(ann_data, f, indent=2)
+    return jsonify({"success": True})
+
+@app.route('/api/analysis/<session_id>', methods=['DELETE'])
+def delete_analysis(session_id):
+    session_path = os.path.join('data/interviews/sessions', f'{session_id}.json')
+    if not os.path.exists(session_path):
+        return jsonify({"error": "Session not found"}), 404
+    with open(session_path, 'r') as f:
+        session_data = json.load(f)
+    session_data['analysis'] = None
+    with open(session_path, 'w') as f:
+        json.dump(session_data, f, indent=2)
+    return jsonify({"success": True})
