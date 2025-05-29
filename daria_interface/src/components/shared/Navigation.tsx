@@ -64,6 +64,16 @@ const Navigation: React.FC = () => {
               >
                 Analysis
               </Link>
+              <Link
+                to="/super-search"
+                className={`inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium ${
+                  isActive('/super-search')
+                    ? 'border-purple-400 text-white'
+                    : 'border-transparent text-purple-200 hover:border-purple-300 hover:text-white'
+                }`}
+              >
+                Super Search
+              </Link>
             </div>
           </div>
           <div className="hidden sm:ml-6 sm:flex sm:items-center">

@@ -345,6 +345,20 @@
         </div>
     </div>
 
+    <div style="margin-top:2em; border:1px solid #ccc; padding:1em;">
+        <h3>Re-Ingest Session to Semantic Index</h3>
+        <input type="text" id="reingest-session-id" placeholder="Session ID" style="width: 300px;" />
+        <button onclick="reingestSession()">Re-Ingest</button>
+        <div id="reingest-result" style="margin-top:1em; color: green;"></div>
+    </div>
+
+    <div style="margin-top:2em; border:1px solid #ccc; padding:1em;">
+        <h3>Analyze Session (Debug Tool)</h3>
+        <input type="text" id="analyze-session-id" placeholder="Session ID" style="width: 300px;" />
+        <button onclick="analyzeSession()">Analyze</button>
+        <div id="analyze-result" style="margin-top:1em; color: #333; background: #f9f9f9; padding: 1em; border-radius: 4px; max-height: 300px; overflow:auto;"></div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         // Fetch service status
@@ -444,6 +458,64 @@
                 resultDiv.innerHTML = `<pre class="mb-0">${JSON.stringify(data, null, 2)}</pre>`;
             } catch (error) {
                 resultDiv.innerHTML = `<div class="alert alert-danger">Error: ${error.message}</div>`;
+            }
+        }
+
+        async function reingestSession() {
+            const sessionId = document.getElementById('reingest-session-id').value.trim();
+            if (!sessionId) {
+                alert('Please enter a session ID.');
+                return;
+            }
+            document.getElementById('reingest-result').innerText = 'Processing...';
+
+            // Fetch the session data (assuming you have an endpoint for this)
+            const resp = await fetch(`/api/research_session/${sessionId}`);
+            if (!resp.ok) {
+                document.getElementById('reingest-result').innerText = 'Session not found!';
+                return;
+            }
+            const data = await resp.json();
+            const transcript = data.session.transcript || (data.session.messages ? data.session.messages.map(m => m.content).join('\n') : '');
+            if (!transcript) {
+                document.getElementById('reingest-result').innerText = 'No transcript found in session!';
+                return;
+            }
+
+            // Post to semantic_ingest
+            const ingestResp = await fetch('/api/semantic_ingest', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    transcript,
+                    metadata: { session_id: sessionId }
+                })
+            });
+            if (ingestResp.ok) {
+                document.getElementById('reingest-result').innerText = 'Re-ingest successful!';
+            } else {
+                const err = await ingestResp.text();
+                document.getElementById('reingest-result').innerText = 'Error: ' + err;
+            }
+        }
+
+        async function analyzeSession() {
+            const sessionId = document.getElementById('analyze-session-id').value.trim();
+            if (!sessionId) {
+                alert('Please enter a session ID.');
+                return;
+            }
+            document.getElementById('analyze-result').innerText = 'Analyzing...';
+            try {
+                const resp = await fetch(`/api/research_session/${sessionId}/analyze`, { method: 'POST' });
+                const data = await resp.json();
+                if (resp.ok && data.success) {
+                    document.getElementById('analyze-result').innerText = JSON.stringify(data.analysis, null, 2);
+                } else {
+                    document.getElementById('analyze-result').innerText = 'Error: ' + (data.error || 'Unknown error');
+                }
+            } catch (err) {
+                document.getElementById('analyze-result').innerText = 'Error: ' + err;
             }
         }
     </script>

@@ -74,12 +74,9 @@
     <div class="d-flex justify-content-between mb-4">
         <h1 class="h3">Research Session</h1>
         <div class="d-flex gap-2">
-            <a href="/interview/{{ session_id }}?remote=true&accepted=true&character={{ session.character }}" class="btn btn-success" target="_blank">
-                <i class="bi bi-play-fill me-1"></i> Start Remote Session
-            </a>
-            <a href="/discussion_guide/{{ session.guide_id }}" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left me-1"></i> Back to Guide
-            </a>
+            <a href="/remote_interview?session_id={{ session.id }}&accepted=true" class="btn btn-primary">Start Remote Session</a>
+            <a href="/discussion_guide/{{ guide.id }}" class="btn btn-secondary"><i class="bi bi-arrow-left me-1"></i> Back to Guide</a>
+            <button class="btn btn-danger" onclick="confirmDeleteSession()">Delete Session</button>
         </div>
     </div>
     
@@ -803,5 +800,20 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 });
+
+function confirmDeleteSession() {
+    if (confirm('Are you sure you want to delete this session? This action cannot be undone.')) {
+        fetch(`/api/session/{{ session.id }}`, { method: 'DELETE' })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/discussion_guide/{{ guide.id }}';
+                } else {
+                    alert('Error deleting session: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => alert('Error deleting session: ' + err));
+    }
+}
 </script>
 {% endblock %} 

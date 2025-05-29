@@ -55,7 +55,8 @@ def tag_chunk(chunk, metadata):
       "follow_up_questions": [...]
     }}
     """
-    completion = openai.ChatCompletion.create(
+    client = openai.OpenAI()
+    completion = client.chat.completions.create(
         model="gpt-4",
         messages=[{"role": "system", "content": prompt}]
     )

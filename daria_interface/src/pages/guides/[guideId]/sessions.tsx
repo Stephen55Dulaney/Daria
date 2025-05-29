@@ -3,6 +3,8 @@ import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import SessionCard from '../../../components/shared/SessionCard';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 interface Session {
   id: string;
   title: string;
@@ -30,6 +32,13 @@ interface GuideDetails {
   project: string;
 }
 
+const InfoRow: React.FC<{ label: string; value: string }> = ({ label, value }) => (
+  <div className="flex justify-between text-sm text-gray-600">
+    <span className="font-medium">{label}:</span>
+    <span>{value}</span>
+  </div>
+);
+
 const GuideSessions: React.FC = () => {
   // Get guideId from URL
   const { guideId } = useParams();
@@ -49,13 +58,13 @@ const GuideSessions: React.FC = () => {
         
         // Fetch guide details
         const guideResponse = await axios.get<{ guide: GuideDetails }>(
-          `http://127.0.0.1:5025/api/discussion_guide/${guideId}`
+          `${API_BASE_URL}/api/discussion_guide/${guideId}`
         );
         setGuide(guideResponse.data.guide);
         
         // Fetch sessions for this guide
         const sessionsResponse = await axios.get<{ sessions: Session[] }>(
-          `http://127.0.0.1:5025/api/discussion_guide/${guideId}/sessions`
+          `${API_BASE_URL}/api/discussion_guide/${guideId}/sessions`
         );
         setSessions(sessionsResponse.data.sessions);
         

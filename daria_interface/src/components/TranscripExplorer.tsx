@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import TranscriptTab from './TranscriptTab';
 import AnalysisTab from './AnalysisTab';
-import SemanticSearchTab from './shared/SemanticSearchTab';
+import SemanticSearchTab from './SemanticSearchTab';
 
 interface Message {
   id: string;

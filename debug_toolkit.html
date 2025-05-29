@@ -96,5 +96,51 @@ cp templates/debug_character_test.html static/
             <li>You can try copying the file to the <code>static</code> folder which is usually served directly</li>
         </ol>
     </div>
+
+    <div style="margin-top:2em; border:1px solid #ccc; padding:1em;">
+        <h3>Re-Ingest Session to Semantic Index</h3>
+        <input type="text" id="reingest-session-id" placeholder="Session ID" style="width: 300px;" />
+        <button onclick="reingestSession()">Re-Ingest</button>
+        <div id="reingest-result" style="margin-top:1em; color: green;"></div>
+    </div>
+    <script>
+    async function reingestSession() {
+        const sessionId = document.getElementById('reingest-session-id').value.trim();
+        if (!sessionId) {
+            alert('Please enter a session ID.');
+            return;
+        }
+        document.getElementById('reingest-result').innerText = 'Processing...';
+
+        // Fetch the session data (assuming you have an endpoint for this)
+        const resp = await fetch(`/api/research_session/${sessionId}`);
+        if (!resp.ok) {
+            document.getElementById('reingest-result').innerText = 'Session not found!';
+            return;
+        }
+        const data = await resp.json();
+        const transcript = data.session.transcript || (data.session.messages ? data.session.messages.map(m => m.content).join('\\n') : '');
+        if (!transcript) {
+            document.getElementById('reingest-result').innerText = 'No transcript found in session!';
+            return;
+        }
+
+        // Post to semantic_ingest
+        const ingestResp = await fetch('/api/semantic_ingest', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                transcript,
+                metadata: { session_id: sessionId }
+            })
+        });
+        if (ingestResp.ok) {
+            document.getElementById('reingest-result').innerText = 'Re-ingest successful!';
+        } else {
+            const err = await ingestResp.text();
+            document.getElementById('reingest-result').innerText = 'Error: ' + err;
+        }
+    }
+    </script>
 </body>
 </html> 

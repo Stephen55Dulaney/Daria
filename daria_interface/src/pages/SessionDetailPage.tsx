@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import SessionCard from '../components/shared/SessionCard';
 import TranscriptTab from '../components/TranscriptTab';
 import AnalysisTab from '../components/AnalysisTab';
-import SemanticSearchTab from '../components/shared/SemanticSearchTab';
+import SemanticSearchTab from '../components/SemanticSearchTab';
 import AnnotationsTab from '../components/AnnotationsTab'; // To be created
 import axios from 'axios';
 
@@ -110,7 +110,7 @@ const SessionDetailPage: React.FC = () => {
             <AnnotationsTab messages={session.session.messages || []} sessionId={session.session.id} />
           )}
           {activeTab === 'semantic' && (
-            <SemanticSearchTab />
+            <SemanticSearchTab sessionId={sessionId} />
           )}
         </div>
       </div>
