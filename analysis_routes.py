@@ -4,6 +4,7 @@ import os
 import json
 from typing import Dict, Any
 from flask_login import login_required
+import datetime
 
 analysis_bp = Blueprint('analysis', __name__)
 analyzer = UXAnalyzer(api_key=os.getenv("OPENAI_API_KEY"))
@@ -117,9 +118,34 @@ def test_route():
 @analysis_bp.route('/session/<session_id>/annotations/', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
 def handle_session_annotations(session_id):
+    annotations_path = os.path.join('data', 'annotations', f'{session_id}.json')
+    os.makedirs(os.path.dirname(annotations_path), exist_ok=True)
+
+    # Load existing annotations
+    if os.path.exists(annotations_path):
+        with open(annotations_path, 'r') as f:
+            annotations = json.load(f)
+    else:
+        annotations = []
+
     if request.method == 'GET':
-        return jsonify({"message": "GET annotations for session " + session_id})
+        return jsonify({"annotations": annotations})
+
     elif request.method == 'POST':
         data = request.get_json()
-        # Your logic here
-        return jsonify({"success": True, "message": "Annotations received"}) 
+        # Expecting: { "messageId": ..., "content": ... }
+        if not data or "messageId" not in data or "content" not in data:
+            return jsonify({"success": False, "error": "Missing messageId or content"}), 400
+
+        annotation = {
+            "id": str(len(annotations) + 1),
+            "messageId": data["messageId"],
+            "content": data["content"],
+            "user": {"name": "Current User"},  # Replace with real user info if available
+            "timestamp": str(datetime.datetime.utcnow())
+        }
+        annotations.append(annotation)
+        with open(annotations_path, 'w') as f:
+            json.dump(annotations, f, indent=2)
+
+        return jsonify({"success": True, "annotation": annotation}) 

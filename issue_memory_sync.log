@@ -1369,11 +1369,47 @@
 2025-05-30 13:29:20,719 - issue_memory_sync - ERROR - Error connecting to Issue Tracker: HTTPConnectionPool(host='localhost', port=5025): Max retries exceeded with url: /api/issues?type=opportunity (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101d162d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
 2025-05-30 13:39:20,757 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
 2025-05-30 13:39:20,777 - issue_memory_sync - ERROR - Failed to get issues: 404
-ry Companion
-2025-05-30 13:09:20,597 - issue_memory_sync - ERROR - Failed to get issues: 404
-2025-05-30 13:19:20,671 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
-2025-05-30 13:19:20,680 - issue_memory_sync - ERROR - Failed to get issues: 404
-2025-05-30 13:29:20,711 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
-2025-05-30 13:29:20,719 - issue_memory_sync - ERROR - Error connecting to Issue Tracker: HTTPConnectionPool(host='localhost', port=5025): Max retries exceeded with url: /api/issues?type=opportunity (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101d162d0>: Failed to establish a new connection: [Errno 61] Connection refused'))
-2025-05-30 13:39:20,757 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
-2025-05-30 13:39:20,777 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 13:49:20,809 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 13:49:20,820 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 13:59:20,884 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 13:59:20,895 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 14:09:20,922 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 14:09:20,931 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 14:19:20,972 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 14:19:20,984 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 14:29:21,039 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 14:29:21,053 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 14:39:21,092 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 14:39:21,101 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 14:49:21,152 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 14:49:21,162 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 14:59:21,205 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 14:59:21,215 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 15:09:21,253 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 15:09:21,260 - issue_memory_sync - ERROR - Error connecting to Issue Tracker: HTTPConnectionPool(host='localhost', port=5025): Max retries exceeded with url: /api/issues?type=opportunity (Caused by NewConnectionError('<urllib3.connection.HTTPConnection object at 0x101cfb290>: Failed to establish a new connection: [Errno 61] Connection refused'))
+2025-05-30 15:19:21,310 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 15:19:21,318 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 15:29:21,351 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 15:29:21,376 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 15:40:21,375 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 15:40:21,391 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 15:50:21,445 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 15:50:21,452 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 16:00:21,509 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 16:00:21,518 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 16:10:21,563 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 16:10:21,573 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 16:20:21,580 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 16:20:21,591 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 16:30:21,651 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 16:30:21,664 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 15:50:21,445 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 15:50:21,452 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 16:00:21,509 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 16:00:21,518 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 16:10:21,563 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 16:10:21,573 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 16:20:21,580 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 16:20:21,591 - issue_memory_sync - ERROR - Failed to get issues: 404
+2025-05-30 16:30:21,651 - issue_memory_sync - INFO - Starting sync from Issue Tracker to Memory Companion
+2025-05-30 16:30:21,664 - issue_memory_sync - ERROR - Failed to get issues: 404

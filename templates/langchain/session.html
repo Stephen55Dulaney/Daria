@@ -800,7 +800,7 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-function confirmDeleteSession() {
+window.confirmDeleteSession = function() {
     if (confirm('Are you sure you want to delete this session? This action cannot be undone.')) {
         fetch(`/api/session/{{ session.id }}`, { method: 'DELETE' })
             .then(resp => resp.json())

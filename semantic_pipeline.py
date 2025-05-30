@@ -1,6 +1,7 @@
 # semantic_pipeline.py
 import openai
 import tiktoken
+import chromadb
 
 def chunk_transcript(transcript, max_tokens=256):
     # Simple chunker: split by sentences, group into chunks

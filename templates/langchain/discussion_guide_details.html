@@ -108,6 +108,9 @@
             <button class="btn btn-outline-secondary" data-bs-toggle="modal" data-bs-target="#shareModal">
                 <i class="bi bi-share me-1"></i> Share
             </button>
+            <button class="btn btn-outline-primary" id="generateQuestionsBtn">
+                <i class="bi bi-question-circle me-1"></i> Generate Questions
+            </button>
             <div class="dropdown">
                 <button class="btn btn-light dropdown-toggle" type="button" id="actionsDropdown" data-bs-toggle="dropdown" aria-expanded="false">
                     <i class="bi bi-three-dots-vertical"></i>
@@ -606,6 +609,39 @@
         </div>
     </div>
 </div>
+
+<!-- Questions Modal -->
+<div class="modal fade" id="questionsModal" tabindex="-1" aria-labelledby="questionsModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="questionsModalLabel">Generated Interview Questions</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="d-flex justify-content-between align-items-center mb-3">
+                    <div>
+                        <span class="badge bg-primary" id="questionCount">0 questions</span>
+                    </div>
+                    <div class="btn-group">
+                        <button class="btn btn-outline-secondary btn-sm" id="copyQuestionsBtn">
+                            <i class="bi bi-clipboard me-1"></i> Copy All
+                        </button>
+                        <button class="btn btn-outline-secondary btn-sm" id="printQuestionsBtn">
+                            <i class="bi bi-printer me-1"></i> Print
+                        </button>
+                    </div>
+                </div>
+                <div class="questions-list" id="questionsList">
+                    <!-- Questions will be populated here -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
 {% endblock %}
 
 {% block scripts %}
@@ -928,6 +964,121 @@
         } else {
             console.error('submitUploadBtn not found in the DOM');
         }
+    });
+
+    document.getElementById('generateQuestionsBtn').addEventListener('click', async function() {
+        try {
+            // Show loading state
+            const questionsList = document.getElementById('questionsList');
+            questionsList.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div><p>Generating questions...</p></div>';
+            
+            // Show the modal
+            const questionsModal = new bootstrap.Modal(document.getElementById('questionsModal'));
+            questionsModal.show();
+            
+            // Get guide data
+            const guideData = {
+                character_select: '{{ guide.character_select }}',
+                topic: '{{ guide.topic }}',
+                context: '{{ guide.context }}',
+                goals: {{ guide.goals|tojson|safe }},
+                interview_type: '{{ guide.interview_type }}',
+                custom_questions: {{ guide.custom_questions|tojson|safe }}
+            };
+            
+            // Call the API to generate questions
+            const response = await fetch('/api/generate_questions', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(guideData)
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                // Update question count
+                document.getElementById('questionCount').textContent = `${data.count} questions`;
+                
+                // Populate questions list
+                questionsList.innerHTML = data.questions.map((q, i) => `
+                    <div class="card mb-2">
+                        <div class="card-body">
+                            <div class="d-flex justify-content-between align-items-start">
+                                <p class="mb-0">${i + 1}. ${q}</p>
+                                <button class="btn btn-sm btn-outline-secondary copy-question" data-question="${q}">
+                                    <i class="bi bi-clipboard"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                `).join('');
+                
+                // Add copy functionality for individual questions
+                document.querySelectorAll('.copy-question').forEach(btn => {
+                    btn.addEventListener('click', function() {
+                        const question = this.getAttribute('data-question');
+                        navigator.clipboard.writeText(question);
+                        this.innerHTML = '<i class="bi bi-check"></i>';
+                        setTimeout(() => {
+                            this.innerHTML = '<i class="bi bi-clipboard"></i>';
+                        }, 2000);
+                    });
+                });
+            } else {
+                questionsList.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+            }
+        } catch (error) {
+            console.error('Error generating questions:', error);
+            document.getElementById('questionsList').innerHTML = 
+                `<div class="alert alert-danger">Error generating questions: ${error.message}</div>`;
+        }
+    });
+
+    // Copy all questions
+    document.getElementById('copyQuestionsBtn').addEventListener('click', function() {
+        const questions = Array.from(document.querySelectorAll('.questions-list .card-body p'))
+            .map(p => p.textContent)
+            .join('\n');
+        
+        navigator.clipboard.writeText(questions);
+        this.innerHTML = '<i class="bi bi-check me-1"></i> Copied!';
+        setTimeout(() => {
+            this.innerHTML = '<i class="bi bi-clipboard me-1"></i> Copy All';
+        }, 2000);
+    });
+
+    // Print questions
+    document.getElementById('printQuestionsBtn').addEventListener('click', function() {
+        const printWindow = window.open('', '_blank');
+        const questions = Array.from(document.querySelectorAll('.questions-list .card-body p'))
+            .map(p => p.textContent)
+            .join('\n');
+        
+        printWindow.document.write(`
+            <html>
+                <head>
+                    <title>Interview Questions - {{ guide.title }}</title>
+                    <style>
+                        body { font-family: Arial, sans-serif; padding: 20px; }
+                        h1 { color: #333; }
+                        .question { margin-bottom: 15px; }
+                    </style>
+                </head>
+                <body>
+                    <h1>Interview Questions</h1>
+                    <p><strong>Guide:</strong> {{ guide.title }}</p>
+                    <p><strong>Character:</strong> {{ guide.character_select }}</p>
+                    <p><strong>Topic:</strong> {{ guide.topic }}</p>
+                    <hr>
+                    ${questions.split('\n').map(q => `<div class="question">${q}</div>`).join('')}
+                </body>
+            </html>
+        `);
+        
+        printWindow.document.close();
+        printWindow.print();
     });
 </script>
 {% endblock %} 

@@ -3198,7 +3198,7 @@ def api_edit_prompt(prompt_id):
         
         logger.info(f"Editing prompt {prompt_id} with data: {data}")
         
-        # Load current prompt to preserve structure
+        # Load current prompt to preserve structure 
         try:
             config = prompt_mgr.load_prompt(prompt_id)
             if not config:
@@ -4805,36 +4805,7 @@ if __name__ == '__main__':
     
     socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode, allow_unsafe_werkzeug=True) 
 
-@app.route('/api/sessions/<session_id>annotation', methods=['GET', 'POST'])
-@login_required
-def save_annotation(session_id):
-    data = request.json
-    chunk_id = data['chunk_id']
-    annotation = data['annotation']
 
-    # Add user information to the annotation
-    annotation['user'] = {
-        'id': current_user.id,
-        'name': current_user.name,
-        'email': current_user.email
-    }
-    annotation['created_at'] = datetime.datetime.utcnow().isoformat()
-
-    ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
-    try:
-        if os.path.exists(ann_path):
-            with open(ann_path, 'r') as f:
-                ann_data = json.load(f)
-        else:
-            ann_data = {}
-        if chunk_id not in ann_data:
-            ann_data[chunk_id] = []
-        ann_data[chunk_id].append(annotation)
-        with open(ann_path, 'w') as f:
-            json.dump(ann_data, f, indent=2)
-        return jsonify({"success": True, "message": "Annotation saved"})
-    except Exception as e:
-        return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/annotations/<session_id>', methods=['GET'])
 @login_required
@@ -4935,51 +4906,7 @@ def delete_analysis(session_id):
         logger.error(f"Error deleting analysis for session {session_id}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/session/<session_id>', methods=['GET', 'DELETE'])
-def delete_session(session_id):
-    if request.method == 'GET':
-        # Handle GET request
-        try:
-            session = discussion_service.get_session(session_id)
-            if not session:
-                return jsonify({'success': False, 'error': 'Session not found'}), 404
-            return jsonify(session)
-        except Exception as e:
-            return jsonify({'success': False, 'error': str(e)}), 500
-    else:  # DELETE
-        if not discussion_service:
-            return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
 
-        try:
-            # Get the session first to check if it exists
-            session = discussion_service.get_session(session_id)
-            if not session:
-                return jsonify({'success': False, 'error': 'Session not found'}), 404
-
-            # Remove session from all guides
-            guides = discussion_service.list_guides()
-            for guide in guides:
-                if 'sessions' in guide and session_id in guide['sessions']:
-                    guide['sessions'] = [sid for sid in guide['sessions'] if sid != session_id]
-                    discussion_service.update_guide(guide['id'], guide)
-
-            # Delete vectors from ChromaDB
-            try:
-                if vector_store and hasattr(vector_store, 'interview_collection'):
-                    vector_store.interview_collection.delete(
-                        where={"session_id": session_id}
-                    )
-                    logger.info(f"Deleted vectors for session {session_id} from ChromaDB")
-            except Exception as e:
-                logger.error(f"Error deleting vectors from ChromaDB: {str(e)}")
-                # Continue with deletion even if vector deletion fails
-
-            # Delete the session itself
-            discussion_service.delete_session(session_id)
-            return jsonify({'success': True})
-        except Exception as e:
-            logger.error(f"Error deleting session {session_id}: {str(e)}")
-            return jsonify({'success': False, 'error': str(e)}), 500
 
 def generate_greeting(character):
     return f"Hello! I am {character}, your interview assistant."
@@ -5157,6 +5084,67 @@ def annotations_alias(session_id):
                 return jsonify({"success": True, "message": "Annotation saved"})
             return jsonify({"success": False, "error": "Failed to save annotation"}), 500
         return jsonify({"success": False, "error": "Invalid request format"}), 400
+
+@analysis_bp.route('/generate_questions', methods=['POST'])
+def generate_questions():
+    """Generate potential interview questions based on discussion guide configuration using AI."""
+    try:
+        data = request.json
+        if not data:
+            return jsonify({'success': False, 'error': 'No data provided'}), 400
+
+        # Extract guide configuration
+        character = data.get('character_select', '').lower()
+        topic = data.get('topic', '')
+        context = data.get('context', '')
+        goals = data.get('goals', [])
+        interview_type = data.get('interview_type', 'research_interview')
+        custom_questions = data.get('custom_questions', [])
+
+        # Prepare the prompt for the AI
+        prompt = f"""You are an expert research interviewer. Generate 5-7 relevant interview questions based on the following context:\n\nCharacter: {character}\nTopic: {topic}\nContext: {context}\nGoals: {', '.join(goals) if isinstance(goals, list) else goals}\nInterview Type: {interview_type}\n\nAdditional Context:\n- The questions should be open-ended and encourage detailed responses\n- They should align with the character's personality and interview style\n- They should help achieve the stated research goals\n- They should be appropriate for the specified interview type\n\nGenerate a list of questions that will help gather valuable insights for this research session."""
+
+        # Call OpenAI API to generate questions
+        response = openai.ChatCompletion.create(
+            model="gpt-4",
+            messages=[
+                {"role": "system", "content": "You are an expert research interviewer who generates thoughtful, open-ended questions."},
+                {"role": "user", "content": prompt}
+            ],
+            temperature=0.7,
+            max_tokens=500
+        )
+
+        # Extract and format the questions
+        ai_response = response.choices[0].message.content
+        questions = [q.strip() for q in ai_response.split('\n') if q.strip() and q.strip().endswith('?')]
+
+        # Add any custom questions if provided
+        if custom_questions:
+            if isinstance(custom_questions, list):
+                for question in custom_questions:
+                    if isinstance(question, dict) and 'text' in question:
+                        questions.append(question['text'])
+                    elif isinstance(question, str):
+                        questions.append(question)
+
+        # Remove duplicates while preserving order
+        seen = set()
+        unique_questions = []
+        for q in questions:
+            if q not in seen:
+                seen.add(q)
+                unique_questions.append(q)
+
+        return jsonify({
+            'success': True,
+            'questions': unique_questions,
+            'count': len(unique_questions)
+        })
+
+    except Exception as e:
+        logger.error(f"Error generating questions: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 if __name__ == "__main__":
     print("Registered routes:")
