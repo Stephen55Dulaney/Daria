@@ -1,0 +1,85 @@
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">API Health Checks</h5>
+    </div>
+    <div class="card-body">
+        <div class="d-flex gap-2">
+            <a href="/api/health" class="btn btn-primary" target="_blank">API Health</a>
+            <a href="/api/semantic_health" class="btn btn-info" target="_blank">ChromaDB Health</a>
+            <button class="btn btn-warning" onclick="runBatchIngest()">Run Batch Ingest</button>
+        </div>
+        <div id="batchIngestStatus" class="mt-2 text-muted"></div>
+    </div>
+</div>
+
+<script>
+function runBatchIngest() {
+    // First fetch all sessions
+    fetch('/api/sessions')
+        .then(response => response.json())
+        .then(sessions => {
+            if (!sessions || sessions.length === 0) {
+                alert('No sessions found to process');
+                return;
+            }
+            
+            // Process each session
+            const processSession = async (session) => {
+                try {
+                    const response = await fetch('/api/semantic_ingest', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            transcript: session.transcript || '',
+                            metadata: {
+                                session_id: session.id,
+                                timestamp: session.timestamp,
+                                ...session.metadata
+                            }
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`Failed to process session ${session.id}`);
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    console.error(`Error processing session ${session.id}:`, error);
+                    throw error;
+                }
+            };
+            
+            // Process all sessions sequentially
+            let processed = 0;
+            const processNext = async (index) => {
+                if (index >= sessions.length) {
+                    alert(`Batch ingest completed. Processed ${processed} sessions.`);
+                    return;
+                }
+                
+                try {
+                    await processSession(sessions[index]);
+                    processed++;
+                    // Update progress
+                    document.getElementById('batchIngestStatus').textContent = 
+                        `Processing session ${index + 1} of ${sessions.length}...`;
+                    // Process next session
+                    processNext(index + 1);
+                } catch (error) {
+                    console.error('Error in batch process:', error);
+                    alert(`Error processing session ${sessions[index].id}. Check console for details.`);
+                }
+            };
+            
+            // Start processing
+            processNext(0);
+        })
+        .catch(error => {
+            console.error('Error fetching sessions:', error);
+            alert('Error fetching sessions. Check console for details.');
+        });
+}
+</script> 

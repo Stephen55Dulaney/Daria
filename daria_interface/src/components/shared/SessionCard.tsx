@@ -28,9 +28,11 @@ interface SessionCardProps {
   hideDetailsButton?: boolean;
   onViewTranscript?: (session: Session) => void;
   className?: string;
+  children?: React.ReactNode;
+  onClick?: (session: Session) => void;
 }
 
-const SessionCard: React.FC<SessionCardProps> = ({ session, hideDetailsButton, onViewTranscript, className = '' }) => {
+const SessionCard: React.FC<SessionCardProps> = ({ session, hideDetailsButton, onViewTranscript, className = '', children, onClick }) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleString('en-US', {
       year: 'numeric',
@@ -49,6 +51,7 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, hideDetailsButton, o
   return (
     <div 
       className={`p-4 border rounded-lg shadow-sm bg-white hover:shadow-md transition-shadow hover:border-purple-400 ${className}`}
+      onClick={() => onClick?.(session)}
     >
       <div className="flex justify-between items-start mb-3">
         <h2 className="text-xl font-semibold text-gray-900">{session.title || 'Untitled Session'}</h2>
@@ -133,7 +136,8 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, hideDetailsButton, o
         {/* Placeholder buttons for future features */}
         <button
           className="bg-gray-200 text-gray-700 px-3 py-1 rounded text-sm hover:bg-gray-300 transition-colors flex items-center gap-1"
-          disabled
+          disabled={!onViewTranscript}
+          onClick={() => onViewTranscript?.(session)}
         >
           <span role="img" aria-label="semantic">🔖</span> Semantic Transcript
         </button>
@@ -150,6 +154,8 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, hideDetailsButton, o
           <span role="img" aria-label="delete">🗑️</span> Delete
         </button>
       </div>
+
+      {children}
     </div>
   );
 };

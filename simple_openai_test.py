@@ -6,6 +6,7 @@ Simple script to test OpenAI API directly without any LangChain dependencies.
 import os
 import sys
 import openai
+from openai import OpenAI
 
 def test_openai_analysis():
     """Test OpenAI API for interview analysis."""
@@ -17,7 +18,7 @@ def test_openai_analysis():
         print("Error: OPENAI_API_KEY environment variable not set.")
         return False
     
-    openai.api_key = api_key
+    client = OpenAI(api_key=api_key)
     
     # Simple test transcript
     transcript = """
@@ -39,7 +40,7 @@ def test_openai_analysis():
     
     try:
         # Call OpenAI API directly
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-3.5-turbo",
             messages=[
                 {"role": "system", "content": "You are an expert interview analyst."},
@@ -49,7 +50,7 @@ def test_openai_analysis():
         )
         
         # Extract the analysis text
-        analysis = response.choices[0].message['content'].strip()
+        analysis = response.choices[0].message.content.strip()
         
         print("\nAnalysis generated successfully:")
         print("-" * 50)

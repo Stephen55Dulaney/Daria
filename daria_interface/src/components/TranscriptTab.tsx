@@ -1,11 +1,5 @@
 // TranscriptTab.tsx
 import React from 'react';
-import TagList from './shared/TagList';
-import type { Tag } from './shared/TagList';
-import TagEditor from './shared/TagEditor';
-import InsightAnnotation from './shared/InsightAnnotation';
-
-import { useEffect, useState } from 'react';
 
 interface Message {
   content: string;

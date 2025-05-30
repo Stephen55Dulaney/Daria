@@ -42,6 +42,7 @@ from user_routes import user_bp
 from auth_routes import auth_bp
 from routes.issue_routes import bp as issues_bp
 from langchain_features import langchain_blueprint
+from analysis_routes import analysis_bp
 
 # Set up logging
 logging.basicConfig(
@@ -63,6 +64,9 @@ args = parser.parse_args()
 app = Flask(__name__, 
            template_folder='templates',
            static_folder='static')
+
+def get_discussion_service():
+    return discussion_service
 
 # Configure secret key for sessions
 app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'daria-interview-tool-secret-key')
@@ -1432,31 +1436,47 @@ def interview_setup():
 # add semantic search routes
 @app.route('/api/semantic_ingest', methods=['POST'])
 def semantic_ingest():
-    data = request.json
-    print("Received data:", data)
-    transcript = data['transcript']
-    metadata = data.get('metadata', {})
-    print("About to chunk transcript")
-    chunks = chunk_transcript(transcript)
-    print("Chunks:", chunks)
-    print("About to embed chunks")
-    embeddings = embed_chunks(chunks)
-    print("Embeddings:", embeddings)
-    print("About to tag chunks")
-    tags = [tag_chunk(chunk, metadata) for chunk in chunks]
-    print("Tags:", tags)
-    print("About to add to vector store")
-    add_chunks_to_vector_store(chunks, embeddings, [metadata]*len(chunks))
-    print("semantic_ingest received:", data)
-    return jsonify({"chunks": chunks, "tags": tags})
-
-@app.route('/api/semantic_search', methods=['POST'])
-def semantic_search_api():
     try:
         data = request.json
-        query = data['query']
+        print("Received data:", data)
+        transcript = data['transcript']
+        metadata = data.get('metadata', {})
+        print("About to chunk transcript")
+        chunks = chunk_transcript(transcript)
+        print("Chunks:", chunks)
+        print("About to embed chunks")
+        embeddings = embed_chunks(chunks)
+        print("Embeddings:", embeddings)
+        print("About to tag chunks")
+        tags = [tag_chunk(chunk, metadata) for chunk in chunks]
+        print("Tags:", tags)
+        print("About to add to vector store")
+        add_chunks_to_vector_store(chunks, embeddings, [metadata]*len(chunks))
+        print("semantic_ingest received:", data)
+        return jsonify({"chunks": chunks, "tags": tags})
+    except Exception as e:
+        import traceback
+        print("Error in semantic_ingest:", e)
+        print(traceback.format_exc())
+        return jsonify({"error": str(e)}), 500
+
+@app.route('/api/semantic_search', methods=['GET', 'POST'])
+def semantic_search_api():
+    try:
+        if request.method == 'POST':
+            data = request.json
+            query = data['query']
+            session_id = data.get('session_id')
+        else:  # GET
+            query = request.args.get('query')
+            session_id = request.args.get('session_id')
+            
+        if not query:
+            return jsonify({"error": "Query parameter is required"}), 400
+            
         query_embedding = embed_chunks([query])[0]
-        raw_results = semantic_search(query_embedding)
+        filters = {"session_id": session_id} if session_id else None
+        raw_results = semantic_search(query_embedding, filters=filters)
         # Format results for frontend
         formatted = []
         docs = raw_results.get('documents', [[]])[0]
@@ -1474,6 +1494,21 @@ def semantic_search_api():
         print("Semantic search error:", e)
         print(traceback.format_exc())
         return jsonify({"error": str(e)}), 500
+    
+@app.route('/api/semantic_health', methods=['GET'])
+def semantic_health():
+    from transcript_processor import TranscriptProcessor
+    processor = TranscriptProcessor()
+    collection = processor.collection
+    all_metadatas = collection.get(include=['metadatas'])['metadatas']
+    session_ids = set()
+    for meta in all_metadatas:
+        if isinstance(meta, dict) and 'session_id' in meta:
+            session_ids.add(meta['session_id'])
+    return jsonify({
+        "ingested_session_count": len(session_ids),
+        "ingested_session_ids": list(session_ids)
+    })    
 
 @app.route('/interview_archive')
 def interview_archive():
@@ -2080,21 +2115,51 @@ def get_guide_sessions(guide_id):
         logger.error(f"Error getting guide sessions: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
-@app.route('/api/session/<session_id>', methods=['GET'])
-def get_session(session_id):
-    """Get a session by ID."""
-    if not discussion_service:
-        return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
-    
-    try:
-        session = discussion_service.get_session(session_id)
-        if not session:
-            return jsonify({'success': False, 'error': 'Session not found'}), 404
-        
-        return jsonify({'success': True, 'session': session})
-    except Exception as e:
-        logger.error(f"Error getting session: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+@app.route('/api/session/<session_id>', methods=['GET', 'DELETE'])
+def delete_session(session_id):
+    if request.method == 'GET':
+        # Handle GET request
+        try:
+            session = discussion_service.get_session(session_id)
+            if not session:
+                return jsonify({'success': False, 'error': 'Session not found'}), 404
+            return jsonify(session)
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    else:  # DELETE
+        if not discussion_service:
+            return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+
+        try:
+            # Get the session first to check if it exists
+            session = discussion_service.get_session(session_id)
+            if not session:
+                return jsonify({'success': False, 'error': 'Session not found'}), 404
+
+            # Remove session from all guides
+            guides = discussion_service.list_guides()
+            for guide in guides:
+                if 'sessions' in guide and session_id in guide['sessions']:
+                    guide['sessions'] = [sid for sid in guide['sessions'] if sid != session_id]
+                    discussion_service.update_guide(guide['id'], guide)
+
+            # Delete vectors from ChromaDB
+            try:
+                if vector_store and hasattr(vector_store, 'interview_collection'):
+                    vector_store.interview_collection.delete(
+                        where={"session_id": session_id}
+                    )
+                    logger.info(f"Deleted vectors for session {session_id} from ChromaDB")
+            except Exception as e:
+                logger.error(f"Error deleting vectors from ChromaDB: {str(e)}")
+                # Continue with deletion even if vector deletion fails
+
+            # Delete the session itself
+            discussion_service.delete_session(session_id)
+            return jsonify({'success': True})
+        except Exception as e:
+            logger.error(f"Error deleting session {session_id}: {str(e)}")
+            return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/session/create', methods=['POST'])
 def create_session():
@@ -3294,6 +3359,7 @@ app.register_blueprint(user_bp)
 app.register_blueprint(auth_bp)
 app.register_blueprint(issues_bp, url_prefix='/issues')
 app.register_blueprint(langchain_blueprint)
+app.register_blueprint(analysis_bp, url_prefix='/api')
 
 # ------ Upload Transcript Routes ------
 
@@ -4266,11 +4332,28 @@ def get_all_sessions():
                 with open(os.path.join(sessions_dir, filename), 'r') as f:
                     try:
                         session_data = json.load(f)
-                        sessions.append(session_data)
+                        # Filter out sensitive or unnecessary information
+                        filtered_data = {
+                            'id': session_data.get('id'),
+                            'name': session_data.get('title') or f"Session {session_data.get('id', '')[:8]}",
+                            'project': session_data.get('project'),
+                            'topic': session_data.get('topic'),
+                            'context': session_data.get('context'),
+                            'goals': session_data.get('goals'),
+                            'created_at': session_data.get('created_at'),
+                            'updated_at': session_data.get('updated_at'),
+                            'interview_type': session_data.get('interview_type'),
+                            'status': session_data.get('status'),
+                            'participant_name': session_data.get('participant_name'),
+                            'character': session_data.get('character'),
+                            'messages': session_data.get('messages', []),
+                            'transcript': session_data.get('transcript', '')
+                        }
+                        sessions.append(filtered_data)
                     except Exception as e:
-                        # Optionally log error
+                        logger.error(f"Error loading session {filename}: {str(e)}")
                         continue
-    return jsonify({'success': True, 'sessions': sessions})
+    return jsonify(sessions)
 
 @app.route('/api/research_session/<session_id>', methods=['GET'])
 def get_research_session(session_id):
@@ -4722,12 +4805,21 @@ if __name__ == '__main__':
     
     socketio.run(app, host='0.0.0.0', port=port, debug=debug_mode, allow_unsafe_werkzeug=True) 
 
-@app.route('/api/annotation', methods=['POST'])
-def save_annotation():
+@app.route('/api/sessions/<session_id>annotation', methods=['GET', 'POST'])
+@login_required
+def save_annotation(session_id):
     data = request.json
-    session_id = data['session_id']
     chunk_id = data['chunk_id']
-    annotation = data['annotation']  # must include 'user'
+    annotation = data['annotation']
+
+    # Add user information to the annotation
+    annotation['user'] = {
+        'id': current_user.id,
+        'name': current_user.name,
+        'email': current_user.email
+    }
+    annotation['created_at'] = datetime.datetime.utcnow().isoformat()
+
     ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
     try:
         if os.path.exists(ann_path):
@@ -4745,6 +4837,7 @@ def save_annotation():
         return jsonify({"success": False, "error": str(e)}), 500
 
 @app.route('/api/annotations/<session_id>', methods=['GET'])
+@login_required
 def get_annotations(session_id):
     ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
     if not os.path.exists(ann_path):
@@ -4754,6 +4847,7 @@ def get_annotations(session_id):
     return jsonify(ann_data)
 
 @app.route('/api/annotations/<session_id>/consensus', methods=['GET'])
+@login_required
 def get_consensus(session_id):
     ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
     if not os.path.exists(ann_path):
@@ -4763,23 +4857,39 @@ def get_consensus(session_id):
     consensus = {}
     for chunk_id, annotations in ann_data.items():
         tag_counts = {}
+        user_tags = {}  # Track which users tagged what
         for ann in annotations:
             tag = ann.get('tag')
+            user = ann.get('user', {}).get('name', 'Unknown')
             if tag:
-                tag_counts[tag] = tag_counts.get(tag, 0) + 1
-        consensus[chunk_id] = tag_counts
+                if tag not in tag_counts:
+                    tag_counts[tag] = 0
+                    user_tags[tag] = set()
+                tag_counts[tag] += 1
+                user_tags[tag].add(user)
+        consensus[chunk_id] = {
+            'tag_counts': tag_counts,
+            'user_agreement': {tag: list(users) for tag, users in user_tags.items()}
+        }
     return jsonify(consensus)
 
 @app.route('/api/annotations/<session_id>/all', methods=['GET'])
+@login_required
 def list_all_annotations(session_id):
-    ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
-    if not os.path.exists(ann_path):
-        return jsonify({})
-    with open(ann_path, 'r') as f:
-        ann_data = json.load(f)
-    return jsonify(ann_data)
+    """Get all annotations for a session."""
+    try:
+        session = load_interview(session_id)
+        if not session:
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
+            
+        annotations = session.get('annotations', {})
+        return jsonify({'success': True, 'annotations': annotations})
+    except Exception as e:
+        logger.error(f"Error getting annotations for session {session_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
 
 @app.route('/api/annotation/<session_id>/<chunk_id>/<int:index>', methods=['PUT', 'DELETE'])
+@login_required
 def edit_or_delete_annotation(session_id, chunk_id, index):
     ann_path = f"data/interviews/sessions/{session_id}_annotations.json"
     if not os.path.exists(ann_path):
@@ -4788,8 +4898,16 @@ def edit_or_delete_annotation(session_id, chunk_id, index):
         ann_data = json.load(f)
     if chunk_id not in ann_data or index >= len(ann_data[chunk_id]):
         return jsonify({"error": "Annotation not found"}), 404
+    
+    # Check if user is the owner of the annotation
+    annotation = ann_data[chunk_id][index]
+    if annotation.get('user', {}).get('id') != current_user.id:
+        return jsonify({"error": "Unauthorized to modify this annotation"}), 403
+    
     if request.method == 'PUT':
         new_data = request.json.get('annotation')
+        new_data['user'] = annotation['user']  # Preserve original user info
+        new_data['updated_at'] = datetime.datetime.utcnow().isoformat()
         ann_data[chunk_id][index] = new_data
     elif request.method == 'DELETE':
         ann_data[chunk_id].pop(index)
@@ -4799,12 +4917,249 @@ def edit_or_delete_annotation(session_id, chunk_id, index):
 
 @app.route('/api/analysis/<session_id>', methods=['DELETE'])
 def delete_analysis(session_id):
-    session_path = os.path.join('data/interviews/sessions', f'{session_id}.json')
-    if not os.path.exists(session_path):
-        return jsonify({"error": "Session not found"}), 404
-    with open(session_path, 'r') as f:
-        session_data = json.load(f)
-    session_data['analysis'] = None
-    with open(session_path, 'w') as f:
-        json.dump(session_data, f, indent=2)
-    return jsonify({"success": True})
+    try:
+        discussion_service = get_discussion_service()
+        if not discussion_service:
+            return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+
+        session = discussion_service.get_session(session_id)
+        if not session:
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
+
+        if 'analysis' in session:
+            del session['analysis']
+            discussion_service.update_session(session_id, session)
+            return jsonify({'success': True})
+        return jsonify({'success': False, 'error': 'No analysis found'}), 404
+    except Exception as e:
+        logger.error(f"Error deleting analysis for session {session_id}: {str(e)}")
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@app.route('/api/session/<session_id>', methods=['GET', 'DELETE'])
+def delete_session(session_id):
+    if request.method == 'GET':
+        # Handle GET request
+        try:
+            session = discussion_service.get_session(session_id)
+            if not session:
+                return jsonify({'success': False, 'error': 'Session not found'}), 404
+            return jsonify(session)
+        except Exception as e:
+            return jsonify({'success': False, 'error': str(e)}), 500
+    else:  # DELETE
+        if not discussion_service:
+            return jsonify({'success': False, 'error': 'Discussion service not available'}), 500
+
+        try:
+            # Get the session first to check if it exists
+            session = discussion_service.get_session(session_id)
+            if not session:
+                return jsonify({'success': False, 'error': 'Session not found'}), 404
+
+            # Remove session from all guides
+            guides = discussion_service.list_guides()
+            for guide in guides:
+                if 'sessions' in guide and session_id in guide['sessions']:
+                    guide['sessions'] = [sid for sid in guide['sessions'] if sid != session_id]
+                    discussion_service.update_guide(guide['id'], guide)
+
+            # Delete vectors from ChromaDB
+            try:
+                if vector_store and hasattr(vector_store, 'interview_collection'):
+                    vector_store.interview_collection.delete(
+                        where={"session_id": session_id}
+                    )
+                    logger.info(f"Deleted vectors for session {session_id} from ChromaDB")
+            except Exception as e:
+                logger.error(f"Error deleting vectors from ChromaDB: {str(e)}")
+                # Continue with deletion even if vector deletion fails
+
+            # Delete the session itself
+            discussion_service.delete_session(session_id)
+            return jsonify({'success': True})
+        except Exception as e:
+            logger.error(f"Error deleting session {session_id}: {str(e)}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+def generate_greeting(character):
+    return f"Hello! I am {character}, your interview assistant."
+
+from semantic_search.core.vector_store import InterviewVectorStore
+
+vector_store = InterviewVectorStore()
+
+@app.route('/api/test', methods=['GET'])
+def test_route():
+    return "It works!"
+
+@analysis_bp.route('/session/<session_id>/annotations/', methods=['GET', 'POST'], strict_slashes=False)
+@login_required
+def handle_session_annotations(session_id):
+    if request.method == 'GET':
+        # For GET, return a placeholder response
+        return jsonify({"message": "GET annotations for session " + session_id})
+    elif request.method == 'POST':
+        # For POST, log the incoming payload and return a success response
+        data = request.get_json()
+        logger.info(f"Received annotations payload for session {session_id}: {data}")
+        return jsonify({"success": True, "message": "Annotations received"})
+
+# /api/session/{sessionId}/tags
+@app.route('/api/session/<session_id>/tags', methods=['POST'])
+def handle_tags(session_id):
+    data = request.json
+    add_tag(session_id, data['messageId'], data['tag'])
+    return jsonify({'success': True})
+
+def delete_tag(session_id: str, tag_id: str) -> bool:
+    """Delete a tag from a session."""
+    try:
+        session = load_interview(session_id)
+        if not session or 'tags' not in session:
+            return False
+            
+        for message_id in session['tags']:
+            session['tags'][message_id] = [
+                tag for tag in session['tags'][message_id] 
+                if tag['id'] != tag_id
+            ]
+            
+        return save_interview(session_id, session)
+    except Exception as e:
+        logger.error(f"Error deleting tag: {str(e)}")
+        return False
+
+# /api/session/{sessionId}/tags/{tagId}
+@app.route('/api/session/<session_id>/tags/<tag_id>', methods=['DELETE'])
+def handle_tag_deletion(session_id, tag_id):
+    delete_tag(session_id, tag_id)
+    return jsonify({'success': True})
+
+def get_tags_for_messages(session_id: str, message_ids: list) -> dict:
+    """Get tags for specific messages in a session."""
+    try:
+        session = load_interview(session_id)
+        if not session:
+            return {}
+        
+        tags = {}
+        for msg_id in message_ids:
+            tags[msg_id] = session.get('tags', {}).get(msg_id, [])
+        return tags
+    except Exception as e:
+        logger.error(f"Error getting tags for messages: {str(e)}")
+        return {}
+
+def get_annotations_for_messages(session_id: str, message_ids: list) -> dict:
+    """Get annotations for specific messages in a session."""
+    try:
+        session = load_interview(session_id)
+        if not session:
+            return {}
+        
+        annotations = {}
+        for msg_id in message_ids:
+            annotations[msg_id] = session.get('annotations', {}).get(msg_id, [])
+        return annotations
+    except Exception as e:
+        logger.error(f"Error getting annotations for messages: {str(e)}")
+        return {}
+
+def add_annotation(session_id: str, message_id: str, content: str) -> bool:
+    """Add an annotation to a specific message in a session."""
+    try:
+        session = load_interview(session_id)
+        if not session:
+            return False
+        
+        if 'annotations' not in session:
+            session['annotations'] = {}
+        if message_id not in session['annotations']:
+            session['annotations'][message_id] = []
+            
+        session['annotations'][message_id].append({
+            'id': str(uuid.uuid4()),
+            'content': content,
+            'timestamp': datetime.datetime.utcnow().isoformat(),
+            'user': {
+                'name': current_user.name if current_user.is_authenticated else 'Anonymous',
+                'id': current_user.id if current_user.is_authenticated else None
+            }
+        })
+        
+        return save_interview(session_id, session)
+    except Exception as e:
+        logger.error(f"Error adding annotation: {str(e)}")
+        return False
+
+def add_tag(session_id: str, message_id: str, tag: dict) -> bool:
+    """Add a tag to a specific message in a session."""
+    try:
+        session = load_interview(session_id)
+        if not session:
+            return False
+        
+        if 'tags' not in session:
+            session['tags'] = {}
+        if message_id not in session['tags']:
+            session['tags'][message_id] = []
+            
+        session['tags'][message_id].append({
+            'id': str(uuid.uuid4()),
+            'label': tag.get('label', ''),
+            'color': tag.get('color', '#e5e7eb'),
+            'timestamp': datetime.datetime.utcnow().isoformat(),
+            'user': current_user.name if current_user.is_authenticated else 'Anonymous'
+        })
+        
+        return save_interview(session_id, session)
+    except Exception as e:
+        logger.error(f"Error adding tag: {str(e)}")
+        return False
+
+
+
+@app.route('/api/session/<session_id>/annotations', methods=['GET', 'POST'], strict_slashes=False)
+@login_required
+def annotations_alias(session_id):
+    if request.method == 'GET':
+        try:
+            session = load_interview(session_id)
+            if not session:
+                return jsonify({'success': False, 'error': 'Session not found'}), 404
+            annotations = session.get('annotations', {})
+            tags = session.get('tags', {})
+            return jsonify({
+                'success': True,
+                'annotations': annotations,
+                'tags': tags
+            })
+        except Exception as e:
+            logger.error(f"Error getting annotations for session {session_id}: {str(e)}")
+            return jsonify({'success': False, 'error': str(e)}), 500
+
+    elif request.method == 'POST':
+        data = request.json
+        if 'messageIds' in data:
+            message_ids = data['messageIds']
+            annotations = get_annotations_for_messages(session_id, message_ids)
+            tags = get_tags_for_messages(session_id, message_ids)
+            return jsonify({
+                'success': True,
+                'annotations': annotations,
+                'tags': tags
+            })
+        if 'messageId' in data and 'content' in data:
+            message_id = data['messageId']
+            content = data['content']
+            success = add_annotation(session_id, message_id, content)
+            if success:
+                return jsonify({"success": True, "message": "Annotation saved"})
+            return jsonify({"success": False, "error": "Failed to save annotation"}), 500
+        return jsonify({"success": False, "error": "Invalid request format"}), 400
+
+if __name__ == "__main__":
+    print("Registered routes:")
+    for rule in app.url_map.iter_rules():
+        print(rule)
+    app.run()

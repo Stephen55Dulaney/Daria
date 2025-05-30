@@ -16,9 +16,10 @@ interface SessionCardProps {
   };
   onClick?: (session: SessionCardProps['session']) => void;
   className?: string;
+  children?: React.ReactNode;
 }
 
-const SessionCard: React.FC<SessionCardProps> = ({ session, onClick, className = '' }) => {
+const SessionCard: React.FC<SessionCardProps> = ({ session, onClick, className = '', children }) => {
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
       year: 'numeric',
@@ -56,6 +57,8 @@ const SessionCard: React.FC<SessionCardProps> = ({ session, onClick, className =
         <InfoRow label="Created" value={formatDate(session.created_at)} />
         <InfoRow label="Session ID" value={<CopyableText text={session.id} />} />
       </div>
+
+      {children}
     </div>
   );
 };

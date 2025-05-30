@@ -3,6 +3,7 @@ from ux_analyzer import UXAnalyzer
 import os
 import json
 from typing import Dict, Any
+from flask_login import login_required
 
 analysis_bp = Blueprint('analysis', __name__)
 analyzer = UXAnalyzer(api_key=os.getenv("OPENAI_API_KEY"))
@@ -107,4 +108,18 @@ def list_interviews():
         return jsonify(mock_interviews), 200
 
     except Exception as e:
-        return jsonify({"error": str(e)}), 500 
+        return jsonify({"error": str(e)}), 500
+
+@analysis_bp.route('/test', methods=['GET'])
+def test_route():
+    return "It works!"
+
+@analysis_bp.route('/session/<session_id>/annotations/', methods=['GET', 'POST'], strict_slashes=False)
+@login_required
+def handle_session_annotations(session_id):
+    if request.method == 'GET':
+        return jsonify({"message": "GET annotations for session " + session_id})
+    elif request.method == 'POST':
+        data = request.get_json()
+        # Your logic here
+        return jsonify({"success": True, "message": "Annotations received"}) 

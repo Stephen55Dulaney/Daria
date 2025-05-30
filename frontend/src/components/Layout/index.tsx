@@ -58,6 +58,11 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           label: <Link to="/advanced-search">Advanced Search</Link>,
         },
         {
+          key: '/super-search',
+          icon: <FileSearchOutlined />,
+          label: <Link to="/super-search">Super Search</Link>,
+        },
+        {
           key: '/upload-transcript',
           icon: <FileTextOutlined />,
           label: <Link to="/upload-transcript">Upload Transcript</Link>,

@@ -113,7 +113,7 @@ export default function GuideSessions() {
             <SessionCard
               key={session.id}
               session={session}
-              onClick={handleSessionClick}
+              onClick={() => handleSessionClick(session)}
             />
           ))}
         </div>

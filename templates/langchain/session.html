@@ -756,7 +756,7 @@ document.addEventListener('DOMContentLoaded', function() {
         createOpportunityBtn.addEventListener('click', async function() {
             createOpportunityBtn.disabled = true;
             createOpportunityBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Creating...';
-            const analysisForOpportunity = {{ session.analysis|tojson|safe }};
+            const analysisForOpportunity = JSON.parse('{{ session.analysis|tojson|safe }}');
             let analysisText = '';
             if (typeof analysisForOpportunity === 'string') {
                 analysisText = analysisForOpportunity;
@@ -799,7 +799,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-});
 
 function confirmDeleteSession() {
     if (confirm('Are you sure you want to delete this session? This action cannot be undone.')) {

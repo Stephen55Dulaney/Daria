@@ -109,7 +109,7 @@ const SessionDetailPage: React.FC = () => {
           {activeTab === 'annotations' && (
             <AnnotationsTab messages={session.session.messages || []} sessionId={session.session.id} />
           )}
-          {activeTab === 'semantic' && (
+          {activeTab === 'semantic' && sessionId && (
             <SemanticSearchTab sessionId={sessionId} />
           )}
         </div>

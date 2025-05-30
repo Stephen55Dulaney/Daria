@@ -3,13 +3,6 @@ import axios from 'axios';
 import DiscussionGuideCard from './DiscussionGuideCard';
 import { useNavigate } from 'react-router-dom';
 
-interface Session {
-  id: string;
-  title?: string;
-  created_at?: string;
-  updated_at?: string;
-}
-
 interface DiscussionGuide {
   id: string;
   title: string;

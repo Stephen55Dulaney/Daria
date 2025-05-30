@@ -13,6 +13,7 @@ import JourneyMapsGallery from './pages/JourneyMapsGallery'
 import AnnotatedTranscript from './pages/AnnotatedTranscript'
 import PersonaGenerator from './pages/PersonaGenerator'
 import AdvancedSearch from './pages/AdvancedSearch'
+import SuperSemanticSearch from './pages/SuperSemanticSearch'
 import UploadTranscript from './pages/UploadTranscript'
 import CreateInterview from './pages/CreateInterview'
 import ResearchSurvey from './pages/ResearchSurvey'
@@ -55,6 +56,7 @@ const App: React.FC = () => {
               <Route path="/annotated-transcript/:transcriptId" element={<AnnotatedTranscript />} />
               <Route path="/persona-generator" element={<PersonaGenerator />} />
               <Route path="/advanced-search" element={<AdvancedSearch />} />
+              <Route path="/super-search" element={<SuperSemanticSearch />} />
               <Route path="/upload-transcript" element={<UploadTranscript />} />
               <Route path="/create-interview" element={<CreateInterview />} />
               <Route path="/research-survey" element={<ResearchSurvey />} />

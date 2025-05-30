@@ -14,9 +14,10 @@ interface Message {
 interface TranscriptExplorerProps {
   messages: Message[];
   analysis?: { content: string };
+  sessionId: string;
 }
 
-const TranscriptExplorer: React.FC<TranscriptExplorerProps> = ({ messages, analysis }) => {
+const TranscriptExplorer: React.FC<TranscriptExplorerProps> = ({ messages, analysis, sessionId }) => {
   const [activeTab, setActiveTab] = useState<'transcript' | 'analysis' | 'semantic'>('transcript');
 
   return (
@@ -43,7 +44,7 @@ const TranscriptExplorer: React.FC<TranscriptExplorerProps> = ({ messages, analy
       </div>
       {activeTab === 'transcript' && <TranscriptTab messages={messages} />}
       {activeTab === 'analysis' && <AnalysisTab analysis={analysis} />}
-      {activeTab === 'semantic' && <SemanticSearchTab messages={messages} analysis={analysis} />}
+      {activeTab === 'semantic' && <SemanticSearchTab sessionId={sessionId} />}
     </div>
   );
 };

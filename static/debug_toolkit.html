@@ -326,6 +326,13 @@
                             <a href="/monitor_interview" class="btn btn-outline-secondary" target="_blank">Monitor Interviews</a>
                             <a href="/issues/my-issues" class="btn btn-outline-danger" target="_blank">My Issues</a>
                         </div>
+
+                        <h6 class="mt-4 mb-3">ChromaDB & Semantic Search</h6>
+                        <div class="d-grid gap-2">
+                            <a href="/api/semantic_health" class="btn btn-outline-info" target="_blank">ChromaDB Health</a>
+                            <button onclick="runBatchIngest()" class="btn btn-outline-warning">Run Batch Ingest</button>
+                            <a href="/api/semantic_search" class="btn btn-outline-info" target="_blank">Test Semantic Search</a>
+                        </div>
                     </div>
                 </div>
 
@@ -517,6 +524,58 @@
             } catch (err) {
                 document.getElementById('analyze-result').innerText = 'Error: ' + err;
             }
+        }
+
+        function runBatchIngest() {
+            // First fetch all sessions
+            fetch('/api/sessions')
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.sessions || data.sessions.length === 0) {
+                        alert('No sessions found to ingest');
+                        return;
+                    }
+
+                    // Process each session
+                    const processSession = async (session) => {
+                        const transcript = session.transcript || (session.messages ? session.messages.map(m => m.content).join('\n') : '');
+                        if (!transcript) {
+                            console.warn(`No transcript found for session ${session.id}`);
+                            return;
+                        }
+
+                        try {
+                            const response = await fetch('/api/semantic_ingest', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json'
+                                },
+                                body: JSON.stringify({
+                                    transcript,
+                                    metadata: { session_id: session.id }
+                                })
+                            });
+                            const result = await response.json();
+                            console.log(`Ingested session ${session.id}:`, result);
+                        } catch (error) {
+                            console.error(`Error ingesting session ${session.id}:`, error);
+                        }
+                    };
+
+                    // Process all sessions sequentially
+                    const processAllSessions = async () => {
+                        for (const session of data.sessions) {
+                            await processSession(session);
+                        }
+                        alert('Batch ingest completed');
+                    };
+
+                    processAllSessions();
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('Error running batch ingest');
+                });
         }
     </script>
 </body>

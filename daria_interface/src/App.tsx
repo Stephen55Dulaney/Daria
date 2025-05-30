@@ -9,6 +9,7 @@ import Sessions from './pages/Sessions';
 import GuideSessions from './pages/guides/[guideId]/sessions';
 import AnalysisPage from './pages/analysis';
 import SessionDetailPage from './pages/SessionDetailPage';
+import SuperSemanticSearch from './pages/SuperSemanticSearch';
 
 const App: React.FC = () => {
   return (
@@ -42,6 +43,12 @@ const App: React.FC = () => {
                     Analysis
                   </Link>
                   <Link
+                    to="/super-search"
+                    className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  >
+                    Super Search
+                  </Link>
+                  <Link
                     to="/gallery"
                     className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                   >
@@ -61,6 +68,7 @@ const App: React.FC = () => {
             <Route path="/guides/:guideId/sessions" element={<GuideSessions />} />
             <Route path="/guides/:guideId/sessions/:sessionId" element={<div>Guide Session Details (Coming Soon)</div>} />
             <Route path="/analysis" element={<Analysis />} />
+            <Route path="/super-search" element={<SuperSemanticSearch />} />
             <Route path="/gallery" element={<Gallery />} />
             <Route path="/gallery/:assistantId" element={<Gallery />} />
             <Route path="/" element={<Analysis />} />

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useRouter } from 'next/router';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 
 interface Message {
@@ -23,8 +23,8 @@ interface Session {
 }
 
 export default function SessionDetail() {
-  const router = useRouter();
-  const { guideId, sessionId } = router.query;
+  const { guideId, sessionId } = useParams();
+  const navigate = useNavigate();
   
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
@@ -90,7 +90,7 @@ export default function SessionDetail() {
         <div className="flex items-center justify-between">
           <h1 className="text-2xl font-bold text-gray-900">{session.title}</h1>
           <button
-            onClick={() => router.back()}
+            onClick={() => navigate(-1)}
             className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900"
           >
             ← Back to Sessions

@@ -1,0 +1,51 @@
+function runBatchIngest() {
+    // First fetch all sessions
+    fetch('/api/research_sessions')
+        .then(response => response.json())
+        .then(data => {
+            if (!data.sessions || data.sessions.length === 0) {
+                alert('No sessions found to ingest');
+                return;
+            }
+
+            // Process each session
+            const processSession = async (session) => {
+                const transcript = session.transcript || (session.messages ? session.messages.map(m => m.content).join('\n') : '');
+                if (!transcript) {
+                    console.warn(`No transcript found for session ${session.id}`);
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/semantic_ingest', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify({
+                            transcript,
+                            metadata: { session_id: session.id }
+                        })
+                    });
+                    const result = await response.json();
+                    console.log(`Ingested session ${session.id}:`, result);
+                } catch (error) {
+                    console.error(`Error ingesting session ${session.id}:`, error);
+                }
+            };
+
+            // Process all sessions sequentially
+            const processAllSessions = async () => {
+                for (const session of data.sessions) {
+                    await processSession(session);
+                }
+                alert('Batch ingest completed');
+            };
+
+            processAllSessions();
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('Error running batch ingest');
+        });
+} 

@@ -26,6 +26,8 @@ interface DiscussionGuidesResponse {
   success: boolean;
 }
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 const DiscussionGuidesList: React.FC = () => {
   const [guides, setGuides] = useState<DiscussionGuide[]>([]);
   const [loading, setLoading] = useState(true);
@@ -34,7 +36,7 @@ const DiscussionGuidesList: React.FC = () => {
   useEffect(() => {
     const fetchGuides = async () => {
       try {
-        const response = await axios.get<DiscussionGuidesResponse>('http://127.0.0.1:5025/api/discussion_guides');
+        const response = await axios.get<DiscussionGuidesResponse>(`${API_BASE_URL}/api/discussion_guides`);
         setGuides(response.data.guides);
       } catch (err: any) {
         setError(err.message || 'Failed to fetch discussion guides');
@@ -57,7 +59,7 @@ const DiscussionGuidesList: React.FC = () => {
     }
 
     try {
-      await axios.delete(`http://127.0.0.1:5025/api/discussion_guide/${guideId}`);
+      await axios.delete(`${API_BASE_URL}/api/discussion_guide/${guideId}`);
       setGuides(guides.filter(g => g.id !== guideId));
     } catch (err: any) {
       console.error('Failed to delete guide:', err);
