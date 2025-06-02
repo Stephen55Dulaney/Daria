@@ -133,9 +133,9 @@
                     <div class="mb-4">
                         <h5 class="card-title">AI Character & Voice</h5>
                         <div class="d-flex flex-wrap align-items-center gap-3 mb-3">
-                            <div class="character-badge character-{{ guide.character_select|default('daria')|lower }}">
+                            <div class="character-badge character-{{ guide.character_select|e|lower }}">
                                 <i class="bi bi-robot"></i>
-                                <span>{{ guide.character_select|default('Daria')|title }}</span>
+                                <span>{{ guide.character_select|e|title }}</span>
                             </div>
                             
                             <div class="badge voice-badge p-2">
@@ -146,7 +146,7 @@
                         </div>
                         <div class="alert alert-info">
                             <i class="bi bi-info-circle me-2"></i>
-                            <strong>Character:</strong> {{ guide.character_select|default('Daria')|title }} 
+                            <strong>Character:</strong> {{ guide.character_select|e|title }} 
                             <span class="mx-2">|</span>
                             <strong>Voice:</strong> {{ guide.voice_name|default('Default Voice') }}
                         </div>
@@ -646,439 +646,186 @@
 
 {% block scripts %}
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Add global error handling
-        window.addEventListener('error', function(event) {
-            console.error('Global error caught:', event.error);
-            console.error('Error message:', event.message);
-            console.error('Error source:', event.filename, 'Line:', event.lineno, 'Column:', event.colno);
-        });
-        
-        // Add unhandled promise rejection handling
-        window.addEventListener('unhandledrejection', function(event) {
-            console.error('Unhandled promise rejection:', event.reason);
-            console.error('Promise:', event.promise);
-        });
-        
-        // Copy functionality for prompts
-        document.querySelectorAll('.copy-btn').forEach(button => {
-            button.addEventListener('click', function() {
-                const contentId = this.getAttribute('data-content');
-                const contentElement = document.getElementById(contentId);
-                
-                // Copy text to clipboard
-                const text = contentElement.textContent;
-                navigator.clipboard.writeText(text)
-                    .then(() => {
-                        const originalText = this.innerHTML;
-                        this.innerHTML = '<i class="bi bi-check"></i> Copied!';
-                        
-                        // Reset button text after 2 seconds
-                        setTimeout(() => {
-                            this.innerHTML = originalText;
-                        }, 2000);
-                    })
-                    .catch(err => {
-                        console.error('Error copying text: ', err);
-                    });
-            });
-        });
-        
-        // Copy guide ID functionality
-        document.getElementById('copy-guide-id-btn').addEventListener('click', function() {
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize all Bootstrap modals
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        new bootstrap.Modal(modal);
+    });
+
+    // Copy Guide ID button
+    const copyGuideIdBtn = document.getElementById('copy-guide-id-btn');
+    if (copyGuideIdBtn) {
+        copyGuideIdBtn.addEventListener('click', function() {
             const guideId = this.getAttribute('data-id');
-            
-            navigator.clipboard.writeText(guideId)
-                .then(() => {
-                    const originalText = this.innerHTML;
-                    this.innerHTML = '<i class="bi bi-check"></i> Copied!';
-                    
-                    // Reset button text after 2 seconds
-                    setTimeout(() => {
-                        this.innerHTML = originalText;
-                    }, 2000);
-                })
-                .catch(err => {
-                    console.error('Error copying text: ', err);
-                });
+            navigator.clipboard.writeText(guideId);
+            this.innerHTML = '<i class="bi bi-check"></i> Copied!';
+            setTimeout(() => {
+                this.innerHTML = '<i class="bi bi-clipboard"></i> Copy ID';
+            }, 2000);
         });
-        
-        // Copy functionality for share links
-        document.getElementById('copy-share-link').addEventListener('click', function() {
-            const link = document.getElementById('share-link');
-            navigator.clipboard.writeText(link.value)
-                .then(() => {
-                    this.innerHTML = '<i class="bi bi-check"></i>';
-                    setTimeout(() => {
-                        this.innerHTML = '<i class="bi bi-clipboard"></i>';
-                    }, 2000);
-                });
+    }
+
+    // Start New Session button
+    const startNewSessionBtn = document.getElementById('startNewSessionBtn');
+    if (startNewSessionBtn) {
+        startNewSessionBtn.addEventListener('click', function() {
+            const createSessionModal = new bootstrap.Modal(document.getElementById('createSessionModal'));
+            createSessionModal.show();
         });
-        
-        document.getElementById('copy-interview-link').addEventListener('click', function() {
-            const link = document.getElementById('interview-link');
-            navigator.clipboard.writeText(link.value)
-                .then(() => {
-                    this.innerHTML = '<i class="bi bi-check"></i>';
-                    setTimeout(() => {
-                        this.innerHTML = '<i class="bi bi-clipboard"></i>';
-                    }, 2000);
-                });
+    }
+
+    // Upload Transcript button
+    const uploadTranscriptBtn = document.getElementById('uploadTranscriptBtn');
+    if (uploadTranscriptBtn) {
+        uploadTranscriptBtn.addEventListener('click', function() {
+            const uploadTranscriptModal = new bootstrap.Modal(document.getElementById('uploadTranscriptModal'));
+            uploadTranscriptModal.show();
         });
-        
-        // Archive functionality
-        document.getElementById('confirm-archive-btn').addEventListener('click', function() {
-            fetch('/api/discussion_guide/{{ guide_id }}/archive', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
+    }
+
+    // Generate Questions button
+    const generateQuestionsBtn = document.getElementById('generateQuestionsBtn');
+    if (generateQuestionsBtn) {
+        generateQuestionsBtn.addEventListener('click', async function() {
+            try {
+                // Show loading state
+                const questionsList = document.getElementById('questionsList');
+                if (questionsList) {
+                    questionsList.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div><p>Generating questions...</p></div>';
                 }
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = '/discussion_guides';
-                } else {
-                    alert('Error archiving guide: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error archiving guide: ' + error);
-            });
-        });
-        
-        // Duplicate functionality
-        document.getElementById('confirm-duplicate-btn').addEventListener('click', function() {
-            const title = document.getElementById('duplicate-title').value;
-            
-            fetch('/api/discussion_guide/{{ guide_id }}/duplicate', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    title: title
-                })
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.guide_id) {
-                    window.location.href = '/discussion_guide/' + data.guide_id;
-                } else {
-                    alert('Error duplicating guide: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error duplicating guide: ' + error);
-            });
-        });
-        
-        // Session creation functionality
-        function showSessionModal() {
-            const sessionModal = new bootstrap.Modal(document.getElementById('createSessionModal'));
-            sessionModal.show();
-        }
-        
-        // Add event listeners to all buttons that should open the session creation modal
-        document.getElementById('startNewSessionBtn').addEventListener('click', showSessionModal);
-        const noSessionsBtn = document.getElementById('noSessionsBtn');
-        if (noSessionsBtn) {
-            noSessionsBtn.addEventListener('click', showSessionModal);
-        }
-        
-        // Handle session creation form submission
-        document.getElementById('submit-session-btn').addEventListener('click', function(event) {
-            event.preventDefault();
-            
-            const guideId = document.getElementById('session-guide-id').value;
-            const participantName = document.getElementById('participant-name').value;
-            const participantEmail = document.getElementById('participant-email').value;
-            const participantRole = document.getElementById('participant-role').value;
-            const participantDepartment = document.getElementById('participant-department').value;
-            const participantCompany = document.getElementById('participant-company').value;
-            
-            // Collect demographics data
-            const ageRange = document.getElementById('participant-age-range')?.value || '';
-            const gender = document.getElementById('participant-gender')?.value || '';
-            const location = document.getElementById('participant-location')?.value || '';
-            
-            // Create session data
-            const sessionData = {
-                guide_id: guideId,
-                interviewee: {
-                    name: participantName,
-                    email: participantEmail,
-                    role: participantRole,
-                    department: participantDepartment,
-                    company: participantCompany,
-                    demographics: {
-                        age_range: ageRange,
-                        gender: gender,
-                        location: location
+                
+                // Show the modal
+                const questionsModal = new bootstrap.Modal(document.getElementById('questionsModal'));
+                questionsModal.show();
+                
+                // Get guide data
+                const guideData = {
+                    character_select: {{ guide.character_select|tojson }},
+                    topic: {{ guide.topic|tojson }},
+                    context: {{ guide.context|tojson }},
+                    goals: {{ guide.goals|tojson }},
+                    interview_type: {{ guide.interview_type|tojson }},
+                    custom_questions: {{ guide.custom_questions|tojson }}
+                };
+                
+                console.log('Sending guide data:', guideData);
+                
+                // Call the API to generate questions
+                const response = await fetch('/api/generate_questions', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(guideData)
+                });
+                
+                console.log('API response received:', response.status);
+                const data = await response.json();
+                console.log('API data:', data);
+                
+                if (data.success && questionsList) {
+                    // Update question count
+                    const questionCount = document.getElementById('questionCount');
+                    if (questionCount) {
+                        questionCount.textContent = `${data.count} questions`;
                     }
-                },
-                character: "{{ guide.character_select|default('daria') }}"
-            };
+                    
+                    // Populate questions list
+                    questionsList.innerHTML = data.questions.map((q, i) => `
+                        <div class="card mb-2">
+                            <div class="card-body">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <p class="mb-0">${i + 1}. ${q}</p>
+                                    <button class="btn btn-sm btn-outline-secondary copy-question" data-question="${q}">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+                    
+                    // Add copy functionality for individual questions
+                    document.querySelectorAll('.copy-question').forEach(btn => {
+                        btn.addEventListener('click', function() {
+                            const question = this.getAttribute('data-question');
+                            navigator.clipboard.writeText(question);
+                            this.innerHTML = '<i class="bi bi-check"></i>';
+                            setTimeout(() => {
+                                this.innerHTML = '<i class="bi bi-clipboard"></i>';
+                            }, 2000);
+                        });
+                    });
+                } else {
+                    if (questionsList) {
+                        questionsList.innerHTML = `<div class="alert alert-danger">Error: ${data.error || 'Unknown error'}</div>`;
+                    }
+                }
+            } catch (error) {
+                console.error('Error generating questions:', error);
+                const questionsList = document.getElementById('questionsList');
+                if (questionsList) {
+                    questionsList.innerHTML = 
+                        `<div class="alert alert-danger">Error generating questions: ${error.message}</div>`;
+                }
+            }
+        });
+    }
+
+    // Submit Session button
+    const submitSessionBtn = document.getElementById('submit-session-btn');
+    if (submitSessionBtn) {
+        submitSessionBtn.addEventListener('click', async function() {
+            const form = document.getElementById('create-session-form');
+            const formData = new FormData(form);
             
-            // Send the request to create the session
-            fetch('/api/session/create', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(sessionData)
-            })
-            .then(response => response.json())
-            .then(data => {
-                if (data.success && data.session_id) {
-                    // Redirect to the session page
-                    window.location.href = data.redirect_url || '/session/' + data.session_id;
+            try {
+                const response = await fetch('/api/session', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(Object.fromEntries(formData))
+                });
+                
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = `/session/${data.session_id}`;
                 } else {
                     alert('Error creating session: ' + (data.error || 'Unknown error'));
                 }
-            })
-            .catch(error => {
-                console.error('Error:', error);
-                alert('Error creating session: ' + error);
-            });
+            } catch (error) {
+                console.error('Error creating session:', error);
+                alert('Error creating session: ' + error.message);
+            }
         });
-        
-        // Upload transcript functionality
-        const uploadTranscriptBtn = document.getElementById('uploadTranscriptBtn');
-        const uploadTranscriptModal = document.getElementById('uploadTranscriptModal') ? 
-            new bootstrap.Modal(document.getElementById('uploadTranscriptModal')) : null;
-        const uploadTranscriptForm = document.getElementById('uploadTranscriptForm');
-        const fileInput = document.getElementById('transcript_file');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
-        const fileNameText = document.getElementById('fileNameText');
-        const uploadError = document.getElementById('uploadError');
-        const submitUploadBtn = document.getElementById('submitUploadBtn');
-        
-        // Debug info for element existence
-        console.log('Element check:', {
-            'uploadTranscriptBtn': !!uploadTranscriptBtn,
-            'uploadTranscriptModal': !!document.getElementById('uploadTranscriptModal'),
-            'uploadTranscriptForm': !!uploadTranscriptForm,
-            'fileInput': !!fileInput,
-            'fileNameDisplay': !!fileNameDisplay,
-            'fileNameText': !!fileNameText,
-            'uploadError': !!uploadError,
-            'submitUploadBtn': !!submitUploadBtn
-        });
-        
-        // Only bind events if elements exist
-        if (uploadTranscriptBtn) {
-            uploadTranscriptBtn.addEventListener('click', function() {
-                console.log('Upload transcript button clicked');
-                if (uploadTranscriptModal) {
-                    uploadTranscriptModal.show();
-                } else {
-                    console.error('uploadTranscriptModal is not initialized');
-                }
-            });
-        } else {
-            console.error('uploadTranscriptBtn not found in the DOM');
-        }
-        
-        if (fileInput) {
-            fileInput.addEventListener('change', function() {
-                console.log('File input changed');
-                if (this.files.length) {
-                    const file = this.files[0];
-                    console.log('Selected file:', file.name, 'Size:', file.size, 'Type:', file.type);
-                    fileNameText.textContent = file.name;
-                    fileNameDisplay.classList.remove('d-none');
-                } else {
-                    fileNameDisplay.classList.add('d-none');
-                }
-            });
-        } else {
-            console.error('fileInput not found in the DOM');
-        }
-        
-        if (submitUploadBtn) {
-            submitUploadBtn.addEventListener('click', function() {
-                console.log('Submit upload button clicked');
-                if (!uploadTranscriptForm.checkValidity()) {
-                    console.log('Form validation failed');
-                    uploadTranscriptForm.reportValidity();
-                    return;
-                }
-                
-                console.log('Form is valid, proceeding with upload');
-                uploadError.classList.add('d-none');
-                
-                const formData = new FormData(uploadTranscriptForm);
-                
-                // Log form data for debugging
-                for (let [key, value] of formData.entries()) {
-                    console.log(`FormData: ${key} = ${value instanceof File ? `File: ${value.name}` : value}`);
-                }
-                
-                // Disable submit button during upload
-                submitUploadBtn.disabled = true;
-                submitUploadBtn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Uploading...';
-                
-                console.log('Sending fetch request to /api/upload_transcript');
-                fetch('/api/upload_transcript', {
+    }
+
+    // Submit Upload button
+    const submitUploadBtn = document.getElementById('submitUploadBtn');
+    if (submitUploadBtn) {
+        submitUploadBtn.addEventListener('click', async function() {
+            const form = document.getElementById('uploadTranscriptForm');
+            const formData = new FormData(form);
+            
+            try {
+                const response = await fetch('/api/upload_transcript', {
                     method: 'POST',
                     body: formData
-                })
-                .then(response => {
-                    console.log('Received response:', response.status, response.statusText);
-                    return response.json();
-                })
-                .then(data => {
-                    console.log('Received data:', data);
-                    submitUploadBtn.disabled = false;
-                    submitUploadBtn.innerHTML = 'Upload Transcript';
-                    
-                    if (data.success) {
-                        console.log('Upload successful, closing modal and reloading page');
-                        // Close modal
-                        if (uploadTranscriptModal) {
-                            uploadTranscriptModal.hide();
-                        }
-                        
-                        // Reload the page to show the new session
-                        setTimeout(() => {
-                            console.log('Reloading page...');
-                            window.location.reload();
-                        }, 500);
-                    } else {
-                        console.error('Upload failed:', data.error);
-                        uploadError.textContent = data.error || 'An error occurred during upload';
-                        uploadError.classList.remove('d-none');
-                    }
-                })
-                .catch(error => {
-                    console.error('Fetch error:', error);
-                    submitUploadBtn.disabled = false;
-                    submitUploadBtn.innerHTML = 'Upload Transcript';
-                    uploadError.textContent = 'Network error: ' + error.message;
-                    uploadError.classList.remove('d-none');
                 });
-            });
-        } else {
-            console.error('submitUploadBtn not found in the DOM');
-        }
-    });
-
-    document.getElementById('generateQuestionsBtn').addEventListener('click', async function() {
-        try {
-            // Show loading state
-            const questionsList = document.getElementById('questionsList');
-            questionsList.innerHTML = '<div class="text-center py-3"><div class="spinner-border text-primary" role="status"></div><p>Generating questions...</p></div>';
-            
-            // Show the modal
-            const questionsModal = new bootstrap.Modal(document.getElementById('questionsModal'));
-            questionsModal.show();
-            
-            // Get guide data
-            const guideData = {
-                character_select: '{{ guide.character_select }}',
-                topic: '{{ guide.topic }}',
-                context: '{{ guide.context }}',
-                goals: {{ guide.goals|tojson|safe }},
-                interview_type: '{{ guide.interview_type }}',
-                custom_questions: {{ guide.custom_questions|tojson|safe }}
-            };
-            
-            // Call the API to generate questions
-            const response = await fetch('/api/generate_questions', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(guideData)
-            });
-            
-            const data = await response.json();
-            
-            if (data.success) {
-                // Update question count
-                document.getElementById('questionCount').textContent = `${data.count} questions`;
                 
-                // Populate questions list
-                questionsList.innerHTML = data.questions.map((q, i) => `
-                    <div class="card mb-2">
-                        <div class="card-body">
-                            <div class="d-flex justify-content-between align-items-start">
-                                <p class="mb-0">${i + 1}. ${q}</p>
-                                <button class="btn btn-sm btn-outline-secondary copy-question" data-question="${q}">
-                                    <i class="bi bi-clipboard"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-                
-                // Add copy functionality for individual questions
-                document.querySelectorAll('.copy-question').forEach(btn => {
-                    btn.addEventListener('click', function() {
-                        const question = this.getAttribute('data-question');
-                        navigator.clipboard.writeText(question);
-                        this.innerHTML = '<i class="bi bi-check"></i>';
-                        setTimeout(() => {
-                            this.innerHTML = '<i class="bi bi-clipboard"></i>';
-                        }, 2000);
-                    });
-                });
-            } else {
-                questionsList.innerHTML = `<div class="alert alert-danger">Error: ${data.error}</div>`;
+                const data = await response.json();
+                if (data.success) {
+                    window.location.href = `/session/${data.session_id}`;
+                } else {
+                    alert('Error uploading transcript: ' + (data.error || 'Unknown error'));
+                }
+            } catch (error) {
+                console.error('Error uploading transcript:', error);
+                alert('Error uploading transcript: ' + error.message);
             }
-        } catch (error) {
-            console.error('Error generating questions:', error);
-            document.getElementById('questionsList').innerHTML = 
-                `<div class="alert alert-danger">Error generating questions: ${error.message}</div>`;
-        }
-    });
-
-    // Copy all questions
-    document.getElementById('copyQuestionsBtn').addEventListener('click', function() {
-        const questions = Array.from(document.querySelectorAll('.questions-list .card-body p'))
-            .map(p => p.textContent)
-            .join('\n');
-        
-        navigator.clipboard.writeText(questions);
-        this.innerHTML = '<i class="bi bi-check me-1"></i> Copied!';
-        setTimeout(() => {
-            this.innerHTML = '<i class="bi bi-clipboard me-1"></i> Copy All';
-        }, 2000);
-    });
-
-    // Print questions
-    document.getElementById('printQuestionsBtn').addEventListener('click', function() {
-        const printWindow = window.open('', '_blank');
-        const questions = Array.from(document.querySelectorAll('.questions-list .card-body p'))
-            .map(p => p.textContent)
-            .join('\n');
-        
-        printWindow.document.write(`
-            <html>
-                <head>
-                    <title>Interview Questions - {{ guide.title }}</title>
-                    <style>
-                        body { font-family: Arial, sans-serif; padding: 20px; }
-                        h1 { color: #333; }
-                        .question { margin-bottom: 15px; }
-                    </style>
-                </head>
-                <body>
-                    <h1>Interview Questions</h1>
-                    <p><strong>Guide:</strong> {{ guide.title }}</p>
-                    <p><strong>Character:</strong> {{ guide.character_select }}</p>
-                    <p><strong>Topic:</strong> {{ guide.topic }}</p>
-                    <hr>
-                    ${questions.split('\n').map(q => `<div class="question">${q}</div>`).join('')}
-                </body>
-            </html>
-        `);
-        
-        printWindow.document.close();
-        printWindow.print();
-    });
+        });
+    }
+});
 </script>
 {% endblock %} 
