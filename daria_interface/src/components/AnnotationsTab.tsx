@@ -3,6 +3,7 @@ import React from 'react';
 import type { Tag } from './shared/TagList';
 import TagEditor from './shared/TagEditor';
 import InsightAnnotation from './shared/InsightAnnotation';
+import AnnotationDetails from './shared/AnnotationDetails';
 
 interface Message {
   id: string;
@@ -10,6 +11,18 @@ interface Message {
   role: string;
   timestamp: string;
   tags?: string[]; // AI-assigned tags
+  semantic?: {
+    themes?: string[];
+    emotions?: string[];
+    intent?: string;
+    task_success?: string;
+    goal_satisfaction?: string;
+    persona?: string;
+    frustration_markers?: string[];
+    ux_heuristic_violations?: string[];
+    pain_points?: { issue: string; severity_score: number }[];
+    quotes?: { text: string }[];
+  };
 }
 
 interface AnnotationsTabProps {
@@ -27,6 +40,58 @@ interface Annotation {
   timestamp: string;
 }
 
+// Tag component for colored badges
+const Tag = ({ label, color }: { label: string, color: string }) => (
+  <span style={{
+    background: color,
+    color: '#fff',
+    borderRadius: '8px',
+    padding: '2px 8px',
+    marginRight: '4px',
+    fontSize: '0.85em'
+  }}>{label}</span>
+);
+
+const colorMap = {
+  theme: '#a78bfa', // purple
+  emotion: '#60a5fa', // blue
+  intent: '#34d399', // green
+  task_success: '#fbbf24', // yellow
+  goal_satisfaction: '#f472b6', // pink
+  persona: '#f87171', // red
+  heuristic: '#f59e42', // orange
+  pain: '#ef4444', // red
+};
+
+const Message = ({ msg }: { msg: any }) => {
+  const s = msg.semantic || {};
+  return (
+    <div className="mb-4 p-3 bg-white rounded shadow">
+      <div className="font-semibold">{msg.role}</div>
+      <div>{msg.content}</div>
+      <div className="mt-2 flex flex-wrap gap-2">
+        {s.themes && s.themes.map((t: string) => <Tag key={t} label={t} color={colorMap.theme} />)}
+        {s.emotions && s.emotions.map((e: string) => <Tag key={e} label={e} color={colorMap.emotion} />)}
+        {s.intent && <Tag label={s.intent} color={colorMap.intent} />}
+        {s.task_success && <Tag label={s.task_success} color={colorMap.task_success} />}
+        {s.goal_satisfaction && <Tag label={s.goal_satisfaction} color={colorMap.goal_satisfaction} />}
+        {s.persona && <Tag label={s.persona} color={colorMap.persona} />}
+        {s.ux_heuristic_violations && s.ux_heuristic_violations.map((h: string) => <Tag key={h} label={h} color={colorMap.heuristic} />)}
+        {s.frustration_markers && s.frustration_markers.map((f: string) => <Tag key={f} label={f} color={colorMap.pain} />)}
+        {s.pain_points && s.pain_points.map((p: any, i: number) =>
+          <Tag key={i} label={`${p.issue} (sev: ${p.severity_score})`} color={colorMap.pain} />
+        )}
+      </div>
+      {/* Optionally, show quotes */}
+      {s.quotes && s.quotes.length > 0 && (
+        <div className="mt-2 text-xs text-gray-500">
+          Quotes: {s.quotes.map((q: any, i: number) => <span key={i} style={{ background: '#e0e7ff', borderRadius: 4, padding: '2px 4px', marginRight: 4 }}>{q.text}</span>)}
+        </div>
+      )}
+    </div>
+  );
+};
+
 const AnnotationsTab: React.FC<AnnotationsTabProps> = ({ messages, sessionId }) => {
   const [activeMsgId, setActiveMsgId] = React.useState<string | null>(null);
   const [annotations, setAnnotations] = React.useState<{ [msgId: string]: Annotation[] }>({});
@@ -40,8 +105,9 @@ const AnnotationsTab: React.FC<AnnotationsTabProps> = ({ messages, sessionId }) 
       setIsLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/session/${sessionId}/annotations/`, {
+        const response = await fetch(`/api/analysis/session/${sessionId}/annotations/`, {
           method: 'GET',
+          credentials: 'include',
         });
         const data = await response.json();
         if (data.annotations) {
@@ -72,10 +138,11 @@ const AnnotationsTab: React.FC<AnnotationsTabProps> = ({ messages, sessionId }) 
     setIsLoading(true);
     setError(null);
     try {
-      const response = await fetch(`/api/session/${sessionId}/annotations/`, {
+      const response = await fetch(`/api/analysis/session/${sessionId}/annotations/`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messageId: activeMsgId, content: newComment })
+        body: JSON.stringify({ messageId: activeMsgId, content: newComment }),
+        credentials: 'include',
       });
       const data = await response.json();
       if (data.success && data.annotation) {
@@ -96,6 +163,22 @@ const AnnotationsTab: React.FC<AnnotationsTabProps> = ({ messages, sessionId }) 
 
   // Find the currently active participant message
   const activeMsg = messages.find(m => m.id === activeMsgId && isParticipant(m));
+
+  // Patch activeMsg to ensure pain_points have all required fields and only pass if activeMsg is defined
+  const patchedActiveMsg = activeMsg
+    ? {
+        content: activeMsg.content,
+        semantic: {
+          ...activeMsg.semantic,
+          pain_points: activeMsg.semantic?.pain_points?.map((p: any) => ({
+            quote: p.quote ?? activeMsg.content ?? '',
+            issue: p.issue,
+            severity_score: p.severity_score,
+            sentiment: p.sentiment ?? '',
+          })),
+        },
+      }
+    : undefined;
 
   return (
     <div className="flex gap-6 h-[80vh]">
@@ -142,42 +225,12 @@ const AnnotationsTab: React.FC<AnnotationsTabProps> = ({ messages, sessionId }) 
 
       {/* Right column: Annotation workspace */}
       <div className="w-1/4 pl-4 flex flex-col">
-        <h2 className="text-lg font-semibold mb-4">Annotation Workspace</h2>
-        {activeMsg ? (
+        {patchedActiveMsg ? (
           <>
-            <div className="mb-4">
-              <div className="text-sm text-gray-500 mb-1">Participant Message:</div>
-              <div className="p-2 bg-gray-50 rounded border mb-2 text-gray-900">{activeMsg.content}</div>
-              {/* Show tags here as well for quick reference */}
-              {activeMsg.tags && activeMsg.tags.length > 0 && (
-                <div className="mb-2 flex flex-wrap gap-2">
-                  {activeMsg.tags.map((tag, i) => (
-                    <span key={i} className="px-2 py-1 text-xs rounded-full bg-purple-100 text-purple-700 border border-purple-200">
-                      {tag}
-                    </span>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="mb-6">
-              <h3 className="font-medium mb-2">Add Comment</h3>
-              <textarea
-                className="w-full border rounded p-2 mb-2"
-                rows={3}
-                value={newComment}
-                onChange={e => setNewComment(e.target.value)}
-                placeholder="Add your annotation/comment here..."
-                disabled={isLoading}
-              />
-              <button
-                className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-                onClick={handleAddAnnotation}
-                disabled={isLoading || !newComment.trim()}
-              >
-                Save Annotation
-              </button>
-              {error && <div className="text-red-600 mt-2">{error}</div>}
-            </div>
+            <AnnotationDetails
+              message={patchedActiveMsg}
+              onSaveComment={handleAddAnnotation}
+            />
             <div>
               <h3 className="font-medium mb-2">Comments</h3>
               {activeMsgId && annotations[activeMsgId]?.length > 0 ? (
