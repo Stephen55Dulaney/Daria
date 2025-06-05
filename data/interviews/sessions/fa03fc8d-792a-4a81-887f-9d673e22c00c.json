@@ -1,6 +1,6 @@
 {
   "id": "fa03fc8d-792a-4a81-887f-9d673e22c00c",
-  "guide_id": "3e0c3c1d-78ed-4ff5-bd5a-8703b18c5770",
+  "guide_id": null,
   "interviewee": {
     "name": "cynthia sue",
     "email": "sdulaney@deloitte.com",
@@ -13,7 +13,7 @@
       "location": ""
     }
   },
-  "status": "active",
+  "status": "orphaned",
   "messages": [
     {
       "role": "assistant",
@@ -59,5 +59,5 @@
     "generated_at": "2025-05-30T10:01:08.370443"
   },
   "created_at": "2025-05-06T15:47:09.524449",
-  "updated_at": "2025-05-30T10:01:08.370769"
+  "updated_at": "2025-06-02T08:02:39.552069"
 }

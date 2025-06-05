@@ -645,7 +645,22 @@
 {% endblock %}
 
 {% block scripts %}
+<!-- Initialize guide data -->
+<script type="application/json" id="guide-data">
+{
+    "character_select": {{ guide.character_select|default('""')|tojson|safe }},
+    "topic": {{ guide.topic|default('""')|tojson|safe }},
+    "context": {{ guide.context|default('""')|tojson|safe }},
+    "goals": {{ guide.goals|default([])|tojson|safe }},
+    "interview_type": {{ guide.interview_type|default('""')|tojson|safe }},
+    "custom_questions": {{ guide.custom_questions|default([])|tojson|safe }}
+}
+</script>
+
 <script>
+// Get guide data from the JSON element
+const guideData = JSON.parse(document.getElementById('guide-data').textContent);
+
 document.addEventListener('DOMContentLoaded', function() {
     // Initialize all Bootstrap modals
     const modals = document.querySelectorAll('.modal');
@@ -699,16 +714,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 const questionsModal = new bootstrap.Modal(document.getElementById('questionsModal'));
                 questionsModal.show();
                 
-                // Get guide data
-                const guideData = {
-                    character_select: {{ guide.character_select|tojson }},
-                    topic: {{ guide.topic|tojson }},
-                    context: {{ guide.context|tojson }},
-                    goals: {{ guide.goals|tojson }},
-                    interview_type: {{ guide.interview_type|tojson }},
-                    custom_questions: {{ guide.custom_questions|tojson }}
-                };
-                
                 console.log('Sending guide data:', guideData);
                 
                 // Call the API to generate questions
@@ -732,18 +737,22 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     
                     // Populate questions list
-                    questionsList.innerHTML = data.questions.map((q, i) => `
-                        <div class="card mb-2">
-                            <div class="card-body">
-                                <div class="d-flex justify-content-between align-items-start">
-                                    <p class="mb-0">${i + 1}. ${q}</p>
-                                    <button class="btn btn-sm btn-outline-secondary copy-question" data-question="${q}">
-                                        <i class="bi bi-clipboard"></i>
-                                    </button>
+                    questionsList.innerHTML = data.questions.map((q, i) => {
+                        // Remove leading number(s) and dot/space, e.g. "1. " or "10. "
+                        const cleanQ = q.replace(/^\d+\.\s*/, '');
+                        return `
+                            <div class="card mb-2">
+                                <div class="card-body">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <p class="mb-0">${i + 1}. ${cleanQ}</p>
+                                        <button class="btn btn-sm btn-outline-secondary copy-question" data-question="${cleanQ}">
+                                            <i class="bi bi-clipboard"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
-                        </div>
-                    `).join('');
+                        `;
+                    }).join('');
                     
                     // Add copy functionality for individual questions
                     document.querySelectorAll('.copy-question').forEach(btn => {
@@ -780,7 +789,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const formData = new FormData(form);
             
             try {
-                const response = await fetch('/api/session', {
+                const response = await fetch('/api/session/create', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'

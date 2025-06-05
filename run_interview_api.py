@@ -64,6 +64,10 @@ args = parser.parse_args()
 app = Flask(__name__, 
            template_folder='templates',
            static_folder='static')
+CORS(app, supports_credentials=True, origins=[
+    "http://localhost:5173", "http://127.0.0.1:5173"
+])
+logger.info("CORS enabled for all origins with extended header support")
 
 def get_discussion_service():
     return discussion_service
@@ -3229,6 +3233,8 @@ def api_edit_prompt(prompt_id):
         logger.error(f"Error in api_edit_prompt for {prompt_id}: {str(e)}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+
+
 @socketio.on('request_insights')
 def handle_request_insights(data):
     """Handle a request for AI insights on the interview."""
@@ -3361,6 +3367,11 @@ app.register_blueprint(issues_bp, url_prefix='/issues')
 app.register_blueprint(langchain_blueprint)
 app.register_blueprint(analysis_bp, url_prefix='/api')
 
+# Debug: Print all registered routes
+print("\nRegistered Routes:")
+for rule in app.url_map.iter_rules():
+    print(f"{rule.endpoint}: {rule.rule}")
+
 # ------ Upload Transcript Routes ------
 
 @app.route('/api/upload_transcript', methods=['POST'])
@@ -3428,7 +3439,8 @@ def api_upload_transcript():
                 'id': str(uuid.uuid4()),
                 'content': content,
                 'role': role,
-                'timestamp': datetime.datetime.now().isoformat()
+                'timestamp': datetime.datetime.now().isoformat(),
+                "semantic": {}
             })
 
         # 5. Update the session JSON with messages, transcript, and guide metadata
@@ -4270,7 +4282,7 @@ def export_session(session_id):
 def get_research_assistants():
     # Replace with your real data source or file/database read
     assistants = [
-        {"id": "1", "name": "Thomas", "description": "Expert in user research", "imageUrl": "/images/thomas.jpg"},
+        {"id": "1", "name": "Thomas", "description": "A debugging assistant character designed to walk through the DARIA Interview Tool test plan step-by-step and help identify, verify, and troubleshoot issues during regression testing.", "imageUrl": "/images/thomas.jpg"},
         {"id": "2", "name": "Synthia", "description": "Qualitative data specialist", "imageUrl": "/images/synthia.jpg"}
     ]
     return jsonify(assistants)
@@ -4915,52 +4927,11 @@ from semantic_search.core.vector_store import InterviewVectorStore
 
 vector_store = InterviewVectorStore()
 
-@app.route('/api/test', methods=['GET'])
-def test_route():
-    return "It works!"
 
-@analysis_bp.route('/session/<session_id>/annotations/', methods=['GET', 'POST'], strict_slashes=False)
-@login_required
-def handle_session_annotations(session_id):
-    if request.method == 'GET':
-        # For GET, return a placeholder response
-        return jsonify({"message": "GET annotations for session " + session_id})
-    elif request.method == 'POST':
-        # For POST, log the incoming payload and return a success response
-        data = request.get_json()
-        logger.info(f"Received annotations payload for session {session_id}: {data}")
-        return jsonify({"success": True, "message": "Annotations received"})
+
+
 
 # /api/session/{sessionId}/tags
-@app.route('/api/session/<session_id>/tags', methods=['POST'])
-def handle_tags(session_id):
-    data = request.json
-    add_tag(session_id, data['messageId'], data['tag'])
-    return jsonify({'success': True})
-
-def delete_tag(session_id: str, tag_id: str) -> bool:
-    """Delete a tag from a session."""
-    try:
-        session = load_interview(session_id)
-        if not session or 'tags' not in session:
-            return False
-            
-        for message_id in session['tags']:
-            session['tags'][message_id] = [
-                tag for tag in session['tags'][message_id] 
-                if tag['id'] != tag_id
-            ]
-            
-        return save_interview(session_id, session)
-    except Exception as e:
-        logger.error(f"Error deleting tag: {str(e)}")
-        return False
-
-# /api/session/{sessionId}/tags/{tagId}
-@app.route('/api/session/<session_id>/tags/<tag_id>', methods=['DELETE'])
-def handle_tag_deletion(session_id, tag_id):
-    delete_tag(session_id, tag_id)
-    return jsonify({'success': True})
 
 def get_tags_for_messages(session_id: str, message_ids: list) -> dict:
     """Get tags for specific messages in a session."""
@@ -5044,107 +5015,31 @@ def add_tag(session_id: str, message_id: str, tag: dict) -> bool:
         logger.error(f"Error adding tag: {str(e)}")
         return False
 
+@app.route('/api/gallery/characters', methods=['GET'])
+def get_gallery_characters():
+    prompts = load_all_prompts()
+    gallery_characters = []
+    for name, data in prompts.items():
+        if all(key in data for key in ['description', 'interview_prompt', 'analysis_prompt']):
+            # Copy all fields, then add/override voice_id and avatar_url
+            char_data = dict(data)
+            char_data['name'] = name
+            char_data['voice_id'] = data.get('voice_id', '')
+            char_data['avatar_url'] = data.get('avatar_url', '')
+            gallery_characters.append(char_data)
+    return jsonify({"characters": gallery_characters})
 
-
-@app.route('/api/session/<session_id>/annotations', methods=['GET', 'POST'], strict_slashes=False)
-@login_required
-def annotations_alias(session_id):
-    if request.method == 'GET':
-        try:
-            session = load_interview(session_id)
-            if not session:
-                return jsonify({'success': False, 'error': 'Session not found'}), 404
-            annotations = session.get('annotations', {})
-            tags = session.get('tags', {})
-            return jsonify({
-                'success': True,
-                'annotations': annotations,
-                'tags': tags
-            })
-        except Exception as e:
-            logger.error(f"Error getting annotations for session {session_id}: {str(e)}")
-            return jsonify({'success': False, 'error': str(e)}), 500
-
-    elif request.method == 'POST':
-        data = request.json
-        if 'messageIds' in data:
-            message_ids = data['messageIds']
-            annotations = get_annotations_for_messages(session_id, message_ids)
-            tags = get_tags_for_messages(session_id, message_ids)
-            return jsonify({
-                'success': True,
-                'annotations': annotations,
-                'tags': tags
-            })
-        if 'messageId' in data and 'content' in data:
-            message_id = data['messageId']
-            content = data['content']
-            success = add_annotation(session_id, message_id, content)
-            if success:
-                return jsonify({"success": True, "message": "Annotation saved"})
-            return jsonify({"success": False, "error": "Failed to save annotation"}), 500
-        return jsonify({"success": False, "error": "Invalid request format"}), 400
-
-@analysis_bp.route('/generate_questions', methods=['POST'])
-def generate_questions():
-    """Generate potential interview questions based on discussion guide configuration using AI."""
-    try:
-        data = request.json
-        if not data:
-            return jsonify({'success': False, 'error': 'No data provided'}), 400
-
-        # Extract guide configuration
-        character = data.get('character_select', '').lower()
-        topic = data.get('topic', '')
-        context = data.get('context', '')
-        goals = data.get('goals', [])
-        interview_type = data.get('interview_type', 'research_interview')
-        custom_questions = data.get('custom_questions', [])
-
-        # Prepare the prompt for the AI
-        prompt = f"""You are an expert research interviewer. Generate 5-7 relevant interview questions based on the following context:\n\nCharacter: {character}\nTopic: {topic}\nContext: {context}\nGoals: {', '.join(goals) if isinstance(goals, list) else goals}\nInterview Type: {interview_type}\n\nAdditional Context:\n- The questions should be open-ended and encourage detailed responses\n- They should align with the character's personality and interview style\n- They should help achieve the stated research goals\n- They should be appropriate for the specified interview type\n\nGenerate a list of questions that will help gather valuable insights for this research session."""
-
-        # Call OpenAI API to generate questions
-        response = openai.ChatCompletion.create(
-            model="gpt-4",
-            messages=[
-                {"role": "system", "content": "You are an expert research interviewer who generates thoughtful, open-ended questions."},
-                {"role": "user", "content": prompt}
-            ],
-            temperature=0.7,
-            max_tokens=500
-        )
-
-        # Extract and format the questions
-        ai_response = response.choices[0].message.content
-        questions = [q.strip() for q in ai_response.split('\n') if q.strip() and q.strip().endswith('?')]
-
-        # Add any custom questions if provided
-        if custom_questions:
-            if isinstance(custom_questions, list):
-                for question in custom_questions:
-                    if isinstance(question, dict) and 'text' in question:
-                        questions.append(question['text'])
-                    elif isinstance(question, str):
-                        questions.append(question)
-
-        # Remove duplicates while preserving order
-        seen = set()
-        unique_questions = []
-        for q in questions:
-            if q not in seen:
-                seen.add(q)
-                unique_questions.append(q)
-
-        return jsonify({
-            'success': True,
-            'questions': unique_questions,
-            'count': len(unique_questions)
-        })
-
-    except Exception as e:
-        logger.error(f"Error generating questions: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500
+@app.route('/api/gallery/character/<name>', methods=['GET'])
+def get_gallery_character(name):
+    prompts = load_all_prompts()
+    data = prompts.get(name)
+    if not data:
+        return jsonify({"error": "Character not found"}), 404
+    char_data = dict(data)
+    char_data['name'] = name
+    char_data['voice_id'] = data.get('voice_id', '')
+    char_data['avatar_url'] = data.get('avatar_url', '')
+    return jsonify(char_data)
 
 if __name__ == "__main__":
     print("Registered routes:")

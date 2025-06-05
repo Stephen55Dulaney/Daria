@@ -4,12 +4,11 @@ import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import Analysis from './pages/Analysis';
 import Gallery from './pages/Gallery';
-import Layout from './components/shared/Layout';
 import Sessions from './pages/Sessions';
 import GuideSessions from './pages/guides/[guideId]/sessions';
-import AnalysisPage from './pages/analysis';
 import SessionDetailPage from './pages/SessionDetailPage';
 import SuperSemanticSearch from './pages/SuperSemanticSearch';
+import CharacterDetail from './components/shared/CharacterDetail';
 
 const App: React.FC = () => {
   return (
@@ -70,7 +69,7 @@ const App: React.FC = () => {
             <Route path="/analysis" element={<Analysis />} />
             <Route path="/super-search" element={<SuperSemanticSearch />} />
             <Route path="/gallery" element={<Gallery />} />
-            <Route path="/gallery/:assistantId" element={<Gallery />} />
+            <Route path="/gallery/:characterName" element={<CharacterDetail />} />
             <Route path="/" element={<Analysis />} />
             <Route path="/sessions/:sessionId" element={<SessionDetailPage />} />
           </Routes>

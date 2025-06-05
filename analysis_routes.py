@@ -7,6 +7,8 @@ from flask_login import login_required
 import datetime
 import openai
 import logging
+from semantic_pipeline import tag_chunk, save_annotations
+from flask import current_app
 
 logger = logging.getLogger(__name__)
 
@@ -119,7 +121,7 @@ def list_interviews():
 def test_route():
     return jsonify({'message': 'Analysis blueprint is working!'})
 
-@analysis_bp.route('/session/<session_id>/annotations/', methods=['GET', 'POST'], strict_slashes=False)
+@analysis_bp.route('/analysis/session/<session_id>/annotations/', methods=['GET', 'POST'], strict_slashes=False)
 @login_required
 def handle_session_annotations(session_id):
     annotations_path = os.path.join('data', 'annotations', f'{session_id}.json')
@@ -213,4 +215,132 @@ def generate_questions():
 
     except Exception as e:
         logger.error(f"Error generating questions: {str(e)}")
-        return jsonify({'success': False, 'error': str(e)}), 500 
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+@analysis_bp.route('/debug/semantic_annotate/<session_id>', methods=['GET'])
+def debug_semantic_annotate(session_id):
+    session_path = f"data/interviews/sessions/{session_id}.json"
+    if not os.path.exists(session_path):
+        return jsonify({"error": "Session not found"}), 404
+
+    with open(session_path, "r") as f:
+        session = json.load(f)
+
+    annotations = []
+    for msg in session.get("messages", []):
+        semantic_json = tag_chunk(msg.get("content", ""), msg)
+        try:
+            semantic_data = json.loads(semantic_json)
+        except Exception:
+            semantic_data = {"raw": semantic_json}
+        msg["semantic"] = semantic_data
+        # Build annotation object for saving
+        annotation = {
+            "id": msg["id"],
+            "messageId": msg["id"],
+            "content": msg["content"],
+            "semantic": semantic_data,
+            "user": {"name": "System"},
+            "timestamp": msg.get("timestamp", "")
+        }
+        annotations.append(annotation)
+
+    # Save to annotations directory
+    save_annotations(session_id, annotations)
+
+    return jsonify(session)
+
+@analysis_bp.route('/session/<session_id>/messages_with_semantics', methods=['GET'])
+def get_messages_with_semantics(session_id):
+    """
+    Return session messages merged with semantic data from annotations.
+    """
+    try:
+        # Load session messages
+        session_path = os.path.join('data', 'interviews', 'sessions', f'{session_id}.json')
+        if not os.path.exists(session_path):
+            return jsonify({'success': False, 'error': 'Session not found'}), 404
+        with open(session_path, 'r') as f:
+            session = json.load(f)
+        messages = session.get('messages', [])
+
+        # Load annotations (semantic) if available
+        annotations_path = os.path.join('data', 'annotations', f'{session_id}.json')
+        semantic_map = {}
+        if os.path.exists(annotations_path):
+            with open(annotations_path, 'r') as f:
+                annotations = json.load(f)
+                semantic_map = {a['messageId']: a.get('semantic', {}) for a in annotations}
+
+        # Merge semantic data into messages
+        for msg in messages:
+            if msg['id'] in semantic_map:
+                msg['semantic'] = semantic_map[msg['id']]
+
+        return jsonify({'success': True, 'messages': messages})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+
+# Helper functions (import or define if not already available)
+def load_interview(session_id):
+    session_path = os.path.join('data', 'interviews', 'sessions', f'{session_id}.json')
+    if not os.path.exists(session_path):
+        return None
+    with open(session_path, 'r') as f:
+        return json.load(f)
+
+def save_interview(session_id, session):
+    session_path = os.path.join('data', 'interviews', 'sessions', f'{session_id}.json')
+    with open(session_path, 'w') as f:
+        json.dump(session, f, indent=2)
+    return True
+
+# /api/session/{sessionId}/tags
+@analysis_bp.route('/session/<session_id>/tags', methods=['POST'])
+def handle_tags(session_id):
+    """
+    Save all tags for a specific message in a session.
+    Expects JSON: { "messageId": "...", "tags": [...] }
+    """
+    data = request.json
+    message_id = data.get('messageId')
+    tags = data.get('tags', [])
+    if not message_id:
+        return jsonify({'success': False, 'error': 'Missing messageId'}), 400
+
+    session = load_interview(session_id)
+    if not session:
+        return jsonify({'success': False, 'error': 'Session not found'}), 404
+    if 'tags' not in session:
+        session['tags'] = {}
+    session['tags'][message_id] = tags
+    save_interview(session_id, session)
+    return jsonify({'success': True})
+
+# /api/session/{sessionId}/tags/{tagId}
+@analysis_bp.route('/session/<session_id>/tags/<tag_id>', methods=['DELETE'])
+def handle_tag_deletion(session_id, tag_id):
+    """
+    Delete a tag by tag_id from all messages in a session.
+    """
+    session = load_interview(session_id)
+    if not session or 'tags' not in session:
+        return jsonify({'success': False, 'error': 'Session or tags not found'}), 404
+
+    found = False
+    for message_id in session['tags']:
+        # Only keep tags that do NOT match tag_id
+        before = len(session['tags'][message_id])
+        session['tags'][message_id] = [
+            tag for tag in session['tags'][message_id]
+            if not (isinstance(tag, dict) and tag.get('id') == tag_id)
+        ]
+        if len(session['tags'][message_id]) < before:
+            found = True
+
+    if found:
+        save_interview(session_id, session)
+        return jsonify({'success': True})
+    else:
+        return jsonify({'success': False, 'error': 'Tag not found'}), 404 
+    

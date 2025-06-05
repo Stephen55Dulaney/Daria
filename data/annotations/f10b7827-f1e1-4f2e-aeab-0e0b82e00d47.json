@@ -1,0 +1,424 @@
+[
+  {
+    "id": "825b6727-0441-4c22-a115-6a4be2eaa95e",
+    "messageId": "825b6727-0441-4c22-a115-6a4be2eaa95e",
+    "content": "00:00 This is a test transcript.",
+    "semantic": {
+      "themes": [],
+      "emotions": [
+        "neutral"
+      ],
+      "affinity_hint": "Initial test phase",
+      "follow_up_questions": [],
+      "intent": "clarify",
+      "frustration_markers": [],
+      "interaction_modality": "spoken",
+      "task_success": "not applicable",
+      "ux_heuristic_violations": [],
+      "phase": "",
+      "persona": "other",
+      "goal_satisfaction": "not applicable",
+      "pain_points": [],
+      "quotes": [
+        {
+          "text": "00:00 This is a test transcript.",
+          "theme": "",
+          "emotion": "neutral",
+          "persona": "other"
+        }
+      ]
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:32.162948"
+  },
+  {
+    "id": "efbf638c-d82c-4326-9701-11efad61d1fc",
+    "messageId": "efbf638c-d82c-4326-9701-11efad61d1fc",
+    "content": "01:00 Hello, I'm responding to the test transcript.",
+    "semantic": {
+      "themes": [],
+      "emotions": [
+        "neutral"
+      ],
+      "affinity_hint": "Participant opening statement.",
+      "follow_up_questions": [
+        "Can you tell us what is the reason for your response to the test transcript?"
+      ],
+      "intent": "clarify",
+      "frustration_markers": [],
+      "interaction_modality": "spoken",
+      "task_success": "not applicable",
+      "ux_heuristic_violations": [],
+      "phase": "",
+      "persona": "other",
+      "goal_satisfaction": "not applicable",
+      "pain_points": [],
+      "quotes": [
+        {
+          "text": "Hello, I'm responding to the test transcript.",
+          "theme": "",
+          "emotion": "neutral",
+          "persona": "other"
+        }
+      ]
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:33.162948"
+  },
+  {
+    "id": "7765efa5-2d58-413f-ab35-c4fd09c59b6f",
+    "messageId": "7765efa5-2d58-413f-ab35-c4fd09c59b6f",
+    "content": "02:00 Thank you for your response.",
+    "semantic": {
+      "themes": [],
+      "emotions": [
+        "neutral"
+      ],
+      "affinity_hint": "Polite response",
+      "follow_up_questions": [],
+      "intent": "feedback",
+      "frustration_markers": [],
+      "interaction_modality": "spoken",
+      "task_success": "not applicable",
+      "ux_heuristic_violations": [],
+      "phase": "",
+      "persona": "",
+      "goal_satisfaction": "not applicable",
+      "pain_points": [],
+      "quotes": [
+        {
+          "text": "02:00 Thank you for your response.",
+          "theme": "",
+          "emotion": "neutral",
+          "persona": "assistant"
+        }
+      ]
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:34.162948"
+  },
+  {
+    "id": "f6ef1c01-5c67-4dfe-b1b7-e84dce3d1df9",
+    "messageId": "f6ef1c01-5c67-4dfe-b1b7-e84dce3d1df9",
+    "content": "Hello Jason, thank you for participating in this interview. To start, could you please describe the current process you follow when placing orders through the World of Washing Machines Corp. self-service ordering portal?",
+    "semantic": {
+      "themes": [],
+      "emotions": [
+        "neutral"
+      ],
+      "affinity_hint": "Interviewee will be explaining the current ordering process for appliances company.",
+      "follow_up_questions": [
+        "What part of the process do you find most complex?",
+        "Are there any steps you wish could be handled differently?",
+        "How frequently do you use the self-service ordering portal?"
+      ],
+      "intent": "request help",
+      "frustration_markers": [],
+      "interaction_modality": "spoken",
+      "task_success": "not attempted",
+      "ux_heuristic_violations": [],
+      "phase": "User Interviews",
+      "persona": "other",
+      "goal_satisfaction": "not applicable",
+      "pain_points": [],
+      "quotes": []
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:35.162948"
+  },
+  {
+    "id": "de01cc08-7ae8-4efe-b212-70a01e27a87b",
+    "messageId": "de01cc08-7ae8-4efe-b212-70a01e27a87b",
+    "content": "I check in every morning and the first thing I do is open the portal and I look for the shipments that are coming today and then after that I look for back orders and then at the very end of the day I go ahead and use the door to reorder what we sold that day.",
+    "semantic": {
+      "themes": [
+        "workflow"
+      ],
+      "emotions": [
+        "neutral"
+      ],
+      "affinity_hint": "Daily routine practices in handling shipments",
+      "follow_up_questions": [
+        "Do you encounter any difficulties when checking for shipments or back orders?",
+        "How do you find the experience of reordering what you sold at the end of the day?",
+        "Have you ever had any issues with the portal interface?"
+      ],
+      "intent": "describe process",
+      "frustration_markers": [],
+      "interaction_modality": "spoken",
+      "task_success": "not applicable",
+      "ux_heuristic_violations": [],
+      "phase": "",
+      "persona": "retailer",
+      "goal_satisfaction": "not applicable",
+      "pain_points": [],
+      "quotes": [
+        {
+          "text": "I check in every morning and the first thing I do is open the portal and I look for the shipments that are coming today and then after that I look for back orders and then at the very end of the day I go ahead and use the door to reorder what we sold that day.",
+          "theme": "workflow",
+          "emotion": "neutral",
+          "persona": "retailer"
+        }
+      ]
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:36.162948"
+  },
+  {
+    "id": "dcff5863-b209-4750-9cb4-ecbf4018e6bd",
+    "messageId": "dcff5863-b209-4750-9cb4-ecbf4018e6bd",
+    "content": "It sounds like you have a routine for using the ordering portal. Could you tell me more about the process of looking for shipments and back orders in the portal? How easy or challenging is it to find that information?",
+    "semantic": {
+      "themes": [
+        "workflow",
+        "navigation"
+      ],
+      "emotions": [
+        "neutral"
+      ],
+      "affinity_hint": "The user has a routine for using the ordering portal, focusing on looking for shipments and back orders.",
+      "follow_up_questions": [
+        "Can you share what specifically you do to look for shipments and back orders in the ordering portal?",
+        "Could you give me an example of a situation where finding this information was particularly easy or difficult?",
+        "What improvements would you suggest for the ordering portal?"
+      ],
+      "intent": "clarify",
+      "frustration_markers": [],
+      "interaction_modality": "spoken",
+      "task_success": "not applicable",
+      "ux_heuristic_violations": [],
+      "phase": "",
+      "persona": "",
+      "goal_satisfaction": "not applicable",
+      "pain_points": [],
+      "quotes": []
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:37.162948"
+  },
+  {
+    "id": "d4bd5879-d083-4db6-b13f-d615dc5d73c6",
+    "messageId": "d4bd5879-d083-4db6-b13f-d615dc5d73c6",
+    "content": "Well, it's not that intuitive. I have to click through several menus to find the shipment tracking page, and often I have to log out and log back in because the system times out while I'm checking inventory. The back orders section is buried in a submenu that's hard to find. I've just memorized the steps after using it daily for months.",
+    "semantic": {
+      "themes": [
+        "navigation",
+        "system status",
+        "workflow"
+      ],
+      "emotions": [
+        "frustration"
+      ],
+      "affinity_hint": "Difficulty navigating through the system",
+      "follow_up_questions": [
+        "Can you show me how you navigate to the shipment tracking page?",
+        "What steps do you need to take to check the inventory?",
+        "Can you describe where the back orders section is located?"
+      ],
+      "intent": "feedback",
+      "frustration_markers": [
+        "it's not that intuitive",
+        "I have to click through several menus",
+        "I have to log out and log back in",
+        "the system times out while I'm checking inventory",
+        "buried in a submenu that's hard to find"
+      ],
+      "interaction_modality": "spoken",
+      "task_success": "partial success",
+      "ux_heuristic_violations": [
+        "visibility of system status",
+        "match between system and real world",
+        "user control and freedom"
+      ],
+      "phase": "",
+      "persona": "retailer",
+      "goal_satisfaction": "partially achieved",
+      "pain_points": [
+        {
+          "issue": "Poor system navigation",
+          "frequency": "High - daily use mentions having to manage through difficulties consistently",
+          "impact": "High - affects daily workflow and tasks",
+          "severity_score": 4,
+          "sentiment": "negative",
+          "quote": "Well, it's not that intuitive. I have to click through several menus to find the shipment tracking page, and often I have to log out and log back in because the system times out while I'm checking inventory."
+        },
+        {
+          "issue": "Unavailable system status",
+          "frequency": "Unknown",
+          "impact": "Moderate - forces logouts and logins",
+          "severity_score": 3,
+          "sentiment": "negative",
+          "quote": "The system times out while I'm checking inventory."
+        },
+        {
+          "issue": "Challenging Access to back orders",
+          "frequency": "Unknown",
+          "impact": "High - poor discoverability affects task execution",
+          "severity_score": 4,
+          "sentiment": "negative",
+          "quote": "The back orders section is buried in a submenu that's hard to find."
+        }
+      ],
+      "quotes": [
+        {
+          "text": "Well, it's not that intuitive. I have to click through several menus to find the shipment tracking page, and often I have to log out and log back in because the system times out while I'm checking inventory.",
+          "theme": "navigation",
+          "emotion": "frustration",
+          "persona": "retailer"
+        },
+        {
+          "text": "The back orders section is buried in a submenu that's hard to find. I've just memorized the steps after using it daily for months.",
+          "theme": "workflow",
+          "emotion": "frustration",
+          "persona": "retailer"
+        }
+      ]
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:38.162948"
+  },
+  {
+    "id": "40f61082-d0ad-4558-b5fc-03d0a3fdaa5c",
+    "messageId": "40f61082-d0ad-4558-b5fc-03d0a3fdaa5c",
+    "content": "Thank you for that detailed explanation. That's really helpful to understand the navigation challenges. When you mentioned you \"use the door to reorder\" at the end of the day, could you explain what you mean by that?",
+    "semantic": {
+      "themes": [
+        "navigation",
+        "terminology"
+      ],
+      "emotions": [
+        "neutral",
+        "interest"
+      ],
+      "affinity_hint": "The assistant's intent is to understand the user\u2019s workaround and explore potential issues with the system\u2019s navigation.",
+      "follow_up_questions": [
+        "Can you detail your daily tasks related to the usage of the 'door to reorder'?",
+        "Are there any specific situations or conditions that make you use this method?"
+      ],
+      "intent": "clarify",
+      "frustration_markers": [],
+      "interaction_modality": "spoken",
+      "task_success": "not applicable",
+      "ux_heuristic_violations": [],
+      "phase": "Not provided",
+      "persona": "Not provided",
+      "goal_satisfaction": "not applicable",
+      "pain_points": [],
+      "quotes": [
+        {
+          "text": "Thank you for that detailed explanation. That's really helpful to understand the navigation challenges. When you mentioned you 'use the door to reorder' at the end of the day, could you explain what you mean by that?",
+          "theme": "navigation, terminology",
+          "emotion": "neutral, interest",
+          "persona": "assistant"
+        }
+      ]
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:39.162948"
+  },
+  {
+    "id": "903d6f94-6933-4339-9634-6ca6df72f5da",
+    "messageId": "903d6f94-6933-4339-9634-6ca6df72f5da",
+    "content": "Oh sorry, that's just what we call the reordering system internally. It's actually the \"Daily Order Operations and Reordering\" module, so D.O.O.R. for short. It's where we input all the products we need to replenish based on daily sales.",
+    "semantic": {
+      "themes": [
+        "terminology"
+      ],
+      "emotions": [
+        "neutral"
+      ],
+      "affinity_hint": "Internal jargon and the system's naming",
+      "follow_up_questions": [
+        "Do you find the D.O.O.R. module easy to use?",
+        "Are there any features you wish D.O.O.R. had to make the reordering process easier?",
+        "Does the name D.O.O.R. reflect its functionality and make sense for its users?"
+      ],
+      "intent": "clarify",
+      "frustration_markers": [],
+      "interaction_modality": "spoken",
+      "task_success": "success",
+      "ux_heuristic_violations": [],
+      "phase": "",
+      "persona": "retailer",
+      "goal_satisfaction": "achieved",
+      "pain_points": [],
+      "quotes": [
+        {
+          "text": "Oh sorry, that's just what we call the reordering system internally. It's actually the \"Daily Order Operations and Reordering\" module, so D.O.O.R. for short. It's where we input all the products we need to replenish based on daily sales.",
+          "theme": "terminology",
+          "emotion": "neutral",
+          "persona": "retailer"
+        }
+      ]
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:40.162948"
+  },
+  {
+    "id": "57e51e0e-d5b0-454b-a048-09485ca8b780",
+    "messageId": "57e51e0e-d5b0-454b-a048-09485ca8b780",
+    "content": "I see, thank you for clarifying. How would you describe your overall satisfaction with the ordering portal?",
+    "semantic": {
+      "themes": [],
+      "emotions": [
+        "neutral"
+      ],
+      "affinity_hint": "Participant's response to this question could provide insight into their overall user experience and satisfaction",
+      "follow_up_questions": [
+        "Can you tell me about any challenges you've faced when using the ordering portal?",
+        "What features do you find most useful in the ordering portal?",
+        "What improvements would you suggest for the ordering portal?"
+      ],
+      "intent": "request help",
+      "frustration_markers": [],
+      "interaction_modality": "spoken",
+      "task_success": "not applicable",
+      "ux_heuristic_violations": [],
+      "phase": "none",
+      "persona": "none",
+      "goal_satisfaction": "not applicable",
+      "pain_points": [],
+      "quotes": []
+    },
+    "user": {
+      "name": "System"
+    },
+    "timestamp": "2025-05-22T22:02:41.162948"
+  },
+  {
+    "id": "11",
+    "messageId": "de01cc08-7ae8-4efe-b212-70a01e27a87b",
+    "content": "help",
+    "user": {
+      "name": "Current User"
+    },
+    "timestamp": "2025-06-03 18:03:37.088822"
+  },
+  {
+    "id": "12",
+    "messageId": "903d6f94-6933-4339-9634-6ca6df72f5da",
+    "content": "not so fast",
+    "user": {
+      "name": "Current User"
+    },
+    "timestamp": "2025-06-03 18:14:30.842324"
+  }
+]

@@ -484,6 +484,22 @@
 </div>
 
 <script>
+// Define the delete session function at the top
+function confirmDeleteSession() {
+    if (confirm('Are you sure you want to delete this session? This action cannot be undone.')) {
+        fetch(`/api/session/{{ session.id }}`, { method: 'DELETE' })
+            .then(resp => resp.json())
+            .then(data => {
+                if (data.success) {
+                    window.location.href = '/discussion_guide/{{ guide.id }}';
+                } else {
+                    alert('Error deleting session: ' + (data.error || 'Unknown error'));
+                }
+            })
+            .catch(err => alert('Error deleting session: ' + err));
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     // Get DOM elements
     const completeSessionBtn = document.getElementById('completeSessionBtn');
@@ -799,20 +815,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
     }
-
-window.confirmDeleteSession = function() {
-    if (confirm('Are you sure you want to delete this session? This action cannot be undone.')) {
-        fetch(`/api/session/{{ session.id }}`, { method: 'DELETE' })
-            .then(resp => resp.json())
-            .then(data => {
-                if (data.success) {
-                    window.location.href = '/discussion_guide/{{ guide.id }}';
-                } else {
-                    alert('Error deleting session: ' + (data.error || 'Unknown error'));
-                }
-            })
-            .catch(err => alert('Error deleting session: ' + err));
-    }
-}
+});
 </script>
 {% endblock %} 

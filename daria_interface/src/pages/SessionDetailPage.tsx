@@ -4,7 +4,7 @@ import SessionCard from '../components/shared/SessionCard';
 import TranscriptTab from '../components/TranscriptTab';
 import AnalysisTab from '../components/AnalysisTab';
 import SemanticSearchTab from '../components/SemanticSearchTab';
-import AnnotationsTab from '../components/AnnotationsTab'; // To be created
+import AnnotationsTab from '../components/AnnotationsTab';
 import axios from 'axios';
 
 interface Message {
@@ -107,7 +107,7 @@ const SessionDetailPage: React.FC = () => {
             <AnalysisTab analysis={session.session.analysis} />
           )}
           {activeTab === 'annotations' && (
-            <AnnotationsTab messages={session.session.messages || []} sessionId={session.session.id} />
+            <AnnotationsTab messages={session.session.messages || []} sessionId={sessionId || ''} />
           )}
           {activeTab === 'semantic' && sessionId && (
             <SemanticSearchTab sessionId={sessionId} />

@@ -16,6 +16,9 @@ from pathlib import Path
 from flask import Flask, request, jsonify, render_template, send_from_directory
 from flask_cors import CORS
 
+from semantic_pipeline import chunk_transcript, embed_chunks, tag_chunk
+from vector_store import add_chunks_to_vector_store, semantic_search
+
 # Set up logging
 logging.basicConfig(
     level=logging.INFO,
@@ -365,9 +368,31 @@ def interview_archive():
     interviews = load_interviews()
     return render_template('langchain/interview_archive.html', interviews=interviews)
 
-from flask import Flask, jsonify, request
+# add semantic search routes
+@app.route('/api/semantic_ingest', methods=['POST'])
+def semantic_ingest():
+    data = request.json
+    transcript = data['transcript']
+    metadata = data.get('metadata', {})
+    chunks = chunk_transcript(transcript)
+    embeddings = embed_chunks(chunks)
+    tags = [tag_chunk(chunk, metadata) for chunk in chunks]
+    add_chunks_to_vector_store(chunks, embeddings, [metadata]*len(chunks))
+    return jsonify({"chunks": chunks, "tags": tags})
 
-app = Flask(__name__)
+@app.route('/api/semantic_search', methods=['POST'])
+def semantic_search_api():
+    try:
+        data = request.json
+        print("Received data:", data)  # Debug print
+        query = data['query']
+        query_embedding = embed_chunks([query])[0]
+        results = semantic_search(query_embedding)
+        return jsonify(results)
+    except Exception as e:
+        print("Semantic search error:", e)
+        return jsonify({"error": str(e)}), 500
+
 
 # --- Research Assistants Endpoint ---
 @app.route('/api/research-assistants', methods=['GET'])
@@ -704,7 +729,7 @@ if __name__ == "__main__":
                 // Set up navigation if guide_id is present
                 if (session.guide_id) {
                     document.getElementById('session-nav').innerHTML = 
-                        `<a href="/discussion_guide/${session.guide_id}">&larr; Back to guide</a>`;
+                        `<a href="/discussion_guide/${session.guide_id}">&larr; Back to guide 123</a>`;
                 }
                 
                 // Display metadata

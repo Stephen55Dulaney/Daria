@@ -12,7 +12,7 @@ def add_chunks_to_vector_store(chunks, embeddings, metadatas):
             metadatas=[metadata],
             ids=[str(uuid.uuid4())]
         )
-    client.persist()
+    #client.persist()
 
 def semantic_search(query_embedding, top_k=10, filters=None):
     query_args = {

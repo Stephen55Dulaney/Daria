@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Gallery from '../components/shared/Gallery';
+import Gallery from '../components/shared/CharacterDetail';
 import Select from '../components/shared/Select';
 import Card from '../components/shared/Card';
 import LoadingSpinner from '../components/shared/LoadingSpinner';
 import Button from '../components/shared/Button';
 import { analysisService } from '../services/analysisService';
 import type { ResearchAssistant, AnalysisResult } from '../services/analysisService';
+import axios from 'axios';
 
 interface GalleryItem {
   id: string;
@@ -17,6 +18,13 @@ interface GalleryItem {
   type: 'character' | 'analysis';
 }
 
+interface Character {
+  name: string;
+  display_name: string;
+  description: string;
+  role: string;
+}
+
 const GalleryPage: React.FC = () => {
   const { assistantId } = useParams<{ assistantId?: string }>();
   const navigate = useNavigate();
@@ -24,6 +32,7 @@ const GalleryPage: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [researchAssistants, setResearchAssistants] = useState<ResearchAssistant[]>([]);
   const [savedAnalyses, setSavedAnalyses] = useState<AnalysisResult[]>([]);
+  const [characters, setCharacters] = useState<Character[]>([]);
 
   useEffect(() => {
     const loadData = async () => {
@@ -45,12 +54,18 @@ const GalleryPage: React.FC = () => {
     loadData();
   }, []);
 
+  useEffect(() => {
+    axios.get('/api/characters').then(res => {
+      setCharacters(res.data.characters);
+    });
+  }, []);
+
   const allItems: GalleryItem[] = [
-    ...researchAssistants.map(assistant => ({
-      id: assistant.id,
-      title: assistant.name,
-      description: assistant.description,
-      imageUrl: assistant.imageUrl,
+    ...characters.map(char => ({
+      id: char.name,
+      title: char.display_name || char.name,
+      description: char.description,
+      imageUrl: '', // or char.imageUrl if available
       createdAt: new Date().toISOString(),
       type: 'character' as const,
     })),
