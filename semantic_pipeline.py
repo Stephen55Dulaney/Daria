@@ -130,7 +130,7 @@ if __name__ == "__main__":
     session_id = "your-session-id"
     annotations = []
 
-    with open("data/annotations/session_file.json", "r") as f:
+    with open("path/to/your/p/session_file.json", "r") as f:
         session = json.load(f)
 
     for msg in session["messages"]:

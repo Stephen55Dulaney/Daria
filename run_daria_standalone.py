@@ -103,6 +103,34 @@ def health_check():
         'timestamp': datetime.datetime.now().isoformat()
     })
 
+
+# --- Research Assistants Endpoint ---
+@app.route('/api/research-assistants', methods=['GET'])
+def get_research_assistants():
+    # Replace with your real data source or file/database read
+    assistants = [
+        {"id": "1", "name": "Thomas", "description": "Expert in user research", "imageUrl": "/images/thomas.jpg"},
+        {"id": "2", "name": "Synthia", "description": "Qualitative data specialist", "imageUrl": "/images/synthia.jpg"}
+    ]
+    return jsonify(assistants)
+
+# --- Gallery Analyses Endpoint (GET) ---
+@app.route('/api/gallery/analysis', methods=['GET'])
+def get_gallery_analysis():
+    # Replace with your real data source or file/database read
+    analyses = [
+        {"id": "a1", "title": "Sample Analysis", "content": "Findings...", "createdAt": "2024-05-26", "assistantId": "1"}
+    ]
+    return jsonify(analyses)
+
+# --- Save Analysis to Gallery (POST) ---
+@app.route('/api/gallery/analysis', methods=['POST'])
+def save_gallery_analysis():
+    data = request.json
+    # Here you would save the data to your file/database
+    # For now, just echo it back
+    return jsonify(data), 201
+
 @app.route('/api/sessions')
 def get_sessions():
     """Get all interview sessions."""

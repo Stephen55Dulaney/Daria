@@ -729,7 +729,7 @@ if __name__ == "__main__":
                 // Set up navigation if guide_id is present
                 if (session.guide_id) {
                     document.getElementById('session-nav').innerHTML = 
-                        `<a href="/discussion_guide/${session.guide_id}">&larr; Back to guide 123</a>`;
+                        `<a href="/discussion_guide/${session.guide_id}">&larr; Back to guide</a>`;
                 }
                 
                 // Display metadata

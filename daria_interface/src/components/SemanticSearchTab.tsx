@@ -150,7 +150,7 @@ const SemanticSearchTab: React.FC<SemanticSearchTabProps> = ({ sessionId }) => {
       </div>
 
       {/* Debug Information */}
-      {process.env.NODE_ENV === 'development' && debugInfo.rawResults && (
+      {import.meta.env.DEV && debugInfo.rawResults && (
         <div className="mt-8 p-4 bg-gray-100 rounded">
           <h3 className="font-bold mb-2">Debug Information</h3>
           <div className="text-xs">
